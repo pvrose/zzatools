@@ -42,9 +42,10 @@ class qso_dxcc :
         virtual void draw_cell(TableContext context, int R = 0, int C = 0, int X = 0, int Y = 0,
             int W = 0, int H = 0);
 
-        void set_qso(record* qso, string nickname);
+        void set_data();
 
     protected:
+
         // Worked data
         struct wkd_line {
             string text;
@@ -54,11 +55,7 @@ class qso_dxcc :
         };
         // worked matrix
         map < worked_t, wkd_line > wkd_matrix_;
-        // Station callsign
-        string call_;
-
-
-    };
+     };
 
 public:
     qso_dxcc(int X, int Y, int W, int H, const char* L = nullptr);
@@ -119,6 +116,8 @@ protected:
     bool show_extract_;
     // The continent
     string continent_;
+    // Station callsign
+    string station_;
 
     // BAnd worked
     band_set* bands_worked_;

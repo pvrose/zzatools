@@ -1071,17 +1071,13 @@ void book::add_use_data(record* use_record) {
 	// Do not look at SWL records
 	if (use_record->item("SWL") == "") {
 		string band = use_record->item("BAND");
-		int dxcc;
-		use_record->item("DXCC", dxcc);
+		string dxcc = use_record->item("DXCC");
 		string call = use_record->item("STATION_CALLSIGN");
 		string grid = use_record->item("GRIDSQUARE");
-		int grid4;
-		if (grid.length() < 4) grid4 = -1;
-		else grid4 = hashed(grid.substr(0, 4));
-		int cqz;
-		use_record->item("CQZ", cqz);
-		if (cqz == 0) cqz = -1;
-		int cont = hashed(use_record->item("CONT"));
+		if (grid.length() < 4) grid = "";
+		else grid = grid.substr(0, 4);
+		string cqz = use_record->item("CQZ");
+		string cont = use_record->item("CONT");
 
 		if (band == "") {
 			// Get the band from the frequency 
@@ -1093,11 +1089,11 @@ void book::add_use_data(record* use_record) {
 		if (band.length()) {
 			used_bands_.insert(band);
 			bands_[call][WK_DXCC][dxcc].insert(band);
-			bands_[call][WK_GRID4][grid4].insert(band);
+			bands_[call][WK_GRID4][grid].insert(band);
 			bands_[call][WK_CQZ][cqz].insert(band);
 			bands_[call][WK_CONT][cont].insert(band);
 			bands_[""][WK_DXCC][dxcc].insert(band);
-			bands_[""][WK_GRID4][grid4].insert(band);
+			bands_[""][WK_GRID4][grid].insert(band);
 			bands_[""][WK_CQZ][cqz].insert(band);
 			bands_[""][WK_CONT][cont].insert(band);
 		}
@@ -1105,11 +1101,11 @@ void book::add_use_data(record* use_record) {
 		if (mode.length()) {
 			used_modes_.insert(mode);
 			modes_[call][WK_DXCC][dxcc].insert(mode);
-			modes_[call][WK_GRID4][grid4].insert(mode);
+			modes_[call][WK_GRID4][grid].insert(mode);
 			modes_[call][WK_CQZ][cqz].insert(mode);
 			modes_[call][WK_CONT][cont].insert(mode);
 			modes_[""][WK_DXCC][dxcc].insert(mode);
-			modes_[""][WK_GRID4][grid4].insert(mode);
+			modes_[""][WK_GRID4][grid].insert(mode);
 			modes_[""][WK_CQZ][cqz].insert(mode);
 			modes_[""][WK_CONT][cont].insert(mode);
 		}
@@ -1120,11 +1116,11 @@ void book::add_use_data(record* use_record) {
 		if (submode.length()) {
 			used_submodes_.insert(submode);
 			submodes_[call][WK_DXCC][dxcc].insert(submode);
-			submodes_[call][WK_GRID4][grid4].insert(submode);
+			submodes_[call][WK_GRID4][grid].insert(submode);
 			submodes_[call][WK_CQZ][cqz].insert(submode);
 			submodes_[call][WK_CONT][cont].insert(submode);
 			submodes_[""][WK_DXCC][dxcc].insert(submode);
-			submodes_[""][WK_GRID4][grid4].insert(submode);
+			submodes_[""][WK_GRID4][grid].insert(submode);
 			submodes_[""][WK_CQZ][cqz].insert(submode);
 			submodes_[""][WK_CONT][cont].insert(submode);
 		}
@@ -1243,16 +1239,16 @@ band_set* book::used_bands() {
 	return &used_bands_;
 }
 
-band_set* book::used_bands(worked_t category = WK_ANY, string entity = "", string call = "") {
-	return used_bands(category, hashed(entity), call);
+band_set* book::used_bands(worked_t category = WK_ANY, int32_t entity = 0, string call = "") {
+	return used_bands(category, to_string(entity), call);
 }
 
-band_set* book::used_bands(worked_t category = WK_ANY, int32_t entity = 0, string call = "") {
+band_set* book::used_bands(worked_t category = WK_ANY, string entity = "", string call = "") {
 	band_set* result = nullptr;
 	if (category == WK_ANY) return &used_bands_;
 	else if (bands_.find(call) == bands_.end());
 	else if (bands_.at(call).find(category) == bands_.at(call).end());
-	else if (bands_.at(call).at(category).find(entity) == bands_.at(call).at(category).end() || entity == -1);
+	else if (bands_.at(call).at(category).find(entity) == bands_.at(call).at(category).end() || entity == "-1");
 	else return &bands_.at(call).at(category).at(entity);
 	return result;
 }
@@ -1262,16 +1258,16 @@ set<string>* book::used_modes() {
 	return &used_modes_;
 }
 
-set<string>* book::used_modes(worked_t category = WK_ANY, string entity = "", string call = "") {
-	return used_modes(category, hashed(entity), call);
+set<string>* book::used_modes(worked_t category = WK_ANY, int32_t entity = 0, string call = "") {
+	return used_modes(category, to_string(entity), call);
 }
 
-set<string>* book::used_modes(worked_t category = WK_ANY, int32_t entity = 0, string call = "") {
+set<string>* book::used_modes(worked_t category = WK_ANY, string entity = "", string call = "") {
 	set<string>* result = nullptr;
 	if (category == WK_ANY) return &used_modes_;
 	else if (modes_.find(call) == modes_.end());
 	else if (modes_.at(call).find(category) == modes_.at(call).end());
-	else if (modes_.at(call).at(category).find(entity) == modes_.at(call).at(category).end() || entity == -1);
+	else if (modes_.at(call).at(category).find(entity) == modes_.at(call).at(category).end() || entity == "-1");
 	else return &modes_.at(call).at(category).at(entity);
 	return result;
 }
@@ -1281,16 +1277,16 @@ set<string>* book::used_submodes() {
 	return &used_submodes_;
 }
 
-set<string>* book::used_submodes(worked_t category = WK_ANY, string entity = "", string call = "") {
-	return used_submodes(category, hashed(entity), call);
+set<string>* book::used_submodes(worked_t category = WK_ANY, int32_t entity = 0, string call = "") {
+	return used_submodes(category, to_string(entity), call);
 }
 
-set<string>* book::used_submodes(worked_t category = WK_ANY, int32_t entity = 0, string call = "") {
+set<string>* book::used_submodes(worked_t category = WK_ANY, string entity = "", string call = "") {
 	set<string>* result = nullptr;
 	if (category == WK_ANY) return &used_submodes_;
 	else if (submodes_.find(call) == submodes_.end());
 	else if (submodes_.at(call).find(category) == submodes_.at(call).end());
-	else if (submodes_.at(call).at(category).find(entity) == submodes_.at(call).at(category).end() || entity == -1);
+	else if (submodes_.at(call).at(category).find(entity) == submodes_.at(call).at(category).end() || entity == "-1");
 	else return &submodes_.at(call).at(category).at(entity);
 	return result;
 }
@@ -1702,16 +1698,4 @@ bool book::is_dirty() {
 // Is this record dirty
 bool book::is_dirty_record(record* qso) {
 	return (dirty_qsos_.find(qso) != dirty_qsos_.end());
-}
-
-// Convert upto 4 character string into integer
-int32_t book::hashed(string s) {
-	if (s.length() > 4) return -1;
-	else {
-		int result = 0;
-		for (int ix = s.length() - 1; ix >= 0; ix--) {
-			result = (result << 8) + (int)s[ix];
-		}
-		return result;
-	}
 }

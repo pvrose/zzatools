@@ -77,6 +77,7 @@ using namespace std;
 		WK_GRID4,                 // 4-character gridsquares
 		WK_CQZ,                   // CQ Zone
 		WK_CONT,                  // Continent
+		WK_PAS,                   // Prmary Admin: Subdiv: (eg US State)
 	};
 
 	// The records are kept in a container with size_t as index
@@ -245,9 +246,6 @@ using namespace std;
 		// Book is dirty
 		bool is_dirty();
 
-		// Convert short string to integer
-		int32_t hashed(string s);
-
 		// Protected attributes
 	protected:
 		// current selected item number
@@ -293,11 +291,11 @@ using namespace std;
 		// Ignore null macros
 		bool ignore_null_;
 		// Bands worked per DXCC
-		map < string, map < worked_t, map < int, band_set > > > bands_;
+		map < string, map < worked_t, map < string, band_set > > > bands_;
 		// mOdes worked per DXCC
-		map < string, map < worked_t, map < int, set<string> > > > modes_;
+		map < string, map < worked_t, map < string, set<string> > > > modes_;
 		// submOdes worked per DXCC
-		map < string, map < worked_t, map < int, set<string> > > > submodes_;
+		map < string, map < worked_t, map < string, set<string> > > > submodes_;
 		// match query question
 		string match_question_;
 		// INhibit automatic save -

@@ -107,6 +107,7 @@ void qso_dxcc::create_form() {
 	g_wb4_ = new wb4_table(curr_x, curr_y, avail_width, avail_height, "Worked Before?");
 	//g_wb4_ = new wb4_buttons(curr_x, curr_y, avail_width, avail_height);
 	g_wb4_->align(FL_ALIGN_TOP);
+	g_wb4_->box(FL_BORDER_BOX);
 
 	end();
 	enable_widgets();
@@ -205,6 +206,7 @@ void qso_dxcc::set_data(record* qso) {
 	modes_worked_ = nullptr;
 	if (qso_) {
 		callsign_ = qso_->item("CALL");
+		station_ = qso_->item("STATION_CALLSIGN");
 		// Is a prefix supplied
 		nickname_ = cty_data_->nickname(qso_);
 		name_ = cty_data_->name(qso_);
@@ -214,7 +216,7 @@ void qso_dxcc::set_data(record* qso) {
 		dxcc_ = cty_data_->entity(qso_);
 		my_location_ = qso_->location(true);
 		continent_ = cty_data_->continent(qso_);
-		g_wb4_->set_qso(qso, nickname_);
+		g_wb4_->set_data();
 	}
 
 }
@@ -254,6 +256,7 @@ qso_dxcc::wb4_table::~wb4_table() {
 // inherited from Fl_Table
 void qso_dxcc::wb4_table::draw_cell(TableContext context, int R, int C, int X, int Y, int W, int H) {
 	worked_t cat = (worked_t)(R + 1);
+	qso_dxcc* qd = ancestor_view<qso_dxcc>(this);
 	switch (context) {
 	case CONTEXT_ROW_HEADER:
 		fl_color(FL_BACKGROUND_COLOR);
@@ -277,6 +280,8 @@ void qso_dxcc::wb4_table::draw_cell(TableContext context, int R, int C, int X, i
 				break;
 			case WK_CONT:
 				fl_draw("Continent", X, Y, W, H, FL_ALIGN_CENTER);
+				break;
+			default:
 				break;
 			}
 			fl_font(0, FL_NORMAL_SIZE);
@@ -342,27 +347,25 @@ void qso_dxcc::wb4_table::draw_cell(TableContext context, int R, int C, int X, i
 		fl_rectf(X1, Y1, W1, H1);
 		fl_color(FL_FOREGROUND_COLOR);
 		fl_yxline(X1, Y1, Y1 + H1 - 1, X1 + W1);
-		fl_draw(call_.c_str(), X1, Y1, W1, H1, FL_ALIGN_CENTER);
+		fl_draw(qd->station_.c_str(), X1, Y1, W1, H1, FL_ALIGN_CENTER);
 		break;
 	}
+	default:
+		break;
 	}
 }
 
 // Getthe data for the table
-void qso_dxcc::wb4_table::set_qso(record * qso, string nickname) {
-	if (qso == nullptr) return;
-	call_ = qso->item("STATION_CALLSIGN");
-	int dxcc;
-	qso->item("DXCC", dxcc);
-	int cqz;
-	qso->item("CQZ", cqz);
-	string grid = qso->item("GRIDSQUARE").substr(0, 4);
-	string cont = qso->item("CONT");
-	string band = qso->item("BAND");
-	string mode = qso->item("MODE");
+void qso_dxcc::wb4_table::set_data() {
+	qso_dxcc* qd = ancestor_view<qso_dxcc>(this);
 
-	band_set* dxcc_b = book_->used_bands(WK_DXCC, dxcc, call_);
-	set<string>* dxcc_m = book_->used_modes(WK_DXCC, dxcc, call_);
+	double freq;
+	qd->qso_->item("FREQ", freq);
+	string band = spec_data_->band_for_freq(freq);
+	string mode = qd->qso_->item("MODE");
+	string grid = qd->qso_->item("GRIDSQUARE").substr(0, 4);
+	band_set* dxcc_b = book_->used_bands(WK_DXCC, qd->dxcc_, qd->station_);
+	set<string>* dxcc_m = book_->used_modes(WK_DXCC, qd->dxcc_, qd->station_);
 	if (dxcc_b) {
 		wkd_matrix_[WK_DXCC].any = (bool)dxcc_b->size() == 0;
 		wkd_matrix_[WK_DXCC].band = dxcc_b->find(band) == dxcc_b->end();
@@ -377,10 +380,10 @@ void qso_dxcc::wb4_table::set_qso(record * qso, string nickname) {
 	else {
 		wkd_matrix_[WK_DXCC].mode = true;
 	}
-	wkd_matrix_[WK_DXCC].text = nickname;
+	wkd_matrix_[WK_DXCC].text = qd->nickname_;
 
-	band_set* grid_b = book_->used_bands(WK_GRID4, grid, call_);
-	set<string>* grid_m = book_->used_modes(WK_GRID4, grid, call_);
+	band_set* grid_b = book_->used_bands(WK_GRID4, grid, qd->station_);
+	set<string>* grid_m = book_->used_modes(WK_GRID4, grid, qd->station_);
 	if (grid_b) {
 		wkd_matrix_[WK_GRID4].any = (bool)grid_b->size() == 0;
 		wkd_matrix_[WK_GRID4].band = grid_b->find(band) == grid_b->end();
@@ -397,8 +400,8 @@ void qso_dxcc::wb4_table::set_qso(record * qso, string nickname) {
 	}
 	wkd_matrix_[WK_GRID4].text = grid;
 
-	band_set* cqz_b = book_->used_bands(WK_CQZ, cqz, call_);
-	set<string>* cqz_m = book_->used_modes(WK_CQZ, cqz, call_);
+	band_set* cqz_b = book_->used_bands(WK_CQZ, qd->cq_zone_, qd->station_);
+	set<string>* cqz_m = book_->used_modes(WK_CQZ, qd->cq_zone_, qd->station_);
 	if (cqz_b) {
 		wkd_matrix_[WK_CQZ].any = (bool)cqz_b->size() == 0;
 		wkd_matrix_[WK_CQZ].band = cqz_b->find(band) == cqz_b->end();
@@ -413,10 +416,10 @@ void qso_dxcc::wb4_table::set_qso(record * qso, string nickname) {
 	else {
 		wkd_matrix_[WK_CQZ].mode = true;
 	}
-	wkd_matrix_[WK_CQZ].text = cqz ? "CQZ " + qso->item("CQZ") : "";
+	wkd_matrix_[WK_CQZ].text = qd->cq_zone_ > 0 ? "CQZ " + to_string(qd->cq_zone_) : "";
 
-	band_set* cont_b = book_->used_bands(WK_CONT, cont, call_);
-	set<string>* cont_m = book_->used_modes(WK_CONT, cont, call_);
+	band_set* cont_b = book_->used_bands(WK_CONT, qd->continent_, qd->station_);
+	set<string>* cont_m = book_->used_modes(WK_CONT, qd->continent_, qd->station_);
 	if (cont_b) {
 		wkd_matrix_[WK_CONT].any = (bool)cont_b->size() == 0;
 		wkd_matrix_[WK_CONT].band = cont_b->find(band) == cont_b->end();
@@ -431,7 +434,7 @@ void qso_dxcc::wb4_table::set_qso(record * qso, string nickname) {
 	else {
 		wkd_matrix_[WK_CONT].mode = true;
 	}
-	wkd_matrix_[WK_CONT].text = cont;
+	wkd_matrix_[WK_CONT].text = qd->continent_;
 
 }
 
