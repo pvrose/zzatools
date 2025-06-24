@@ -192,7 +192,7 @@ void banner::start_progress(uint64_t max_value, object_t object, const char* msg
 	status_->misc_status(ST_PROGRESS, text);
 	snprintf(text, sizeof(text), "%s: %s.", OBJECT_NAMES.at(object), msg);
 	op_prog_title_->value(text);
-	snprintf(text, sizeof(text), "/%lld %s", max_value, suffix);
+	snprintf(text, sizeof(text), " out of %lld %s", max_value, suffix);
 	op_prog_value_->copy_label(text);
 	op_prog_value_->value("0");
 	fd_progress_->selection_color(OBJECT_COLOURS.at(object));
