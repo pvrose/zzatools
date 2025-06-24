@@ -635,6 +635,15 @@ time_t xml_reader::convert_xml_datetime(string value) {
 	long adjust = (long)(seconds / resolution);
 #ifdef _WIN32
 	time_t result = _mkgmtime(&tv);
+	// dates pre 1970 return -1
+	if (tv.tm_year < 70) {
+		tv.tm_year += 100;
+		double day_s = 24 * 60 * 60;
+		double cent_s = (100 * 365 + 24) * day_s;
+		result = _mkgmtime(&tv);
+		long long cent_t = cent_s / resolution;
+		result = result - cent_t;
+	}
 #else
 	time_t result = timegm(&tv);
 #endif
