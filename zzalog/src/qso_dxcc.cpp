@@ -31,7 +31,6 @@ qso_dxcc::qso_dxcc(int X, int Y, int W, int H, const char* L) :
 	, bands_worked_(nullptr)
 	, modes_worked_(nullptr)
 	, qso_(nullptr)
-	, show_extract_(false)
 {
 	labelfont(FL_BOLD);
 	labelsize(FL_NORMAL_SIZE + 2);
@@ -59,19 +58,15 @@ void qso_dxcc::create_form() {
 	op_call_->color(FL_BACKGROUND_COLOR);
 	op_call_->textfont(FL_BOLD);
 	op_call_->textsize(FL_NORMAL_SIZE + 2);
+	op_call_->tooltip("Current callsign of interest");
 	curr_x += op_call_->w();
 
 	// QRZ.com button
 	bn_qrz_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "QRZ.com");
 	bn_qrz_->callback(cb_bn_qrz, nullptr);
+	bn_qrz_->tooltip("Look up call in QRZ.com");
 
 	curr_y += bn_qrz_->h();
-
-	// Show all button
-	bn_show_extract_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Ext. Only");
-	bn_show_extract_->callback(cb_bn_show_xt, &show_extract_);
-	bn_show_extract_->value(show_extract_);
-
 
 	curr_x = x() + GAP;
 	curr_y = op_call_->y() + op_call_->h();
@@ -81,24 +76,28 @@ void qso_dxcc::create_form() {
 	op_prefix_->box(FL_FLAT_BOX);
 	op_prefix_->color(FL_BACKGROUND_COLOR);
 	op_prefix_->textfont(FL_BOLD);
+	op_prefix_->tooltip("Shows the DXCC of the call of interest");
 	curr_y += ROW_HEIGHT;
 
 	// Display how the DXCC was found (decoded or from exception file)
 	op_source_ = new Fl_Output(curr_x, curr_y, avail_width - WBUTTON, ROW_HEIGHT);
 	op_source_->box(FL_FLAT_BOX);
 	op_source_->color(FL_BACKGROUND_COLOR);
+	op_source_->tooltip("Shows how the DXCC was obtained - decoded or an exception");
 	curr_y += ROW_HEIGHT;
 
 	// Display geographic information
 	op_geo_ = new Fl_Output(curr_x, curr_y, avail_width, ROW_HEIGHT);
 	op_geo_->box(FL_FLAT_BOX);
 	op_geo_->color(FL_BACKGROUND_COLOR);
+	op_geo_->tooltip("Shows geographical data for the DXCC");
 	curr_y += ROW_HEIGHT;
 
 	// Display geographic information
 	op_dist_bear_ = new Fl_Output(curr_x, curr_y, avail_width, ROW_HEIGHT);
 	op_dist_bear_->box(FL_FLAT_BOX);
 	op_dist_bear_->color(FL_BACKGROUND_COLOR);
+	op_dist_bear_->tooltip("Shows the distance and bearing of the DXCC - centre or specified grid");
 	curr_y += ROW_HEIGHT + HTEXT;
 
 	avail_height -= (curr_y - y());
@@ -107,7 +106,8 @@ void qso_dxcc::create_form() {
 	g_wb4_ = new wb4_table(curr_x, curr_y, avail_width, avail_height, "Worked Before?");
 	//g_wb4_ = new wb4_buttons(curr_x, curr_y, avail_width, avail_height);
 	g_wb4_->align(FL_ALIGN_TOP);
-	g_wb4_->box(FL_BORDER_BOX);
+	g_wb4_->box(FL_FLAT_BOX);
+	g_wb4_->tooltip("Shows the worked before status: any, specific band or mode");
 
 	end();
 	enable_widgets();
@@ -192,10 +192,6 @@ void qso_dxcc::enable_widgets() {
 		op_geo_->value("Location N/A");
 		op_dist_bear_->value("Distance N/A");
 	}
-	if (book_ == navigation_book_) {
-		show_extract_ = false;
-		bn_show_extract_->value(show_extract_);
-	}
 }
 
 // Set the data - parse the callsign in the current qso
@@ -226,14 +222,6 @@ void qso_dxcc::cb_bn_qrz(Fl_Widget* w, void* v) {
 	qso_dxcc* that = ancestor_view<qso_dxcc>(w);
 	menu::cb_mi_info_qrz(w, (void*)&that->callsign_);
 }
-
-// Show extract
-void qso_dxcc::cb_bn_show_xt(Fl_Widget* w, void* v) {
-	cb_value<Fl_Light_Button, bool>(w, v);
-	qso_dxcc* that = ancestor_view<qso_dxcc>(w);
-	that->enable_widgets();
-}
-
 
 qso_dxcc::wb4_table::wb4_table(int X, int Y, int W, int H, const char* L) :
 	Fl_Table(X, Y, W, H, L) 
@@ -292,6 +280,7 @@ void qso_dxcc::wb4_table::draw_cell(TableContext context, int R, int C, int X, i
 		fl_rectf(X, Y, W, H);
 		fl_color(FL_FOREGROUND_COLOR);
 		fl_yxline(X, Y, Y + H - 1, X + W);
+		fl_line(X, Y, X + W, Y);
 		switch (C) {
 		case 0:
 			fl_draw("ANY", X, Y, W, H, FL_ALIGN_CENTER);
@@ -301,6 +290,7 @@ void qso_dxcc::wb4_table::draw_cell(TableContext context, int R, int C, int X, i
 			break;
 		case 2:
 			fl_draw("MODE", X, Y, W, H, FL_ALIGN_CENTER);
+			fl_line(X + W - 1, Y, X + W - 1, Y + H - 1);
 			break;
 		}
 		break;
@@ -320,6 +310,7 @@ void qso_dxcc::wb4_table::draw_cell(TableContext context, int R, int C, int X, i
 			break;
 		case 2:
 			new_entity = w.mode;
+			fl_line(X + W - 1, Y, X + W - 1, Y + H - 1);
 			break;
 		}
 		if (w.text.length()) {
@@ -347,7 +338,9 @@ void qso_dxcc::wb4_table::draw_cell(TableContext context, int R, int C, int X, i
 		fl_rectf(X1, Y1, W1, H1);
 		fl_color(FL_FOREGROUND_COLOR);
 		fl_yxline(X1, Y1, Y1 + H1 - 1, X1 + W1);
+		fl_line(X1, Y1, X1 + W1, Y1);
 		fl_draw(qd->station_.c_str(), X1, Y1, W1, H1, FL_ALIGN_CENTER);
+		// Also draw top and left lines
 		break;
 	}
 	default:
