@@ -96,9 +96,8 @@ bool wx_handler::start_element(string name, map<string, string>* attributes) {
 	else if (element_name == "MESSAGE") result = start_message() || result;
 	else {
 		char* message = new char[50 + element_name.length()];
-		sprintf(message, "WX_HANDLER: Unexpected XML element %s encountered - ignored", element_name.c_str());
-		status_->misc_status(ST_WARNING, message);
-		delete[] message;
+        sprintf(message, "WX_HANDLER: Unexpected XML element %s encountered - ignored", element_name.c_str());
+        Fl::awake(cb_fetch_error, message);
 		result = false;
 	}
 
@@ -145,9 +144,8 @@ bool wx_handler::end_element(string name) {
 
 	char* message = new char[50 + name.length()];
 	sprintf(message, "WX_HANDLER: Invalid XML - mismatch start and end of element %s", name.c_str());
-	status_->misc_status(ST_ERROR, message);
-	delete[] message;
-	return false;
+    Fl::awake(cb_fetch_error, message);
+    return false;
 }
 
 // Special element
@@ -237,6 +235,12 @@ void wx_handler::cb_fetch_done(void* v) {
     qso_manager_->enable_widgets();
 }
 
+// Static call back: WX fetch complete
+void wx_handler::cb_fetch_error(void* v) {
+    status_->misc_status(ST_ERROR, (char*)v);
+    qso_manager_->enable_widgets();
+}
+
 // Get the various weather items - 
 // summation icon
 Fl_Image* wx_handler::icon() {
@@ -321,7 +325,7 @@ float wx_handler::pressure() {
 // The overall XML container CURRENT
 bool wx_handler::start_current() {
     if (elements_.size()) {
-        status_->misc_status(ST_ERROR, "WX_HANDLER: Incorrect XML - unexpected adif element");
+        Fl::awake(cb_fetch_error, "WX_HANDLER: Incorrect XML - unexpected adif element");
         return false;
 	}
 	else {
@@ -721,7 +725,7 @@ bool wx_handler::start_clienterror() {
 bool wx_handler::end_clienterror() {
     char msg[128];
     snprintf(msg, sizeof(msg), "WX_HANDLER: Rejected: %d (%s)", error_code_, error_message_.c_str());
-    status_->misc_status(ST_ERROR, msg);
+    Fl::awake(cb_fetch_error, msg);
     return true;
 }
 
@@ -771,7 +775,7 @@ time_t wx_handler::convert_date(string s) {
     } else {
         char msg[128];
         snprintf(msg, sizeof(msg), "WX_HANDLER: Invalid date received %s", s.c_str());
-        status_->misc_status(ST_ERROR, msg);
+        Fl::awake(cb_fetch_error, msg);
         return 0;
     }
 }
@@ -786,11 +790,7 @@ Fl_Image* wx_handler::fetch_icon(string name) {
         Fl_PNG_Image* result = new Fl_PNG_Image(nullptr, (unsigned char*)ss.str().c_str(), ss.str().length());
         return result;
     } else {
-        status_->misc_status(ST_ERROR, "WX_HANDLER: WX icon read failed - see pop-up help wiindow");
-        Fl_Help_Dialog* dlg = new Fl_Help_Dialog();
-        ss.seekg(ios::beg);
-        dlg->load(ss.str().c_str());
-        dlg->show();
+        Fl::awake(cb_fetch_error, "WX_HANDLER: WX icon read failed");
         return nullptr;
     }
 }

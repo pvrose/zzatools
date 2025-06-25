@@ -101,6 +101,8 @@ public:
     static void cb_ticker(void* v);
     // Fetch complete callback
     static void cb_fetch_done(void* v);
+    // Fetch error
+    static void cb_fetch_error(void* v);
     
     // Get the various weather items - 
     // summation icon
