@@ -603,7 +603,12 @@ void qso_qsl::qsl_mark_done() {
 		string via_name;
 		string today = now(false, "%Y%m%d");
 		bool overwrite = false;
-		switch(extract_records_->use_mode()) {
+		extract_data::extract_mode_t mode = extract_records_->use_mode();
+		if (single_qso_) {
+			if  (via_code_ == "B") mode = extract_data::extract_mode_t::CARD;
+			else if (via_code_ == "E") mode = extract_data::extract_mode_t::EMAIL;
+		}
+		switch(mode) {
 		case extract_data::extract_mode_t::CARD:
 		case extract_data::extract_mode_t::EMAIL:
 			date_name = "QSLSDATE";
