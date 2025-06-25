@@ -81,7 +81,7 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;    // Default height for table rows
 		{ OT_ADIF, fl_color_average(FL_RED, FL_YELLOW, (float)(1.0 / 3.0)) },
 		{ OT_REPORT, fl_color_average(FL_RED, FL_WHITE, 0.25) },
 		{ OT_DXCC, FL_YELLOW },
-		{ OT_BAND, FL_GRAY },
+		{ OT_BAND, COLOUR_CLARET },
 		{ OT_CARD, fl_color_average(FL_BLUE, FL_WHITE, 0.25) },
 		{ OT_WSJTX, COLOUR_NAVY },
 		{ OT_RIGS, COLOUR_PINK },
