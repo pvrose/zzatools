@@ -325,7 +325,7 @@ float wx_handler::pressure() {
 // The overall XML container CURRENT
 bool wx_handler::start_current() {
     if (elements_.size()) {
-        Fl::awake(cb_fetch_error, "WX_HANDLER: Incorrect XML - unexpected adif element");
+        Fl::awake(cb_fetch_error, (void*)"WX_HANDLER: Incorrect XML - unexpected adif element");
         return false;
 	}
 	else {
@@ -790,7 +790,7 @@ Fl_Image* wx_handler::fetch_icon(string name) {
         Fl_PNG_Image* result = new Fl_PNG_Image(nullptr, (unsigned char*)ss.str().c_str(), ss.str().length());
         return result;
     } else {
-        Fl::awake(cb_fetch_error, "WX_HANDLER: WX icon read failed");
+        Fl::awake(cb_fetch_error, (void *)"WX_HANDLER: WX icon read failed");
         return nullptr;
     }
 }
