@@ -74,11 +74,11 @@ bool qsl_reader::start_qsl_data(xml_wreader* that, map<string, string>* attribut
 	for (auto it : *attributes) {
 		string name = to_upper(it.first);
 		if (name == "VERSION") {
-			if (!((qsl_reader*)that)->check_version(it.second)) {
-				return false;
-			} else {
+			//if (!((qsl_reader*)that)->check_version(it.second)) {
+			//	return false;
+			//} else {
 				return true;
-			}
+			//}
 			// else 
 			char msg[128];
 			snprintf(msg, sizeof(msg), "QSL: Unexpected attribute %s=%s in QSL_DATA element",

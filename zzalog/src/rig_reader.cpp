@@ -73,9 +73,9 @@ bool rig_reader::start_rigs(xml_wreader* that, map<string, string>* attributes) 
 	for (auto it : *attributes) {
 		string name = to_upper(it.first);
 		if (name == "VERSION") {
-			if (!((rig_reader*)that)->check_version(it.second)) {
-				return false;
-			}
+			//if (!((rig_reader*)that)->check_version(it.second)) {
+			//	return false;
+			//}
 			return true;
 		} 
 		// else 
