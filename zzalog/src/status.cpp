@@ -11,6 +11,7 @@
 #include "utils.h"
 
 #include <iostream>
+#include <thread>
 
 #include <FL/Fl.H>
 #include <FL/Fl_Preferences.H>
@@ -32,6 +33,8 @@ extern ticker* ticker_;
 extern banner* banner_;
 extern string default_data_directory_;
 extern bool keep_banner_;
+
+std::thread::id main_thread_id_ = std::this_thread::get_id();
 
 // Constructor
 status::status() :
@@ -73,6 +76,11 @@ void status::progress(const char* message, object_t object) {
 
 // Update miscellaneous status - set text and colour, log the status
 void status::misc_status(status_t status, const char* label) {
+	// Trap any call that is not from the main thread
+	if (this_thread::get_id() != main_thread_id_) {
+		printf("Calling status::misc_status(%s) when not in the main thread\n", label);
+		throw;
+	}
 	// Start each entry with a timestamp
 	string timestamp = now(false, "%Y/%m/%d %H:%M:%S", true);
 	char f_message[256];
