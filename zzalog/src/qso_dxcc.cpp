@@ -286,10 +286,12 @@ void qso_dxcc::wb4_table::draw_cell(TableContext context, int R, int C, int X, i
 			fl_draw("ANY", X, Y, W, H, FL_ALIGN_CENTER);
 			break;
 		case 1:
-			fl_draw("BAND", X, Y, W, H, FL_ALIGN_CENTER);
+			if (qd->qso_) fl_draw(qd->qso_->item("BAND").c_str(), X, Y, W, H, FL_ALIGN_CENTER);
+			else fl_draw("BAND", X, Y, W, H, FL_ALIGN_CENTER);
 			break;
 		case 2:
-			fl_draw("MODE", X, Y, W, H, FL_ALIGN_CENTER);
+			if (qd->qso_) fl_draw(qd->qso_->item("MODE").c_str(), X, Y, W, H, FL_ALIGN_CENTER);
+			else fl_draw("MODE", X, Y, W, H, FL_ALIGN_CENTER);
 			fl_line(X + W - 1, Y, X + W - 1, Y + H - 1);
 			break;
 		}
