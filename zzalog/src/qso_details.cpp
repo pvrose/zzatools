@@ -110,9 +110,11 @@ void qso_details::get_qsos() {
 		}
 	}
 	if (call_body.length() == 0) {
-		char msg[128];
-		snprintf(msg, sizeof(msg), "DASH: Call %s does not match a typical call", call.c_str());
-		status_->misc_status(ST_WARNING, msg);
+		if (call.length()) {
+			char msg[128];
+			snprintf(msg, sizeof(msg), "DASH: Call %s does not match a typical call", call.c_str());
+			status_->misc_status(ST_WARNING, msg);
+		}
 		match_possible = false;
 	}
 	else {
