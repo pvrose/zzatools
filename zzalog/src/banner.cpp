@@ -6,6 +6,7 @@
 #include "utils.h"
 
 #include <string>
+#include <thread>
 
 // FLTK classes
 #include <FL/Fl.H>
@@ -39,6 +40,8 @@ const Fl_Text_Display::Style_Table_Entry style_table_[] = {
 	{ STATUS_COLOURS.at(ST_SEVERE).fg, FL_COURIER, FL_NORMAL_SIZE, Fl_Text_Display::ATTR_BGCOLOR, STATUS_COLOURS.at(ST_SEVERE).bg },
 	{ STATUS_COLOURS.at(ST_FATAL).fg, FL_COURIER, FL_NORMAL_SIZE, Fl_Text_Display::ATTR_BGCOLOR, STATUS_COLOURS.at(ST_FATAL).bg }
 };
+
+std::thread::id main_thread_id_ = std::this_thread::get_id();
 
 banner::banner(int W, int H, const char* L) :
 	Fl_Double_Window(W, H, L)
@@ -142,6 +145,11 @@ void banner::enable_widgets() {}
 
 // Add a message to the banner
 void banner::add_message(status_t type, const char* msg) {
+	// Trap any call that is not from the main thread
+	if (this_thread::get_id() != main_thread_id_) {
+		printf("Calling banner::add_message(%s) when not in the main thread\n", msg);
+		throw;
+	}
 	switch (type) {
 	case ST_PROGRESS: {
 		break;
@@ -179,6 +187,11 @@ void banner::add_message(status_t type, const char* msg) {
 
 // Add progress
 void banner::start_progress(uint64_t max_value, object_t object, const char* msg, const char* suffix) {
+	// Trap any call that is not from the main thread
+	if (this_thread::get_id() != main_thread_id_) {
+		printf("Calling banner_start_progress(%s) when not in the main thread\n", msg);
+		throw;
+	}
 	char text[128];
 	const uint64_t FRACTION = 100L;
 	max_value_ = max_value;
@@ -203,6 +216,11 @@ void banner::start_progress(uint64_t max_value, object_t object, const char* msg
 
 // Update progress dial and output
 void banner::add_progress(uint64_t value) {
+	// Trap any call that is not from the main thread
+	if (this_thread::get_id() != main_thread_id_) {
+		printf("Calling banner::add_progress(%ld) when not in the main thread\n", value);
+		throw;
+	}
 	char text[128];
 	if ((value == max_value_) || (value - prev_value_) > delta_) {
 		snprintf(text, sizeof(text), "%lld", value);
@@ -221,6 +239,11 @@ void banner::add_progress(uint64_t value) {
 
 // Ending the progress - log message
 void banner::end_progress() {
+	// Trap any call that is not from the main thread
+	if (this_thread::get_id() != main_thread_id_) {
+		printf("Calling banner::end_progress(%s) when not in the main thread\n", prg_msg_);
+		throw;
+	}
 	char text[128];
 	// Set display message
 	snprintf(text, sizeof(text), "%s: PROGRESS: Ending %s", OBJECT_NAMES.at(prg_object_), prg_msg_);
@@ -233,6 +256,11 @@ void banner::end_progress() {
 
 // cancelling the progress - log message
 void banner::cancel_progress(const char* msg) {
+	// Trap any call that is not from the main thread
+	if (this_thread::get_id() != main_thread_id_) {
+		printf("Calling banner::cancel_progress(%s) when not in the main thread\n", msg);
+		throw;
+	}
 	char text[128];
 	// Set display message
 	snprintf(text, sizeof(text), "%s: PROGRESS: cancelling %s - %s", OBJECT_NAMES.at(prg_object_), prg_msg_, msg);
