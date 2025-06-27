@@ -365,6 +365,7 @@ bool book::store_data(string filename, bool force, field_list* fields) {
 				header_->item("PROGRAMID", PROGRAM_ID);
 				header_->item("PROGRAMVERSION", PROGRAM_VERSION);
 				header_->item("ADIF_VER", spec_data_->adif_version());
+				header_->item("APP_ZZA_NUMRECORDS", to_string(size()));
 
 				// use supplied filename (for Save As) or remembered filename (for Save)
 				if (filename != "") {
