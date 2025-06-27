@@ -290,6 +290,7 @@ void menu::cb_mi_file_new(Fl_Widget* w, void* v) {
 	}
 
 	ticker_->stop_all();
+	book_->delete_contents(true);
 	qso_manager_->deactivate_all();
 
 	// get book to delete contents by loading no data
@@ -320,6 +321,7 @@ void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 	}
 
 	ticker_->stop_all();
+	book_->delete_contents(true);
 	qso_manager_->deactivate_all();
 	
 	// Set to a recent file number (1 to 4) or 0 for file_chooser

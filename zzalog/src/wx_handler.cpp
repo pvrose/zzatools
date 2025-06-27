@@ -181,11 +181,13 @@ void wx_handler::update() {
     // Create a dummy record to get own location
     record* dummy = qso_manager_->dummy_qso();
     string qth_id = qso_manager_->get_default(qso_manager::QTH);
-    const qth_info_t* info = stn_data_->get_qth(qth_id);
     lat_long_t location = { nan(""), nan("") };
-    if (info != nullptr) {
-        dummy->item("MY_GRIDSQUARE", info->data.at(LOCATOR));
-        location = dummy->location(true);
+    if (qth_id.length()) {
+        const qth_info_t* info = stn_data_->get_qth(qth_id);
+        if (info != nullptr) {
+            dummy->item("MY_GRIDSQUARE", info->data.at(LOCATOR));
+            location = dummy->location(true);
+        }
     }
     if (isnan(location.latitude) || isnan(location.longitude)) {
         report_ = wx_report();
