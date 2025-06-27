@@ -18,6 +18,7 @@ void ticker::stop_all() {
     for( auto it = tickers_.begin(); it != tickers_.end(); it++) {
         delete *it;
     };
+    tickers_.clear();
 }
 
 ticker::~ticker() {
