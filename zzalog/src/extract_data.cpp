@@ -960,53 +960,94 @@ void extract_data::swap_records(item_num_t first, item_num_t second) {
 	rev_mapping_[mapping_.at(second)] = second;
 }
 
+bool extract_data::comp_records(record* lhs, record* rhs, string field, bool reversed) {
+	if (reversed) {
+		return rhs->item(field) < lhs->item(field);
+	}
+	else {
+		return lhs->item(field) < rhs->item(field);
+	}
+}
+
+
 // Sort records according to field_name
 void extract_data::sort_records(string field_name, bool reversed) {
+
 	fl_cursor(FL_CURSOR_WAIT);
 	item_num_t count = size();
 	int num_scans = 0;
 	char message[100];
 	snprintf(message, 100, "EXTRACT: Starting sorting %zu records on %s", size(), field_name.c_str());
 	status_->misc_status(ST_NOTE, message);
-	status_->progress(size(), book_type(), "Sorting log", "Sorting passes");
-	// Repeat until we no longer swap anything
-	// NB: We may have to implement more efficient sort algorithm, if size() increases much.
-	// Current 2K+ records takes a couple of seconds
-	while (count > 0) {
-		count = 0;
-		// Compare each record with its immediate follower - swap if it's larger
-		for (item_num_t ix = 0; ix < size() - 1; ix++) {
-			if (spec_data_->datatype_indicator(field_name) == 'N') {
-				// Numeric field - compare the numeric value - basically ignore white space
-				double item_1;
-				double item_2;
-				at(ix)->item(field_name, item_1);
-				at(ix + 1)->item(field_name, item_2);
-				if ((!reversed && item_1 > item_2) ||
-					(reversed && item_1 < item_2)) {
-					swap_records(ix, ix + 1);
-					count++;
+	status_->progress(size(), book_type(), "Hanging log", "Records");
+
+	sort_node* root = new sort_node(record_number(0), nullptr);
+	// Tree sort - hang the qsos on the tree
+	for (size_t ix = 1; ix < size(); ix++) {
+		bool hung = false;
+		sort_node* hanger = root;
+		while (!hung) {
+			if (comp_records(at(ix), at(item_number(hanger->qso_num)), field_name, reversed)) {
+				if (hanger->left == nullptr) {
+					sort_node* node = new sort_node(record_number(ix), hanger);
+					hanger->left = node;
+					hung = true;
+				}
+				else {
+					hanger = hanger->left;
 				}
 			}
 			else {
-				// compare string value
-				if ((!reversed && at(ix)->item(field_name, true) > at(ix + 1)->item(field_name, true)) ||
-					(reversed && at(ix)->item(field_name, true) < at(ix + 1)->item(field_name, true))) {
-					swap_records(ix, ix + 1);
-					count++;
+				if (hanger->right == nullptr) {
+					sort_node* node = new sort_node(record_number(ix), hanger);
+					hanger->right = node;
+					hung = true;
+				}
+				else {
+					hanger = hanger->right;
 				}
 			}
 		}
-		num_scans++;
-		status_->progress(num_scans, book_type());
+		status_->progress(ix, book_type());
 	}
-	snprintf(message, 100, "EXTRACT: Done - %d passes required", num_scans);
-	status_->misc_status(ST_OK, message);
-	// Note may have taken fewer passes than primed progress bar with - stop progress if it has
-	if (num_scans < (signed)size()) {
-		status_->progress("Taken fewer passes", book_type());
+	// Now unravel the tree
+	status_->progress(size(), book_type(), "Picking log", "Records");
+	clear();
+	// Clear the mappings
+	mapping_.clear();
+	rev_mapping_.clear();
+	// now tidy up this book, records have already been removed so will not be deleted
+	delete_contents(true);
+
+	int copied = pick_node(root);
+	if (copied != count) {
+		char msg[128];
+		snprintf(msg, sizeof(msg), "DEBUG: Wrong number picked from tree %d picked, %zd hung\n", copied, count);
+		status_->misc_status(ST_ERROR, msg);
 	}
 	fl_cursor(FL_CURSOR_DEFAULT);
+}
+
+// Place the node and all those beneath it in the extracted list
+int extract_data::pick_node(sort_node* n) {
+	int result = 0;
+	// Add all the nodes on the left
+	if (n->left) {
+		result += pick_node(n->left);
+	}
+	// We have none remaining in the left, so this node is next
+	item_num_t item = size();
+	push_back(book_->at(n->qso_num));
+	mapping_.push_back(n->qso_num);
+	rev_mapping_[n->qso_num] = item;
+	result++;
+	status_->progress(item + 1, book_type());
+	// Add all the nodes on the right
+	if (n->right) {
+		result += pick_node(n->right);
+	}
+	// Now return all the nodes picked
+	return result;
 }
 
 // Undo the above sort 

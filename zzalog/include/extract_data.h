@@ -80,6 +80,24 @@ using namespace std;
 		virtual item_num_t selection(item_num_t num_record, hint_t hint = HT_SELECTED, view* requester = nullptr, qso_num_t num_other = 0);
 
 	protected:
+
+		struct sort_node {
+			qso_num_t qso_num;
+			sort_node* parent;
+			sort_node* left;
+			sort_node* right;
+
+			sort_node(qso_num_t n, sort_node* p) {
+				qso_num = n;
+				parent = p;
+				left = nullptr;
+				right = nullptr;
+			}
+		};
+
+		// Add contents of node to the book, return the number of nodes picked
+		int pick_node(sort_node* node);
+
 		// Extract records for the criteria
 		void extract_records();
 		// Generate description extract criterion for use in the header comment
@@ -90,6 +108,9 @@ using namespace std;
 		void swap_records(item_num_t record_num_1, item_num_t record_num_2);
 		// Check record is within the extraction criteria
 		bool meets_criteria(record* qso);
+
+		// Compare records
+		bool comp_records(record* lhs, record* rhs, string field, bool reversed);
 
 		// The list of extract criteria
 		list<search_criteria_t> extract_criteria_;
