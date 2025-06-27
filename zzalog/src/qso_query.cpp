@@ -74,6 +74,7 @@ void qso_query::enable_widgets() {
 	case qso_data::QUERY_MATCH:
 	case qso_data::QUERY_NEW:
 	case qso_data::QUERY_WSJTX:
+	case qso_data::QRZ_MERGE:
 		tab_query_->activate();
 		tab_query_->set_records(log_qso_, query_qso_, original_qso_);
 		tab_query_->redraw();

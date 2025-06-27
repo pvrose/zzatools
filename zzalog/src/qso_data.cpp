@@ -331,6 +331,8 @@ void qso_data::enable_widgets() {
 			// Show two logged QSOs in query form to check for duplicate
 		case QUERY_MATCH:
 			// Show an imported QSO and possible match in log check if matcehd
+		case QRZ_MERGE:
+			// Show details downloaded from QRZ.com and check any matches
 			g_entry_->hide();
 			snprintf(l, sizeof(l), "QSO Query - %s - %s", call.c_str(), g_query_->query_message().c_str());
 			g_query_->copy_label(l);
@@ -1319,6 +1321,7 @@ void qso_data::action_save_merge() {
 	g_query_->clear_query();
 	action_deactivate();;
 	enable_widgets();
+	book_->selection(-1, HT_MINOR_CHANGE);
 	qrz_handler_->merge_done();
 }
 

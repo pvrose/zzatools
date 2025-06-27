@@ -210,7 +210,7 @@ string qrz_handler::generate_details_uri(string callsign) {
 // Fetch user details - returns false if not enabled or whether username or password are blank strings
 bool qrz_handler::user_details() {
 	server_data_t* qrz_data = qsl_dataset_->get_server_data("QRZ");
-	bool enabled = qrz_data->enabled;
+	bool enabled = qrz_data->use_xml;
 	if (enabled) {
 		username_ = qrz_data->user;
 		password_ = qrz_data->password;
