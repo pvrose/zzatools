@@ -975,7 +975,6 @@ void extract_data::sort_records(string field_name, bool reversed) {
 
 	fl_cursor(FL_CURSOR_WAIT);
 	item_num_t count = size();
-	int num_scans = 0;
 	char message[100];
 	snprintf(message, 100, "EXTRACT: Starting sorting %zu records on %s", size(), field_name.c_str());
 	status_->misc_status(ST_NOTE, message);
