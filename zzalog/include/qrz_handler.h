@@ -43,7 +43,7 @@ struct qrz_api_data {
 		// Open the QRZ.com session
 		bool open_session();
 		// Fetch the contacts details and present the user with a merge opportunity
-		bool fetch_details();
+		bool fetch_details(record* qso);
 		// Callback to say done
 		void merge_done();
 		// REturn message

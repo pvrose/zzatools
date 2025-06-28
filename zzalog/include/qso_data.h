@@ -62,7 +62,8 @@ public:
 		QUERY_WSJTX,     // Query found in WSJT-X ALL.TXT file
 		QUERY_DUPE,      // Query: Two records in log found to be possible duplicates - select either, both or a merge
 		QUERY_SWL,       // Query: SWL report
-		QRZ_MERGE,       // Merge details downloaded from QRZ.com
+		QRZ_MERGE,       // Merge details downloaded from QRZ.com (existing record)
+		QRZ_COPY,        // Copy details downloaded from QRZ.com (new record)
 		NET_STARTED,     // Started several QSOs in a net.
 		NET_EDIT,        // Converting sngle QSO into a net by adding callsigns
 		NET_ADDING,      // Adding a new QSO to the started net.
@@ -263,7 +264,7 @@ protected:
 	qso_num_t potential_match_;
 	qso_num_t query_number_;
 
-	// Peek - save logging state
+	// Peek/QRZ merge/QRZ copy - save logging state
 	logging_state_t interrupted_state_;
 	// QSO being peeked
 	record* peeked_qso_;

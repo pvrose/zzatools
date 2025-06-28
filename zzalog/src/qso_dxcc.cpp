@@ -220,7 +220,8 @@ void qso_dxcc::set_data(record* qso) {
 // QRZ.com button clicked
 void qso_dxcc::cb_bn_qrz(Fl_Widget* w, void* v) {
 	qso_dxcc* that = ancestor_view<qso_dxcc>(w);
-	menu::cb_mi_info_qrz(w, (void*)&that->callsign_);
+	qso_data* data = ancestor_view<qso_data>(that);
+	data->action_qrz_com();
 }
 
 qso_dxcc::wb4_table::wb4_table(int X, int Y, int W, int H, const char* L) :

@@ -30,6 +30,8 @@ public:
 	void save_values();
 	// Set QSOs
 	void set_query(string message, qso_num_t log_number, record* query_qso = nullptr, bool save_original = true);
+	// Set query to merge with new QSO
+	void set_query(string message, record* new_qso, record* query_qso = nullptr, bool save_original = true);
 	// Return QSO
 	record* qso();
 	// Return Query QSO

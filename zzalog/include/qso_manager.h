@@ -124,6 +124,9 @@ enum hint_t : uchar;
 		void qsl_print_done();
 		void qsl_email();
 
+		// Merge QRZ.com data
+		void merge_qrz_com();
+
 		// Widgets have been xcreated
 		bool created_;
 

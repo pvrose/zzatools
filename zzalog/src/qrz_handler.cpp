@@ -120,7 +120,7 @@ bool qrz_handler::open_session() {
 }
 
 // Fetch the contacts details and present the user with a merge opportunity
-bool qrz_handler::fetch_details() {
+bool qrz_handler::fetch_details(record* qso) {
 	if (!user_details()) {
 		status_->misc_status(ST_ERROR, "QRZ: login details are not available");
 		return false;
@@ -130,9 +130,8 @@ bool qrz_handler::fetch_details() {
 		return false;
 	}
 	// Request 
-	record* query = navigation_book_->get_record();
-	status_->misc_status(ST_NOTE, string("QRZ: Fetching information for " + query->item("CALL")).c_str());
-	string uri = generate_details_uri(query->item("CALL"));
+	status_->misc_status(ST_NOTE, string("QRZ: Fetching information for " + qso->item("CALL")).c_str());
+	string uri = generate_details_uri(qso->item("CALL"));
 	stringstream response;
 	// Send Session requesst to QRZ
 	if (!url_handler_->read_url(uri, &response)) {
@@ -144,9 +143,8 @@ bool qrz_handler::fetch_details() {
 	// Create a new record
 	delete qrz_info_;
 	qrz_info_ = new record;
-	if (decode_details_response(response) && 
-		query_merge()) {
-		status_->misc_status(ST_OK, string("QRZ: query for " + query->item("CALL") + " completed.").c_str());
+	if (decode_details_response(response)) {
+		status_->misc_status(ST_OK, string("QRZ: query for " + qso->item("CALL") + " completed.").c_str());
 		return true;
 	}
 	else {
@@ -179,7 +177,7 @@ bool qrz_handler::decode_details_response(istream& response) {
 bool qrz_handler::query_merge() {
 	merge_done_ = false;
 	// Get the record view to merge data
-	navigation_book_->selection(-1, HT_MERGE_DETAILS);
+	qso_manager_->merge_qrz_com();
 	while (!merge_done_) Fl::check();
 	status_->misc_status(ST_OK, "QRZ: Update complete");
 	return false;

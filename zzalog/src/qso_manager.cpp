@@ -351,9 +351,6 @@ void qso_manager::update_qso(hint_t hint, qso_num_t match_num, qso_num_t query_n
 	case HT_DUPE_QUERY:
 		data_group_->update_query(qso_data::QUERY_DUPE, match_num, query_num);
 		break;
-	case HT_MERGE_DETAILS:
-		data_group_->update_query(qso_data::QRZ_MERGE, match_num, query_num);
-		break;
 	case HT_IMPORT_QUERYSWL:
 		data_group_->update_query(qso_data::QUERY_SWL, match_num, query_num);
 		break;
@@ -496,3 +493,9 @@ void qso_manager::deactivate_all() {
 	data_group_->action_deactivate();
 	rig_group_->deactivate_rigs();
 }
+
+// Merge QRZ.com data
+void qso_manager::merge_qrz_com() {
+	data_group_->action_qrz_com();
+}
+

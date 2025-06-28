@@ -75,6 +75,7 @@ void qso_query::enable_widgets() {
 	case qso_data::QUERY_NEW:
 	case qso_data::QUERY_WSJTX:
 	case qso_data::QRZ_MERGE:
+	case qso_data::QRZ_COPY:
 		tab_query_->activate();
 		tab_query_->set_records(log_qso_, query_qso_, original_qso_);
 		tab_query_->redraw();
@@ -135,6 +136,19 @@ void qso_query::set_query(string message, qso_num_t log_number, record* query_qs
 	query_qso_ = query_qso;
 }
 
+//Set QSOs into query
+void qso_query::set_query(string message, record* new_qso, record* query_qso, bool save_original) {
+	query_message_ = message;
+	log_number_ = -1;
+	log_qso_ = new_qso;
+	if (save_original) {
+		if (log_qso_) original_qso_ = new record(*log_qso_);
+		else original_qso_ = nullptr;
+	}
+	else original_qso_ = nullptr;
+	query_qso_ = query_qso;
+}
+
 // Get QSO
 record* qso_query::qso() {
 	return log_qso_;
@@ -166,6 +180,7 @@ void qso_query::action_handle_dclick(int col, string field) {
 	case qso_data::QUERY_MATCH:
 	case qso_data::QUERY_DUPE:
 	case qso_data::QRZ_MERGE:
+	case qso_data::QRZ_COPY:
 		switch (col) {
 		case 0:
 			//// Treat as if clicking row header

@@ -1166,26 +1166,12 @@ void menu::cb_mi_rep_level(Fl_Widget* w, void* v) {
 // Information->QRZ.com - query QRZ.com about the selected contact
 // v is string*. nullptr = uses selected record else uses call sign in v.
 void menu::cb_mi_info_qrz(Fl_Widget* w, void* v) {
-	record* record = book_->get_record();
-	if (v != nullptr) {
-		// Open with the web browser and fetch the page for the callsign
-		qrz_handler_->open_web_page(*(string*)v);
+	if (v == nullptr) {
+		// Treat as button(s) within qso_manager_
+		qso_manager_->merge_qrz_com();
 	}
 	else {
-		// We are using selected record and merge data accordingly
-		bool ok = true;
-		if (!qrz_handler_->has_session()) {
-			// Try and open an XML Database session
-			ok = qrz_handler_->open_session();
-		}
-		if (ok) {
-			// Access it
-			ok = qrz_handler_->fetch_details();
-		}
-		else {
-			// Fall-back to the web-page interface
-			qrz_handler_->open_web_page(record->item("CALL"));
-		}
+		qrz_handler_->open_web_page(*(string*)v);
 	}
 }
 

@@ -54,7 +54,8 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 		qso_buttons::KEEP_BOTH_DUPES }},
 	{ qso_data::QUERY_SWL, { qso_buttons::ADD_QUERY, qso_buttons::REJECT_QUERY } },
 	{ qso_data::QRZ_MERGE, { qso_buttons::MERGE_DONE }},
-	{ qso_data::NET_STARTED, {qso_buttons::SAVE_NET, qso_buttons::SAVE_QSO, qso_buttons::SAVE_CONTINUE, 
+	{ qso_data::QRZ_COPY, { qso_buttons::MERGE_DONE }},
+	{ qso_data::NET_STARTED, {qso_buttons::SAVE_NET, qso_buttons::SAVE_QSO, qso_buttons::SAVE_CONTINUE,
 		qso_buttons::CANCEL_QSO, qso_buttons::CANCEL_NET,
 		qso_buttons::NAV_FIRST, qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST,
 		qso_buttons::ADD_NET_QSO, qso_buttons::QRZ_COM }},
@@ -618,6 +619,7 @@ void qso_buttons::cb_bn_save_merge(Fl_Widget* w, void* v) {
 	that->disable_widgets();
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QRZ_MERGE:
+	case qso_data::QRZ_COPY:
 		that->qso_data_->action_save_merge();
 		break;
 	default:
@@ -804,6 +806,8 @@ void qso_buttons::cb_bn_qrz_com(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
 	switch (that->qso_data_->logging_state()) {
+	case qso_data::QSO_PENDING:
+	case qso_data::TEST_PENDING:
 	case qso_data::QSO_STARTED:
 	case qso_data::QSO_EDIT:
 	case qso_data::QSO_VIEW:

@@ -332,6 +332,7 @@ void qso_data::enable_widgets() {
 		case QUERY_MATCH:
 			// Show an imported QSO and possible match in log check if matcehd
 		case QRZ_MERGE:
+		case QRZ_COPY:
 			// Show details downloaded from QRZ.com and check any matches
 			g_entry_->hide();
 			snprintf(l, sizeof(l), "QSO Query - %s - %s", call.c_str(), g_query_->query_message().c_str());
@@ -1228,9 +1229,46 @@ void qso_data::action_query(logging_state_t query, qso_num_t match_number, qso_n
 		// Note record numbers relate to book even if it is extracted data that refered the dupe check
 		g_query_->set_query(navigation_book_->match_question(), match_number, book_->get_record(query_number, false), false);
 		break;
-	case QRZ_MERGE:
-		g_query_->set_query(qrz_handler_->get_merge_message(), match_number, qrz_handler_->get_record());
+	case QRZ_MERGE: {
+		// We are using selected record and merge data accordingly
+		bool ok = true;
+		if (!qrz_handler_->has_session()) {
+			// Try and open an XML Database session
+			ok = qrz_handler_->open_session();
+		}
+		if (ok) {
+			// Access it
+			if (match_number == -1) {
+				ok = qrz_handler_->fetch_details(current_qso());
+			}
+			else {
+				ok = qrz_handler_->fetch_details(book_->get_record(match_number, false));
+			}
+			if (ok) g_query_->set_query(qrz_handler_->get_merge_message(), match_number, qrz_handler_->get_record());
+		}
+		if (!ok) {
+			// Fall-back to the web-page interface
+			qrz_handler_->open_web_page(book_->get_record(match_number, false)->item("CALL"));
+		}
 		break;
+	}
+	case QRZ_COPY: {
+		// We are using selected record and merge data accordingly
+		bool ok = true;
+		if (!qrz_handler_->has_session()) {
+			// Try and open an XML Database session
+			ok = qrz_handler_->open_session();
+		}
+		if (ok) {
+			ok = qrz_handler_->fetch_details(current_qso());
+			if (ok) g_query_->set_query(qrz_handler_->get_merge_message(), current_qso(), qrz_handler_->get_record());
+		}
+		if (!ok) {
+			// Fall-back to the web-page interface
+			qrz_handler_->open_web_page(current_qso()->item("CALL"));
+		}
+		break;
+	}
 	default:
 		// TODO trap this sensibly
 		return;
@@ -1317,12 +1355,24 @@ void qso_data::action_handle_dupe(dupe_flags action) {
 // Action save as a result of a merge
 void qso_data::action_save_merge() {
 	// We no longer need to maintain the copy of the original QSO
-	book_->add_use_data(g_query_->qso());
-	g_query_->clear_query();
-	action_deactivate();;
-	enable_widgets();
-	book_->selection(-1, HT_MINOR_CHANGE);
-	qrz_handler_->merge_done();
+	switch (logging_state_) {
+	case QRZ_MERGE: {
+		book_->add_use_data(g_query_->qso());
+		g_query_->clear_query();
+		logging_state_ = interrupted_state_;
+		enable_widgets();
+		book_->selection(-1, HT_MINOR_CHANGE);
+		break;
+	}
+	case QRZ_COPY: {
+		g_query_->clear_query();
+		logging_state_ = interrupted_state_;
+
+		enable_widgets();
+		g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+		break;
+	}
+	}
 }
 
 // ACtion look in ALL.TXT
@@ -1627,26 +1677,35 @@ void qso_data::action_import_query() {
 
 // Open QRZ.com page
 void qso_data::action_qrz_com() {
-	record* qso = nullptr;
+	interrupted_state_ = logging_state_;
 	switch(logging_state_) {
-		case qso_data::QSO_STARTED:
-		case qso_data::QSO_EDIT:
-		case qso_data::QSO_VIEW:
-		case qso_data::QSO_BROWSE:
-		case qso_data::NET_EDIT:
-		case qso_data::NET_STARTED: {
-			qso = current_qso();
-			break;
-		}
-		case qso_data::QUERY_MATCH:
-		case qso_data::QUERY_NEW: {
-			qso = query_qso();
-			break;
-		}
-		default:
-			break;
+	case qso_data::QSO_PENDING:
+	case qso_data::TEST_PENDING: {
+		qso_num_t qso_n = current_number();
+		action_query(QRZ_COPY, qso_n, -1);
+		break;
+	}
+	case qso_data::QSO_STARTED:
+	case qso_data::QSO_EDIT:
+	case qso_data::NET_EDIT:
+	case qso_data::NET_STARTED: {
+		qso_num_t qso_n = current_number();
+		action_query(QRZ_MERGE, qso_n, -1);
+		break;
+	}
+	case qso_data::QSO_VIEW:
+	case qso_data::QSO_BROWSE: {
+		qrz_handler_->open_web_page(current_qso()->item("CALL"));
+		break;
+	}
+	case qso_data::QUERY_MATCH:
+	case qso_data::QUERY_NEW: {
+		qrz_handler_->open_web_page(query_qso()->item("CALL"));
+		break;
+	}
+	default:
+		break;
 	} 
-	if (qso) qrz_handler_->open_web_page(qso->item("CALL"));
 }
 
 // Action update CAT
@@ -1848,6 +1907,7 @@ record* qso_data::current_qso() {
 	case QUERY_NEW:
 	case QUERY_WSJTX:
 	case QRZ_MERGE:
+	case QRZ_COPY:
 		return g_query_->qso();
 	case NET_STARTED:
 	case NET_EDIT:
@@ -1882,6 +1942,7 @@ record* qso_data::query_qso() {
 	case QUERY_NEW:
 	case QUERY_WSJTX:
 	case QRZ_MERGE:
+	case QRZ_COPY:
 		return g_query_->query_qso();
 	default:
 		return nullptr;
@@ -1908,6 +1969,7 @@ qso_num_t qso_data::current_number() {
 	case QUERY_NEW:
 	case QUERY_WSJTX:
 	case QRZ_MERGE:
+	case QRZ_COPY:
 		return g_query_->qso_number();
 	case NET_STARTED:
 	case NET_EDIT:

@@ -295,6 +295,7 @@
     <ClInclude Include="zzalog\include\page_dialog.h" />
     <ClInclude Include="zzalog\include\password_input.h" />
     <ClInclude Include="zzalog\include\png_writer.h" />
+    <ClInclude Include="zzalog\include\qrz_handler.h" />
     <ClInclude Include="zzalog\include\qsl_data.h" />
     <ClInclude Include="zzalog\include\qsl_dataset.h" />
     <ClInclude Include="zzalog\include\qsl_display.h" />
