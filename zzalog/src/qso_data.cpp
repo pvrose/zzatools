@@ -1372,6 +1372,8 @@ void qso_data::action_save_merge() {
 		g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 		break;
 	}
+	default:
+		break;
 	}
 }
 
