@@ -650,14 +650,14 @@ bool rig_if::th_read_values() {
 		if (response < milliseconds(100)) {
 			snprintf(msg, sizeof(msg), "RIG %s Responding normally %dms", 
 				my_rig_name_.c_str(), (int)response.count());
-			status_->misc_status(ST_NOTE, msg);
+			Fl::awake(cb_rig_warning, msg);
 			rig_data_.slow = false;
 		}
 	} else if (response > milliseconds((int)(hamlib_data_->timeout * 1000.0))) {
 			snprintf(msg, sizeof(msg), "RIG %s Responding slowly %dms", 
 				my_rig_name_.c_str(), (int)response.count());
-			status_->misc_status(ST_ERROR, msg);
-		rig_data_.slow = true;
+			Fl::awake(cb_rig_warning, msg);
+			rig_data_.slow = true;
 	}
 
 	return true;
@@ -673,28 +673,31 @@ bool rig_if::error_handler(int code, const char* meter, bool* flag, int* to_coun
 	case RIG_ENAVAIL:
 		if (flag) {
 			snprintf(msg, sizeof(msg), "RIG: Access is %s is not available - turn off future access", meter);
-			status_->misc_status(ST_WARNING, msg);
+			Fl::awake(cb_rig_warning, msg);
 			*flag = false;
 			ok = false;
 		}
 		else {
 			ok = true;
 		}
+		break;
 	case RIG_ETIMEOUT:
 		if (to_count) {
 			(*to_count)++;
 			if (*to_count < hamlib_data_->max_to_count) {
 				snprintf(msg, sizeof(msg), "RIG: Access to %s timed out - continuing", meter);
-				status_->misc_status(ST_WARNING, msg);
+				Fl::awake(cb_rig_warning, msg);
 			}
 			else {
 				snprintf(msg, sizeof(msg), "RIG: Access to %s has timed out %d times, no further access", meter, *to_count);
-				status_->misc_status(ST_ERROR, msg);
+				Fl::awake(cb_rig_warning, msg);
 			}
 			ok = false;
 		}
+		break;
 	default:
 		ok =  true;
+		break;
 	}
 	return ok;
 }
@@ -706,6 +709,12 @@ void rig_if::cb_rig_error(void* v) {
 	snprintf(msg, sizeof(msg), "RIG: No longer open %s", that->error_message(that->read_item_.c_str()).c_str());
 	status_->misc_status(ST_ERROR, msg);
 	that->close();
+}
+
+void rig_if::cb_rig_warning(void* v) {
+	char msg[128];
+	snprintf(msg, sizeof(msg), "RIG: %s", (char*)v);
+	status_->misc_status(ST_WARNING, msg);
 }
 
 // Return the most recent error message

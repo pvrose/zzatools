@@ -179,6 +179,8 @@ using namespace std::chrono;
 		static void th_sopen_rig(rig_if* that);
 		// Callback if error while accessing rig
 		static void cb_rig_error(void* v);
+		// Callback if warning while accessing rig
+		static void cb_rig_warning(void* v);
 
 		// Protected attributes
 	protected:
