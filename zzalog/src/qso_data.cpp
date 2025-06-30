@@ -1682,7 +1682,8 @@ void qso_data::action_qrz_com() {
 	interrupted_state_ = logging_state_;
 	switch(logging_state_) {
 	case qso_data::QSO_PENDING:
-	case qso_data::TEST_PENDING: {
+	case qso_data::TEST_PENDING:
+	case qso_data::QSO_WSJTX: {
 		qso_num_t qso_n = current_number();
 		action_query(QRZ_COPY, qso_n, -1);
 		break;
