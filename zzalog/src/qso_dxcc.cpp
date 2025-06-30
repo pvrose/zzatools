@@ -72,7 +72,7 @@ void qso_dxcc::create_form() {
 	curr_y = op_call_->y() + op_call_->h();
 
 	// Display the DXCC prefix
-	op_prefix_ = new Fl_Output(curr_x, curr_y, avail_width - WBUTTON, ROW_HEIGHT);
+	op_prefix_ = new Fl_Output(curr_x, curr_y, avail_width, ROW_HEIGHT);
 	op_prefix_->box(FL_FLAT_BOX);
 	op_prefix_->color(FL_BACKGROUND_COLOR);
 	op_prefix_->textfont(FL_BOLD);
