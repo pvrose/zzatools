@@ -80,7 +80,7 @@ void qso_dxcc::create_form() {
 	curr_y += ROW_HEIGHT;
 
 	// Display how the DXCC was found (decoded or from exception file)
-	op_source_ = new Fl_Output(curr_x, curr_y, avail_width - WBUTTON, ROW_HEIGHT);
+	op_source_ = new Fl_Output(curr_x, curr_y, avail_width, ROW_HEIGHT);
 	op_source_->box(FL_FLAT_BOX);
 	op_source_->color(FL_BACKGROUND_COLOR);
 	op_source_->tooltip("Shows how the DXCC was obtained - decoded or an exception");
