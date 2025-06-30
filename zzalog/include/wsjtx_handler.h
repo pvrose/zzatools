@@ -143,6 +143,21 @@ class socket_server;
 			TEXT,      // Any other decode
 		};
 
+		// 
+		map<message_t, string> mess_char_ = {
+			{ TX1, "TX1"},
+			{ TX1A, "TX1A"},
+			{ TX2, "TX2"},
+			{ TX3, "TX3"},
+			{ TX4, "TX4"},
+			{ TX4A, "TX4A"},
+			{ TX5, "TX5"},
+			{ TX6, "TX6"},
+			{ TX6A, "TX6A"},
+			{ MISC, "MISC"},
+			{ TEXT, "TEXT"}
+		};
+
 		// The message decoded
 		struct decoded_msg {
 			message_t type{ TX1 };		// Message format

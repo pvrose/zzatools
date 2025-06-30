@@ -55,7 +55,7 @@ const basic_regex<char> REGEX_GRIDSQUARE4("[a-rA-R]{2}[0-9]{2}");
 const basic_regex<char> REGEX_REPORT("[-+][0-9]{1,2}");
 const basic_regex<char> REGEX_ROGER("R[-+][0-9]{1,2}"); 
 // CQ target - CQ or CQ xxxx
-const basic_regex<char> REGEX_CQ("CQ(| [A-Z][0-9]{1,4})");
+const basic_regex<char> REGEX_CQ("CQ( [A-Z][0-9]{1,4})?");
 // Definition of valid white-space
 const basic_regex<char> REGEX_WHITE_SPACE("\\s*");
 // RPC date time format - YYYYMMDDTHH:MM:SS or YYYY-MM-DDTHH:MM:SS

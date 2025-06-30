@@ -97,26 +97,19 @@ int wsjtx_handler::rcv_dgram(stringstream & ss) {
 	switch (dgram_type) {
 	case 0:
 		// Heartbeat
-		// printf("HEARTBEAT\n");
 		return handle_hbeat(ss);
 	case 1:
 		// Status
-		// printf("STATUS\n");
 		return handle_status(ss);
 	case 2:
-		// printf("DECODE\n");
 		return handle_decode(ss);
 	case 4:
-		// printf("REPLY\n");
 		return handle_reply(ss);
 	case 6:
-		// printf("CLOSE\n");
 		return handle_close(ss);
 	case 12:
-		// printf("LOG ADIF\n");
 		return handle_log(ss);
 	default:
-		// printf("Unsupported %d\n", dgram_type);
 		return handle_default(ss, dgram_type);
 	}
 	return 0;
@@ -660,7 +653,7 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 			}
 		}
 		else {
-			record* qso = match != nullptr ? match : qso_call(sender, false);
+			record* qso = match != nullptr ? match : qso_call(sender, true);
 			if (qso) {
 				qso->item("QSO_COMPLETE", string("N"));
 				switch (decode.type) {
