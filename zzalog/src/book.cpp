@@ -325,6 +325,7 @@ bool book::load_data(string filename)
 // Store data - only if modified or force is true. If fields is defined only output specified fields
 bool book::store_data(string filename, bool force, field_list* fields) {
 	bool ok = false;
+	bool changed_file = false;
 	if (save_in_progress_) {
 		// Race hazard - can instigate a second store before finished this one
 		status_->misc_status(ST_WARNING, "LOG: Ignoring request to store log as currently doing so");
@@ -370,6 +371,7 @@ bool book::store_data(string filename, bool force, field_list* fields) {
 				// use supplied filename (for Save As) or remembered filename (for Save)
 				if (filename != "") {
 					filename_ = filename;
+					changed_file = true;
 				}
 				// Update status bar
 				char * message = new char[filename_.length() + 20];
@@ -456,7 +458,7 @@ bool book::store_data(string filename, bool force, field_list* fields) {
 					// File was closed in the fail paths
 					file.close();
 					// Update file name on window label
-					main_window_label(filename_);
+					if (changed_file) main_window_label(filename_);
 				}
 			}
 			else {
