@@ -230,7 +230,9 @@ void banner::add_progress(uint64_t value) {
 			end_progress();
 		}
 		else {
-			redraw();
+			// Only redraw these two items.
+			fd_progress_->redraw();
+			op_prog_value_->redraw();
 			if (visible()) Fl::check();
 		}
 	}
