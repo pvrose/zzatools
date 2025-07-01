@@ -11,7 +11,7 @@ extern string PROGRAM_VERSION;
 string USER_AGENT = PROGRAM_ID + '/' + PROGRAM_VERSION;
 
 // Make sure only one HTML transfer happens at once
-mutex url_handler::lock_;
+recursive_mutex url_handler::lock_;
 
 // Constructor
 url_handler::url_handler()
@@ -61,7 +61,8 @@ size_t url_handler::cb_read(char* data, size_t size, size_t nmemb, void* is) {
 
 // Read the URL (HTTP GET) and write it back to the output stream
 bool url_handler::read_url(string url, ostream* os) {
-	
+
+
 	lock_.lock();
 
 	CURLcode result;
@@ -98,11 +99,12 @@ bool url_handler::read_url(string url, ostream* os) {
 	/* check for errors */
 	if (result != CURLE_OK) {
 		char msg[256];
-		printf(msg, sizeof(msg), "ERROR - URL_HANDLER: %s\n", error_msg);
+		printf("ERROR - URL_HANDLER: %s\n", error_msg);
 		curl_easy_cleanup(curl_);
 		lock_.unlock();
 		return false;
 	}
+
 
 	/* reset transfer details */
 	curl_easy_cleanup(curl_);

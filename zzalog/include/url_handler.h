@@ -54,6 +54,6 @@ using namespace std;
 		CURL * curl_;
 		
 		// Ensure only 1 CURL operation at once
-		static mutex lock_;
+		static recursive_mutex lock_;
 	};
 #endif

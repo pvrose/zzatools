@@ -81,7 +81,7 @@ string COPYRIGHT = "\302\251 Philip Rose GM3ZZA 2018-2025. All rights reserved.\
 string DATA_COPYRIGHT = "\302\251 Philip Rose %s. This data may be copied for the purpose of correlation and analysis";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string PROGRAM_VERSION = "3.5.10 (3.6.0-rc2)";
+string PROGRAM_VERSION = "3.5.11 (3.6.0-rc3)";
 string VENDOR = "GM3ZZA";
 string TIMESTAMP = string(__DATE__) + " " + string(__TIME__) + " Local";
 
@@ -599,7 +599,6 @@ string get_file(char * arg_filename) {
 				result = chooser->filename();
 			}
 			delete chooser;
-			new_file_ = true;
 		}
 	}
 	else {
