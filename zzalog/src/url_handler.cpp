@@ -98,7 +98,6 @@ bool url_handler::read_url(string url, ostream* os) {
 
 	/* check for errors */
 	if (result != CURLE_OK) {
-		char msg[256];
 		printf("ERROR - URL_HANDLER: %s\n", error_msg);
 		curl_easy_cleanup(curl_);
 		lock_.unlock();
