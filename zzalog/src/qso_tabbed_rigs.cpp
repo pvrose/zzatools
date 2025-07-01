@@ -106,7 +106,8 @@ void qso_tabbed_rigs::enable_widgets() {
 		else {
 			name = label();
 		}
-		value(label_map_.at(name));
+		// Select the tab per the label if it is present
+		if (label_map_.find(name) != label_map_.end()) value(label_map_.at(name));
 		// Set standard tab label format
 		for (auto ix = label_map_.begin(); ix != label_map_.end(); ix++) {
 			Fl_Widget* w = (*ix).second;

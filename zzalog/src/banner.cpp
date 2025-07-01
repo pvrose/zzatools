@@ -136,7 +136,6 @@ void banner::create_form() {
 	Fl::screen_xywh(sx, sy, sw, sh, x(), y());
 	int nx = sx + (sw / 2) - (w() / 2);
 	int ny = sy + (sh / 2) - (h() / 2);
-	set_non_modal();
 	resize(nx, ny, w(), h());
 	show();
 }
