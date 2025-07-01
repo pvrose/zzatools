@@ -361,8 +361,11 @@ void qso_qsl::enable_widgets() {
 	else {
 		bn_upld_club_->deactivate();
 	}
-	// QRZ.com upload is only valid for a single QSO.
-	if (single_qso_) {
+	//
+	if (!extract_in_progress_ && extract_records_->use_mode() == extract_data::QRZCOM) {
+		bn_upld_qrz_->activate();
+	}
+	else if (single_qso_) {
 		bn_upld_qrz_->activate();
 	} else {
 		bn_upld_qrz_->deactivate();

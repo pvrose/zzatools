@@ -11,6 +11,7 @@
 
 using namespace std;
 
+class book;
 class record;
 class xml_element;
 class Fl_Help_Dialog;
@@ -58,6 +59,8 @@ struct qrz_api_data {
 		bool download_qrzlog_log(stringstream* adif);
 		// Upload current QSL.
 		bool upload_single_qso(qso_num_t qso_number);
+		// Upload extracted log
+		bool upload_log(book* log);
 
 
 	protected:

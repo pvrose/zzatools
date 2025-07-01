@@ -1,15 +1,18 @@
 #include "extract_data.h"
-#include "utils.h"
+
 #include "tabbed_forms.h"
-#include "status.h"
 #include "adi_writer.h"
+#include "club_handler.h"
 #include "eqsl_handler.h"
 #include "lotw_handler.h"
-#include "spec_data.h"
-#include "club_handler.h"
-#include "search_dialog.h"
+#include "qrz_handler.h"
 #include "qso_manager.h"
 #include "record.h"
+#include "search_dialog.h"
+#include "spec_data.h"
+#include "status.h"
+
+#include "utils.h"
 
 #include <sstream>
 
@@ -20,13 +23,14 @@
 
 extern book* book_;
 extern book* navigation_book_;
-extern tabbed_forms* tabbed_forms_;
-extern status* status_;
+extern club_handler* club_handler_;
 extern eqsl_handler* eqsl_handler_;
 extern lotw_handler* lotw_handler_;
-extern club_handler* club_handler_;
-extern spec_data* spec_data_;
+extern qrz_handler* qrz_handler_;
 extern qso_manager* qso_manager_;
+extern spec_data* spec_data_;
+extern status* status_;
+extern tabbed_forms* tabbed_forms_;
 
 // Constructor
 extract_data::extract_data() :
@@ -824,6 +828,11 @@ void extract_data::upload() {
 			status_->misc_status(ST_OK, "EXTRACT: Clublog upload requested!");
 		}
 		break;
+	case QRZCOM:
+		if (qrz_handler_->upload_log(this)) {
+			status_->misc_status(ST_OK, "EXTRACT: QRZ.com upload requested!");
+		}
+		break;
 	case ALL:
 		if (eqsl_handler_->upload_eqsl_log(this)) {
 			status_->misc_status(ST_OK, "EXTRACT: eQSL upload requested!");
@@ -833,6 +842,9 @@ void extract_data::upload() {
 		}
 		if (club_handler_->upload_log(this)) {
 			status_->misc_status(ST_OK, "EXTRACT: Clublog upload requested!");
+		}
+		if (qrz_handler_->upload_log(this)) {
+			status_->misc_status(ST_OK, "EXTRACT: QRZ.com upload requested!");
 		}
 		break;
 	default:

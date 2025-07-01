@@ -622,6 +622,17 @@ bool qrz_handler::upload_single_qso(qso_num_t qso_number) {
 	return true;
 }
 
+bool qrz_handler::upload_log(book* log) {
+	bool ok = true;
+	for (item_num_t ix = 0; ix < log->size() && ok; ix++) {
+		ok = upload_single_qso(log->record_number(ix));
+		if (!ok) {
+			status_->misc_status(ST_WARNING, "QRZ: IUpload log failed - see above message");
+		}
+	}
+	return ok;
+}
+
 // Upload thread - sit in a loop waiting for upload requests
 void qrz_handler::thread_run(qrz_handler* that) {
 	if (DEBUG_THREADS) printf("QRZ THREAD: Thread started\n");
