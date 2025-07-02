@@ -105,27 +105,10 @@ bool club_handler::upload_log(book* book) {
 void club_handler::generate_form(vector<url_handler::field_pair>& fields, record* the_qso) {
 	// Read the settings that define user's access 
 	server_data_t* club_data = qsl_dataset_->get_server_data("Club");
-	// Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	// Fl_Preferences qsl_settings(settings, "QSL");
-	// Fl_Preferences clublog_settings(qsl_settings, "ClubLog");
-	// uchar offset = hash8(clublog_settings.path());
-	// int itemp;
-	// clublog_settings.get("Email Length", itemp, 0);
-	// char* email = new char[itemp + 1];
-	// memset(email, '\0', itemp + 1);
-	// clublog_settings.get("Email", email, (void*)"", 0, &itemp);
-	// xor_crypt(email, itemp, seed_, offset);
 	string email = club_data->user;
 	fields.push_back({"email", email, "", ""});
-	// delete[] email;
-	// clublog_settings.get("Password Length", itemp, 0);
-	// char* password = new char[itemp + 1];
-	// memset(password, '\0', itemp + 1);
-	// clublog_settings.get("Password", password, (void*)"", 0, &itemp);
-	// xor_crypt(password, itemp, seed_, offset);
 	string password = club_data->password;
 	fields.push_back({ "password", password, "", "" });
-	// delete[] password;
 	if (the_qso != nullptr) {
 		// get logging callsign from QSO record
 		string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
@@ -223,11 +206,6 @@ void club_handler::get_reference(string& dir_name) {
 
 // Upload the single specified QSO in real time
 bool club_handler::upload_single_qso(qso_num_t record_num) {
-	// Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	// Fl_Preferences qsl_settings(settings, "QSL");
-	// Fl_Preferences club_settings(qsl_settings, "ClubLog");
-	// int upload_qso;
-	// club_settings.get("Upload per QSO", upload_qso, false);
 	server_data_t* club_data = qsl_dataset_->get_server_data("Club");
 	bool upload_qso = club_data->upload_per_qso;
 	if (upload_qso == false) {
@@ -359,5 +337,28 @@ void club_handler::set_adif_fields() {
 	adif_fields_ = fields_->field_names("ClubLog Upload");
 }
 
+// Download the OQRS list of QSL requests
+bool club_handler::download_oqrs(stringstream* adif) {
+	fl_cursor(FL_CURSOR_WAIT);
+	status_->misc_status(ST_NOTE, "CLUBLOG: Starting download OQRS");
+	stringstream request;
+	generate_oqrs(request);
+	if (!url_handler_->post_url("https://clublog.org/getadif.php", "", &request, adif)) {
+		status_->misc_status(ST_ERROR, "CLUBLOG: Download OQRS failed");
+		return false;
+	}
+	return true;
+}
 
+// Generate the HTTP POST reqyest to download OQRS
+void club_handler::generate_oqrs(ostream& request) {
+	// Read the settings that define user's access 
+	server_data_t* club_data = qsl_dataset_->get_server_data("Club");
+	string email = club_data->user;
+	request << "email=" << email << "&";
+	string password = club_data->password;
+	request << "password=" << password << "&";
+	string my_call = qso_manager_->get_default(qso_manager::CALLSIGN);
+	request << "call=" << my_call << "&type=dxqsl";
+}
 

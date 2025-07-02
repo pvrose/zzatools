@@ -57,10 +57,14 @@ typedef size_t qso_num_t;
 		bool download_exception(string filename);
 		// Upload a single QSO
 		bool upload_single_qso(qso_num_t record_num);
+		// Download OQRS Request data - creates an import_data file
+		bool download_oqrs(stringstream* adif);
 
 	protected:
 		// Generate the fields for posting the log
 		void generate_form(vector<url_handler::field_pair>& fields, record* the_qso);
+		// Generate the fields for OQRS
+		void generate_oqrs(ostream& req);
 		// Unzip the downloaded  exceptions file
 		bool unzip_exception(string filename);
 		// Get reference directory

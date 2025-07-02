@@ -119,6 +119,7 @@ protected:
     Fl_Button* bn_cancel_;
     Fl_Button* bn_send_email_;
     Fl_Button* bn_email_done_;
+    Fl_Button* bn_down_oqrs_;
     Fl_Fill_Dial* op_eqsl_count_;
 
 };

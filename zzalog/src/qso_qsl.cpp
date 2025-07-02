@@ -233,6 +233,11 @@ void qso_qsl::create_form() {
 	bn_extr_card_ = new Fl_Button(C4, curr_y, W4, HBUTTON, "@search");
 	bn_extr_card_->callback(cb_extract, (void*)extract_data::CARD);
 	bn_extr_card_->tooltip("Extract records for printing labels");
+	// Download OQRS
+	bn_down_oqrs_ = new Fl_Button(C3, curr_y, W3, HBUTTON, "OQRS");
+	bn_down_oqrs_->labelsize(FL_NORMAL_SIZE - 2);
+	bn_down_oqrs_->callback(cb_download, (void*)import_data::OQRS);
+	bn_down_oqrs_->tooltip("Download OQRS requests from Clublog.org");
 	// print
 	bn_print_ = new Fl_Button(C5, curr_y, W5, HBUTTON, "@fileprint");
 	bn_print_->callback(cb_print);
@@ -309,6 +314,7 @@ void qso_qsl::enable_widgets() {
 		bn_down_eqsl_->activate();
 		bn_down_lotw_->activate();
 		bn_down_qrz_->activate();
+		bn_down_oqrs_->activate();
 		bn_extr_club_->activate();
 		bn_extr_eqsl_->activate();
 		bn_extr_lotw_->activate();
@@ -319,6 +325,7 @@ void qso_qsl::enable_widgets() {
 		bn_down_eqsl_->deactivate();
 		bn_down_lotw_->deactivate();
 		bn_down_qrz_->deactivate();
+		bn_down_oqrs_->deactivate();
 		bn_extr_club_->deactivate();
 		bn_extr_eqsl_->deactivate();
 		bn_extr_lotw_->deactivate();

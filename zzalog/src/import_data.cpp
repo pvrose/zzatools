@@ -100,7 +100,7 @@ void import_data::merge_update() {
 	record* book_record = book_->get_record();
 	// Grid square may change (more accurate)
 	hint_t hint;
-	book_record->merge_records(import_record, false, &hint);
+	book_record->merge_records(import_record, MR_NONE, &hint);
 	cty_data_->update_qso(book_record);
 	spec_data_->validate(book_record, book_->selection());
 	// Tell views to update with new record
@@ -161,6 +161,10 @@ void import_data::update_book() {
 		update_is_new_ = false;
 		int offset = 0;
 		char message[256];
+		match_flags_t match_flags = MR_NONE;
+		if (update_mode_ == LOTW_UPDATE) (uchar&)match_flags |= MR_ALLOW_LOC;
+		if (update_mode_ == OQRS) (uchar&)match_flags |= MR_ALLOW_QSLS;
+
 		// Process the records - always process the zeroth one as it gets deleted
 		// update_in_progress_ indicates we want to drop out to present user with a 
 		// choice.
@@ -207,7 +211,7 @@ void import_data::update_book() {
 					found_match = true;
 					had_swl_match = false;
 					// merge_records the matching record from the import record and delete the import record
-					if (test_qso->merge_records(import_record, update_mode_ == LOTW_UPDATE)) {
+					if (test_qso->merge_records(import_record, match_flags)) {
 						snprintf(message, 256, "IMPORT: Updated record. %s %s %s %s %s",
 							test_qso->item("QSO_DATE").c_str(), test_qso->item("TIME_ON").c_str(),
 							test_qso->item("CALL").c_str(),
@@ -280,7 +284,7 @@ void import_data::update_book() {
 					// can update without query and delete record
 				case MT_PROBABLE:
 					found_match = true;
-					if (test_qso->merge_records(import_record, update_mode_ == LOTW_UPDATE)) {
+					if (test_qso->merge_records(import_record, match_flags)) {
 						number_modified_++;
 					}
 					number_matched_++;
@@ -668,6 +672,11 @@ bool import_data::download_data(import_data::update_mode_t server) {
 		status_->misc_status(ST_NOTE, "IMPORT: Downloading QRZ.com");
 		result = qrz_handler_->download_qrzlog_log(&adif);
 		break;
+	case OQRS:
+		// Fetch QSL request list from Clublog.org
+		update_mode_ = server;
+		status_->misc_status(ST_NOTE, "IMPORT: Downloading OQRS from Cliublog.org");
+		result = club_handler_->download_oqrs(&adif);
 	default:
 		break;
 	}

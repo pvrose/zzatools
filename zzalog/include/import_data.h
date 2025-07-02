@@ -30,6 +30,7 @@ class book;
 			DATAGRAM,        // Book contains data received from WSJT-X datagram
 			CLIPBOARD,       // Book is being imported from clipboard
 			SINGLE_ADIF,     // Import a single ADIF
+			OQRS,            // Book contains a list of OQRS QSL requests
 		};
 
 	public:

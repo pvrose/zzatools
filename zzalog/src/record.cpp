@@ -638,7 +638,7 @@ bool record::update_band(bool force /*=false*/) {
 }
 
 // Merge fields from another record
-bool record::merge_records(record* merge_record, bool allow_loc_mismatch /* = false */, hint_t* result /*= nullptr*/)
+bool record::merge_records(record* merge_record, match_flags_t flags, hint_t* result /*= nullptr*/)
 {
 	bool merged = false;
 	bool bearing_change = false;
@@ -665,7 +665,7 @@ bool record::merge_records(record* merge_record, bool allow_loc_mismatch /* = fa
 			field_name == "STATE") {
 			// Geographic location field
 			is_location = true;
-			if (allow_loc_mismatch) {
+			if (flags & MR_ALLOW_LOC) {
 				bearing_change = true;
 			}
 		}
@@ -701,7 +701,10 @@ bool record::merge_records(record* merge_record, bool allow_loc_mismatch /* = fa
 			field_name == "QSL_SENT_VIA" ||
 			field_name == "QSLMSG") {
 			// Fields added by eQSL - ignore these
-			ignore_import = true;
+			// Also used by OQRS - ignore if we've already sent a bureau card
+			if (flags & MR_ALLOW_QSLS) {
+				if (item("QSL_SENT") == "Y" && item("QSL_SENT_VIA") == "B") ignore_import = true;
+			} else ignore_import = true;
 		}
 		else if (field_name == "TIME_OFF" ||
 			field_name == "QSO_DATE_OFF") {
@@ -758,7 +761,7 @@ bool record::merge_records(record* merge_record, bool allow_loc_mismatch /* = fa
 		// Merge if current field is "", is a location field being updated by LotW or 
 		// is updating from 4-char gridsquare to 6-char or QSL received
 		if ((my_data == "" && !ignore_import) ||
-			(is_location && allow_loc_mismatch) || is_grid_4_to_6 || is_qsl_rcvd) {
+			(is_location && (flags & MR_ALLOW_LOC)) || is_grid_4_to_6 || is_qsl_rcvd) {
 			// Can safely merge - use un-case-converted
 			item(field_name, merge_data);
 			merged = true;

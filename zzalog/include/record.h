@@ -31,6 +31,14 @@ using namespace std;
 		MT_OVERLAP,          // The two records have same freq/mode and times overlap
 	};
 
+	// Flags used in match_records
+	enum match_flags_t : uchar {
+		MR_NONE,             // No special match instructions - default
+		MR_ALLOW_LOC = 1,    // ALlow limited location mismatch (used for LOTW)
+		MR_ALLOW_QSLS = 2,   // Allow processing of QSL_SENT* (used for OQRS)
+	};
+
+
 	// Location source
 	enum location_t : uchar {
 		LOC_NONE,        // not derived
@@ -95,7 +103,7 @@ using namespace std;
 		// update BAND from FREQ
 		bool update_band(bool force = false);
 		// combine records - update result with hint to use in subsequent update
-		bool merge_records(record* record, bool allow_locn_mismatch = false, hint_t* result = nullptr);
+		bool merge_records(record* record, match_flags_t flags = MR_NONE, hint_t* result = nullptr);
 		// records are duplicates
 		match_result_t match_records(record* record);
 		// Add timeoff if its isn't set
