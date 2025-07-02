@@ -2106,5 +2106,14 @@ string qso_data::get_default_station(char item) {
 void qso_data::update_station_fields(record* qso) {
 	record* ud_qso = (qso == nullptr) ? current_qso() : qso;
 	g_station_->update_qso(ud_qso);
+	switch(logging_state_) {
+		case qso_data::QSO_STARTED:
+		case qso_data::QSO_EDIT:
+		case qso_data::QSO_ENTER:
+			g_entry_->copy_qso_to_display(qso_entry::CF_CAT);
+			break;
+		default:
+			break;
+		}
 	return;
 }
