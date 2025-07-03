@@ -1,27 +1,32 @@
 #include "report_tree.h"
-#include "record.h"
+
 #include "book.h"
-#include "extract_data.h"
 #include "cty_data.h"
+#include "extract_data.h"
+#include "field_choice.h"
+#include "menu.h"
+#include "qso_data.h"
+#include "qso_manager.h"
+#include "record.h"
 #include "spec_data.h"
+#include "status.h"
 #include "tabbed_forms.h"
 
-#include "status.h"
 #include "callback.h"
 #include "utils.h"
-#include "menu.h"
-#include "field_choice.h"
 
 #include <FL/fl_draw.H>
 #include <FL/Fl_Preferences.H>
 
 extern book* book_;
-extern extract_data* extract_records_;
 extern cty_data* cty_data_;
-extern spec_data* spec_data_;
-extern tabbed_forms* tabbed_forms_;
-extern status* status_;
+extern extract_data* extract_records_;
 extern menu* menu_;
+extern qso_manager* qso_manager_;
+extern spec_data* spec_data_;
+extern status* status_;
+extern tabbed_forms* tabbed_forms_;
+
 extern bool DARK;
 extern string VENDOR;
 extern string PROGRAM_ID;
@@ -566,11 +571,13 @@ void report_tree::create_map() {
 	status_->misc_status(ST_NOTE, "LOG: Report selection started");
 	status_->progress(get_book()->size(), OT_REPORT, "Converting log into a report tree", "records");
 	// Get current selected record so we can find all records with the same report item
-	record* selection = book_->get_record();
+	record* selection = qso_manager_->data()->current_qso();
 	report_cat_t category = adj_order_[0];
 	string selector_name;
 	string field_name;
-	station_call_ = selection->item("STATION_CALLSIGN");
+	station_call_ = selection ? 
+		selection->item("STATION_CALLSIGN") : 
+		qso_manager_->get_default(qso_manager::CALLSIGN);
 	// map_.entry_cat = category;
 	// Get the field we use from the selected record to get our report criterion
 	switch (category) {
