@@ -2110,7 +2110,7 @@ void qso_data::update_station_fields(record* qso) {
 		case qso_data::QSO_STARTED:
 		case qso_data::QSO_EDIT:
 		case qso_data::QSO_ENTER:
-			g_entry_->copy_qso_to_display(qso_entry::CF_CAT);
+			g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 			break;
 		default:
 			break;

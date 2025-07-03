@@ -319,6 +319,7 @@ void qso_entry::copy_qso_to_display(int flags) {
 		}
 		ip_notes_->value("");
 	}
+	redraw();
 }
 
 // Copy from an existing record: fields depend on flags set
