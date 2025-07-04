@@ -109,9 +109,8 @@ void banner::create_form() {
 
 	curr_y += HBUTTON;
 	// Progress value
-	op_prog_value_ = new Fl_Output(curr_x, curr_y, WSMEDIT, HBUTTON);
-	op_prog_value_->align(FL_ALIGN_RIGHT);
-	op_prog_value_->textsize(FL_NORMAL_SIZE);
+	bx_prog_value_ = new Fl_Box(curr_x, curr_y, WEDIT, HBUTTON);
+	bx_prog_value_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 
 	curr_y += HBUTTON + GAP;
 	h_small_ = curr_y - y();
@@ -204,9 +203,8 @@ void banner::start_progress(uint64_t max_value, object_t object, const char* msg
 	status_->misc_status(ST_PROGRESS, text);
 	snprintf(text, sizeof(text), "%s: %s.", OBJECT_NAMES.at(object), msg);
 	op_prog_title_->value(text);
-	snprintf(text, sizeof(text), " out of %lld %s", max_value, suffix);
-	op_prog_value_->copy_label(text);
-	op_prog_value_->value("0");
+	snprintf(text, sizeof(text), "0 out of %lld %s", max_value, suffix);
+	bx_prog_value_->copy_label(text);
 	fd_progress_->selection_color(OBJECT_COLOURS.at(object));
 
 	redraw();
@@ -217,13 +215,13 @@ void banner::start_progress(uint64_t max_value, object_t object, const char* msg
 void banner::add_progress(uint64_t value) {
 	// Trap any call that is not from the main thread
 	if (this_thread::get_id() != main_thread_id_) {
-		printf("Calling banner::add_progress(%ld) when not in the main thread\n", value);
+		printf("Calling banner::add_progress(%lld) when not in the main thread\n", value);
 		throw;
 	}
 	char text[128];
 	if ((value == max_value_) || (value - prev_value_) > delta_) {
-		snprintf(text, sizeof(text), "%lld", value);
-		op_prog_value_->value(text);
+		snprintf(text, sizeof(text), "%lld out of %lld %s", value, max_value_, prg_unit_);
+		bx_prog_value_->copy_label(text);
 		fd_progress_->value((double)value / double(max_value_));
 		prev_value_ = value;
 		if (value == max_value_) {
@@ -232,7 +230,7 @@ void banner::add_progress(uint64_t value) {
 		else {
 			// Only redraw these two items.
 			fd_progress_->redraw();
-			op_prog_value_->redraw();
+			bx_prog_value_->redraw();
 			if (visible()) Fl::check();
 		}
 	}

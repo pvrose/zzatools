@@ -52,7 +52,7 @@ protected:
     Fl_Multiline_Output* op_msg_low_;
     Fl_Multiline_Output* op_msg_high_;
     Fl_Output* op_prog_title_;
-    Fl_Output* op_prog_value_;
+    Fl_Box* bx_prog_value_;
     Fl_Text_Display* display_;
 
     // Overall heights - small banner
