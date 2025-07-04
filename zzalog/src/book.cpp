@@ -202,7 +202,7 @@ bool book::load_data(string filename)
 							}
 							else {
 								main_window_label(filename);
-								header_->item("APP_ZZA_NUMRECORDS", to_string(size()));
+								if (header_) header_->item("APP_ZZA_NUMRECORDS", to_string(size()));
 							}
 						}
 						delete adi_reader_;
