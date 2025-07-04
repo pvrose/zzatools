@@ -211,9 +211,7 @@ void import_data::update_book() {
 				end_pos++;
 				end_pt = book_->get_record(end_pos, false)->ctimestamp();
 			}
-			bool overlap = false;
 			for (item_num_t test_record = start_pos; test_record <= end_pos && !found_match; test_record++) {
-				overlap = false;
 				// If the test record is outwith the book skip the check
 				if (test_record < 0 || test_record >= book_->size()) continue;
 				// Get potential match QSO
@@ -246,16 +244,13 @@ void import_data::update_book() {
 					discard_update(false);
 					break;
 				case MT_OVERLAP:
-					overlap = true;
 					break;
 				default:
 					break;
 				}
 			}
 			// Now look for near misses.
-			overlap = false;
 			for (item_num_t test_record = start_pos; test_record <= end_pos && !found_match; test_record++) {
-				overlap = false;
 				// If the test record is outwith the book skip the check
 				if (test_record < 0 || test_record >= book_->size()) continue;
 				// Get potential match QSO
@@ -330,7 +325,6 @@ void import_data::update_book() {
 					}
 					break;
 				case MT_OVERLAP:
-					overlap = true;
 					break;
 				default:
 					break;
