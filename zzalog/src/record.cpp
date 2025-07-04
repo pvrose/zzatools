@@ -910,10 +910,10 @@ match_result_t record::match_records(record* record) {
 	// Need more detailed analysis 
 	else {
 		// The two records overlap
-		chrono::system_clock::time_point this_on = chrono::system_clock::from_time_t(timestamp());
-		chrono::system_clock::time_point this_off = chrono::system_clock::from_time_t(timestamp(true));
-		chrono::system_clock::time_point that_on = chrono::system_clock::from_time_t(record->timestamp());
-		chrono::system_clock::time_point that_off = chrono::system_clock::from_time_t(record->timestamp(true));
+		chrono::system_clock::time_point this_on = ctimestamp();
+		chrono::system_clock::time_point this_off = ctimestamp(true);
+		chrono::system_clock::time_point that_on = record->ctimestamp();
+		chrono::system_clock::time_point that_off = record->ctimestamp(true);
 		chrono::seconds min30(1800);
 		// Make the QSO lengths >= 30 minutes
 		if (this_off - this_on < min30) this_off = this_on + min30;
@@ -1056,6 +1056,11 @@ bool record::items_match(record* record, string field_name) {
 		}
 	}
 	return false;
+}
+
+// Get the date and time as a chrono::system_clock::timepoisnt
+chrono::system_clock::time_point record::ctimestamp(bool time_off) {
+	return chrono::system_clock::from_time_t(timestamp(time_off));
 }
 
 // get the date and time as a time_t object

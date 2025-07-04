@@ -14,6 +14,7 @@ record.h - Individual record data item: header file
 #include <string>
 #include <istream>
 #include <ostream>
+#include <chrono>
 
 using namespace std;
 
@@ -116,6 +117,8 @@ using namespace std;
 		string item_merge(string data, bool indirect = false);
 		// get the timestamp
 		time_t timestamp(bool time_off = false);
+		// And similar in chrono form
+		chrono::system_clock::time_point ctimestamp(bool time_off = false);
 		// items match between records
 		bool items_match(record* record, string field_name);
 		// Delete all contents

@@ -15,6 +15,7 @@
 
 #include <sstream>
 #include <ctime>
+#include <chrono>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -159,7 +160,6 @@ void import_data::update_book() {
 		bool cancel_update = false;
 		update_in_progress_ = false;
 		update_is_new_ = false;
-		int offset = 0;
 		char message[256];
 		match_flags_t match_flags = MR_NONE;
 		if (update_mode_ == LOTW_UPDATE) (uchar&)match_flags |= MR_ALLOW_LOC;
@@ -184,7 +184,8 @@ void import_data::update_book() {
 			convert_update(import_record);
 			bool found_match = false;
 			// Find the position of the record either equal in time or just after
-			offset = book_->get_insert_point(import_record);
+			item_num_t datum_pos = book_->get_insert_point(import_record);
+
 			number_checked_++;
 			// Need separate checks for SWL report - wait until all records checked to see if one is a 2-way SWL match
 			bool had_swl_match = false;
@@ -193,12 +194,26 @@ void import_data::update_book() {
 			// Start at previous record or beginning of the book
 
 			// Start looking for an exact match only from 2 before until no longer overlap
+
+			// Start N minutes before the time 
+			const chrono::seconds MINUTES_30(1800);
+			chrono::system_clock::time_point datum = import_record->ctimestamp();
+			item_num_t start_pos = datum_pos;
+			chrono::system_clock::time_point start = book_->get_record(start_pos, false)->ctimestamp();
+			while (datum - start < MINUTES_30 && start_pos > 0) {
+				start_pos--;
+				start = book_->get_record(start_pos, false)->ctimestamp();
+			}
+			item_num_t end_pos = datum_pos;
+			datum = import_record->ctimestamp(true);
+			chrono::system_clock::time_point end_pt = book_->get_record(end_pos, false)->ctimestamp(true);
+			while (end_pt - datum < MINUTES_30 && end_pos < book_->size() - 1) {
+				end_pos++;
+				end_pt = book_->get_record(end_pos, false)->ctimestamp();
+			}
 			bool overlap = false;
-			for (int ix = -2;
-				(ix < 2 || overlap) && !found_match;
-				ix++) {
+			for (item_num_t test_record = start_pos; test_record <= end_pos && !found_match; test_record++) {
 				overlap = false;
-				int test_record = offset + ix;
 				// If the test record is outwith the book skip the check
 				if (test_record < 0 || test_record >= book_->size()) continue;
 				// Get potential match QSO
@@ -239,12 +254,8 @@ void import_data::update_book() {
 			}
 			// Now look for near misses.
 			overlap = false;
-			for (int ix = -2;
-				// Stop at next record, possible match or match found or end of book 
-				(ix < 5 || overlap) && !update_in_progress_ && !found_match;
-				ix++) {
+			for (item_num_t test_record = start_pos; test_record <= end_pos && !found_match; test_record++) {
 				overlap = false;
-				int test_record = offset + ix;
 				// If the test record is outwith the book skip the check
 				if (test_record < 0 || test_record >= book_->size()) continue;
 				// Get potential match QSO
@@ -327,12 +338,12 @@ void import_data::update_book() {
 			}
 			if (had_swl_match) {
 				// get the possible values for STATION_CALLSIGN
-				string stn1 = book_->get_record(offset, false)->item("STATION_CALLSIGN");
+				string stn1 = book_->get_record(datum_pos, false)->item("STATION_CALLSIGN");
 				import_record->item("STATION_CALLSIGN", stn1);
 				// ASk if valid SWL report
 				update_in_progress_ = true;
 				match_question_ = "SWL Report - please check validity.";
-				book_->selection(offset, HT_IMPORT_QUERYSWL);
+				book_->selection(datum_pos, HT_IMPORT_QUERYSWL);
 				number_swl_++;
 				had_swl_match = false;
 			}
@@ -344,10 +355,10 @@ void import_data::update_book() {
 				update_is_new_ = true;
 				match_question_ = "Cannot find matching record - select appropriate action";
 				// we have (probably) looked beyond the end of the book, select the last record
-				if ((unsigned)offset >= book_->size()) {
-					offset = book_->size() - 1;
+				if ((unsigned)datum_pos >= book_->size()) {
+					datum_pos = book_->size() - 1;
 				}
-				book_->selection(offset, HT_IMPORT_QUERYNEW);
+				book_->selection(datum_pos, HT_IMPORT_QUERYNEW);
 			}
 			// Expected new record (merging logs) - Move from update log to main log. 
 			else if (!found_match && (update_mode_ == FILE_IMPORT || 
@@ -362,9 +373,9 @@ void import_data::update_book() {
 					qso_manager_->update_import_qso(import_record);
 				}
 
-				book_->insert_record_at(offset, import_record);
+				book_->insert_record_at(datum_pos, import_record);
 				number_added_++;
-				last_added_number_ = offset;
+				last_added_number_ = datum_pos;
 				accept_update();
 			}
 		}
