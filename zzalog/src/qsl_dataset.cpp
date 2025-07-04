@@ -59,11 +59,11 @@ server_data_t* qsl_dataset::get_server_data(string server) {
 	return server_data_.at(server);
 }
 
-qrz_api_data* qsl_dataset::get_qrz_api(string callsign) {
+qsl_call_data* qsl_dataset::get_qrz_api(string callsign) {
 	server_data_t* sd = get_server_data("QRZ") ;
 	if (sd) {
-		if (sd->api_data.find(callsign) != sd->api_data.end()) {
-			return sd->api_data.at(callsign);
+		if (sd->call_data.find(callsign) != sd->call_data.end()) {
+			return sd->call_data.at(callsign);
 		} 
 	}
 	char msg[128];

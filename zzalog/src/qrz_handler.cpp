@@ -397,15 +397,15 @@ void qrz_handler::open_web_page(string callsign) {
 	fl_open_uri(uri);
 }
 
-// Load the api_data from settings
+// Load the call_data from settings
 void qrz_handler::load_data() {
 	server_data_t* qrz_data = qsl_dataset_->get_server_data("QRZ");
 	use_api_ = qrz_data->use_api;
 	upload_qso_ = qrz_data->upload_per_qso;
-	api_data_ = &qrz_data->api_data;
+	api_data_ = &qrz_data->call_data;
 }
 
-// Store the api_data to settings
+// Store the call_data to settings
 void qrz_handler::store_data() {
 }
 
@@ -453,7 +453,7 @@ bool qrz_handler::download_qrzlog_log(stringstream* adif) {
 }
 
 // Generate the fetch request
-bool qrz_handler::fetch_request(qrz_api_data* api, ostream& req) {
+bool qrz_handler::fetch_request(qsl_call_data* api, ostream& req) {
 	// Key
 	req << "KEY=" << api->key << "&";
 	// Action
@@ -466,7 +466,7 @@ bool qrz_handler::fetch_request(qrz_api_data* api, ostream& req) {
 }
 
 // Decode the fetch response and copy to import_data
-bool qrz_handler::fetch_response(qrz_api_data* api, istream& resp, int& count, string& adif) {
+bool qrz_handler::fetch_response(qsl_call_data* api, istream& resp, int& count, string& adif) {
 	bool ok = true;
 	char msg[128];
 	bool done = false;
@@ -662,13 +662,13 @@ void qrz_handler::th_upload_qso(record* qso) {
 	stringstream request;
 	stringstream response;
 	string callsign = qso->item("STATION_CALLSIGN");
-	qrz_api_data* api_data = api_data_->at(callsign);
+	qsl_call_data* call_data = api_data_->at(callsign);
 	string fail_message;
-	insert_request(api_data, request, qso);
+	insert_request(call_data, request, qso);
 	url_handler_->post_url("https://logbook.qrz.com/api", "", &request, &response);
 	response.seekg(0, ios::beg);
 	upload_resp_t* resp = new upload_resp_t;
-	resp->success = insert_response(api_data, response, resp->message, resp->logid);
+	resp->success = insert_response(call_data, response, resp->message, resp->logid);
 	resp->qso = qso;
 	// Send response back to 
 	upload_resp_ = resp;
@@ -724,7 +724,7 @@ void qrz_handler::upload_done(upload_resp_t* resp) {
 }
 
 // Generate insert request
-bool qrz_handler::insert_request(qrz_api_data* api, ostream& request, record* qso) {
+bool qrz_handler::insert_request(qsl_call_data* api, ostream& request, record* qso) {
 	// Key
 	request << "KEY=" << api->key << "&";
 	// Action insert
@@ -739,7 +739,7 @@ bool qrz_handler::insert_request(qrz_api_data* api, ostream& request, record* qs
 
 // Decode insert response
 qrz_handler::insert_resp_t qrz_handler::insert_response(
-	qrz_api_data* api, 
+	qsl_call_data* api, 
 	istream& response, 
 	string& fail_reason,
 	unsigned long long& logid

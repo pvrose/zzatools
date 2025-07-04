@@ -354,12 +354,17 @@ bool qsl_writer::write_element(qsl_element_t element) {
         if (server_name_ != "eMail") { 
             if (!write_value("Enable", server_->enabled)) return false;
             if (!write_value("Upload per QSO", server_->upload_per_qso)) return false;
-             if (!write_value("Last Download", server_->last_downloaded)) return false;
+            if (!write_value("Last Download", server_->last_downloaded)) return false;
         }
         if (server_name_ == "eQSL") {
             if (!write_value("Download Confirmed", server_->download_confirmed)) return false;
             if (!write_value("QSO Message", server_->qso_message)) return false;
             if (!write_value("SWL Message", server_->swl_message)) return false;
+            for (auto it : server_->call_data) {
+                logbook_name_ = it.first;
+                api_data_ = it.second;
+                if (!write_element(QSL_LOGBOOK)) return false;
+            }
         }
         if (server_name_ == "LotW") {
             if (!write_value("Export File", server_->export_file)) return false;
@@ -367,7 +372,7 @@ bool qsl_writer::write_element(qsl_element_t element) {
         if (server_name_ == "QRZ") {
             if (!write_value("Use XML Database", server_->use_xml)) return false;
             if (!write_value("Use API", server_->use_api)) return false;
-            for (auto it : server_->api_data) {
+            for (auto it : server_->call_data) {
                 logbook_name_ = it.first;
                 api_data_ = it.second;
                 if (!write_element(QSL_LOGBOOK)) return false;
@@ -422,11 +427,13 @@ string qsl_writer::font2text(Fl_Font f) {
 }
 
 bool qsl_writer::write_value(string name, string data) {
-    map<string, string>* attributes = new map<string, string>;
-    (*attributes)["name"] = name;
-    if (!start_element("value", attributes)) return false;
-    if (!characters(data)) return false;
-    if (!end_element("value")) return false;
+    if (data.length()) {
+        map<string, string>* attributes = new map<string, string>;
+        (*attributes)["name"] = name;
+        if (!start_element("value", attributes)) return false;
+        if (!characters(data)) return false;
+        if (!end_element("value")) return false;
+    }
     return true;
 }
 

@@ -9,7 +9,7 @@
 using namespace std;
 
 struct server_data_t;
-struct qrz_api_data;
+struct qsl_call_data;
 
 
 // XML element used in qsls.xml
@@ -160,7 +160,7 @@ protected:
     // Current server data
     server_data_t* server_;
     // Current QRZ logbook api credentials
-    qrz_api_data* api_data_;
+    qsl_call_data* api_data_;
     // Current value name
     string value_name_;
     // Current value data

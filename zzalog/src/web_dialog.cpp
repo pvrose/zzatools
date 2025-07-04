@@ -96,8 +96,11 @@ void web_dialog::load_values() {
 	if (call_set) {
 		for (auto it : call_set->data) {
 			string call = it.first;
-			if (qrz_data_->api_data.find(call) == qrz_data_->api_data.end()) {
-				qrz_data_->api_data[call] = new qrz_api_data;
+			if (qrz_data_->call_data.find(call) == qrz_data_->call_data.end()) {
+				qrz_data_->call_data[call] = new qsl_call_data;
+			}
+			if (eqsl_data_->call_data.find(call) == eqsl_data_->call_data.end()) {
+				eqsl_data_->call_data[call] = new qsl_call_data;
 			}
 		}
 	}
@@ -150,33 +153,33 @@ void web_dialog::create_form(int X, int Y) {
 }
 
 void web_dialog::create_eqsl(int rx, int ry, int rw, int rh) {
-	// Group 1 eQSL widgets
-	const int GRP1 = ry + GAP;
-	const int R1_1 = GRP1 + GAP;
-	const int H1_1 = HBUTTON;
-	const int R1_1A = R1_1 + H1_1;
-	const int H1_1A = HBUTTON;
-	const int R1_1B = R1_1A + H1_1A;
-	const int H1_1B = HBUTTON;
-	const int R1_2 = R1_1B + H1_1B + GAP;
-	const int H1_2 = HBUTTON;
-	const int R1_3 = R1_2 + H1_2 + GAP;
-	const int H1_3 = HBUTTON;
-	// main columns
-	const int C1 = rx + GAP;
-	const int W1 = HBUTTON; // square check button
-	const int C2 = C1 + W1 + GAP;
-	const int W2 = WSMEDIT;
-	const int C3 = C2 + W2 + GAP;
-	const int W3 = HBUTTON * 3 / 2;
-	const int C4 = C3 + W3 + GAP;
-	const int W4 = WSMEDIT;
-	const int C5 = C4 + W4 + GAP;
-	const int W5 = WSMEDIT;
-	const int W6 = HBUTTON;
-	// offset columns
-	const int C2A = C1 + W1 + WLLABEL + GAP;
-	const int W2A = WEDIT;
+	//// Group 1 eQSL widgets
+	//const int GRP1 = ry + GAP;
+	//const int R1_1 = GRP1 + GAP;
+	//const int H1_1 = HBUTTON;
+	//const int R1_1A = R1_1 + H1_1;
+	//const int H1_1A = HBUTTON;
+	//const int R1_1B = R1_1A + H1_1A;
+	//const int H1_1B = HBUTTON;
+	//const int R1_2 = R1_1B + H1_1B + GAP;
+	//const int H1_2 = HBUTTON;
+	//const int R1_3 = R1_2 + H1_2 + GAP;
+	//const int H1_3 = HBUTTON;
+	//// main columns
+	//const int C1 = rx + GAP;
+	//const int W1 = HBUTTON; // square check button
+	//const int C2 = C1 + W1 + GAP;
+	//const int W2 = WSMEDIT;
+	//const int C3 = C2 + W2 + GAP;
+	//const int W3 = HBUTTON * 3 / 2;
+	//const int C4 = C3 + W3 + GAP;
+	//const int W4 = WSMEDIT;
+	//const int C5 = C4 + W4 + GAP;
+	//const int W5 = WSMEDIT;
+	//const int W6 = HBUTTON;
+	//// offset columns
+	//const int C2A = C1 + W1 + WLLABEL + GAP;
+	//const int W2A = WEDIT;
 
 	Fl_Group* gp01 = new Fl_Group(rx, ry, rw, rh, "eQSL.cc");
 
@@ -187,16 +190,20 @@ void web_dialog::create_eqsl(int rx, int ry, int rw, int rh) {
 	gp1->box(FL_BORDER_BOX);
 	gp1->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 
-	// Row 1 Col 2 - Date last accessed
-	calendar_input* in1_1_2 = new calendar_input(C2, R1_1, W2 + H1_1, H1_1, "Last accessed");
-	in1_1_2->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	in1_1_2->value(eqsl_data_->last_downloaded.c_str());
-	in1_1_2->callback(cb_value<intl_input, string>, &eqsl_data_->last_downloaded);
-	in1_1_2->when(FL_WHEN_CHANGED);
-	in1_1_2->tooltip("Last time eQSL.cc accessed");
+	//// Row 1 Col 2 - Date last accessed
+	//calendar_input* in1_1_2 = new calendar_input(C2, R1_1, W2 + H1_1, H1_1, "Last accessed");
+	//in1_1_2->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	//in1_1_2->value(eqsl_data_->last_downloaded.c_str());
+	//in1_1_2->callback(cb_value<intl_input, string>, &eqsl_data_->last_downloaded);
+	//in1_1_2->when(FL_WHEN_CHANGED);
+	//in1_1_2->tooltip("Last time eQSL.cc accessed");
+
+	// Leave room for the eQSL enable button
+	int curr_x = rx + GAP + HBUTTON;
+	int curr_y = ry + GAP;
 
 	// Row 1 Col 4 - User entry field
-	intl_input* in1_1_4 = new intl_input(C4, R1_1, W4, H1_1, "User");
+	intl_input* in1_1_4 = new intl_input(curr_x, curr_y, WSMEDIT, HBUTTON, "User");
 	in1_1_4->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in1_1_4->value(eqsl_data_->user.c_str());
 	in1_1_4->callback(cb_value<intl_input, string>, &eqsl_data_->user);
@@ -204,40 +211,93 @@ void web_dialog::create_eqsl(int rx, int ry, int rw, int rh) {
 	in1_1_4->tooltip("Enter user name for eQSL.cc");
 
 	// Row 1 Col 5 - Password entry field
-	password_input* in1_1_5 = new password_input(C5, R1_1, W5 + W6, H1_1, "Password");
+	curr_x += WSMEDIT + GAP;
+	password_input* in1_1_5 = new password_input(curr_x, curr_y, WSMEDIT + HBUTTON, HBUTTON, "Password");
 	in1_1_5->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in1_1_5->value(eqsl_data_->password.c_str());
 	in1_1_5->callback(cb_value<Fl_Input, string>, &eqsl_data_->password);
 	in1_1_5->when(FL_WHEN_CHANGED);
 	in1_1_5->tooltip("Enter password for eQSL.cc");
 
+	curr_y += HBUTTON + GAP;
+	curr_x = in1_1_4->x();
 	// Row 1A Col 1 - Update evry QSO
-	Fl_Check_Button* bn1_1A_1 = new Fl_Check_Button(C1, R1_1A, W1, H1_1A, "Update each QSO");
+	Fl_Check_Button* bn1_1A_1 = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "Update each QSO");
 	bn1_1A_1->align(FL_ALIGN_RIGHT);
 	bn1_1A_1->value(eqsl_data_->upload_per_qso);
 	bn1_1A_1->callback(cb_value < Fl_Check_Button, bool>, &eqsl_data_->upload_per_qso);
 	bn1_1A_1->when(FL_WHEN_CHANGED);
 	bn1_1A_1->tooltip("Upload each QSO as it is logged");
 
+	curr_x = in1_1_5->x();
 	// Row 1A Col 3 - Download Confirmed
-	Fl_Check_Button* bn1_1A_2 = new Fl_Check_Button(C3, R1_1A, HBUTTON, H1_1A, "Download Confirmed");
+	Fl_Check_Button* bn1_1A_2 = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "Download Confirmed");
 	bn1_1A_2->align(FL_ALIGN_RIGHT);
 	bn1_1A_2->value(eqsl_data_->download_confirmed);
 	bn1_1A_2->callback(cb_value<Fl_Check_Button, bool>, &eqsl_data_->download_confirmed);
 	bn1_1A_2->when(FL_WHEN_CHANGED);
 	bn1_1A_2->tooltip("Include previously confirmed QSOs");
 
+	// Now the 
+	curr_y += GAP + HBUTTON;
+	curr_x = rx + GAP + HBUTTON;
+	grp_eqsl_calls_ = new Fl_Group(curr_x, curr_y, rw + rx - curr_x - GAP, HBUTTON * (eqsl_data_->call_data.size() + 2) + GAP);
+
+	Fl_Box* b1 = new Fl_Box(curr_x, curr_y, WBUTTON, HBUTTON, "Call");
+	b1->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+	b1->box(FL_FLAT_BOX);
+
+	curr_x += WBUTTON + GAP;
+	Fl_Box* b1a = new Fl_Box(curr_x, curr_y, HBUTTON, HBUTTON, "Used");
+	b1a->align(FL_ALIGN_CENTER);
+	b1a->box(FL_FLAT_BOX);
+
+	curr_x += HBUTTON + GAP;
+	Fl_Box* b4 = new Fl_Box(curr_x, curr_y, WSMEDIT + HBUTTON, HBUTTON, "Last Downloaded");
+	b4->align(FL_ALIGN_CENTER);
+	b4->box(FL_FLAT_BOX);
+
+	curr_y += HBUTTON;
+	for (auto it = eqsl_data_->call_data.begin(); it != eqsl_data_->call_data.end(); it++) {
+		curr_x = rx + GAP + HBUTTON;
+		Fl_Output* op_book = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON);
+		op_book->box(FL_FLAT_BOX);
+		op_book->color(FL_BACKGROUND_COLOR);
+		op_book->value(it->first.c_str());
+
+		curr_x += WBUTTON + GAP;
+		Fl_Check_Button* bn_use = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON);
+		bn_use->value(it->second->used);
+		bn_use->callback(cb_ch_enable, &it->second->used);
+		bn_use->tooltip("Select to allow access for this book");
+
+		curr_x += HBUTTON + GAP;
+		calendar_input* ip_lastdl = new calendar_input(curr_x, curr_y, WSMEDIT + HBUTTON, HBUTTON);
+		ip_lastdl->value(it->second->last_download.c_str());
+		ip_lastdl->callback(cb_value<intl_input, string>, &it->second->last_download);
+		ip_lastdl->tooltip("The date of the last download");
+
+		w_eqsl_lupds_[it->first] = ip_lastdl;
+
+		curr_y += HBUTTON;
+	}
+
+	grp_eqsl_calls_->end();
+
+	curr_x = rx + GAP + HBUTTON + WLLABEL;
+	curr_y += GAP;
 
 	// Row2 Col 2A - QSO Message
-	intl_input* in1_2_2 = new intl_input(C2A, R1_2, W2A, H1_2, "QSL Message (QSO)");
+	intl_input* in1_2_2 = new intl_input(curr_x, curr_y, WEDIT, HBUTTON, "QSL Message (QSO)");
 	in1_2_2->align(FL_ALIGN_LEFT);
 	in1_2_2->value(eqsl_data_->qso_message.c_str());
 	in1_2_2->callback(cb_value<intl_input, string>, &eqsl_data_->qso_message);
 	in1_2_2->when(FL_WHEN_CHANGED);
 	in1_2_2->tooltip("Message to send to eQSL.cc or print on cards for QSOs");
 
+	curr_y += HBUTTON;
 	// Row2 Col 2A - SWL Message
-	intl_input* in1_3_2 = new intl_input(C2A, R1_3, W2A, H1_3, "QSL Message (SWL)");
+	intl_input* in1_3_2 = new intl_input(curr_x, curr_y, WEDIT, HBUTTON, "QSL Message (SWL)");
 	in1_3_2->align(FL_ALIGN_LEFT);
 	in1_3_2->value(eqsl_data_->swl_message.c_str());
 	in1_3_2->callback(cb_value<intl_input, string>, &eqsl_data_->swl_message);
@@ -250,7 +310,7 @@ void web_dialog::create_eqsl(int rx, int ry, int rw, int rh) {
 	gp1->end();
 
 	// Row 1 Col 1 - eQSL Enable
-	Fl_Check_Button* bn1_1_1 = new Fl_Check_Button(C1, R1_1, W1, H1_1, "En");
+	Fl_Check_Button* bn1_1_1 = new Fl_Check_Button(rx + GAP, ry + GAP, HBUTTON, HBUTTON, "En");
 	bn1_1_1->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	bn1_1_1->value(eqsl_data_->enabled);
 	bn1_1_1->callback(cb_ch_enable, &eqsl_data_->enabled);
@@ -370,8 +430,6 @@ void web_dialog::create_qrz(int rx, int ry, int rw, int rh) {
 	grp_qrz_xml_ = new Fl_Group(curr_x, curr_y, rw + rx - curr_x - GAP, HBUTTON + GAP);
 	grp_qrz_xml_->box(FL_FLAT_BOX);
 
-	curr_y += GAP;
-
 	// Row 1 Col 4 - User entry field
 	intl_input* in3_1_4 = new intl_input(curr_x, curr_y, WSMEDIT, HBUTTON, "User");
 	in3_1_4->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
@@ -403,7 +461,7 @@ void web_dialog::create_qrz(int rx, int ry, int rw, int rh) {
 
 	curr_y += HBUTTON;
 	
-	grp_qrz_api_ = new Fl_Group(curr_x, curr_y, rw + rx - curr_x - GAP, HBUTTON * (qrz_data_->api_data.size() + 2) + GAP);
+	grp_qrz_api_ = new Fl_Group(curr_x, curr_y, rw + rx - curr_x - GAP, HBUTTON * (qrz_data_->call_data.size() + 2) + GAP);
 	grp_qrz_api_->box(FL_FLAT_BOX);
 
 	// Now the headers
@@ -443,7 +501,7 @@ void web_dialog::create_qrz(int rx, int ry, int rw, int rh) {
 	b4->box(FL_FLAT_BOX);
 	
 	curr_y += HBUTTON;
-	for (auto it = qrz_data_->api_data.begin(); it != qrz_data_->api_data.end(); it ++) {
+	for (auto it = qrz_data_->call_data.begin(); it != qrz_data_->call_data.end(); it ++) {
 		Fl_Output* op_book = new Fl_Output(XBOOK, curr_y, WBOOK, HBUTTON);
 		op_book->box(FL_FLAT_BOX);
 		op_book->color(FL_BACKGROUND_COLOR);
@@ -709,6 +767,14 @@ void web_dialog::enable_widgets() {
 	// Enable/Disable eQSL widgets
 	if (eqsl_data_->enabled) {
 		grp_eqsl_->activate();
+		for (auto it = eqsl_data_->call_data.begin(); it != eqsl_data_->call_data.end(); it++) {
+			if (it->second->used) {
+				w_eqsl_lupds_.at(it->first)->activate();
+			}
+			else {
+				w_eqsl_lupds_.at(it->first)->deactivate();
+			}
+		}
 	}
 	else {
 		grp_eqsl_->deactivate();
@@ -728,7 +794,7 @@ void web_dialog::enable_widgets() {
 	}
 	if (qrz_data_->use_api) {
 		grp_qrz_api_->activate();
-		for (auto it = qrz_data_->api_data.begin(); it != qrz_data_->api_data.end(); it++) {
+		for (auto it = qrz_data_->call_data.begin(); it != qrz_data_->call_data.end(); it++) {
 			if (it->second->used) {
 				grp_api_books_.at(it->first)->activate();
 			} else {

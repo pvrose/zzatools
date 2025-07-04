@@ -628,14 +628,14 @@ bool qsl_reader::start_logbook(xml_wreader* w, map<string, string>* attributes) 
 		string name = to_upper(it.first);
 		if (name == "CALL") {
 			string sname = it.second;
-			if (that->server_->api_data.find(sname) != that->server_->api_data.end()) {
+			if (that->server_->call_data.find(sname) != that->server_->call_data.end()) {
 				snprintf(msg, sizeof(msg), "QSL: Already have api data for QRZ callsign %s", sname.c_str());
 				status_->misc_status(ST_WARNING, msg);
 			}
 			// else
 			that->parent_name_ = sname;
-			that->api_data_ = new qrz_api_data;
-			that->server_->api_data[sname] = that->api_data_;
+			that->api_data_ = new qsl_call_data;
+			that->server_->call_data[sname] = that->api_data_;
 			return true;
 		}
 		// else 
@@ -707,7 +707,7 @@ bool qsl_reader::end_value(xml_wreader* w) {
 	qsl_reader* that = (qsl_reader*)w;
 	qsl_element_t parent = (qsl_element_t)that->elements_.back();
 	server_data_t* sd = that->server_;
-	qrz_api_data* ad = that->api_data_;
+	qsl_call_data* ad = that->api_data_;
 	string& vn = that->value_name_;
 	string& vd = that->value_data_;
 	uchar& off = that->offset_;

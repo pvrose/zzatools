@@ -13,7 +13,7 @@ using namespace std;
 
 class Fl_Widget;
 class Fl_Group;
-struct qrz_api_data;
+struct qsl_call_data;
 struct server_data_t;
 
 	// This class provides a dialog to let the user supply web addresses, usernames and passwords
@@ -63,6 +63,7 @@ struct server_data_t;
 
 		// Widgets for eQSL
 		Fl_Group* grp_eqsl_;
+		Fl_Group* grp_eqsl_calls_;
 		// Widgets for LotW
 		Fl_Group* grp_lotw_;
 		// Widgets for QRZ.com
@@ -83,6 +84,7 @@ struct server_data_t;
 		Fl_Group* grp_fldigi_;
 
 		map<string, Fl_Group*> grp_api_books_;
+		map<string, Fl_Widget*> w_eqsl_lupds_;
 
 		server_data_t* eqsl_data_;
 		server_data_t* lotw_data_;

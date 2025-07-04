@@ -11,10 +11,16 @@
 
 using namespace std;
 
+enum extract_mode_t : uchar;
+
 // Class to manage QSL designs
 
-struct qrz_api_data;
-enum extract_mode_t : uchar;
+struct qsl_call_data {
+	bool used;
+	string key;
+	unsigned long long last_logid;
+	string last_download;
+};
 
 struct server_data_t {
 	bool upload_per_qso{false};     // Upload per QSO
@@ -30,7 +36,7 @@ struct server_data_t {
 	bool use_xml{false};            // Use XML (QRZ.com)
 	string mail_server{""};         // Mail server (eMail)
 	string cc_address{""};          // cc Address (eMail)
-	map<string, qrz_api_data*> api_data; // API logbook data (QRZ.com)
+	map<string, qsl_call_data*> call_data; // API logbook data (QRZ.com)
 };
 class qsl_dataset
 {
@@ -46,7 +52,7 @@ public:
 	// Retunr the server data associated with the server (per extract_mode_t)
 	server_data_t* get_server_data(string server);
 	// Get QRZ logbook credentials
-	qrz_api_data* get_qrz_api(string callsign);
+	qsl_call_data* get_qrz_api(string callsign);
 
 	// Mark data dirty
 	void dirty(qsl_data* card);

@@ -6,7 +6,7 @@
 using namespace std;
 
 enum qsl_element_t : char;
-struct qrz_api_data;
+struct qsl_call_data;
 struct server_data_t;
 
 class qsl_writer :
@@ -50,7 +50,7 @@ protected:
     // Name of current server
     string server_name_;
     // Current QRZ logbook api credentials
-    qrz_api_data* api_data_;
+    qsl_call_data* api_data_;
     // Name of current log book
     string logbook_name_;
     // Encryption offset

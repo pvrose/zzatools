@@ -496,7 +496,13 @@ bool eqsl_handler::user_details(
 	}
 	// Check date last access
 	if (last_access != nullptr) {
-		*last_access = eqsl_data->last_downloaded;
+		if (eqsl_data->call_data.find(callsign) == eqsl_data->call_data.end()) {
+			// Deafult if we haven't got a book-specific lat download
+			*last_access = eqsl_data->last_downloaded;
+		}
+		else {
+			*last_access = eqsl_data->call_data.at(callsign)->last_download;
+		}
 	}
 	// Get any message for QSL_MSG
 	if (qsl_message != nullptr) {
@@ -642,7 +648,7 @@ eqsl_handler::response_t eqsl_handler::adif_filename(string& filename) {
 	if (result == ER_OK) {
 		last_access = now(false, EQSL_TIMEFORMAT);
 		server_data_t* eqsl_data = qsl_dataset_->get_server_data("eQSL");
-		eqsl_data->last_downloaded = last_access;
+		eqsl_data->call_data[station]->last_download = last_access;
 	}
 
 	return result;

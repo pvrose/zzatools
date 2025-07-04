@@ -20,12 +20,7 @@ typedef size_t qso_num_t;
 // This class provides the interface to the QRZ.com XML database look-up - it currently
 // is restricted to looking up details based on callsign. 
 // Structure to hold API data per QRZ.com logbook		
-struct qrz_api_data {
-	bool used;
-	string key;
-	unsigned long long last_logid;
-	string last_download;
-};
+struct qsl_call_data;
 
 
 	class qrz_handler
@@ -94,13 +89,13 @@ struct qrz_api_data {
 		// Decode Callsign element
 		bool decode_callsign(xml_element* element);
 		// Generate fetch request
-		bool fetch_request(qrz_api_data* api, ostream& request);
+		bool fetch_request(qsl_call_data* api, ostream& request);
 		// Decode fetch response
-		bool fetch_response(qrz_api_data* api, istream& response, int& count, string& adif);
+		bool fetch_response(qsl_call_data* api, istream& response, int& count, string& adif);
 		// Generate insert request
-		bool insert_request(qrz_api_data* api, ostream& request, record* qso);
+		bool insert_request(qsl_call_data* api, ostream& request, record* qso);
 		// Decode insert response
-		insert_resp_t insert_response(qrz_api_data* api, istream& response, 
+		insert_resp_t insert_response(qsl_call_data* api, istream& response, 
 			string& fail_reason, unsigned long long& logid);
 		// Callback when insert complete
 		static void cb_upload_done(void* v);
@@ -136,7 +131,7 @@ struct qrz_api_data {
 		// Web dialog
 		Fl_Help_Dialog* web_dialog_;
 		// API data
-		map<string, qrz_api_data*>* api_data_;
+		map<string, qsl_call_data*>* api_data_;
 		// Upload thread
 		thread* th_upload_;
 		// Allow thread to run
