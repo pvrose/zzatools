@@ -41,7 +41,7 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 	    qso_buttons::START_QSO, 
 		qso_buttons::NAV_FIRST, qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST ,
 		qso_buttons::QRZ_COM, qso_buttons::LOOK_ALL_TXT,
-		qso_buttons::EDIT_NET, qso_buttons::START_NET } },
+		qso_buttons::EDIT_NET, qso_buttons::START_NET, qso_buttons::BROWSE } },
 	{ qso_data::QSO_BROWSE, { qso_buttons::EDIT_QSO, qso_buttons::CANCEL_BROWSE, qso_buttons::VIEW_QSO, 
 	    qso_buttons::NAV_FIRST,
 		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST, qso_buttons::QRZ_COM } },
@@ -518,6 +518,7 @@ void qso_buttons::cb_bn_browse(Fl_Widget* w, void* v) {
 	that->disable_widgets();
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_PENDING:
+	case qso_data::QSO_VIEW:
 		that->qso_data_->action_deactivate();
 		// Drop through
 	case qso_data::QSO_INACTIVE:
