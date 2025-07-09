@@ -68,6 +68,7 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;    // Default height for table rows
 		OT_RIGS,             // Reading Rig data XML file
 		OT_QSLS,             // Redaing QSL data XML file
 		OT_STN,              // Reading Station data XML file
+		OT_CONTEST,          // Processing contest data
 	};
 
 	// Default colours to use in tab view labels and/or progress bar
@@ -87,6 +88,7 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;    // Default height for table rows
 		{ OT_RIGS, COLOUR_PINK },
 		{ OT_QSLS, COLOUR_MAUVE },
 		{ OT_STN, COLOUR_APPLE },
+		{ OT_CONTEST, COLOUR_ORANGE },
 	};
 
 	// Names of the objects
@@ -105,6 +107,7 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;    // Default height for table rows
 		{ OT_RIGS, "RIG DATA" },
 		{ OT_QSLS, "QSL" },
 		{ OT_STN, "STN DATA" },
+		{ OT_CONTEST, "CONTEST" },
 	};
 
 	// Main window default sizes

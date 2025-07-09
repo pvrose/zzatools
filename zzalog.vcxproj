@@ -166,6 +166,11 @@
     <ClCompile Include="zzalog\src\calendar_input.cpp" />
     <ClCompile Include="zzalog\src\calendar_table.cpp" />
     <ClCompile Include="zzalog\src\config.cpp" />
+    <ClCompile Include="zzalog\src\contest_data.cpp" />
+    <ClCompile Include="zzalog\src\contest_dialog.cpp" />
+    <ClCompile Include="zzalog\src\contest_reader.cpp" />
+    <ClCompile Include="zzalog\src\contest_scorer.cpp" />
+    <ClCompile Include="zzalog\src\contest_writer.cpp" />
     <ClCompile Include="zzalog\src\dxcc_table.cpp" />
     <ClCompile Include="zzalog\src\dxcc_view.cpp" />
     <ClCompile Include="zzalog\src\fields.cpp" />
@@ -285,6 +290,11 @@
     <ClInclude Include="zzalog\include\calendar_table.h" />
     <ClInclude Include="zzalog\include\callback.h" />
     <ClInclude Include="zzalog\include\config.h" />
+    <ClInclude Include="zzalog\include\contest_data.h" />
+    <ClInclude Include="zzalog\include\contest_dialog.h" />
+    <ClInclude Include="zzalog\include\contest_reader.h" />
+    <ClInclude Include="zzalog\include\contest_scorer.h" />
+    <ClInclude Include="zzalog\include\contest_writer.h" />
     <ClInclude Include="zzalog\include\drawing.h" />
     <ClInclude Include="zzalog\include\dxcc_table.h" />
     <ClInclude Include="zzalog\include\dxcc_view.h" />

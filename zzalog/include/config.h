@@ -33,6 +33,7 @@ const int HCONFIG = 500;
 			DLG_STATION,
 			DLG_USER,
 			DLG_QSLE,
+			DLG_CONTEST,
 			DLG_ALL,
 			DLG_X
 		};

@@ -14,6 +14,7 @@ class calendar_table;
 
 	// Format date is represented in ADIF
 	const char ADIF_DATEFORMAT[] = "%Y%m%d";
+	const char ADIF_HOURFORMAT[] = "%H%M";
 
 	// This class provides a widget to be used for date selection
 	class calendar : public Fl_Window

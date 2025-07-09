@@ -1158,3 +1158,12 @@ bool extract_data::meets_criteria(record* qso) {
 	}
 	return match;
 }
+
+// Map records
+void extract_data::map_record(qso_num_t record_num) {
+	int ixe = size() - 1;
+	// Add to both ways mappings
+	mapping_.insert(mapping_.begin() + ixe, record_num);
+	rev_mapping_[record_num] = ixe;
+
+}

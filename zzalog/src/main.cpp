@@ -19,6 +19,7 @@ main.cpp - application entry point
 #include "book.h"
 #include "club_handler.h"
 #include "config.h"
+#include "contest_data.h"
 #include "cty_data.h"
 #include "eqsl_handler.h"
 #include "extract_data.h"
@@ -81,7 +82,7 @@ string COPYRIGHT = "\302\251 Philip Rose GM3ZZA 2018-2025. All rights reserved.\
 string DATA_COPYRIGHT = "\302\251 Philip Rose %s. This data may be copied for the purpose of correlation and analysis";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string PROGRAM_VERSION = "3.5.11 (3.6.0-rc3)";
+string PROGRAM_VERSION = "3.5.12 (3.6.0-rc3)";
 string VENDOR = "GM3ZZA";
 string TIMESTAMP = string(__DATE__) + " " + string(__TIME__) + " Local";
 
@@ -139,6 +140,7 @@ config* config_ = nullptr;
 band_window* band_window_ = nullptr;
 rig_data* rig_data_ = nullptr;
 stn_data* stn_data_ = nullptr;
+contest_data* contest_data_ = nullptr;
 banner* banner_ = nullptr;
 // Recent files opened
 list<string> recent_files_;
@@ -693,6 +695,10 @@ void add_data() {
 	if (!closing_) {
 		stn_data_ = new stn_data;
 	}
+	// Add the contest details database
+	if (!closing_) {
+		contest_data_ = new contest_data;
+	}
 }
 
 // read in the log data
@@ -877,6 +883,7 @@ void tidy() {
 	delete extract_records_;
 	delete import_data_;
 	delete book_;
+	delete contest_data_;
 	delete stn_data_;
 	delete qsl_dataset_;
 	delete band_data_;

@@ -12,7 +12,7 @@
 using namespace std;
 
 class qso_buttons;
-class qso_contest;
+class contest_scorer;
 class qso_entry;
 class qso_misc;
 class qso_net_entry;
@@ -240,7 +240,7 @@ public:
 	// Add parse details to QSO
 	void action_parse_qso();
 
-	qso_contest* contest();
+	contest_scorer* contest();
 	// Contest mode is active
 	bool in_contest();
 	// Can we navigate the net

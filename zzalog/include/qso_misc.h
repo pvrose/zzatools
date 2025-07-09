@@ -6,7 +6,7 @@ class record;
 class qso_details;
 class qso_dxcc;
 class qso_qsl_vwr;
-class qso_contest;
+class contest_scorer;
 typedef size_t qso_num_t;
 
 // This displays a set of tabs for qso_qth, qso_details, qso_dxcc and qso_qsl_vwr
@@ -29,7 +29,7 @@ public:
 	// Set the QSO and QSO number to all objects
 	void qso(record* qso, qso_num_t qso_number);
 	// Return the contest dialog
-	qso_contest* contest();
+	contest_scorer* contest();
 
 protected:
 	// callback when t he tab is changed
@@ -42,7 +42,7 @@ protected:
 	qso_details* details_;
 	qso_dxcc* dxcc_;
 	qso_qsl_vwr* qsl_;
-	qso_contest* contest_;
+	contest_scorer* contest_;
 
 	// Used to reopen the tab that was opened when the app was shut down
 	int default_tab_;

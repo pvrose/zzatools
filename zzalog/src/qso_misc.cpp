@@ -1,7 +1,7 @@
 #include "qso_misc.h"
 #include "qso_details.h"
 #include "qso_dxcc.h"
-#include "qso_contest.h"
+#include "contest_scorer.h"
 #include "qso_qsl_vwr.h"
 #include "drawing.h"
 #include "record.h"
@@ -55,7 +55,7 @@ void qso_misc::create_form() {
 	// QSL details form
 	qsl_ = new qso_qsl_vwr(rx, ry, rw, rh, "QSL");
 	// Contest form
-	contest_ = new qso_contest(rx, ry, rw, rh, "Contest");
+	contest_ = new contest_scorer(rx, ry, rw, rh, "Contest");
 
 	end();
 	show();
@@ -111,6 +111,6 @@ void qso_misc::cb_tabs(Fl_Widget* w, void* v) {
 }
 
 // Return the contest form
-qso_contest* qso_misc::contest() {
+contest_scorer* qso_misc::contest() {
 	return contest_;
 }

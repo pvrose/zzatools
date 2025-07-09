@@ -171,3 +171,18 @@ string xml_writer::escape_string(string source) {
 	}
 	return result;
 }
+
+string xml_writer::convert_xml_datetime(time_t t) {
+	tm* value = gmtime(&t);
+	char result[128];
+	// YYYY-MM-DDTHH:MM:SS+HH:MM
+
+	snprintf(result, sizeof(result), "%04d-%02d-%02dT%02d:%02d:%02d+00:00",
+		value->tm_year + 1900,
+		value->tm_mon + 1,
+		value->tm_mday,
+		value->tm_hour,
+		value->tm_min,
+		value->tm_sec);
+	return string(result);
+}

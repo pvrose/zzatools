@@ -35,7 +35,7 @@ bool rig_writer::store_data(map<string, rig_data_t*>* all_data, ostream& os) {
         return false;
     }
     // else
-    status_->misc_status(ST_OK, "RIG_DATA: XML Saved OK");
+    status_->misc_status(ST_OK, "RIG DATA: XML Saved OK");
     return true;
 }
 

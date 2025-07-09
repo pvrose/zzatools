@@ -72,6 +72,9 @@ using namespace std;
 		// Check and add record
 		void check_add_record(qso_num_t record_num);
 
+		// Map the records
+		void map_record(qso_num_t record_num);
+
 		// return the real record number
 		virtual qso_num_t record_number(item_num_t item);
 		// return the virtual record number

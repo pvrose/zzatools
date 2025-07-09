@@ -8,7 +8,7 @@
 #include "menu.h"
 #include "qrz_handler.h"
 #include "qso_buttons.h"
-#include "qso_contest.h"
+#include "contest_scorer.h"
 #include "qso_entry.h"
 #include "qso_manager.h"
 #include "qso_misc.h"
@@ -2023,7 +2023,7 @@ bool qso_data::inactive() {
 }
 
 // Return the contest form
-qso_contest* qso_data::contest() {
+contest_scorer* qso_data::contest() {
 	return g_misc_->contest();
 }
 

@@ -37,6 +37,8 @@ class xml_element;
 		// Present progress
 		virtual void progress(int count, int total = -1) {};
 
+		static string convert_xml_datetime(time_t t);
+
 	protected:
 		// Output an element
 		bool write_element(xml_element* element, ostream& os, int level);

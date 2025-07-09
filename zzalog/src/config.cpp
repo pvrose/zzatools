@@ -1,20 +1,22 @@
 #include "config.h"
-#include "files_dialog.h"
-#include "web_dialog.h"
-#include "fields_dialog.h"
-#include "user_dialog.h"
+
 #include "config_tree.h"
-#include "qsl_editor.h"
-#include "stn_dialog.h"
+#include "contest_dialog.h"
+#include "fields_dialog.h"
+#include "files_dialog.h"
 #include "page_dialog.h"
+#include "qsl_editor.h"
+#include "user_dialog.h"
+#include "stn_dialog.h"
+#include "web_dialog.h"
 
 #include "utils.h"
 
 #include <FL/Fl.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Return_Button.H>
 #include <FL/Fl_Tabs.H>
-#include <FL/Fl_Preferences.H>
 
 extern config* config_;
 extern string VENDOR;
@@ -87,9 +89,16 @@ config::config(int W, int H, const char* label) :
 	qsl_editor* qsle = new qsl_editor(rx, ry, rw, rh, "QSL Design");
 	qsle->labelfont(FL_BOLD);
 	qsle->labelsize(FL_NORMAL_SIZE + 2);
-	qsle->tooltip("Allows limited configuration of fonts and tip timeouts");
+	qsle->tooltip("Allows the creation of QSL designs");
 	children_ids_.push_back(DLG_QSLE);
 	updatable_views_.insert(qsle);
+	// Contest definition
+	contest_dialog* ctdlg = new contest_dialog(rx, ry, rw, rh, "Contest Def.");
+	ctdlg->labelfont(FL_BOLD);
+	ctdlg->labelsize(FL_NORMAL_SIZE + 2);
+	ctdlg->tooltip("Allows the definition of contests - exchanges & scoring");
+	children_ids_.push_back(DLG_CONTEST);
+	updatable_views_.insert(ctdlg);
 
 	// Lastly - a tree display showing all config
 	Fl_Group* all_settings = new config_tree(rx, ry, rw, rh, "All Settings");
@@ -233,6 +242,9 @@ void config::set_label(config::cfg_dialog_t active) {
 		break;
 	case DLG_QSLE:
 		label("Configuration: Define QSL layout and print configuration");
+		break;
+	case DLG_CONTEST:
+		label("Configuration: Define Contest - dates, exchanges and scoring");
 		break;
 	case DLG_ALL:
 		label("Configuration: Display all options in tree format");
