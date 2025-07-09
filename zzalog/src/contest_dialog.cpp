@@ -91,8 +91,13 @@ contest_dialog::~contest_dialog() {
 void contest_dialog::load_values() {
 	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences contest_settings(settings, "Contest");
-	contest_settings.get("Current ID", contest_id_, "");
-	contest_settings.get("Current Index", contest_index_, "");
+	char* temp;
+	contest_settings.get("Current ID", temp, "");
+	contest_id_ = temp;
+	free(temp);
+	contest_settings.get("Current Index", temp, "");
+	free(temp);
+	contest_index_ = temp;
 }
 
 // Used to create the form

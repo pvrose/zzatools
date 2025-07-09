@@ -5,7 +5,7 @@
 #include <set>
 #include <string>
 
-#include <FL\Fl_Group.H>
+#include <FL/Fl_Group.H>
 
 class extract_data;
 class record;

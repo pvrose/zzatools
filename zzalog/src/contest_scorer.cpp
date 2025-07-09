@@ -41,8 +41,13 @@ contest_scorer::~contest_scorer() {
 void contest_scorer::load_data() {
 	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences contest_settings(settings, "Contest");
-	contest_settings.get("Contest", contest_id_, "");
-	contest_settings.get("Index", contest_index_, "");
+	char * temp;
+	contest_settings.get("Contest", temp, "");
+	contest_id_ = temp;
+	free(temp);
+	contest_settings.get("Index", temp, "");
+	contest_index_ = temp;
+	free(temp);
 	ct_data_t* contest = contest_data_->get_contest(contest_id_, contest_index_);
 	if (contest) {
 		populate_timeframe(contest);
@@ -168,8 +173,8 @@ void contest_scorer::create_form() {
 void contest_scorer::save_data() {
 	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences contest_settings(settings, "Contest");
-	contest_settings.set("Contest", contest_id_);
-	contest_settings.set("Index", contest_index_);
+	contest_settings.set("Contest", contest_id_.c_str());
+	contest_settings.set("Index", contest_index_.c_str());
 	contest_settings.set("Active", contest_status_ == ACTIVE);
 	contest_settings.set("Next Serial", next_serial_);
 }
