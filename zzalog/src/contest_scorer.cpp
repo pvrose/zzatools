@@ -28,6 +28,8 @@ contest_scorer::contest_scorer(int X, int Y, int W, int H, const char* L) :
 	, qso_points_p_(0)
 	, multiplier_p_(0)
 	, total_p_(0)
+	, d_qso_points_(0)
+	, d_multiplier_(0)
 {
 	load_data();
 	create_form();
@@ -146,6 +148,23 @@ void contest_scorer::create_form() {
 
 	curr_x += WOP;
 
+	w_qso_points_d_ = new Fl_Output(curr_x, curr_y, WOP * 2, HBUTTON);
+	w_qso_points_d_->textfont(FL_ITALIC);
+	w_qso_points_d_->tooltip("Displays additional QSO points from QSO");
+
+	curr_x += WOP * 2;
+	w_multiplier_d_ = new Fl_Output(curr_x, curr_y, WOP * 2, HBUTTON);
+	w_multiplier_d_->textfont(FL_ITALIC);
+	w_multiplier_d_->tooltip("Displays additional multiplier from QSO");
+
+	curr_x = g_scores_->x();
+	curr_y += HBUTTON;
+
+	b1 = new Fl_Box(curr_x, curr_y, WOP, HBUTTON, "=");
+	b1->box(FL_FLAT_BOX);
+
+	curr_x += WOP;
+
 	w_qso_points_2_ = new Fl_Output(curr_x, curr_y, WOP * 2, HBUTTON);
 	w_qso_points_2_->textfont(FL_ITALIC);
 	w_qso_points_2_->tooltip("Displays numbetr of points including check QSO");
@@ -180,7 +199,6 @@ void contest_scorer::save_data() {
 }
 
 void contest_scorer::enable_widgets() {
-	char text[32];
 	switch (contest_status_) {
 	case NO_CONTEST:
 		if (contest_id_ == "") w_contest_->value(0);
@@ -209,20 +227,7 @@ void contest_scorer::enable_widgets() {
 		w_finish_time_->value(finish_time_.c_str());
 		w_status_->label("TO COME");
 		g_scores_->activate();
-		snprintf(text, sizeof(text), "%zd", qsos_->size());
-		w_number_qsos_->value(text);
-		snprintf(text, sizeof(text), "%d", qso_points_);
-		w_qso_points_->value(text);
-		snprintf(text, sizeof(text), "%d", multiplier_);
-		w_multiplier_->value(text);
-		snprintf(text, sizeof(text), "%d", total_);
-		w_total_->value(text);
-		snprintf(text, sizeof(text), "%d", qso_points_p_);
-		w_qso_points_2_->value(text);
-		snprintf(text, sizeof(text), "%d", multiplier_p_);
-		w_multiplier_2_->value(text);
-		snprintf(text, sizeof(text), "%d", total_p_);
-		w_total_2_->value(text);
+		copy_points_to_display();
 		break;
 	case PAUSED:
 		w_contest_->deactivate();
@@ -232,20 +237,7 @@ void contest_scorer::enable_widgets() {
 		w_finish_time_->value(finish_time_.c_str());
 		w_status_->label("PAUSED");
 		g_scores_->activate();
-		snprintf(text, sizeof(text), "%zd", qsos_->size());
-		w_number_qsos_->value(text);
-		snprintf(text, sizeof(text), "%d", qso_points_);
-		w_qso_points_->value(text);
-		snprintf(text, sizeof(text), "%d", multiplier_);
-		w_multiplier_->value(text);
-		snprintf(text, sizeof(text), "%d", total_);
-		w_total_->value(text);
-		snprintf(text, sizeof(text), "%d", qso_points_p_);
-		w_qso_points_2_->value(text);
-		snprintf(text, sizeof(text), "%d", multiplier_p_);
-		w_multiplier_2_->value(text);
-		snprintf(text, sizeof(text), "%d", total_p_);
-		w_total_2_->value(text);
+		copy_points_to_display();
 		break;
 	case PAST:
 		w_contest_->activate();
@@ -255,22 +247,32 @@ void contest_scorer::enable_widgets() {
 		w_finish_time_->value(finish_time_.c_str());
 		w_status_->label("PAST");
 		g_scores_->activate();
-		snprintf(text, sizeof(text), "%zd", qsos_->size());
-		w_number_qsos_->value(text);
-		snprintf(text, sizeof(text), "%d", qso_points_);
-		w_qso_points_->value(text);
-		snprintf(text, sizeof(text), "%d", multiplier_);
-		w_multiplier_->value(text);
-		snprintf(text, sizeof(text), "%d", total_);
-		w_total_->value(text);
-		snprintf(text, sizeof(text), "%d", qso_points_p_);
-		w_qso_points_2_->value(text);
-		snprintf(text, sizeof(text), "%d", multiplier_p_);
-		w_multiplier_2_->value(text);
-		snprintf(text, sizeof(text), "%d", total_p_);
-		w_total_2_->value(text);
+		copy_points_to_display();
 		break;
 	}
+}
+
+// Copy points to display
+void contest_scorer::copy_points_to_display() {
+	char text[32];
+	snprintf(text, sizeof(text), "%zd", qsos_->size());
+	w_number_qsos_->value(text);
+	snprintf(text, sizeof(text), "%d", qso_points_);
+	w_qso_points_->value(text);
+	snprintf(text, sizeof(text), "%d", multiplier_);
+	w_multiplier_->value(text);
+	snprintf(text, sizeof(text), "%d", total_);
+	w_total_->value(text);
+	snprintf(text, sizeof(text), "%d", qso_points_p_);
+	w_qso_points_2_->value(text);
+	snprintf(text, sizeof(text), "%d", multiplier_p_);
+	w_multiplier_2_->value(text);
+	snprintf(text, sizeof(text), "%d", d_qso_points_);
+	w_qso_points_d_->value(text);
+	snprintf(text, sizeof(text), "%d", d_multiplier_);
+	w_multiplier_d_->value(text);
+	snprintf(text, sizeof(text), "%d", total_p_);
+	w_total_2_->value(text);
 }
 
 // callbacks
@@ -411,10 +413,14 @@ void contest_scorer::score_basic(record* qso, bool check_only) {
 	string multiplier = qso->item("DXCC") + " " + qso->item("BAND");
 	multiplier_ = multipliers_.size();
 	if (multipliers_.find(multiplier) == multipliers_.end()) {
-		multiplier_p_ = multiplier_ + 1;
+		d_multiplier_ = 1;
+		multiplier_p_ = multiplier_ + d_multiplier_;
 	}
 	// QSO points - 1 per QSO in different DXCC
-	if (qso->item("DXCC") != qso->item("MY_DXCC")) qso_points_p_ = qso_points_ + 1;
+	if (qso->item("DXCC") != qso->item("MY_DXCC")) {
+		d_qso_points_ = 1;
+		qso_points_p_ = qso_points_ + d_qso_points_;
+	}
 	total_p_ = multiplier_p_ * qso_points_p_;
 	if (!check_only) {
 		multiplier_ = multiplier_p_;

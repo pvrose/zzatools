@@ -701,9 +701,6 @@
     <ClInclude Include="common\include\xml_reader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="common\include\xml_writer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zzalog\include\qsl_reader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -754,6 +751,9 @@
     </ClInclude>
     <ClInclude Include="zzalog\include\contest_scorer.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="common\include\xml_writer.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -16,7 +16,9 @@
 extern spec_data* spec_data_;
 extern string PROGRAM_ID;
 extern string PROGRAM_VERSION;
+extern string CONTACT;
 extern string COPYRIGHT;
+extern string PARTY3RD_COPYRIGHT;
 extern string TIMESTAMP;
 extern Fl_PNG_Image main_icon_;
 
@@ -47,24 +49,26 @@ about_dialog::about_dialog() :
 		"\n FLTK version " + to_string(FL_MAJOR_VERSION) + "." + 
 		to_string(FL_MINOR_VERSION) + "." + to_string(FL_PATCH_VERSION) +
 		"\n CURL version " + string(data->version);
-	string copyright = COPYRIGHT + "\n (Hamlib " + rig_copyright() + ")";
+	string copyright = COPYRIGHT + "\ne-mail: " + CONTACT + "\n" + PARTY3RD_COPYRIGHT + "\n (Hamlib " + rig_copyright() + ")";
 	int w = W2;
 	int h = 0;
 	// Get the width and height required to display the message (add a bit of height) 
 	fl_font(0, FL_NORMAL_SIZE);
 	fl_measure(program_id.c_str(), w, h);
 	h += 5;
-	Fl_Multiline_Output* op1 = new Fl_Multiline_Output(C2, R1, W2, h);
-	op1->value(program_id.c_str());
-	op1->wrap(true);
+	Fl_Box* op1 = new Fl_Box(C2, R1, W2, h);
+	op1->copy_label(program_id.c_str());
+	op1->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
+	op1->box(FL_BORDER_BOX);
 	const int R2 = R1 + h + GAP;
 	// Secondly - copyright statement
 	h = 0;
 	fl_measure(copyright.c_str(), w, h);
 	h += 5;
-	Fl_Multiline_Output* op2 = new Fl_Multiline_Output(C2, R2, W2, h);
-	op2->value(copyright.c_str());
-	op2->wrap(true);
+	Fl_Box* op2 = new Fl_Box(C2, R2, W2, h);
+	op2->copy_label(copyright.c_str());
+	op2->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
+	op2->box(FL_BORDER_BOX);
 
 	const int R4 = R2 + h + GAP;
 	const int C3 = WALL - EDGE - WBUTTON;

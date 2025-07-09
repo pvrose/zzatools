@@ -24,6 +24,8 @@ using namespace std;
 
 extern string PROGRAM_ID;
 extern string PROGRAM_VERSION;
+extern string CONTACT;
+extern string COPYRIGHT;
 extern Fl_PNG_Image main_icon_;
 extern status* status_;
 extern ticker* ticker_;
@@ -112,10 +114,19 @@ void banner::create_form() {
 	bx_prog_value_ = new Fl_Box(curr_x, curr_y, WEDIT, HBUTTON);
 	bx_prog_value_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 
-	curr_y += HBUTTON + GAP;
-	h_small_ = curr_y - y();
+	curr_y += HBUTTON;
 
 	int max_x = curr_x + WOP;
+	curr_x = x() + GAP;
+
+	Fl_Box* bx_copyright = new Fl_Box(curr_x, curr_y, max_x - x(), HBUTTON);
+	char msg[128];
+	snprintf(msg, sizeof(msg), "%s %s", COPYRIGHT.c_str(), CONTACT.c_str());
+	bx_copyright->copy_label(msg);
+	bx_copyright->labelsize(FL_NORMAL_SIZE - 1);
+
+	curr_y += HBUTTON + GAP;
+	h_small_ = curr_y - y();
 
 	curr_x = x() + GAP;
 	// Text display for all messages
@@ -136,6 +147,7 @@ void banner::create_form() {
 	int nx = sx + (sw / 2) - (w() / 2);
 	int ny = sy + (sh / 2) - (h() / 2);
 	resize(nx, ny, w(), h());
+	end();
 	show();
 }
 

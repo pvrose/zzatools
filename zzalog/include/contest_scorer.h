@@ -81,6 +81,9 @@ protected:
     // Individual algorithms
     void score_basic(record* qso, bool check_only);
 
+    // Copy points to display
+    void copy_points_to_display();
+
     // data
     string contest_id_;
     string contest_index_;
@@ -97,6 +100,9 @@ protected:
     int qso_points_;
     int multiplier_;
     int total_;
+    // Check QSO deltas
+    int d_qso_points_;
+    int d_multiplier_;
     // Potential values
     int qso_points_p_;
     int multiplier_p_;
@@ -131,6 +137,8 @@ protected:
     Fl_Output* w_qso_points_;
     Fl_Output* w_multiplier_;
     Fl_Output* w_total_;
+    Fl_Output* w_qso_points_d_;
+    Fl_Output* w_multiplier_d_;
     Fl_Output* w_qso_points_2_;
     Fl_Output* w_multiplier_2_;
     Fl_Output* w_total_2_;
