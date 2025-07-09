@@ -564,7 +564,7 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		};
 		status_->misc_status(ST_NOTE, "EXTRACT: Extracting cards for Bureau");
 		criteria(new_criteria, server);
-		sort_records("DXCC", false);
+		if (size()) sort_records("DXCC", false);
 		tabbed_forms_->update_views(nullptr, HT_RESET_ORDER, 0);
 	}
 	if (server == EMAIL) {
