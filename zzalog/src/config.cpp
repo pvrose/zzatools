@@ -107,7 +107,7 @@ config::config(int W, int H, const char* label) :
 	all_settings->tooltip("Displays the current config in tree format");
 	children_ids_.push_back(DLG_ALL);
 
-	all_settings->end();
+	//all_settings->end();
 
 	// Default to show all config
 	settings_view_ = all_settings;

@@ -26,6 +26,7 @@ stn_dialog::stn_dialog(int X, int Y, int W, int H, const char* L) :
 	create_form(x(), y());
 	load_values();
 	enable_widgets();
+	redraw();
 }
 
 stn_dialog::~stn_dialog() {}
@@ -62,6 +63,7 @@ void stn_dialog::create_form(int X, int Y) {
 	tabs_->end();
 
 	end();
+	show();
 }
 
 // Used to write settings back
@@ -73,9 +75,6 @@ void stn_dialog::save_values() {
 
 // Used to enable/disable specific widget - any widgets enabled musr be attributes
 void stn_dialog::enable_widgets() {
-	g_qth_->enable_widgets();
-	g_oper_->enable_widgets();
-	g_call_->enable_widgets();
 	// Standard tab formats
 // value() returns the selected widget. We need to test which widget it is.
 	Fl_Tabs* tabs = (Fl_Tabs*)child(0);
@@ -93,6 +92,9 @@ void stn_dialog::enable_widgets() {
 			wx->deactivate();
 		}
 	}
+	g_qth_->enable_widgets();
+	g_oper_->enable_widgets();
+	g_call_->enable_widgets();
 }
 
 // Switch tabs
@@ -129,6 +131,8 @@ void stn_dialog::single_tab::create_form() {
 	int curr_x = x() + GAP + WLABEL;
 	int curr_y = y() + HTEXT;
 
+	begin();
+
 	ch_id_ = new Fl_Input_Choice(curr_x, curr_y, WSMEDIT, HBUTTON);
 	ch_id_->label(type() == CALLSIGN ? "Call" : "Id");
 	ch_id_->align(FL_ALIGN_LEFT);
@@ -148,20 +152,20 @@ void stn_dialog::single_tab::create_form() {
 	int save_y = curr_y;
 
 	int vertical = (h() - curr_y) / HBUTTON;
-	ip_values_ = new Fl_Input * [num_inputs];
+	ip_values_ = new Fl_Input * [num_inputs_];
 	int ix = 0;
-	for (; ix < vertical && ix < num_inputs; ix++) {
+	for (; ix < vertical && ix < num_inputs_; ix++) {
 		ip_values_[ix] = new Fl_Input(curr_x, curr_y, WSMEDIT, HBUTTON);
 		ip_values_[ix]->copy_label(labels_[ix].c_str());
 		ip_values_[ix]->tooltip("Enter a value if you want this in ADIF");
 
 		curr_y += HBUTTON;
 	}
-	if (ix == vertical && ix < num_inputs) {
+	if (ix == vertical && ix < num_inputs_) {
 		// Note I am assuming that no more than two colums will be needed
 		curr_y = save_y;
 		curr_x += WSMEDIT + GAP + WLABEL;
-		for (; ix < num_inputs; ix++) {
+		for (; ix < num_inputs_; ix++) {
 			ip_values_[ix] = new Fl_Input(curr_x, curr_y, WSMEDIT, HBUTTON);
 			ip_values_[ix]->copy_label(labels_[ix].c_str());
 			ip_values_[ix]->tooltip("Enter a value if you want this in ADIF");
@@ -171,42 +175,60 @@ void stn_dialog::single_tab::create_form() {
 	}
 	populate_choice();
 	end();
+	show();
 }
 
 void stn_dialog::single_tab::enable_widgets() {
-	switch (type()) {
-	case QTH:
-		if (qth_) {
-			ch_id_->value(current_id_.c_str());
-			ip_descr_->value(qth_->description.c_str());
-			for (auto it : QTH_ADIF_MAP) {
-				if (qth_->data.find(it.first) != qth_->data.end()) {
-					ip_values_[(int)it.first]->value(qth_->data.at(it.first).c_str());
+	if (visible()) {
+		switch (type()) {
+		case QTH:
+			if (qth_) {
+				ch_id_->value(current_id_.c_str());
+				ip_descr_->value(qth_->description.c_str());
+				for (auto it : QTH_ADIF_MAP) {
+					if (qth_->data.find(it.first) != qth_->data.end()) {
+						ip_values_[(int)it.first]->value(qth_->data.at(it.first).c_str());
+					}
+					else {
+						ip_values_[(int)it.first]->value("");
+					}
 				}
-				else {
+			}
+			else {
+				ch_id_->value(current_id_.c_str());
+				ip_descr_->value("");
+				for (auto it : QTH_ADIF_MAP) {
 					ip_values_[(int)it.first]->value("");
 				}
 			}
-		}
-		break;
-	case OPERATOR:
-		if (oper_) {
-			ch_id_->value(current_id_.c_str());
-			ip_descr_->value(oper_->description.c_str());
-			for (auto it : OPER_ADIF_MAP) {
-				if (oper_->data.find(it.first) != oper_->data.end()) {
-					ip_values_[(int)it.first]->value(oper_->data.at(it.first).c_str());
+			break;
+		case OPERATOR:
+			if (oper_) {
+				ch_id_->value(current_id_.c_str());
+				ip_descr_->value(oper_->description.c_str());
+				for (auto it : OPER_ADIF_MAP) {
+					if (oper_->data.find(it.first) != oper_->data.end()) {
+						ip_values_[(int)it.first]->value(oper_->data.at(it.first).c_str());
+					}
+					else {
+						ip_values_[(int)it.first]->value("");
+					}
 				}
-				else {
+			}
+			else {
+				ch_id_->value(current_id_.c_str());
+				ip_descr_->value("");
+				for (auto it : OPER_ADIF_MAP) {
 					ip_values_[(int)it.first]->value("");
 				}
 			}
+			break;
+		case CALLSIGN:
+			ch_id_->value(current_id_.c_str());
+			ip_descr_->value(call_descr_.c_str());
+			break;
 		}
-		break;
-	case CALLSIGN:
-		ch_id_->value(current_id_.c_str());
-		ip_descr_->value(call_descr_.c_str());
-		break;
+		show();
 	}
 }
 
@@ -300,16 +322,16 @@ void stn_dialog::single_tab::type(char t) {
 	Fl_Group::type(t);
 	switch (type()) {
 	case QTH:
-		num_inputs = QTH_ADIF_MAP.size();
+		num_inputs_ = QTH_ADIF_MAP.size();
 		labels_ = { "Strret", "City", "Postcode", "Locator", "Country", "DXCC",
 			"Prim'y Sub", "Sec'y Sub", "CQ Zone", "ITU Zone", "Continent", "IOTA", "WAB" };
 		break;
 	case OPERATOR:
-		num_inputs = OPER_ADIF_MAP.size();
+		num_inputs_ = OPER_ADIF_MAP.size();
 		labels_ = { "Name", "Callsign" };
 		break;
 	case CALLSIGN:
-		num_inputs = 0;
+		num_inputs_ = 0;
 		labels_ = { };
 		break;
 	}

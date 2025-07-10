@@ -74,7 +74,7 @@ protected:
 		void populate_choice();
 
 		// Number of individual input widgets
-		int num_inputs;
+		int num_inputs_;
 
 		vector<string> labels_;
 
