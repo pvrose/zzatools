@@ -237,6 +237,8 @@ bool match(string lhs, string rhs)
 		return true;
 	else if (rhs == "")
 		return true;
+	else if (lhs == "")
+		return true;
 	else
 		return false;
 }
