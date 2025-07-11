@@ -75,17 +75,8 @@ bool stn_data::add_qth_item(string id, qth_value_t item, string value) {
 			return true;
 		}
 		else {
-			if (qths_.at(id)->data.at(item) != value) {
-				char msg[128];
-				snprintf(msg, sizeof(msg), "STN DATA: QTH %s Item %s value change from %s to %s ignored",
-					id.c_str(), QTH_ADIF_MAP.at(item).c_str(),
-					qths_.at(id)->data.at(item).c_str(), value.c_str());
-				status_->misc_status(ST_WARNING, msg);
-				return false;
-			}
-			else {
-				return false;
-			}
+			qths_.at(id)->data.at(item) = value;
+			return true;
 		}
 	}
 }
@@ -133,17 +124,8 @@ bool stn_data::add_oper_item(string id, oper_value_t item, string value) {
 			return true;
 		}
 		else {
-			if (opers_.at(id)->data.at(item) != value) {
-				char msg[128];
-				snprintf(msg, sizeof(msg), "STN DATA: Operator \"%s\" Item \"%s\" value change from \"%s\" to \"%s\" ignored",
-					id.c_str(), OPER_ADIF_MAP.at(item).c_str(),
-					opers_.at(id)->data.at(item).c_str(), value.c_str());
-				status_->misc_status(ST_WARNING, msg);
-				return false;
-			}
-			else {
-				return false;
-			}
+			opers_.at(id)->data.at(item) = value;
+			return true;
 		}
 	}
 }

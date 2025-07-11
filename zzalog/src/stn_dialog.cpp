@@ -253,6 +253,11 @@ void stn_dialog::single_tab::save_data() {
 	if (current_id_.length()) {
 		switch (type()) {
 		case QTH:
+			if (!stn_data_->known_qth(current_id_)) {
+				qth_info_t* info = new qth_info_t;
+				stn_data_->add_qth(current_id_, info);
+			}
+			qth_ = stn_data_->get_qth(current_id_);
 			stn_data_->add_qth_descr(current_id_, ip_descr_->value());
 			for (auto it : QTH_ADIF_MAP) {
 				string data;
@@ -269,6 +274,11 @@ void stn_dialog::single_tab::save_data() {
 			}
 			break;
 		case OPERATOR:
+			if (!stn_data_->known_oper(current_id_)) {
+				oper_info_t* info = new oper_info_t;
+				stn_data_->add_oper(current_id_, info);
+			}
+			oper_ = stn_data_->get_oper(current_id_);
 			stn_data_->add_oper_descr(current_id_, ip_descr_->value());
 			for (auto it : OPER_ADIF_MAP) {
 				string data;
@@ -284,40 +294,26 @@ void stn_dialog::single_tab::save_data() {
 			}
 			break;
 		case CALLSIGN:
+			if (!stn_data_->known_call(current_id_)) {
+				stn_data_->add_call(current_id_, "");
+			}
+			call_descr_ = stn_data_->get_call_descr(current_id_);
 			stn_data_->add_call(current_id_, to_upper(ip_descr_->value()));
 			break;
 		}
 	}
 }
 
+// Save new ID value
 void stn_dialog::single_tab::cb_ch_id(Fl_Widget* w, void* v) {
 	single_tab* that = ancestor_view<single_tab>(w);
-	cb_value<Fl_Input_Choice, string>(w, &that->current_id_);
-	switch (that->type()) {
-	case QTH:
-		if (!stn_data_->known_qth(that->current_id_)) {
-			qth_info_t* info = new qth_info_t;
-			stn_data_->add_qth(that->current_id_, info);
-		}
-		that->qth_ = stn_data_->get_qth(that->current_id_);
-		break;
-	case OPERATOR:
-		if (!stn_data_->known_oper(that->current_id_)) {
-			oper_info_t* info = new oper_info_t;
-			stn_data_->add_oper(that->current_id_, info);
-		}
-		that->oper_ = stn_data_->get_oper(that->current_id_);
-		break;
-	case CALLSIGN:
-		if (!stn_data_->known_call(that->current_id_)) {
-			stn_data_->add_call(that->current_id_, "");
-		}
-		that->call_descr_ = stn_data_->get_call_descr(that->current_id_);
-		break;
-	}
+	string s;
+	cb_value<Fl_Input_Choice, string>(w, &s);
+	that->id(s);
 	that->enable_widgets();
 }
 
+// Set type value and configure dialog
 void stn_dialog::single_tab::type(char t) {
 	Fl_Group::type(t);
 	switch (type()) {
@@ -337,34 +333,27 @@ void stn_dialog::single_tab::type(char t) {
 	}
 }
 
+// Return type value
 char stn_dialog::single_tab::type() { return Fl_Group::type(); }
 
+// Return current ID
 string stn_dialog::single_tab::id() { return current_id_; }
 
+// Set ID and initialise data
 void stn_dialog::single_tab::id(string s) {
 	current_id_ = s;
 	switch (type()) {
 	case QTH:
-		if (!stn_data_->known_qth(current_id_)) {
-			qth_info_t* info = new qth_info_t;
-			stn_data_->add_qth(current_id_, info);
-		}
 		qth_ = stn_data_->get_qth(current_id_);
 		break;
 	case OPERATOR:
-		if (!stn_data_->known_oper(current_id_)) {
-			oper_info_t* info = new oper_info_t;
-			stn_data_->add_oper(current_id_, info);
-		}
 		oper_ = stn_data_->get_oper(current_id_);
 		break;
 	case CALLSIGN:
-		if (!stn_data_->known_call(current_id_)) {
-			stn_data_->add_call(current_id_, "");
-		}
 		call_descr_ = stn_data_->get_call_descr(current_id_);
 		break;
 	}
+	enable_widgets();
 }
 
 void stn_dialog::single_tab::populate_choice() {
