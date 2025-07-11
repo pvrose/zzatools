@@ -3,7 +3,9 @@
 #include "book.h"
 #include "contest_data.h"
 #include "extract_data.h"
+#include "qso_manager.h"
 #include "record.h"
+#include "stn_data.h"
 
 #include "utils.h"
 
@@ -15,6 +17,7 @@
 
 extern book* book_;
 extern contest_data* contest_data_;
+extern stn_data* stn_data_;
 extern string VENDOR;
 extern string PROGRAM_ID;
 
@@ -402,25 +405,58 @@ void contest_scorer::populate_contest() {
 // Score QSP
 void contest_scorer::score_qso(record* qso, bool check_only) {
 	// TODO add MY_... data to QSO
-	if (scoring_id_ == "Basic") {
-		score_basic(qso, check_only);
-	}
+	if (scoring_id_ == "Basic") score_basic(qso, check_only);
+	else if (scoring_id_ == "IARU HF") score_iaru_hf(qso, check_only);
 }
 
-// Individual algorithms
+// Individual algorithms - basic 1 pt per QSO with another DXCC. mult = DXCCs per band
 void contest_scorer::score_basic(record* qso, bool check_only) {
+	qso_manager* mgr = ancestor_view<qso_manager>(this);
 	// Multiplier is number of DXCCs worked on each band
 	string multiplier = qso->item("DXCC") + " " + qso->item("BAND");
+	const qth_info_t* my_data = stn_data_->get_qth(mgr->get_default(qso_manager::QTH));
 	multiplier_ = multipliers_.size();
 	if (multipliers_.find(multiplier) == multipliers_.end()) {
 		d_multiplier_ = 1;
 		multiplier_p_ = multiplier_ + d_multiplier_;
 	}
 	// QSO points - 1 per QSO in different DXCC
-	if (qso->item("DXCC") != qso->item("MY_DXCC")) {
+	if (qso->item("DXCC") != my_data->data.at(DXCC_ID)) {
 		d_qso_points_ = 1;
 		qso_points_p_ = qso_points_ + d_qso_points_;
 	}
+	total_p_ = multiplier_p_ * qso_points_p_;
+	if (!check_only) {
+		multiplier_ = multiplier_p_;
+		qso_points_ = qso_points_p_;
+		total_ = total_p_;
+	}
+	enable_widgets();
+}
+// IARU HF 
+// 1 pt per QSO in same ITU zone
+// 1 pt per QSO with HQ or IARU official (ITUZ != numeric)
+// 3 pt per QSO same continent (different ITUZ)
+// 5 pt per qSO different continent and different ITUZ
+// Multiplier = count(ITUZ x BAND)
+// Total = QSO points * multiplier
+void contest_scorer::score_iaru_hf(record* qso, bool check_only) {
+	qso_manager* mgr = ancestor_view<qso_manager>(this);
+	auto my_data = stn_data_->get_qth(mgr->get_default(qso_manager::QTH))->data;
+	// ITU Zone or otherwise
+	string ituz = qso->item("ITUZ");
+	string cont = qso->item("CONT");
+	bool itu_station = !is_integer(ituz);
+	string multiplier = ituz + " " + qso->item("BAND");
+	if (multipliers_.find(multiplier) == multipliers_.end()) {
+		d_multiplier_ = 1;
+		multiplier_p_ = multiplier_ + d_multiplier_;
+	}
+	// QSO points
+	if (ituz == my_data.at(ITU_ZONE)) d_qso_points_ = 1;
+	else if (itu_station) d_qso_points_ = 1;
+	else if (cont == my_data.at(CONTINENT)) d_qso_points_ = 3;
+	else d_qso_points_ = 5;
 	total_p_ = multiplier_p_ * qso_points_p_;
 	if (!check_only) {
 		multiplier_ = multiplier_p_;

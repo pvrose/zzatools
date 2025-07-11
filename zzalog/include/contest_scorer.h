@@ -80,6 +80,7 @@ protected:
 
     // Individual algorithms
     void score_basic(record* qso, bool check_only);
+    void score_iaru_hf(record* qso, bool check_only);
 
     // Copy points to display
     void copy_points_to_display();

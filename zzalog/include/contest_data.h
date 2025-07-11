@@ -44,7 +44,8 @@ struct ct_exch_t {
 };
 
 const vector < pair<string, string> > SCORING_ALGOS = {
-	{"Basic", "1 point per QSO (not own DXCC), multiplier = number of DXCCs per band"}
+	{"Basic", "1 point per QSO (not own DXCC), multiplier = number of DXCCs per band"},
+	{"IARU HF", "Special scoring for IARU HF Championship"}
 };
 
 // Amalgamated contest list
