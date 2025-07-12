@@ -153,7 +153,6 @@ bool contest_reader::start_value(xml_wreader* wr, map<string, string>* attribute
 	contest_reader* that = (contest_reader*)wr;
 	switch (that->elements_.back()) {
 	case CT_CONTEST:
-	case CT_EXCHANGE:
 		that->elements_.push_back(CT_VALUE);
 		// get the name
 		for (auto it : *attributes) {
@@ -174,39 +173,6 @@ bool contest_reader::start_value(xml_wreader* wr, map<string, string>* attribute
 		status_->misc_status(ST_ERROR, "CONTEST: Unexpected VALUE element");
 		return false;
 	}
-	return true;
-}
-
-// Start <EXCHANGE id=>
-bool contest_reader::start_exchange(xml_wreader* wr, map<string, string>* attributes) {
-	contest_reader* that = (contest_reader*)wr;
-	char msg[128];
-	if (that->elements_.back() != CT_CONTESTS) {
-		status_->misc_status(ST_ERROR, "CONTEST: Unexpected EXCHANGE element");
-		return false;
-	}
-	// else
-	that->elements_.push_back(CT_EXCHANGE);
-	// get ID and Index
-	for (auto it : *attributes) {
-		string name = to_upper(it.first);
-		if (name == "ID") {
-			that->exchange_id_ = it.second;
-		}
-		else {
-			snprintf(msg, sizeof(msg), "CONTEST: Unexpected attribute %s=%s in EXCHANGE element",
-				it.first.c_str(), it.second.c_str());
-			status_->misc_status(ST_ERROR, msg);
-			return false;
-		}
-	}
-	if (that->the_data_->exchanges_.find(that->exchange_id_) != that->the_data_->exchanges_.end()) {
-		snprintf(msg, sizeof(msg), "CONTEST: Already have exchange %s defined", that->exchange_id_.c_str());
-		status_->misc_status(ST_ERROR, msg);
-		return false;
-	}
-	that->the_data_->exchanges_[that->exchange_id_] = new ct_exch_t;
-	that->exchange_ = that->the_data_->exchanges_.at(that->exchange_id_);
 	return true;
 }
 
@@ -237,10 +203,6 @@ bool contest_reader::end_value(xml_wreader* wr) {
 	case CT_CONTEST:
 		if (that->value_name_ == "fields")
 			that->contest_data_->fields = that->value_data_;
-		else if (that->value_name_ == "exchange")
-			that->contest_data_->exchange = that->value_data_;
-		else if (that->value_name_ == "scoring")
-			that->contest_data_->scoring = that->value_data_;
 		else {
 			snprintf(msg, sizeof(msg), "CONTEST: Unexpected value item %s: %s in CONTEST %s.%s",
 				that->value_name_.c_str(),
@@ -251,31 +213,9 @@ bool contest_reader::end_value(xml_wreader* wr) {
 			return false;
 		}
 		return true;
-	case CT_EXCHANGE:
-		if (that->value_name_ == "send")
-			that->exchange_->sending = that->value_data_;
-		else if (that->value_name_ == "receive")
-			that->exchange_->receive = that->value_data_;
-		else {
-			snprintf(msg, sizeof(msg), "CONTEST: Unexpected value item %s: %s in EXCHANGE %s",
-				that->value_name_.c_str(),
-				that->value_data_.c_str(),
-				that->exchange_id_.c_str());
-			status_->misc_status(ST_ERROR, msg);
-			return false;
-		}
-		return true;
 	default:
 		return false;
 	}
-}
-
-// End </EXCHANGE>
-bool contest_reader::end_exchange(xml_wreader* wr) {
-	contest_reader* that = (contest_reader*)wr;
-	that->exchange_ = nullptr;
-	that->exchange_id_ = "";
-	return true;
 }
 
 // Characters is value

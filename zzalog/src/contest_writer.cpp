@@ -60,11 +60,6 @@ bool contest_writer::write_element(ct_element_t element) {
                 if (!write_element(CT_CONTEST)) return false;
             }
         }
-        for (auto it : data_->exchanges_) {
-            exchange_id_ = it.first;
-            exchange_ = it.second;
-            if (!write_element(CT_EXCHANGE)) return false;
-        }
         if (!end_element(name)) return false;
         return true;
     case CT_CONTEST:
@@ -74,8 +69,6 @@ bool contest_writer::write_element(ct_element_t element) {
         (*attributes)["index"] = contest_ix_;
         if (!start_element(name, attributes)) return false;
         if (!write_value("fields", contest_->fields)) return false;
-        if (!write_value("exchange", contest_->exchange)) return false;
-        if (!write_value("scoring", contest_->scoring)) return false;
         if (!write_element(CT_TIMEFRAME)) return false;
         if (!end_element(name)) return false;
         return true;
@@ -87,16 +80,7 @@ bool contest_writer::write_element(ct_element_t element) {
         if (!start_element(name, attributes)) return false;
         if (!end_element(name)) return false;
         return true;
-    case CT_EXCHANGE:
-        name = "exchange";
-        attributes = new map<string, string>;
-        (*attributes)["id"] = exchange_id_;
-        if (!start_element(name, attributes)) return false;
-        if (!write_value("send", exchange_->sending)) return false;
-        if (!write_value("receive", exchange_->receive)) return false;
-        if (!end_element(name)) return false;
-        return true;
-    default:
+     default:
         status_->misc_status(ST_ERROR, "RIG DATA: Unsupported XML element");
         return false;
     }

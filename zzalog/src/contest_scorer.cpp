@@ -1,6 +1,7 @@
 #include "contest_scorer.h"
 
 #include "book.h"
+#include "contest_algorithm.h"
 #include "contest_data.h"
 #include "extract_data.h"
 #include "qso_manager.h"
@@ -9,6 +10,7 @@
 
 #include "utils.h"
 
+#include <FL/Fl.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Choice.H>
@@ -20,6 +22,7 @@ extern contest_data* contest_data_;
 extern stn_data* stn_data_;
 extern string VENDOR;
 extern string PROGRAM_ID;
+extern map<string, contest_algorithm*> algorithms_;
 
 contest_scorer::contest_scorer(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
@@ -53,30 +56,12 @@ void contest_scorer::load_data() {
 	contest_settings.get("Index", temp, "");
 	contest_index_ = temp;
 	free(temp);
+	int itemp;
+	contest_settings.get("Active", itemp, (int)false);
+	active_ = itemp;
+	contest_settings.get("Next Serial", next_serial_, 1);
+	// TODO move to change_contest - called after create form
 	ct_data_t* contest = contest_data_->get_contest(contest_id_, contest_index_);
-	if (contest) {
-		populate_timeframe(contest);
-		int itemp;
-		contest_settings.get("Active", itemp, (int)false);
-		populate_status(contest, itemp);
-		scoring_id_ = contest->scoring;
-		exchange_ = contest_data_->get_exchange(contest->exchange);
-		resume_contest();
-		contest_settings.get("Next Serial", next_serial_, 1);
-	}
-	else {
-		char temp[25];
-		time_t t1 = chrono::system_clock::to_time_t(chrono::system_clock::now());
-		tm* t2 = gmtime(&t1);
-		strftime(temp, sizeof(temp), "%Y%m%d 0000", t2);
-		start_time_ = temp;
-		strftime(temp, sizeof(temp), "%Y%m%d 2359", t2);
-		finish_time_ = temp;
-		contest_status_ = NO_CONTEST;
-		scoring_id_ = "";
-		exchange_ = nullptr;
-		next_serial_ = 1;
-	}
 }
 
 void contest_scorer::create_form() {
@@ -89,7 +74,7 @@ void contest_scorer::create_form() {
 	w_contest_->callback(cb_contest);
 	w_contest_->tooltip("Select the contest");
 
-	curr_y += HBUTTON + GAP;
+	curr_y += HBUTTON;
 
 	w_start_time_ = new Fl_Output(curr_x, curr_y, WSMEDIT, HBUTTON, "Start");
 	w_start_time_->value(start_time_.c_str());
@@ -99,14 +84,14 @@ void contest_scorer::create_form() {
 	w_finish_time_ = new Fl_Output(curr_x, curr_y, WSMEDIT, HBUTTON, "Finish");
 	w_finish_time_->value(finish_time_.c_str());
 	w_finish_time_->tooltip("Displays the finish date/time of the contest");
-	curr_y += HBUTTON + GAP;
+	curr_y += HBUTTON;
 
 	w_status_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON);
 	w_status_->callback(cb_bn_status);
 	w_status_->tooltip("Displays the status: can toggle between ACTIVE/PAUSED");
 
 	curr_x = x() + GAP;
-	curr_y += HBUTTON + GAP;
+	curr_y += HBUTTON;
 
 	g_scores_ = new Fl_Group(curr_x, curr_y, w() - GAP - GAP, 4 * HBUTTON, "Scores");
 	g_scores_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
@@ -188,6 +173,29 @@ void contest_scorer::create_form() {
 
 	g_scores_->end();
 
+	curr_x = x();
+
+	g_fields_ = new Fl_Group(curr_x, curr_y, w(), h() + y() - curr_y, "Exchanges");
+	g_fields_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+
+	const int WL = w() / 4;
+	Fl_Box* brx = new Fl_Box(curr_x + WL, curr_y, WL, HBUTTON, "RX");
+	brx->box(FL_FLAT_BOX);
+	Fl_Box* btx = new Fl_Box(curr_x + w() / 2 + WL, curr_y, WL, HBUTTON, "TX");
+	btx->box(FL_FLAT_BOX);
+
+	curr_y += HBUTTON;
+
+	for (int ix = 0; ix < NUMBER_FIELDS; ix++) {
+		w_rx_items_[ix] = new Fl_Output(curr_x + WL, curr_y, WL, HBUTTON);
+		w_rx_items_[ix]->align(FL_ALIGN_LEFT);
+		w_tx_items_[ix] = new Fl_Output(curr_x + w() / 2 + WL, curr_y, WL, HBUTTON);
+		w_tx_items_[ix]->align(FL_ALIGN_LEFT);
+		curr_y += HBUTTON;
+	}
+
+	g_fields_->end();
+
 	end();
 	show();
 }
@@ -228,7 +236,7 @@ void contest_scorer::enable_widgets() {
 		w_finish_time_->activate();
 		w_start_time_->value(start_time_.c_str());
 		w_finish_time_->value(finish_time_.c_str());
-		w_status_->label("TO COME");
+		w_status_->label("ACTIVE");
 		g_scores_->activate();
 		copy_points_to_display();
 		break;
@@ -283,18 +291,15 @@ void contest_scorer::cb_contest(Fl_Widget* w, void* v) {
 	Fl_Choice* ch = (Fl_Choice*)w;
 	contest_scorer* that = ancestor_view<contest_scorer>(w);
 	const Fl_Menu_Item* item = ch->mvalue();
-	that->contest_ = (ct_data_t*)item->user_data();
-	that->populate_timeframe(that->contest_);
-	that->populate_status(that->contest_, true);
+	ct_entry_t* entry = (ct_entry_t*)item->user_data();
+	that->contest_ = entry->definition;
+	that->contest_id_ = entry->id;
+	that->contest_index_ = entry->index;
+	that->change_contest();
+	// TODO the following should be in change_contest
+	that->populate_timeframe();
+	that->populate_status();
 	that->next_serial_ = 1;
-	if (that->contest_) {
-		that->scoring_id_ = that->contest_->scoring;
-		that->exchange_ = contest_data_->get_exchange(that->contest_->exchange);
-	}
-	else {
-		that->scoring_id_ = "";
-		that->exchange_ = nullptr;
-	}
 	that->qsos_ = new extract_data;
 	that->enable_widgets();
 }
@@ -317,6 +322,34 @@ void contest_scorer::cb_bn_status(Fl_Widget* w, void* v) {
 		break;
 	}
 	that->enable_widgets();
+}
+
+// Change the contest
+void contest_scorer::change_contest() {
+	if (contest_) {
+		populate_timeframe();
+		populate_status();
+		create_algo();
+		resume_contest();
+	}
+	else {
+		char temp[25];
+		time_t t1 = chrono::system_clock::to_time_t(chrono::system_clock::now());
+		tm* t2 = gmtime(&t1);
+		strftime(temp, sizeof(temp), "%Y%m%d 0000", t2);
+		start_time_ = temp;
+		strftime(temp, sizeof(temp), "%Y%m%d 2359", t2);
+		finish_time_ = temp;
+		contest_status_ = NO_CONTEST;
+		next_serial_ = -1;
+	}
+
+}
+
+// Use the appropriate algorithm and attach it to this.
+void contest_scorer::create_algo() {
+	algorithm_ = algorithms_.at(contest_id_);
+	algorithm_->attach(this);
 }
 
 // Add record 
@@ -356,14 +389,14 @@ void contest_scorer::resume_contest() {
 }
 
 // Copy contest to timeframe
-void contest_scorer::populate_timeframe(ct_data_t* ct) {
-	if (ct) {
+void contest_scorer::populate_timeframe() {
+	if (contest_) {
 		char temp[25];
-		time_t t1 = chrono::system_clock::to_time_t(ct->date.start);
+		time_t t1 = chrono::system_clock::to_time_t(contest_->date.start);
 		tm* t2 = gmtime(&t1);
 		strftime(temp, sizeof(temp), "%Y%m%d %H%M", t2);
 		start_time_ = temp;
-		t1 = chrono::system_clock::to_time_t(ct->date.finish);
+		t1 = chrono::system_clock::to_time_t(contest_->date.finish);
 		t2 = gmtime(&t1);
 		strftime(temp, sizeof(temp), "%Y%m%d %H%M", t2);
 		finish_time_ = temp;
@@ -375,13 +408,13 @@ void contest_scorer::populate_timeframe(ct_data_t* ct) {
 }
 
 // Copy contest to status
-void contest_scorer::populate_status(ct_data_t* ct, bool previous) {
-	if (ct) {
+void contest_scorer::populate_status() {
+	if (contest_) {
 		chrono::system_clock::time_point today = chrono::system_clock::now();
-		if (today < ct->date.start) contest_status_ = FUTURE;
-		else if (today > ct->date.finish) contest_status_ = PAST;
+		if (today < contest_->date.start) contest_status_ = FUTURE;
+		else if (today > contest_->date.finish) contest_status_ = PAST;
 		else {
-			if (previous) contest_status_ = ACTIVE;
+			if (active_) contest_status_ = ACTIVE;
 			else contest_status_ = PAUSED;
 		}
 	}
@@ -398,65 +431,18 @@ void contest_scorer::populate_contest() {
 		ct_entry_t* info = contest_data_->get_contest_info(ix);
 		string text = info->id + ":" + info->index;
 		// Adding the pointer to the contest definition as user data
-		w_contest_->add(text.c_str(), 0, nullptr, (void*)(info->definition));
+		w_contest_->add(text.c_str(), 0, nullptr, (void*)(info));
 	}
 }
 
 // Score QSP
 void contest_scorer::score_qso(record* qso, bool check_only) {
-	// TODO add MY_... data to QSO
-	if (scoring_id_ == "Basic") score_basic(qso, check_only);
-	else if (scoring_id_ == "IARU HF") score_iaru_hf(qso, check_only);
-}
-
-// Individual algorithms - basic 1 pt per QSO with another DXCC. mult = DXCCs per band
-void contest_scorer::score_basic(record* qso, bool check_only) {
-	qso_manager* mgr = ancestor_view<qso_manager>(this);
-	// Multiplier is number of DXCCs worked on each band
-	string multiplier = qso->item("DXCC") + " " + qso->item("BAND");
-	const qth_info_t* my_data = stn_data_->get_qth(mgr->get_default(qso_manager::QTH));
-	multiplier_ = multipliers_.size();
-	if (multipliers_.find(multiplier) == multipliers_.end()) {
-		d_multiplier_ = 1;
-		multiplier_p_ = multiplier_ + d_multiplier_;
-	}
-	// QSO points - 1 per QSO in different DXCC
-	if (qso->item("DXCC") != my_data->data.at(DXCC_ID)) {
-		d_qso_points_ = 1;
-		qso_points_p_ = qso_points_ + d_qso_points_;
-	}
-	total_p_ = multiplier_p_ * qso_points_p_;
-	if (!check_only) {
-		multiplier_ = multiplier_p_;
-		qso_points_ = qso_points_p_;
-		total_ = total_p_;
-	}
-	enable_widgets();
-}
-// IARU HF 
-// 1 pt per QSO in same ITU zone
-// 1 pt per QSO with HQ or IARU official (ITUZ != numeric)
-// 3 pt per QSO same continent (different ITUZ)
-// 5 pt per qSO different continent and different ITUZ
-// Multiplier = count(ITUZ x BAND)
-// Total = QSO points * multiplier
-void contest_scorer::score_iaru_hf(record* qso, bool check_only) {
-	qso_manager* mgr = ancestor_view<qso_manager>(this);
-	auto my_data = stn_data_->get_qth(mgr->get_default(qso_manager::QTH))->data;
-	// ITU Zone or otherwise
-	string ituz = qso->item("ITUZ");
-	string cont = qso->item("CONT");
-	bool itu_station = !is_integer(ituz);
-	string multiplier = ituz + " " + qso->item("BAND");
-	if (multipliers_.find(multiplier) == multipliers_.end()) {
-		d_multiplier_ = 1;
-		multiplier_p_ = multiplier_ + d_multiplier_;
-	}
-	// QSO points
-	if (ituz == my_data.at(ITU_ZONE)) d_qso_points_ = 1;
-	else if (itu_station) d_qso_points_ = 1;
-	else if (cont == my_data.at(CONTINENT)) d_qso_points_ = 3;
-	else d_qso_points_ = 5;
+	if (algorithm_ = nullptr) return;
+	score_result res = algorithm_->score_qso(qso, multipliers_);
+	d_multiplier_ = res.multiplier;
+	d_qso_points_ = res.qso_points;
+	multiplier_p_ = multiplier_ + d_multiplier_;
+	qso_points_p_ = qso_points_ + d_qso_points_;
 	total_p_ = multiplier_p_ * qso_points_p_;
 	if (!check_only) {
 		multiplier_ = multiplier_p_;
@@ -495,7 +481,12 @@ string contest_scorer::serial() {
 }
 
 // Returns the created exchange
-string contest_scorer::exchange() {
-	if (exchange_) return qso_->item_merge(exchange_->sending);
-	else return "";
+string contest_scorer::generate_exchange(record* qso) {
+	return algorithm_->generate_exchange(qso_);
 }
+
+// Parse exchange
+void contest_scorer::parse_exchange(record* qso, string text) {
+	algorithm_->parse_exchange(qso, text);
+}
+

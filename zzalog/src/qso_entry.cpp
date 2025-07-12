@@ -512,20 +512,8 @@ void qso_entry::copy_default_to_qso() {
 // Copy contest values to QSO - 599 001 etc.
 void qso_entry::copy_contest_to_qso() {
 	if (qso_) {
-		string contest_mode = spec_data_->dxcc_mode(qso_->item("MODE"));
-		if (contest_mode == "CW" || contest_mode == "DATA") {
-			// CW/Data
-			qso_->item("RST_SENT", string("599"));
-			qso_->item("RST_RCVD", string("599"));
-		}
-		else {
-			// Phone
-			qso_->item("RST_SENT", string("59"));
-			qso_->item("RST_RCVD", string("59"));
-		}
-		// Exchange information: serial number, other doobry
-		qso_->item("STX", qso_data_->contest()->serial());
-		qso_->item("STX_STRING", qso_data_->contest()->exchange());
+		qso_data_->contest()->generate_exchange(qso_);
+		qso_data_->contest()->score_qso(qso_, true);
 		qso_->item("CONTEST_ID", qso_data_->contest()->contest_id());
 	}
 }

@@ -50,39 +50,20 @@ contest_dialog::contest_dialog(int X, int Y, int W, int H, const char* L) :
 	, contest_(nullptr)
 	, contest_id_("")
 	, contest_index_("")
-	, exchange_(nullptr)
-	, exchange_id_("")
-	, win_help_(nullptr)
 {
 	load_values();
 	create_form(x(), y());
 	populate_ct_index();
 	populate_logging();
-	populate_exch_id();
-	populate_score_id();
 	update_contest();
 	update_logging();
 	update_timeframe();
-	update_exchange(false);
-	scoring_id_ = SCORING_ALGOS[0].first;
-	update_scoring(false);
 	enable_widgets();
 
 	// Create help window
-	Fl_Group* sv = Fl_Group::current();
-	Fl_Group::current(nullptr);
-	win_help_ = new Fl_Window(300, 200);
-	Fl_Text_Display* dis = new Fl_Text_Display(0, 0, 300, 200);
-	help_buffer_ = new Fl_Text_Buffer;
-	dis->buffer(help_buffer_);
-	dis->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
-	win_help_->end();
-	win_help_->hide();
-	Fl_Group::current(sv);
 }
 
 contest_dialog::~contest_dialog() {
-	Fl::delete_widget(win_help_);
 }
 
 // inherited methods
@@ -149,49 +130,6 @@ void contest_dialog::create_form(int X, int Y) {
 	curr_y += HBUTTON + GAP;
 	curr_x = x() + WLLABEL;
 
-	w_exchange_id_ = new Fl_Input_Choice(curr_x, curr_y, WSMEDIT, HBUTTON, "Exchange");
-	w_exchange_id_->align(FL_ALIGN_LEFT);
-	w_exchange_id_->callback(cb_exch_id, &exchange_id_);
-	w_exchange_id_->tooltip("Please spcify the identifier for the contest exchange");
-
-	curr_x += w_exchange_id_->w() + GAP;
-	w_exchange_help_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Help");
-	w_exchange_help_->callback(cb_exch_help, nullptr);
-	w_exchange_help_->tooltip("Click for guidance on coding exchanges");
-
-	curr_y += HBUTTON;
-	curr_x = x() + WLLABEL;
-
-	w_exch_send_ = new Fl_Input(curr_x, curr_y, WEDIT, HBUTTON, "Send");
-	w_exch_send_->align(FL_ALIGN_LEFT);
-	w_exch_send_->when(FL_WHEN_CHANGED);
-	w_exch_send_->tooltip("Enter the send exchange template");
-
-	curr_y += HBUTTON;
-
-	w_exch_receive_ = new Fl_Input(curr_x, curr_y, WEDIT, HBUTTON, "Receive");
-	w_exch_receive_->align(FL_ALIGN_LEFT);
-	w_exch_receive_->when(FL_WHEN_CHANGED);
-	w_exch_receive_->tooltip("Enter the receive exchange template");
-
-	curr_y += HBUTTON + GAP;
-
-	w_scoring_id_ = new Fl_Choice(curr_x, curr_y, WSMEDIT, HBUTTON, "Scoring");
-	w_scoring_id_->align(FL_ALIGN_LEFT);
-	w_scoring_id_->callback(cb_score_id, &scoring_id_);
-	w_scoring_id_->tooltip("Please spcify the identifier for the scoring algorithm");
-
-	curr_x += WSMEDIT;
-	w_scoring_descr_ = new Fl_Multiline_Output(curr_x, curr_y, WEDIT, 5 * HBUTTON);
-	w_scoring_descr_->box(FL_FLAT_BOX);
-	w_scoring_descr_->color(FL_BACKGROUND_COLOR);
-	w_scoring_descr_->wrap(true);
-	w_scoring_descr_->tooltip("describes the scoring algorithm in more detail");
-
-	curr_y += w_scoring_descr_->h() + GAP;
-
-	curr_x = x() + WLLABEL;
-
 	end();
 	show();
 }
@@ -228,13 +166,6 @@ void contest_dialog::save_values() {
 		contest_->date.start = system_clock::from_time_t(timegm(start));
 		contest_->date.finish = system_clock::from_time_t(timegm(finish));
 #endif
-		contest_->scoring = w_scoring_id_->text();
-	}
-	if (!exchange_) exchange_ = contest_data_->get_exchange(exchange_id_, true);
-	if (exchange_) {
-		if (contest_) contest_->exchange = exchange_id_;
-		exchange_->sending = w_exch_send_->value();
-		exchange_->receive = w_exch_receive_->value();
 	}
 	contest_data_->save_data();
 }
@@ -284,38 +215,6 @@ void contest_dialog::update_timeframe() {
 	w_finish_time_->value(temp);
 }
 
-void contest_dialog::update_exchange(bool from_contest) {
-	if (from_contest) {
-		if (contest_) {
-			exchange_id_ = contest_->exchange;
-		}
-		else {
-			exchange_id_ = "";
-		}
-	}
-	w_exchange_id_->value(exchange_id_.c_str());
-	exchange_ = contest_data_->get_exchange(exchange_id_);
-	if (exchange_) {
-		w_exch_send_->value(exchange_->sending.c_str());
-		w_exch_receive_->value(exchange_->receive.c_str());
-	}
-	else {
-		w_exch_send_->value("");
-		w_exch_receive_->value("");
-	}
-}
-
-void contest_dialog::update_scoring(bool from_contest) {
-	if (from_contest) {
-		if (contest_) {
-			scoring_id_ = contest_->scoring;
-		}
-	}
-	int index = w_scoring_id_->find_index(scoring_id_.c_str());
-	w_scoring_id_->value(index);
-	w_scoring_descr_->value(SCORING_ALGOS[index].second.c_str());
-}
-
 // Callbacks
 // Contest ID field_input
 void contest_dialog::cb_id(Fl_Widget* w, void* v) {
@@ -326,8 +225,6 @@ void contest_dialog::cb_id(Fl_Widget* w, void* v) {
 	that->update_contest();
 	that->update_logging();
 	that->update_timeframe();
-	that->update_exchange(true);
-	that->update_scoring(true);
 }
 
 // Contest index
@@ -337,29 +234,6 @@ void contest_dialog::cb_index(Fl_Widget* w, void* v) {
 	that->update_contest();
 	that->update_logging();
 	that->update_timeframe();
-	that->update_exchange(true);
-	that->update_scoring(true);
-}
-
-
-// Exchange ID
-void contest_dialog::cb_exch_id(Fl_Widget* w, void* v) {
-	contest_dialog* that = ancestor_view<contest_dialog>(w);
-	that->exchange_id_ = ((Fl_Input_Choice*)w)->value();
-	that->update_exchange(false);
-}
-
-// Exchange help
-void contest_dialog::cb_exch_help(Fl_Widget* w, void* v) {
-	contest_dialog* that = ancestor_view<contest_dialog>(w);
-	that->display_help(EXCHANGE_HELP);
-}
-
-// Scoring ID
-void contest_dialog::cb_score_id(Fl_Widget* w, void* v) {
-	contest_dialog* that = ancestor_view<contest_dialog>(w);
-	that->scoring_id_ = ((Fl_Choice*)w)->text();
-	that->update_scoring(false);
 }
 
 // Populate contest index choice
@@ -375,26 +249,6 @@ void contest_dialog::populate_ct_index() {
 	w_contest_ix_->value("");
 }
 
-// Populate exchange ID choice
-void contest_dialog::populate_exch_id() {
-	set<string>* indices = contest_data_->get_exchange_indices();
-	w_exchange_id_->clear();
-	w_exchange_id_->add("");
-	if (indices) {
-		for (auto it : *indices) {
-			w_exchange_id_->add(it.c_str());
-		}
-	}
-}
-// Populate scoring ID choice
-void contest_dialog::populate_score_id() {
-	w_scoring_id_->clear();
-	for (auto it : SCORING_ALGOS) {
-		w_scoring_id_->add(it.first.c_str());
-	}
-	w_scoring_id_->value(0);
-}
-
 // Populate logged fields choice
 void contest_dialog::populate_logging() {
 	set<string> colls = fields_->coll_names();
@@ -404,11 +258,5 @@ void contest_dialog::populate_logging() {
 			w_logging_->add((*it).substr(8).c_str());
 		}
 	}
-}
-
-// Display help window
-void contest_dialog::display_help(const char* text) {
-	help_buffer_->text(text);
-	win_help_->show();
 }
 

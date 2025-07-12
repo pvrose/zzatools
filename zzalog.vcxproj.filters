@@ -363,6 +363,18 @@
     <ClCompile Include="zzalog\src\contest_scorer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zzalog\src\contest_algorithm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zzalog\src\contests\basic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zzalog\src\contests\iaru_hf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zzalog\include\about_dialog.h">
@@ -754,6 +766,15 @@
     </ClInclude>
     <ClInclude Include="common\include\xml_writer.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalog\include\contest_algorithm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalog\include\contests\basic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalog\include\contests\iaru_hf.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

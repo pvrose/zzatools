@@ -13,14 +13,10 @@ class Fl_Choice;
 class Fl_Input;
 class Fl_Input_Choice;
 class Fl_Int_Input;
-class Fl_Multiline_Output;
-class Fl_Text_Buffer;
 class Fl_Window;
 
 struct ct_data_t;
 struct ct_date_t;
-struct ct_exch_t;
-struct ct_score_t;
 
 class contest_dialog :
     public page_dialog
@@ -45,21 +41,11 @@ public:
 	static void cb_id(Fl_Widget* w, void* v);
 	// Contest index
 	static void cb_index(Fl_Widget* w, void* v);
-	// Exchange ID
-	static void cb_exch_id(Fl_Widget* w, void* v);
-	// Exchange help
-	static void cb_exch_help(Fl_Widget* w, void* v);
-	// Scoring ID
-	static void cb_score_id(Fl_Widget* w, void* v);
 
 protected:
 
 	// Populate contest index choice
 	void populate_ct_index();
-	// Populate exchange ID choice
-	void populate_exch_id();
-	// Populate scoring ID choice
-	void populate_score_id();
 	// Populate logging
 	void populate_logging();
 	// Update contest
@@ -68,22 +54,11 @@ protected:
 	void update_logging();
 	// Update timeframe
 	void update_timeframe();
-	// Update exchange
-	void update_exchange(bool from_contest);
-	// Update scoring 
-	void update_scoring(bool from_contest);
-	// Display help
-	void display_help(const char* text);
 
 	// Current contest if any.
 	string contest_id_;
 	string contest_index_;
 	ct_data_t* contest_;
-	// Current exchange
-	string exchange_id_;
-	ct_exch_t* exchange_;
-	// Current scoring
-	string scoring_id_;
 
 	// Widgets
 	// Contest ID
@@ -96,17 +71,5 @@ protected:
 	Fl_Int_Input* w_start_time_;
 	calendar_input* w_finish_date_;
 	Fl_Int_Input* w_finish_time_;
-	// Exchange
-	Fl_Input_Choice* w_exchange_id_;
-	Fl_Input* w_exch_send_;
-	Fl_Input* w_exch_receive_;
-	Fl_Button* w_exchange_help_;
-	// Scoring
-	Fl_Choice* w_scoring_id_;
-	Fl_Multiline_Output* w_scoring_descr_;
-
-	// Help window
-	Fl_Window* win_help_;
-	Fl_Text_Buffer* help_buffer_;
 };
 

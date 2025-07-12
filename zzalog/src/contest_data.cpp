@@ -16,7 +16,6 @@ contest_data::contest_data() {
 contest_data::~contest_data() {
 	save_data();
 	contests_.clear();
-	exchanges_.clear();
 }
 
 // Get contest data structure for contest "id" 
@@ -67,23 +66,6 @@ int contest_data::get_contest_count() {
 // Get the specified conets information
 ct_entry_t* contest_data::get_contest_info(int number) {
 	return contest_infos_[number];
-}
-
-// Get exchanged data for exchange "id"
-ct_exch_t* contest_data::get_exchange(string id, bool create) {
-	if (exchanges_.find(id) == exchanges_.end()) {
-		if (create && id.length()) exchanges_[id] = new ct_exch_t;
-		else return nullptr;
-	}
-	return exchanges_.at(id);
-}
-
-set<string>* contest_data::get_exchange_indices() {
-	set<string>* result = new set<string>;
-	for (auto it : exchanges_) {
-		result->insert(it.first);
-	}
-	return result;
 }
 
 // Load data

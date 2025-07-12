@@ -33,14 +33,6 @@ struct ct_date_t {
 struct ct_data_t {
 	string fields;           // "Pointer" to displayed fields list
 	ct_date_t date;          // Date of the contest
-	string exchange;         // "Pointer" to exchange description
-	string scoring;          // "Pointer" to scoring description
-};
-
-// Exchange data
-struct ct_exch_t {
-	string sending;         // "Mail-merge" type description for sending
-	string receive;         // "Mail-merge" type description for receiving
 };
 
 const vector < pair<string, string> > SCORING_ALGOS = {
@@ -73,10 +65,6 @@ public:
 	ct_entry_t* get_contest_info(int number);
 	set<string>* get_contest_indices(string id);
 
-	// Get exchanged data for exchange "id"
-	ct_exch_t* get_exchange(string id, bool create = false);
-	set<string>* get_exchange_indices();
-
 
 protected:
 	// Load data
@@ -87,8 +75,6 @@ protected:
 	// The databases 
 	// Contests mapped by ID and index (e.g. year)
 	map<string, map<string, ct_data_t*> > contests_;
-	// Exchanges mapped by ID
-	map<string, ct_exch_t*> exchanges_;
 	// Contest info
 	vector<ct_entry_t*> contest_infos_;
 

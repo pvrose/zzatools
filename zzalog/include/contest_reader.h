@@ -14,7 +14,6 @@ enum ct_element_t : char {
     CT_CONTEST,             // Individual contest definition
     CT_TIMEFRAME,           // Timeframe
     CT_VALUE,               // Individual fields
-    CT_EXCHANGE,            // Individual exchange definition
 };
 
 /*
@@ -26,11 +25,6 @@ enum ct_element_t : char {
 *       <VALUE name=scoring>[scoring algo id]</VALUE>
 *     </CONTEST>
 *     <CONTEST....
-*     <EXCHANGE id=[exchange id]
-*       <VALUE name=send>[send exchange]</VALUE>
-*       <VALUE name=receive>[receive exchange]</VALUE>
-*     </EXCHANGE>
-*     <EXCHANGE....
 *   </CONTESTS>
 */
 
@@ -53,16 +47,12 @@ protected:
     static bool start_timeframe(xml_wreader* that, map<string, string>* attributes);
     // Start <VALUE name=>
     static bool start_value(xml_wreader* that, map<string, string>* attributes);
-    // Start <EXCHANGE id=>
-    static bool start_exchange(xml_wreader* that, map<string, string>* attributes);
-    // End </CONTESTS>
+     // End </CONTESTS>
     static bool end_contests(xml_wreader* that);
     // End </CONTEST>
     static bool end_contest(xml_wreader* that);
     // End </VALUE>
     static bool end_value(xml_wreader* that);
-    // End </EXCHANGE>
-    static bool end_exchange(xml_wreader* that);
     // Characters in value
     static bool chars_value(xml_wreader* that, string content);
 
@@ -71,7 +61,6 @@ protected:
         { "CONTEST", CT_CONTEST },
         { "TIMEFRAME", CT_TIMEFRAME },
         { "VALUE", CT_VALUE },
-        { "EXCHANGE", CT_EXCHANGE },
     };
 
     const map<char, methods> method_map_ = {
@@ -79,7 +68,6 @@ protected:
         { CT_CONTEST, { start_contest, end_contest, nullptr } },
         { CT_TIMEFRAME, { start_timeframe, nullptr, nullptr }},
         { CT_VALUE, { start_value, end_value, chars_value }},
-        { CT_EXCHANGE, { start_exchange, end_exchange, nullptr }},
     };
 
     // date being read

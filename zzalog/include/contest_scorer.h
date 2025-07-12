@@ -1,12 +1,13 @@
 #pragma once
 
 
-
+#include <map>
 #include <set>
 #include <string>
 
 #include <FL/Fl_Group.H>
 
+class contest_algorithm;
 class extract_data;
 class record;
 class Fl_Button;
@@ -14,18 +15,20 @@ class Fl_Choice;
 class Fl_Output;
 
 struct ct_data_t;
-struct ct_exch_t;
 
 // The records are kept in a container with size_t as index
 typedef size_t item_num_t;    // Position of item within this book
 typedef size_t qso_num_t;     // Position of item within book_ instance
 
-
 using namespace std;
+
+const int NUMBER_FIELDS = 4;
 
 class contest_scorer :
     public Fl_Group
 {
+
+    friend class contest_algorithm;
 
 public:
     contest_scorer(int X, int Y, int W, int H, const char* L = nullptr);
@@ -60,29 +63,29 @@ public:
 
     // Return serial number as string
     string serial();
-    // Return exchange
-    string exchange();
 
+    // Score QSO
+    void score_qso(record* qso, bool check_only);
+    // Parse exchange
+    void parse_exchange(record* qso, string text);
+    // Create exchang
+    string generate_exchange(record* qso);
 
 
 protected:
 
     void populate_contest();
 
-    void populate_timeframe(ct_data_t* ct);
-    void populate_status(ct_data_t* ct, bool previous);
+    void populate_timeframe();
+    void populate_status();
+    void create_algo();
+
+    void change_contest();
 
     // Load QSOs - after restarting zzalog
     void resume_contest();
 
-    // Score QSP
-    void score_qso(record* qso, bool check_only);
-
-    // Individual algorithms
-    void score_basic(record* qso, bool check_only);
-    void score_iaru_hf(record* qso, bool check_only);
-
-    // Copy points to display
+   // Copy points to display
     void copy_points_to_display();
 
     // data
@@ -90,12 +93,9 @@ protected:
     string contest_index_;
     string start_time_;
     string finish_time_;
+    bool active_;
 
     ct_data_t* contest_;
-    ct_exch_t* exchange_;
-
-    // scoring algorithm
-    string scoring_id_;
 
     // Logged vallues
     int qso_points_;
@@ -124,6 +124,8 @@ protected:
     extract_data* qsos_;
     // Current QSO
     record* qso_;
+    // Algorithm
+    contest_algorithm* algorithm_;
 
     // Multipliers worked
     set<string> multipliers_;
@@ -143,6 +145,9 @@ protected:
     Fl_Output* w_qso_points_2_;
     Fl_Output* w_multiplier_2_;
     Fl_Output* w_total_2_;
+    Fl_Group* g_fields_;
+    Fl_Output* w_rx_items_[NUMBER_FIELDS];
+    Fl_Output* w_tx_items_[NUMBER_FIELDS];
 
 };
 
