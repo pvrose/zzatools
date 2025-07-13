@@ -67,8 +67,6 @@ void contest_scorer::load_data() {
 	contest_settings.get("Active", itemp, (int)false);
 	active_ = itemp;
 	contest_settings.get("Next Serial", next_serial_, 1);
-	// TODO move to change_contest - called after create form
-	ct_data_t* contest = contest_data_->get_contest(contest_id_, contest_index_);
 }
 
 void contest_scorer::create_form() {

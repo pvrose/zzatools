@@ -29,7 +29,6 @@ iaru_hf::iaru_hf() : contest_algorithm() {
 void iaru_hf::parse_exchange(record* qso, string text) {
 	vector<string> words;
 	split_line(text, words, ' ');
-	int ix = 0;
 	qso->item("RST_RCVD", words[0]);
 	qso->item("ITUZ", words[1]);
 }
@@ -37,7 +36,6 @@ void iaru_hf::parse_exchange(record* qso, string text) {
 // Algorithm specific method to generate text from a number of fieds
 string iaru_hf::generate_exchange(record* qso) {
 	string result = "";
-	int ix = 0;
 	if (qso) {
 		set_default_rst(qso);
 		qso->item("APP_ZZA_MY_CONT", my_info_->data.at(CONTINENT));
