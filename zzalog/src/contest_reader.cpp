@@ -15,10 +15,6 @@ contest_reader::contest_reader() :
 	, contest_data_(nullptr)
 	, contest_id_("")
 	, contest_ix_("")
-	, exchange_(nullptr)
-	, exchange_id_("")
-	, value_data_("")
-	, value_name_("")
 {
 	elements_.clear();
 	xml_wreader::method_map_ = method_map_;
@@ -149,28 +145,27 @@ bool contest_reader::start_timeframe(xml_wreader* wr, map<string, string>* attri
 }
 
 // Start <VALUE name=>
-bool contest_reader::start_value(xml_wreader* wr, map<string, string>* attributes) {
+bool contest_reader::start_algorithm(xml_wreader* wr, map<string, string>* attributes) {
 	contest_reader* that = (contest_reader*)wr;
 	switch (that->elements_.back()) {
 	case CT_CONTEST:
-		that->elements_.push_back(CT_VALUE);
+		that->elements_.push_back(CT_ALGORITHM);
 		// get the name
 		for (auto it : *attributes) {
 			string name = to_upper(it.first);
 			if (name == "NAME") {
 				// Iyt might be an empty value
-				that->value_data_ = "";
-				that->value_name_ = it.second;
+				that->contest_data_->algorithm = it.second;
 				return true;
 			}
 			// else
 			char msg[128];
-			snprintf(msg, sizeof(msg), "CONTEST: Unexpected attribute %s=%s in VALUE element",
+			snprintf(msg, sizeof(msg), "CONTEST: Unexpected attribute %s=%s in ALGORITHM element",
 				it.first.c_str(), it.second.c_str());
 			return false;
 		}
 	default:
-		status_->misc_status(ST_ERROR, "CONTEST: Unexpected VALUE element");
+		status_->misc_status(ST_ERROR, "CONTEST: Unexpected ALGORITHM element");
 		return false;
 	}
 	return true;
@@ -191,37 +186,6 @@ bool contest_reader::end_contest(xml_wreader* wr) {
 	that->contest_data_ = nullptr;
 	that->contest_id_ = "";
 	that->contest_ix_ = "";
-	return true;
-}
-
-// End </VALUE>
-bool contest_reader::end_value(xml_wreader* wr) {
-	contest_reader* that = (contest_reader*)wr;
-	char msg[128];
-	ct_element_t parent = (ct_element_t)that->elements_.back();
-	switch (parent) {
-	case CT_CONTEST:
-		if (that->value_name_ == "fields")
-			that->contest_data_->fields = that->value_data_;
-		else {
-			snprintf(msg, sizeof(msg), "CONTEST: Unexpected value item %s: %s in CONTEST %s.%s",
-				that->value_name_.c_str(),
-				that->value_data_.c_str(),
-				that->contest_id_.c_str(),
-				that->contest_ix_.c_str());
-			status_->misc_status(ST_ERROR, msg);
-			return false;
-		}
-		return true;
-	default:
-		return false;
-	}
-}
-
-// Characters is value
-bool contest_reader::chars_value(xml_wreader* wr, string content) {
-	contest_reader* that = (contest_reader*)wr;
-	that->value_data_ = content;
 	return true;
 }
 

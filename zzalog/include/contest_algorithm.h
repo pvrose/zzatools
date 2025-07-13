@@ -3,6 +3,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -11,6 +12,9 @@ class contest_scorer;
 class record;
 
 struct qth_info_t;
+// List of fields
+typedef vector <string> field_list;
+
 
 struct score_result {
     int qso_points;
@@ -35,6 +39,9 @@ public:
     // Algorithm specific method to score an individual QSO
     virtual score_result score_qso(record* qso, const set<string> &multipliers) = 0;
 
+    // Return all fields used in algorithm
+    field_list fields();
+
 protected:
 
     // Default
@@ -44,9 +51,9 @@ protected:
     void update_tx_items(record* qso);
 
     // List of field names to use in RX exchange and scoring
-    set<string> rx_items_;
+    field_list rx_items_;
     // List of field names to use in TX exchange and scoring
-    set<string> tx_items_;
+    field_list tx_items_;
 
     // My details
     const qth_info_t* my_info_;

@@ -14,10 +14,13 @@ extern map<string, contest_algorithm*>* algorithms_;
 
 contest_algorithm* iaru_hf_ = new contests::iaru_hf;
 
-
+// Constructor - add algorithmic specific data here
 iaru_hf::iaru_hf() : contest_algorithm() {
-	rx_items_ = { "RST_RCVD", "ITUZ" };
-	tx_items_ = { "RST_SENT", "MY_ITU_ZONE" };
+	// Add the QSO fields used in scoring and exchanges (RX)
+	rx_items_ = { "RST_RCVD", "ITUZ", "CONT"};
+	// Add the QSO fields used in scoring and exchanges (TX)
+	tx_items_ = { "RST_SENT", "MY_ITU_ZONE", "APP_ZZA_MY_CONT" };
+	// Add this algorithm to the list of algorithms
 	if (algorithms_ == nullptr) algorithms_ = new map<string, contest_algorithm*>;
 	(*algorithms_)["IARU-HF"] = this;
 }

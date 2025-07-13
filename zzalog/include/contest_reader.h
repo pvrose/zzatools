@@ -13,16 +13,14 @@ enum ct_element_t : char {
     CT_CONTESTS,            // Outermost element
     CT_CONTEST,             // Individual contest definition
     CT_TIMEFRAME,           // Timeframe
-    CT_VALUE,               // Individual fields
+    CT_ALGORITHM,               // Individual fields
 };
 
 /*
 *   <CONTESTS>
 *     <CONTEST id=[CONTEST_ID] index=[n]>
-*       <VALUE name=fields>[field-set name]</VALUE>
 *       <TIMEFRAME start=[start time] finish=[finish time] />
-*       <VALUE name=exchange>[exchange id]</VALUE>
-*       <VALUE name=scoring>[scoring algo id]</VALUE>
+*       <ALGORITHM name=[algo id] />
 *     </CONTEST>
 *     <CONTEST....
 *   </CONTESTS>
@@ -45,29 +43,25 @@ protected:
     static bool start_contest(xml_wreader* that, map<string, string>* attributes);
     // Start <TIMEFRAME start= finish=>
     static bool start_timeframe(xml_wreader* that, map<string, string>* attributes);
-    // Start <VALUE name=>
-    static bool start_value(xml_wreader* that, map<string, string>* attributes);
+    // Start <ALGORITHM name=>
+    static bool start_algorithm(xml_wreader* that, map<string, string>* attributes);
      // End </CONTESTS>
     static bool end_contests(xml_wreader* that);
     // End </CONTEST>
     static bool end_contest(xml_wreader* that);
-    // End </VALUE>
-    static bool end_value(xml_wreader* that);
-    // Characters in value
-    static bool chars_value(xml_wreader* that, string content);
 
     const map<string, char> element_map_ = {
         { "CONTESTS", CT_CONTESTS },
         { "CONTEST", CT_CONTEST },
         { "TIMEFRAME", CT_TIMEFRAME },
-        { "VALUE", CT_VALUE },
+        { "ALGORITHM", CT_ALGORITHM },
     };
 
     const map<char, methods> method_map_ = {
         { CT_CONTESTS, { start_contests, end_contests, nullptr } },
         { CT_CONTEST, { start_contest, end_contest, nullptr } },
         { CT_TIMEFRAME, { start_timeframe, nullptr, nullptr }},
-        { CT_VALUE, { start_value, end_value, chars_value }},
+        { CT_ALGORITHM, { start_algorithm, nullptr, nullptr }},
     };
 
     // date being read
@@ -79,15 +73,7 @@ protected:
     string contest_id_;
     // Cureent contest index
     string contest_ix_;
-    // Current exchange
-    ct_exch_t* exchange_;
-    // Current exchange ID
-    string exchange_id_;
-     // Input stream 
+    // Input stream 
     istream* in_file_;
-    // Current value name
-    string value_name_;
-    // Current value data
-    string value_data_;
 };
 

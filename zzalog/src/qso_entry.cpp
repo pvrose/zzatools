@@ -27,7 +27,7 @@ extern double prev_freq_;
 
 // Map showing what fields to display for what usage
 // Used for contest, but not currently used
-collection_t* qso_entry::field_map_ = nullptr;
+field_list* qso_entry::field_map_ = nullptr;
 
 int qso_entry::focus_ix_ = 0;
 
@@ -543,15 +543,27 @@ void qso_entry::initialise_field_map() {
 
 // Initialise fields
 void qso_entry::initialise_fields() {
+	if (field_map_) delete field_map_;
+	field_map_ = new field_list;
 	// Now set fields
 	// TODO: this is where we configure for context
 	switch (qso_data_->logging_state()) {
 	case qso_data::TEST_ACTIVE:
 	case qso_data::TEST_PENDING:
-		field_map_ = fields_->collection(qso_data_->contest()->collection());
+		(*field_map_) = QSO_FIELDS;
+		for (auto it : qso_data_->contest()->fields()) {
+			bool new_field = true;
+			for (auto iu : *field_map_) {
+				if (iu == it) {
+					new_field = false;
+					break;
+				}
+			}
+			if (new_field) field_map_->push_back(it);
+		}
 		break;
 	default:
-		field_map_ = fields_->collection(fields_->coll_name(FO_QSOVIEW));
+		(*field_map_) = fields_->field_names(fields_->coll_name(FO_QSOVIEW));
 		break;
 	}
 	if (field_map_->size() > NUMBER_TOTAL - NUMBER_FIXED) {
@@ -569,7 +581,7 @@ void qso_entry::initialise_fields() {
 	// For non-fixed fields - set field name into field choice and populate
 	// drop-down menu into field input with permitted values
 	for (ix = 0, iy = NUMBER_FIXED; ix < field_map_->size(); ix++, iy++) {
-		string name = (*field_map_)[ix].field;
+		string name = (*field_map_)[ix];
 		ch_field_[iy]->value(name.c_str());
 		ip_field_[iy]->field_name(name.c_str(), qso_);
 		field_ip_map_[name] = iy;
@@ -615,7 +627,7 @@ void qso_entry::action_add_field(int ix, string field) {
 			field_ip_map_.erase(old_field);
 		}
 		field_ip_map_[field] = ix;
-		(*field_map_)[ix - NUMBER_FIXED].field = field;
+		(*field_map_)[ix - NUMBER_FIXED] = field;
 	}
 	else if (ix == fields_in_use_.size() && ix < NUMBER_TOTAL) {
 		if (field_ip_map_.find(field) == field_ip_map_.end()) {
@@ -623,7 +635,7 @@ void qso_entry::action_add_field(int ix, string field) {
 			ip_field_[ix]->field_name(field.c_str(), qso_);
 			ip_field_[ix]->value(qso_->item(field).c_str());
 			field_ip_map_[field] = ix;
-			field_map_->push_back({ field, field, 50 });
+			field_map_->push_back(field);
 			fields_in_use_.push_back(field);
 		}
 		else {
@@ -643,13 +655,13 @@ void qso_entry::action_add_field(int ix, string field) {
 // Delete a field
 void qso_entry::action_del_field(int ix) {
 	int iy = ix - NUMBER_FIXED;
-	string& old_field = (*field_map_)[iy].field;
+	string& old_field = (*field_map_)[iy];
 	field_ip_map_.erase(old_field);
 	int pos = ix;
 	for (; pos < fields_in_use_.size() - 1; pos++) {
 		int posy = pos - NUMBER_FIXED;
-		string& field = (*field_map_)[posy + 1].field;
-		(*field_map_)[posy].field = field;
+		string& field = (*field_map_)[posy + 1];
+		(*field_map_)[posy] = field;
 		ch_field_[pos]->value(field.c_str());
 		ip_field_[pos]->field_name(field.c_str(), qso_);
 		ip_field_[pos]->value(qso_->item(field).c_str());

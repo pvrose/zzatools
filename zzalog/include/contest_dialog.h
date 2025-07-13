@@ -47,13 +47,13 @@ protected:
 	// Populate contest index choice
 	void populate_ct_index();
 	// Populate logging
-	void populate_logging();
+	void populate_algorithm();
 	// Update contest
 	void update_contest();
-	//  Update fields
-	void update_logging();
 	// Update timeframe
 	void update_timeframe();
+	// Update algorithm
+	void update_algorithm();
 
 	// Current contest if any.
 	string contest_id_;
@@ -65,7 +65,7 @@ protected:
 	field_input* w_contest_id_;
 	Fl_Input_Choice* w_contest_ix_;
 	// Fields
-	Fl_Input_Choice* w_logging_;
+	Fl_Input_Choice* w_algorithm_;
 	// Timeframe
 	calendar_input* w_start_date_;
 	Fl_Int_Input* w_start_time_;

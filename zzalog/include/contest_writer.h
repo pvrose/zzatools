@@ -37,10 +37,6 @@ protected:
     string contest_id_;
     // Cureent contest index
     string contest_ix_;
-    // Current exchange
-    ct_exch_t* exchange_;
-    // Current exchange ID
-    string exchange_id_;
 
 };
 

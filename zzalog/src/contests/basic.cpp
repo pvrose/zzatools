@@ -13,11 +13,15 @@ extern map<string, contest_algorithm*>* algorithms_;
 
 contest_algorithm* basic_ = new contests::basic;
 
+// Constructor - add algorithmic specific data here
 basic::basic() : contest_algorithm() {
+	// Add the QSO fields used in scoring and exchanges (RX)
 	rx_items_ = { "RST_RCVD", "SRX" };
+	// Add the QSO fields used in scoring and exchanges (TX)
 	tx_items_ = { "RST_SENT", "STX" };
+	// Add this algorithm to the list of algorithms - 
 	if (algorithms_ == nullptr) algorithms_ = new map<string, contest_algorithm*>;
-	(*algorithms_)["RSGB-COMMONWEALTH"] = this;
+	(*algorithms_)["Basic"] = this;
 
 }
 

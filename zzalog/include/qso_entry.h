@@ -59,7 +59,7 @@ public:
 	static const int NUMBER_TOTAL = NUMBER_FIXED + 20;
 
 	// Variable fields - per usage
-	static collection_t* field_map_;
+	static field_list* field_map_;
 
 protected:
 	// Maps fieldname to index of the Input used for its value

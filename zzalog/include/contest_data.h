@@ -31,23 +31,18 @@ struct ct_date_t {
 
 // Definition of the contest
 struct ct_data_t {
-	string fields;           // "Pointer" to displayed fields list
+	string algorithm;        // Scoring and exchange algorithm
 	ct_date_t date;          // Date of the contest
 };
 
-const vector < pair<string, string> > SCORING_ALGOS = {
-	{"Basic", "1 point per QSO (not own DXCC), multiplier = number of DXCCs per band"},
-	{"IARU HF", "Special scoring for IARU HF Championship"}
-};
-
-// Amalgamated contest list
+// Amalgamated contest list entry
 struct ct_entry_t {
 	string id;
 	string index;
 	ct_data_t* definition;
 };
 
-// The cpntest definition database
+// The contest definition database
 class contest_data
 {
 	friend class contest_reader;

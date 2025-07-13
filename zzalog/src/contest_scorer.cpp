@@ -466,9 +466,11 @@ void contest_scorer::increment_serial() {
 }
 
 // Returns the fields::collection name
-string contest_scorer::collection() {
-	if (contest_) return "Contest/" + contest_->fields;
-	else return "";
+field_list contest_scorer::fields() {
+	if (algorithm_) {
+		return algorithm_->fields();
+	}
+	return {};
 }
 
 // Returns the serial number

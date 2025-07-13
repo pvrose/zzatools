@@ -11,6 +11,8 @@
 
 #include <FL/Fl_Output.H>
 
+typedef vector<string> field_list;
+
 extern qso_manager* qso_manager_;
 extern spec_data* spec_data_;
 extern stn_data* stn_data_;
@@ -82,4 +84,16 @@ void contest_algorithm::update_tx_items(record* qso) {
 		scorer_->w_tx_items_[ix]->value(qso->item(it).c_str());
 		ix++;
 	}
+}
+
+// Return all fields used in algorithm
+field_list contest_algorithm::fields() {
+	vector<string> result;
+	for (auto it : rx_items_) {
+		result.push_back(it);
+	}
+	for (auto it : tx_items_) {
+		result.push_back(it);
+	}
+	return result;
 }

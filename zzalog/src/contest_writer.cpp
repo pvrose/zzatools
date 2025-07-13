@@ -68,8 +68,15 @@ bool contest_writer::write_element(ct_element_t element) {
         (*attributes)["id"] = contest_id_;
         (*attributes)["index"] = contest_ix_;
         if (!start_element(name, attributes)) return false;
-        if (!write_value("fields", contest_->fields)) return false;
+        if (!write_element(CT_ALGORITHM)) return false;
         if (!write_element(CT_TIMEFRAME)) return false;
+        if (!end_element(name)) return false;
+        return true;
+    case CT_ALGORITHM:
+        name = "algorithm";
+        attributes = new map<string, string>;
+        (*attributes)["name"] = contest_->algorithm;
+        if (!start_element(name, attributes)) return false;
         if (!end_element(name)) return false;
         return true;
     case CT_TIMEFRAME:

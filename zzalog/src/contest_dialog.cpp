@@ -2,9 +2,9 @@
 
 #include "calendar.h"
 #include "calendar_input.h"
+#include "contest_algorithm.h"
 #include "contest_data.h"
 #include "field_choice.h"
-#include "fields.h"
 
 #include "drawing.h"
 #include "utils.h"
@@ -19,31 +19,10 @@
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Text_Display.H>
 
+extern map<string, contest_algorithm*>* algorithms_;
 extern contest_data* contest_data_;
-extern fields* fields_;
 extern string VENDOR;
 extern string PROGRAM_ID;
-
-const char EXCHANGE_HELP[] =
-"Enter the fields that are to be used for the exchange. Field names"
-" should be entered in angle brackets. So, for instance "
-"the common RS(T) + serial number exchanged shoule be entered as:\n"
-"\t\"<RST_SEND><STX>\" for the sent exchange and:\n"
-"\t\"<RST_RCVD><SRX>\" for the received exchange.\n"
-"Field names are those defined in the ADIF specification.";
-
-const char SCORING_HELP[] =
-"Enter the scoring algorithm. This is usually in two parts: points given for a QSO, "
-"and a multiplier. Per QSO examples are:\n"
-"\t\"<CONT>!=<MY_CONT>?5:1\" if QSOS with another continent score 5 and within your own 1.\n"
-"\t\"<DXCC>!=<MY_DXCC>?1:0\" if QSOs with another DXCC entity score 1 and none for your own.\n"
-"Field names are those defined in the ADIF specification, with the following "
-"exceptions - <GRID4> and <MY_GRID4> for a 4-character gridsquare rather than what is "
-"captured in <GRIDSQUARE> etc. The special entry \"*CUSTOM*\" is used for a custom or "
-"unsupported scoring algorithm.\n"
-"Multiplier examples are:\n"
-"\t\"COUNT(<DXCC>)\" for the multiplier the number of DXCCs worked.\n"
-"\t\"COUNT(<DXCC>*<BAND>)\" for the number of DXCCs worked on each band.\n";
 
 contest_dialog::contest_dialog(int X, int Y, int W, int H, const char* L) :
 	page_dialog(X, Y, W, H, L)
@@ -54,10 +33,10 @@ contest_dialog::contest_dialog(int X, int Y, int W, int H, const char* L) :
 	load_values();
 	create_form(x(), y());
 	populate_ct_index();
-	populate_logging();
+	populate_algorithm();
 	update_contest();
-	update_logging();
 	update_timeframe();
+	update_algorithm();
 	enable_widgets();
 
 	// Create help window
@@ -102,9 +81,9 @@ void contest_dialog::create_form(int X, int Y) {
 	curr_x = x() + WLLABEL;
 	curr_y += GAP + HBUTTON;
 
-	w_logging_ = new Fl_Input_Choice(curr_x, curr_y, WSMEDIT, HBUTTON, "Fields logged");
-	w_logging_->align(FL_ALIGN_LEFT);
-	w_logging_->tooltip("Please select the collection of fields needed to log for this contest");
+	w_algorithm_ = new Fl_Input_Choice(curr_x, curr_y, WSMEDIT, HBUTTON, "Algorithm");
+	w_algorithm_->align(FL_ALIGN_LEFT);
+	w_algorithm_->tooltip("Please select the algorithm used for scoring and exchange");
 
 	curr_y += GAP + HBUTTON;
 
@@ -138,7 +117,7 @@ void contest_dialog::create_form(int X, int Y) {
 void contest_dialog::save_values() {
 	if (!contest_) contest_ = contest_data_->get_contest(contest_id_, contest_index_, true);
 	if (contest_) {
-		contest_->fields = w_logging_->value();
+		contest_->algorithm = w_algorithm_->value();
 		string start_date = w_start_date_->value();
 		string start_time = w_start_time_->value();
 		tm* start = new tm;
@@ -180,12 +159,12 @@ void contest_dialog::update_contest() {
 }
 
 // Update logging fields
-void contest_dialog::update_logging() {
+void contest_dialog::update_algorithm() {
 	if (contest_) {
-		w_logging_->value(contest_->fields.c_str());
+		w_algorithm_->value(contest_->algorithm.c_str());
 	}
 	else {
-		w_logging_->value(0);
+		w_algorithm_->value(0);
 	}
 }
 
@@ -223,7 +202,7 @@ void contest_dialog::cb_id(Fl_Widget* w, void* v) {
 	that->contest_index_ = "";
 	that->w_contest_ix_->value("");
 	that->update_contest();
-	that->update_logging();
+	that->update_algorithm();
 	that->update_timeframe();
 }
 
@@ -232,7 +211,7 @@ void contest_dialog::cb_index(Fl_Widget* w, void* v) {
 	contest_dialog* that = ancestor_view<contest_dialog>(w);
 	that->contest_index_ = ((Fl_Input_Choice*)w)->value();
 	that->update_contest();
-	that->update_logging();
+	that->update_algorithm();
 	that->update_timeframe();
 }
 
@@ -250,12 +229,11 @@ void contest_dialog::populate_ct_index() {
 }
 
 // Populate logged fields choice
-void contest_dialog::populate_logging() {
-	set<string> colls = fields_->coll_names();
-	// LOad all collections that start "Contest/" to choice - removing that
-	for (auto it = colls.begin(); it != colls.end(); it++) {
-		if ((*it).substr(0, 8) == "Contest/") {
-			w_logging_->add((*it).substr(8).c_str());
+void contest_dialog::populate_algorithm() {
+	w_algorithm_->clear();
+	if (algorithms_) {
+		for (auto it : *algorithms_) {
+			w_algorithm_->add(it.first.c_str());
 		}
 	}
 }

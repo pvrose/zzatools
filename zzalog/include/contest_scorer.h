@@ -4,6 +4,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include <vector>
 
 #include <FL/Fl_Group.H>
 
@@ -16,11 +17,12 @@ class Fl_Output;
 
 struct ct_data_t;
 
+using namespace std;
+
 // The records are kept in a container with size_t as index
 typedef size_t item_num_t;    // Position of item within this book
 typedef size_t qso_num_t;     // Position of item within book_ instance
-
-using namespace std;
+typedef vector<string> field_list;
 
 const int NUMBER_FIELDS = 4;
 
@@ -58,8 +60,8 @@ public:
     // Increment next serial number
     void increment_serial();
 
-    // Return field collection name
-    string collection();
+    // Return list of fields
+    field_list fields();
 
     // Return serial number as string
     string serial();
