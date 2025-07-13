@@ -1617,7 +1617,7 @@ void spec_data::report_error(valn_error_t error_code, const string&  data, const
 		else if (field == "CQZ" || field == "ITUZ" || field == "CONT" || field == "COUNTRY") {
 			incompat_field = "DXCC";
 		}
-		else if (field == "MY_CQZ" || field == "MY_ITUZ" || field == "MY_CONT" || field == "MY_COUNTRY") {
+		else if (field == "MY_CQZ" || field == "MY_ITUZ" || field == "APP_ZZA_MY_CONT" || field == "MY_COUNTRY") {
 			incompat_field = "MY_DXCC";
 		} 
 		else if (field == "TIME_OFF") {
@@ -1912,7 +1912,7 @@ bool spec_data::auto_correction(valn_error_t error_code, const string&  data, co
 			return true;
 		}
 		else if (field == "CQZ" || field == "ITUZ" || field == "CONT" || field == "COUNTRY" ||
-			field == "MY_CQZ" || field == "MY_ITUZ" || field == "MY_CONT" || field == "MY_COUNTRY") {
+			field == "MY_CQZ" || field == "MY_ITUZ" || field == "APP_ZZA_MY_CONT" || field == "MY_COUNTRY") {
 			// These fields should be reparsed - if we can
 			if (record_->item("DXCC").length()) {
 				record_->item(field, string(""));
@@ -2220,6 +2220,7 @@ void spec_data::add_my_appdefs() {
 		"APP_ZZA_QTH",
 		"APP_ZZA_QTH_DESCR",
 		"APP_ZZA_QTH",         // Macro
+		"APP_ZZA_MY_CONT",
 		"APP_LOTW_NUMREC",
 		"APP_LOTW_LASTQSL",
 		"APP_QRZLOG_LOGID",

@@ -47,7 +47,7 @@ public:
     // Add record 
     void add_qso(qso_num_t qso_number);
     // Check record
-    void check_qso(qso_num_t qso_number);
+    void check_qso(record* qso);
 
     // Active
     bool contest_active();

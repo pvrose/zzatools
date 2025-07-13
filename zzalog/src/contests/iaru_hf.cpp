@@ -10,10 +10,16 @@
 using namespace contests;
 
 extern stn_data* stn_data_;
+extern map<string, contest_algorithm*>* algorithms_;
+
+contest_algorithm* iaru_hf_ = new contests::iaru_hf;
+
 
 iaru_hf::iaru_hf() : contest_algorithm() {
 	rx_items_ = { "RST_RCVD", "ITUZ" };
 	tx_items_ = { "RST_SENT", "MY_ITU_ZONE" };
+	if (algorithms_ == nullptr) algorithms_ = new map<string, contest_algorithm*>;
+	(*algorithms_)["IARU-HF"] = this;
 }
 
 // Algorithm specific method to split text into a number of fields
@@ -33,7 +39,7 @@ string iaru_hf::generate_exchange(record* qso) {
 	string result = "";
 	int ix = 0;
 	set_default_rst(qso);
-	qso->item("MY_CONT", my_info_->data.at(CONTINENT));
+	qso->item("APP_ZZA_MY_CONT", my_info_->data.at(CONTINENT));
 	qso->item("MY_ITU_ZONE", my_info_->data.at(ITU_ZONE));
 	for (auto it : tx_items_) {
 		result += qso->item(it);

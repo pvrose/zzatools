@@ -9,9 +9,16 @@
 
 using namespace contests;
 
+extern map<string, contest_algorithm*>* algorithms_;
+
+contest_algorithm* basic_ = new contests::basic;
+
 basic::basic() : contest_algorithm() {
 	rx_items_ = { "RST_RCVD", "SRX" };
 	tx_items_ = { "RST_SENT", "STX" };
+	if (algorithms_ == nullptr) algorithms_ = new map<string, contest_algorithm*>;
+	(*algorithms_)["RSGB-COMMONWEALTH"] = this;
+
 }
 
 // Algorithm specific method to split text into a number of fields

@@ -22,7 +22,7 @@ extern contest_data* contest_data_;
 extern stn_data* stn_data_;
 extern string VENDOR;
 extern string PROGRAM_ID;
-extern map<string, contest_algorithm*> algorithms_;
+extern map<string, contest_algorithm*>* algorithms_;
 
 contest_scorer::contest_scorer(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
@@ -36,6 +36,7 @@ contest_scorer::contest_scorer(int X, int Y, int W, int H, const char* L) :
 	, total_p_(0)
 	, d_qso_points_(0)
 	, d_multiplier_(0)
+	, algorithm_(nullptr)
 {
 	load_data();
 	create_form();
@@ -348,13 +349,12 @@ void contest_scorer::change_contest() {
 
 // Use the appropriate algorithm and attach it to this.
 void contest_scorer::create_algo() {
-	algorithm_ = algorithms_.at(contest_id_);
+	algorithm_ = algorithms_->at(contest_id_);
 	algorithm_->attach(this);
 }
 
 // Add record 
 void contest_scorer::add_qso(qso_num_t qso_number) {
-	// It matches, copy reference to this book
 	record* qso = book_->get_record(qso_number, false);
 	qso_ = qso;
 	qsos_->push_back(qso);
@@ -363,9 +363,7 @@ void contest_scorer::add_qso(qso_num_t qso_number) {
 }
 
 // Check record 
-void contest_scorer::check_qso(qso_num_t qso_number) {
-	// It matches, copy reference to this book
-	record* qso = book_->get_record(qso_number, false);
+void contest_scorer::check_qso(record* qso) {
 	qso_ = qso;
 	score_qso(qso, true);
 }
@@ -437,7 +435,7 @@ void contest_scorer::populate_contest() {
 
 // Score QSP
 void contest_scorer::score_qso(record* qso, bool check_only) {
-	if (algorithm_ = nullptr) return;
+	if (algorithm_ == nullptr || qso == nullptr) return;
 	score_result res = algorithm_->score_qso(qso, multipliers_);
 	d_multiplier_ = res.multiplier;
 	d_qso_points_ = res.qso_points;
@@ -482,7 +480,7 @@ string contest_scorer::serial() {
 
 // Returns the created exchange
 string contest_scorer::generate_exchange(record* qso) {
-	return algorithm_->generate_exchange(qso_);
+	return algorithm_->generate_exchange(qso);
 }
 
 // Parse exchange

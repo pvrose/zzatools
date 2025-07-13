@@ -15,16 +15,12 @@ extern qso_manager* qso_manager_;
 extern spec_data* spec_data_;
 extern stn_data* stn_data_;
 
-contest_algorithm* basic_ = new contests::basic;
-contest_algorithm* iaru_hf_ = new contests::iaru_hf;
-
-map< string, contest_algorithm* > algorithms_ = { 
-	{ "RSGB-COMMONWEALTH", basic_ },
-	{ "IARU-HF", iaru_hf_ }
-};
+map< string, contest_algorithm* >* algorithms_ = nullptr;
 
 // Constructor - should be overriden by the algoritmic specific
 contest_algorithm::contest_algorithm() {
+	my_info_ = nullptr;
+	scorer_ = nullptr;
 	rx_items_.clear();
 	tx_items_.clear();
 

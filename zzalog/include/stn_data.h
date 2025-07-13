@@ -38,7 +38,7 @@ const map<qth_value_t, string> QTH_ADIF_MAP = {
 	{ SECONDARY_SUB, "MY_CNTY" },
 	{ CQ_ZONE, "MY_CQ_ZONE" },
 	{ ITU_ZONE, "MY_ITU_ZONE" },
-	{ CONTINENT, "MY_CONT" },
+	{ CONTINENT, "APP_ZZA_MY_CONT" },
 	{ IOTA, "MY_IOTA" },
 	{ WAB, "APP_ZZA_MY_WAB" }
 };
