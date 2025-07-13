@@ -195,7 +195,6 @@
     <ClCompile Include="zzalog\src\qso_buttons.cpp" />
     <ClCompile Include="zzalog\src\qso_clock.cpp" />
     <ClCompile Include="zzalog\src\qso_clocks.cpp" />
-    <ClCompile Include="zzalog\src\qso_contest.cpp" />
     <ClCompile Include="zzalog\src\qso_details.cpp" />
     <ClCompile Include="zzalog\src\qso_dxcc.cpp" />
     <ClCompile Include="zzalog\src\qso_log.cpp" />
@@ -326,7 +325,6 @@
     <ClInclude Include="zzalog\include\qso_buttons.h" />
     <ClInclude Include="zzalog\include\qso_clock.h" />
     <ClInclude Include="zzalog\include\qso_clocks.h" />
-    <ClInclude Include="zzalog\include\qso_contest.h" />
     <ClInclude Include="zzalog\include\qso_details.h" />
     <ClInclude Include="zzalog\include\qso_dxcc.h" />
     <ClInclude Include="zzalog\include\qso_log.h" />

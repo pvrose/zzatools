@@ -243,9 +243,6 @@
     <ClCompile Include="zzalog\src\fields.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zzalog\src\qso_contest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zzalog\src\qso_apps.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -630,9 +627,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\include\ticker.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qso_contest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\include\qso_apps.h">
