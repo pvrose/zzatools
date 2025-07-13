@@ -100,27 +100,30 @@ void contest_scorer::create_form() {
 	curr_x = x() + GAP;
 	curr_y += HBUTTON + GAP;
 
-	g_exch_ = new Fl_Group(curr_x, curr_y, w() - GAP - GAP, HBUTTON * 3, "Exchanges");
+	const int WGR = (w() - GAP - GAP);
+	const int WOP = WGR / 7;
+
+	g_exch_ = new Fl_Group(curr_x, curr_y, WGR, HBUTTON * 3, "Exchanges");
 	g_exch_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 
-	curr_x += GAP;
+	curr_x += WOP;
 	curr_y += HBUTTON;
-	w_rx_exchange_ = new Fl_Input(curr_x, curr_y, WSMEDIT, HBUTTON, "RX");
+	w_rx_exchange_ = new Fl_Input(curr_x, curr_y, 4 * WOP, HBUTTON, "RX");
 	w_rx_exchange_->align(FL_ALIGN_LEFT);
 	w_rx_exchange_->tooltip("Enter the received exchange - hit Parse to copy to QSO");
 
 	curr_x += w_rx_exchange_->w();
-	w_parse_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Parse");
+	w_parse_ = new Fl_Button(curr_x, curr_y, 2 * WOP, HBUTTON, "Parse");
 	w_parse_->callback(cb_parse, nullptr);
 	w_parse_->tooltip("Copy exchanges to fields in QSO");
 
-	curr_x = g_exch_->x() + GAP;
+	curr_x = g_exch_->x() + WOP;
 	curr_y += HBUTTON;
-	w_tx_exchange_ = new Fl_Output(curr_x, curr_y, WSMEDIT, HBUTTON, "TX");
+	w_tx_exchange_ = new Fl_Output(curr_x, curr_y, 4 * WOP, HBUTTON, "TX");
 	w_tx_exchange_->tooltip("Shows what the next exchange you should send is");
 
 	curr_x += w_tx_exchange_->w();
-	w_next_serno_ = new Fl_Counter(curr_x, curr_y, WBUTTON, HBUTTON);
+	w_next_serno_ = new Fl_Counter(curr_x, curr_y, 2 * WOP, HBUTTON);
 	w_next_serno_->type(FL_SIMPLE_COUNTER);
 	w_next_serno_->step(1.0);
 	w_next_serno_->callback(cb_serno, &next_serial_);
@@ -130,9 +133,9 @@ void contest_scorer::create_form() {
 	curr_x = g_exch_->x();
 	curr_y += HBUTTON + GAP;
 
-	g_scores_ = new Fl_Group(curr_x, curr_y, w() - GAP - GAP, 4 * HBUTTON, "Scores");
+	g_scores_ = new Fl_Group(curr_x, curr_y, WGR, 4 * HBUTTON, "Scores");
 	g_scores_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	const int WOP = (g_scores_->w()) / 7;
+	
 
 	curr_x = g_scores_->x() + 5 * WOP;
 	curr_y = g_scores_->y();
