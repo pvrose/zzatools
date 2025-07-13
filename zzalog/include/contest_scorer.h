@@ -13,6 +13,8 @@ class extract_data;
 class record;
 class Fl_Button;
 class Fl_Choice;
+class Fl_Counter;
+class Fl_Input;
 class Fl_Output;
 
 struct ct_data_t;
@@ -23,8 +25,6 @@ using namespace std;
 typedef size_t item_num_t;    // Position of item within this book
 typedef size_t qso_num_t;     // Position of item within book_ instance
 typedef vector<string> field_list;
-
-const int NUMBER_FIELDS = 4;
 
 class contest_scorer :
     public Fl_Group
@@ -46,10 +46,14 @@ public:
 
     static void cb_bn_status(Fl_Widget* w, void* v);
 
+    static void cb_parse(Fl_Widget* w, void* v);
+
+    static void cb_serno(Fl_Widget* w, void* v);
+
     // Add record 
-    void add_qso(qso_num_t qso_number);
+    void add_qso(record* qso, qso_num_t qso_number);
     // Check record
-    void check_qso(record* qso);
+    void check_qso(record* qso, qso_num_t qso_number);
 
     // Active
     bool contest_active();
@@ -57,10 +61,7 @@ public:
     // Return contest ID
     string contest_id();
 
-    // Increment next serial number
-    void increment_serial();
-
-    // Return list of fields
+     // Return list of fields
     field_list fields();
 
     // Return serial number as string
@@ -126,6 +127,7 @@ protected:
     extract_data* qsos_;
     // Current QSO
     record* qso_;
+    qso_num_t qso_number_;
     // Algorithm
     contest_algorithm* algorithm_;
 
@@ -137,6 +139,11 @@ protected:
     Fl_Output* w_start_time_;
     Fl_Output* w_finish_time_;
     Fl_Button* w_status_;
+    Fl_Group* g_exch_;
+    Fl_Input* w_rx_exchange_;
+    Fl_Output* w_tx_exchange_;
+    Fl_Counter* w_next_serno_;
+    Fl_Button* w_parse_;
     Fl_Group* g_scores_;
     Fl_Output* w_number_qsos_;
     Fl_Output* w_qso_points_;
@@ -147,9 +154,6 @@ protected:
     Fl_Output* w_qso_points_2_;
     Fl_Output* w_multiplier_2_;
     Fl_Output* w_total_2_;
-    Fl_Group* g_fields_;
-    Fl_Output* w_rx_items_[NUMBER_FIELDS];
-    Fl_Output* w_tx_items_[NUMBER_FIELDS];
 
 };
 

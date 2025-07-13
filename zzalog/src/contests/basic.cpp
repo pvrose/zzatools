@@ -34,7 +34,6 @@ void basic::parse_exchange(record* qso, string text) {
 		qso->item(it, words[ix]);
 		ix++;
 	}
-	update_rx_items(qso);
 }
 
 // Algorithm specific method to generate text from a number of fieds
@@ -48,7 +47,6 @@ string basic::generate_exchange(record* qso) {
 		ix++;
 		if (ix < tx_items_.size()) result += ' ';
 	}
-	update_tx_items(qso);
 	return result;
 }
 

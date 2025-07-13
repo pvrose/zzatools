@@ -102,7 +102,7 @@ void qso_misc::qso(record* qso, qso_num_t number) {
 	details_->set_qso(qso_);
 	dxcc_->set_data(qso);
 	qsl_->set_qso(qso_, number);
-	contest_->check_qso(qso);
+	contest_->check_qso(qso, number);
 }
 
 // Callback when changing tabs

@@ -158,7 +158,6 @@
     <ClCompile Include="common\src\xml_element.cpp" />
     <ClCompile Include="common\src\xml_reader.cpp" />
     <ClCompile Include="common\src\xml_writer.cpp" />
-    <ClCompile Include="Source.cpp" />
     <ClCompile Include="widgets\src\filename_input.cpp" />
     <ClCompile Include="zzalog\src\band_data.cpp" />
     <ClCompile Include="zzalog\src\band_widget.cpp" />

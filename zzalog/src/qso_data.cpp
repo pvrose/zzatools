@@ -866,7 +866,7 @@ bool qso_data::action_save(bool continuing) {
 		item_number = book_->item_number(g_entry_->qso_number());
 		qso = g_entry_->qso();
 		qso_number = g_entry_->qso_number();
-		contest()->increment_serial();
+		contest()->add_qso(qso, qso_number);
 		break;
 	default:
 		break;

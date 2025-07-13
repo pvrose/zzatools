@@ -38,6 +38,8 @@ public:
     virtual string generate_exchange(record* qso) = 0;
     // Algorithm specific method to score an individual QSO
     virtual score_result score_qso(record* qso, const set<string> &multipliers) = 0;
+    // Algorithm uses serial number
+    virtual bool uses_serno() = 0;
 
     // Return all fields used in algorithm
     field_list fields();
@@ -46,9 +48,6 @@ protected:
 
     // Default
     void set_default_rst(record* qso);
-    // Update scorer widgts
-    void update_rx_items(record* qso);
-    void update_tx_items(record* qso);
 
     // List of field names to use in RX exchange and scoring
     field_list rx_items_;

@@ -30,26 +30,21 @@ void iaru_hf::parse_exchange(record* qso, string text) {
 	vector<string> words;
 	split_line(text, words, ' ');
 	int ix = 0;
-	for (auto it : rx_items_) {
-		qso->item(it, words[ix]);
-		ix++;
-	}
-	update_rx_items(qso);
+	qso->item("RST_RCVD", words[0]);
+	qso->item("ITUZ", words[1]);
 }
 
 // Algorithm specific method to generate text from a number of fieds
 string iaru_hf::generate_exchange(record* qso) {
 	string result = "";
 	int ix = 0;
-	set_default_rst(qso);
-	qso->item("APP_ZZA_MY_CONT", my_info_->data.at(CONTINENT));
-	qso->item("MY_ITU_ZONE", my_info_->data.at(ITU_ZONE));
-	for (auto it : tx_items_) {
-		result += qso->item(it);
-		ix++;
-		if (ix < tx_items_.size()) result += ' ';
+	if (qso) {
+		set_default_rst(qso);
+		qso->item("APP_ZZA_MY_CONT", my_info_->data.at(CONTINENT));
+		qso->item("MY_ITU_ZONE", my_info_->data.at(ITU_ZONE));
+		result = qso->item("RST_SENT") + " " + my_info_->data.at(ITU_ZONE);
 	}
-	update_tx_items(qso);
+
 	return result;
 }
 

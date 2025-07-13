@@ -363,9 +363,6 @@
     <ClCompile Include="zzalog\src\contest_scorer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zzalog\src\contest_algorithm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

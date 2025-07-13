@@ -3,7 +3,9 @@
 #include "book.h"
 #include "contest_algorithm.h"
 #include "contest_data.h"
+#include "cty_data.h"
 #include "extract_data.h"
+#include "qso_data.h"
 #include "qso_manager.h"
 #include "record.h"
 #include "stn_data.h"
@@ -14,11 +16,15 @@
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Choice.H>
+#include <FL/Fl_Counter.H>
+#include <FL/Fl_Input.H>
+#include <FL/Fl_Int_Input.H>
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Output.H>
 
 extern book* book_;
 extern contest_data* contest_data_;
+extern cty_data* cty_data_;
 extern stn_data* stn_data_;
 extern string VENDOR;
 extern string PROGRAM_ID;
@@ -92,7 +98,37 @@ void contest_scorer::create_form() {
 	w_status_->tooltip("Displays the status: can toggle between ACTIVE/PAUSED");
 
 	curr_x = x() + GAP;
+	curr_y += HBUTTON + GAP;
+
+	g_exch_ = new Fl_Group(curr_x, curr_y, w() - GAP - GAP, HBUTTON * 3, "Exchanges");
+	g_exch_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+
+	curr_x += GAP;
 	curr_y += HBUTTON;
+	w_rx_exchange_ = new Fl_Input(curr_x, curr_y, WSMEDIT, HBUTTON, "RX");
+	w_rx_exchange_->align(FL_ALIGN_LEFT);
+	w_rx_exchange_->tooltip("Enter the received exchange - hit Parse to copy to QSO");
+
+	curr_x += w_rx_exchange_->w();
+	w_parse_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Parse");
+	w_parse_->callback(cb_parse, nullptr);
+	w_parse_->tooltip("Copy exchanges to fields in QSO");
+
+	curr_x = g_exch_->x() + GAP;
+	curr_y += HBUTTON;
+	w_tx_exchange_ = new Fl_Output(curr_x, curr_y, WSMEDIT, HBUTTON, "TX");
+	w_tx_exchange_->tooltip("Shows what the next exchange you should send is");
+
+	curr_x += w_tx_exchange_->w();
+	w_next_serno_ = new Fl_Counter(curr_x, curr_y, WBUTTON, HBUTTON);
+	w_next_serno_->type(FL_SIMPLE_COUNTER);
+	w_next_serno_->step(1.0);
+	w_next_serno_->callback(cb_serno, &next_serial_);
+	w_next_serno_->tooltip("Change the value of the next serial number to send");
+
+	g_exch_->end();
+	curr_x = g_exch_->x();
+	curr_y += HBUTTON + GAP;
 
 	g_scores_ = new Fl_Group(curr_x, curr_y, w() - GAP - GAP, 4 * HBUTTON, "Scores");
 	g_scores_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
@@ -176,27 +212,6 @@ void contest_scorer::create_form() {
 
 	curr_x = x();
 
-	g_fields_ = new Fl_Group(curr_x, curr_y, w(), h() + y() - curr_y, "Exchanges");
-	g_fields_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-
-	const int WL = w() / 4;
-	Fl_Box* brx = new Fl_Box(curr_x + WL, curr_y, WL, HBUTTON, "RX");
-	brx->box(FL_FLAT_BOX);
-	Fl_Box* btx = new Fl_Box(curr_x + w() / 2 + WL, curr_y, WL, HBUTTON, "TX");
-	btx->box(FL_FLAT_BOX);
-
-	curr_y += HBUTTON;
-
-	for (int ix = 0; ix < NUMBER_FIELDS; ix++) {
-		w_rx_items_[ix] = new Fl_Output(curr_x + WL, curr_y, WL, HBUTTON);
-		w_rx_items_[ix]->align(FL_ALIGN_LEFT);
-		w_tx_items_[ix] = new Fl_Output(curr_x + w() / 2 + WL, curr_y, WL, HBUTTON);
-		w_tx_items_[ix]->align(FL_ALIGN_LEFT);
-		curr_y += HBUTTON;
-	}
-
-	g_fields_->end();
-
 	end();
 	show();
 }
@@ -221,6 +236,7 @@ void contest_scorer::enable_widgets() {
 		w_finish_time_->value("");
 		w_status_->label("NO TEST");
 		g_scores_->deactivate();
+		g_exch_->deactivate();
 		break;
 	case FUTURE:
 		w_contest_->activate();
@@ -230,6 +246,7 @@ void contest_scorer::enable_widgets() {
 		w_finish_time_->value(finish_time_.c_str());
 		w_status_->label("TO COME");
 		g_scores_->deactivate();
+		g_exch_->deactivate();
 		break;
 	case ACTIVE:
 		w_contest_->deactivate();
@@ -239,6 +256,16 @@ void contest_scorer::enable_widgets() {
 		w_finish_time_->value(finish_time_.c_str());
 		w_status_->label("ACTIVE");
 		g_scores_->activate();
+		g_exch_->activate();
+		if (algorithm_) {
+			w_tx_exchange_->value(algorithm_->generate_exchange(qso_).c_str());
+		}
+		if (algorithm_ && algorithm_->uses_serno()) {
+			w_next_serno_->activate();
+		}
+		else {
+			w_next_serno_->deactivate();
+		}
 		copy_points_to_display();
 		break;
 	case PAUSED:
@@ -249,6 +276,7 @@ void contest_scorer::enable_widgets() {
 		w_finish_time_->value(finish_time_.c_str());
 		w_status_->label("PAUSED");
 		g_scores_->activate();
+		g_exch_->deactivate();
 		copy_points_to_display();
 		break;
 	case PAST:
@@ -259,6 +287,7 @@ void contest_scorer::enable_widgets() {
 		w_finish_time_->value(finish_time_.c_str());
 		w_status_->label("PAST");
 		g_scores_->activate();
+		g_exch_->deactivate();
 		copy_points_to_display();
 		break;
 	}
@@ -279,10 +308,16 @@ void contest_scorer::copy_points_to_display() {
 	w_qso_points_2_->value(text);
 	snprintf(text, sizeof(text), "%d", multiplier_p_);
 	w_multiplier_2_->value(text);
-	snprintf(text, sizeof(text), "%d", d_qso_points_);
-	w_qso_points_d_->value(text);
-	snprintf(text, sizeof(text), "%d", d_multiplier_);
-	w_multiplier_d_->value(text);
+	if (qso_ && qso_->item("CALL").length()) {
+		snprintf(text, sizeof(text), "%d", d_qso_points_);
+		w_qso_points_d_->value(text);
+		snprintf(text, sizeof(text), "%d", d_multiplier_);
+		w_multiplier_d_->value(text);
+	}
+	else {
+		w_qso_points_d_->value("");
+		w_multiplier_d_->value("");
+	}
 	snprintf(text, sizeof(text), "%d", total_p_);
 	w_total_2_->value(text);
 }
@@ -325,6 +360,22 @@ void contest_scorer::cb_bn_status(Fl_Widget* w, void* v) {
 	that->enable_widgets();
 }
 
+// Parse the recived exchange and update QSO with it
+void contest_scorer::cb_parse(Fl_Widget* w, void* v) {
+	contest_scorer* that = ancestor_view<contest_scorer>(w);
+	qso_data* data = ancestor_view<qso_data>(that);
+	that->algorithm_->parse_exchange(that->qso_, that->w_rx_exchange_->value());
+	data->update_qso(that->qso_number_);
+}
+
+// Changethe serial number
+void contest_scorer::cb_serno(Fl_Widget* w, void* v) {
+	contest_scorer* that = ancestor_view<contest_scorer>(w);
+	double val = ((Fl_Counter*)w)->value();
+	*(int*)v = val;
+	that->enable_widgets();
+}
+
 // Change the contest
 void contest_scorer::change_contest() {
 	if (contest_) {
@@ -354,17 +405,29 @@ void contest_scorer::create_algo() {
 }
 
 // Add record 
-void contest_scorer::add_qso(qso_num_t qso_number) {
-	record* qso = book_->get_record(qso_number, false);
+void contest_scorer::add_qso(record* qso, qso_num_t qso_number) {
+	qso_number_ = qso_number;
 	qso_ = qso;
-	qsos_->push_back(qso);
-	qsos_->map_record(qso_number);
-	score_qso(qso, false);
+	if (qso) {
+		cty_data_->update_qso(qso);
+		qso->update_band();
+	}
+	if (qsos_) {
+		qsos_->push_back(qso);
+		qsos_->map_record(qso_number);
+		score_qso(qso, false);
+	}
+	if (algorithm_->uses_serno()) next_serial_++;
 }
 
 // Check record 
-void contest_scorer::check_qso(record* qso) {
+void contest_scorer::check_qso(record* qso, qso_num_t qso_number) {
+	if (qso) {
+		cty_data_->update_qso(qso);
+		qso->update_band();
+	}
 	qso_ = qso;
+	qso_number_ = qso_number;
 	score_qso(qso, true);
 }
 
@@ -375,10 +438,11 @@ void contest_scorer::resume_contest() {
 	chrono::system_clock::time_point finish = contest_->date.finish;
 	record* qso = book_->get_record(ix, false);
 	chrono::system_clock::time_point ts = qso->ctimestamp();
+	qsos_ = new extract_data();
 	while (ts > start) {
 		// Add all QSOs it this contest (ID equivalent and timestamp within timeframe
 		if (qso->item("CONTEST_ID") == contest_id_ && start < ts && finish > ts) {
-			add_qso(ix);
+			add_qso(qso, ix);
 		}
 		ix--;
 		qso = book_->get_record(ix, false);
@@ -436,16 +500,23 @@ void contest_scorer::populate_contest() {
 // Score QSP
 void contest_scorer::score_qso(record* qso, bool check_only) {
 	if (algorithm_ == nullptr || qso == nullptr) return;
-	score_result res = algorithm_->score_qso(qso, multipliers_);
-	d_multiplier_ = res.multiplier;
-	d_qso_points_ = res.qso_points;
-	multiplier_p_ = multiplier_ + d_multiplier_;
-	qso_points_p_ = qso_points_ + d_qso_points_;
-	total_p_ = multiplier_p_ * qso_points_p_;
-	if (!check_only) {
-		multiplier_ = multiplier_p_;
-		qso_points_ = qso_points_p_;
-		total_ = total_p_;
+	if (qso && qso->item("CALL").length()) {
+		// Only score next QSO if we have one to score
+		score_result res = algorithm_->score_qso(qso, multipliers_);
+		d_multiplier_ = res.multiplier;
+		d_qso_points_ = res.qso_points;
+		multiplier_p_ = multiplier_ + d_multiplier_;
+		qso_points_p_ = qso_points_ + d_qso_points_;
+		total_p_ = multiplier_p_ * qso_points_p_;
+		if (!check_only) {
+			multiplier_ = multiplier_p_;
+			qso_points_ = qso_points_p_;
+			total_ = total_p_;
+		}
+	}
+	else {
+		d_multiplier_ = 0;
+		d_qso_points_ = 0;
 	}
 	enable_widgets();
 }
@@ -458,11 +529,6 @@ bool contest_scorer::contest_active() {
 // Returns value of ADIF.CONTEST_ID
 string contest_scorer::contest_id() {
 	return contest_id_;
-}
-
-// Increment next serial number
-void contest_scorer::increment_serial() {
-	next_serial_++;
 }
 
 // Returns the fields::collection name
