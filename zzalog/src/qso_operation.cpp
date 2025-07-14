@@ -184,6 +184,7 @@ void qso_operation::populate_choices()
 {
 	char l[64];
 	// Populate QTH choice
+	ch_qth_->clear();
 	ch_qth_->add("");
 	for (auto it : *stn_data_->get_qths())
 	{
@@ -204,6 +205,7 @@ void qso_operation::populate_choices()
 		ch_qth_->menubutton()->user_data((void *)&it.first);
 	}
 	// Populate Operator choice
+	ch_oper_->clear();
 	ch_oper_->add("");
 	for (auto it : *stn_data_->get_opers())
 	{
@@ -223,6 +225,7 @@ void qso_operation::populate_choices()
 		ch_oper_->menubutton()->user_data((void *)&it.first);
 	}
 	// Populate callsign choice
+	ch_call_->clear();
 	ch_call_->add("");
 	for (auto it : *stn_data_->get_calls())
 	{
@@ -424,7 +427,7 @@ void qso_operation::update_qso(record *qso)
 	}
 	else
 	{
-		snprintf(msg, sizeof(msg), "DASH: Invalid Oprator %s", current_oper_.c_str());
+		snprintf(msg, sizeof(msg), "DASH: Invalid Operator %s", current_oper_.c_str());
 		status_->misc_status(ST_ERROR, msg);
 	}
 	qso->item("STATION_CALLSIGN", current_call_);

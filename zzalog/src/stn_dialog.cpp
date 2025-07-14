@@ -14,8 +14,9 @@
 #include <FL/Fl_Multiline_Input.H>
 #include <FL/Fl_Tabs.H>
 
-extern stn_data* stn_data_;
+extern bool CLUB_MODE;
 extern qso_manager* qso_manager_;
+extern stn_data* stn_data_;
 
 stn_dialog::stn_dialog(int X, int Y, int W, int H, const char* L) :
 	page_dialog(X, Y, W, H, L),
@@ -71,6 +72,8 @@ void stn_dialog::save_values() {
 	g_qth_->save_data();
 	g_oper_->save_data();
 	g_call_->save_data();
+	// Make the changes availble in qso_data
+	qso_manager_->data()->update_station_choices();
 }
 
 // Used to enable/disable specific widget - any widgets enabled musr be attributes
@@ -127,11 +130,59 @@ stn_dialog::single_tab::single_tab(int rx, int ry, int rw, int rh, char type,
 
 stn_dialog::single_tab::~single_tab() {}
 
+// Tooltips for the specific fields entrie
+map <qth_value_t, string> QTH_TIPS = {
+	{ STREET, "Please enter your street address - optional" },
+	{ CITY, "Please enter your town or city - recommended" },
+	{ POSTCODE, "Please enter your postal code - optional" },
+	{ LOCATOR, "Please enter your grid square (2, 4, 6 or 8 character) - 6 recommended" },
+	{ DXCC_NAME, "Please enter the name of your DXCC entity - not recomended" },
+	{ DXCC_ID, "Please enter the ARRL numerical code for your DXCC entity - recommended" },
+	{ PRIMARY_SUB, "Please enter the primary administrative subdivision name (eg US State) - if supported for your entity" },
+	{ SECONDARY_SUB, "Please enter the secondary administrative subdivision name (eg US County) - if supported for your entity" },
+	{ CQ_ZONE, "Please enter the CQ Zone number for your location - optional, needed for some contests" },
+	{ ITU_ZONE, "Please enter the ITU Zone number for your location - optional, needed for some contests" },
+	{ CONTINENT, "Please enter the two-character code for your continent (AN, AF, AS, EU, NA, OC or SA) - optional" },
+	{ IOTA, "Please enter the IOTA id for your location - if a registered island location" },
+	{ WAB, "Please enter the Worked All Britain (4-caharacter Ordnance Survey geolocator) for your location - optional" }
+};
+map <oper_value_t, string> OPER_TIPS = {
+	{ NAME, "Please enter your name as you want to see it in exchanges - recommended"},
+	{ CALLSIGN, "Please enter your callsign appropriate for operating this station - mandatory"}
+};
+
+
 void stn_dialog::single_tab::create_form() {
 	int curr_x = x() + GAP + WLABEL;
 	int curr_y = y() + HTEXT;
 
 	begin();
+
+	Fl_Box* b_msg = new Fl_Box(x() + GAP, curr_y, w() - GAP - GAP, HBUTTON * 2);
+	b_msg->box(FL_FLAT_BOX);
+	b_msg->labelsize(FL_NORMAL_SIZE + 2);
+	b_msg->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+	switch (type()) {
+	case QTH:
+		b_msg->label("Please select or enter an identifier for the location the station is being operated from\n"
+			"as well as information about that location (Locator etc.)");
+		break;
+	case OPERATOR:
+		if (CLUB_MODE) {
+			b_msg->label("Please select or enter the initials of the person intending to operate (NECESSARY for a club station).\n"
+				"Add the operator's name and callsign.");
+		}
+		else {
+			b_msg->label("Please select or enter the initials of the person intending to operate. \n"
+				"Add the operator's name and callsign.");
+		}
+		break;
+	case CALLSIGN:
+		b_msg->label("Please select or enter the callsign being used by the station.");
+		break;
+	}
+
+	curr_y += b_msg->h() + GAP;
 
 	ch_id_ = new Fl_Input_Choice(curr_x, curr_y, WSMEDIT, HBUTTON);
 	ch_id_->label(type() == CALLSIGN ? "Call" : "Id");
@@ -139,15 +190,23 @@ void stn_dialog::single_tab::create_form() {
 	ch_id_->callback(cb_ch_id, &current_id_);
 	ch_id_->tooltip("Select the Id (or Call)");
 
-	curr_x = x() + GAP;
+	curr_x = x() + GAP + WLABEL;
 	curr_y += HBUTTON;
 
-	ip_descr_ = new Fl_Multiline_Input(curr_x, curr_y, WLABEL + WSMEDIT, 4 * HBUTTON);
+	ip_descr_ = new Fl_Multiline_Input(curr_x, curr_y, WEDIT, 2 * HBUTTON, "Brief\nComment");
+	ip_descr_->align(FL_ALIGN_LEFT);
 	ip_descr_->wrap(true);
 	ip_descr_->tooltip("Enter a brief description of the item");
 
 	curr_y += ip_descr_->h();
 	curr_x = x() + GAP + WLABEL;
+
+	if (type() != CALLSIGN) {
+		Fl_Box* b2 = new Fl_Box(x() + GAP, curr_y, w() - GAP - GAP, HBUTTON, "Enter data below if you want the information saved in the log file");
+		b2->box(FL_FLAT_BOX);
+		b2->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+		curr_y += HBUTTON;
+	}
 
 	int save_y = curr_y;
 
@@ -157,7 +216,14 @@ void stn_dialog::single_tab::create_form() {
 	for (; ix < vertical && ix < num_inputs_; ix++) {
 		ip_values_[ix] = new Fl_Input(curr_x, curr_y, WSMEDIT, HBUTTON);
 		ip_values_[ix]->copy_label(labels_[ix].c_str());
-		ip_values_[ix]->tooltip("Enter a value if you want this in ADIF");
+		switch (type()) {
+		case QTH:
+			ip_values_[ix]->copy_tooltip(QTH_TIPS.at((qth_value_t)ix).c_str());
+			break;
+		case OPERATOR:
+			ip_values_[ix]->copy_tooltip(OPER_TIPS.at((oper_value_t)ix).c_str());
+			break;
+		}
 
 		curr_y += HBUTTON;
 	}
@@ -168,8 +234,14 @@ void stn_dialog::single_tab::create_form() {
 		for (; ix < num_inputs_; ix++) {
 			ip_values_[ix] = new Fl_Input(curr_x, curr_y, WSMEDIT, HBUTTON);
 			ip_values_[ix]->copy_label(labels_[ix].c_str());
-			ip_values_[ix]->tooltip("Enter a value if you want this in ADIF");
-
+			switch (type()) {
+			case QTH:
+				ip_values_[ix]->copy_tooltip(QTH_TIPS.at((qth_value_t)ix).c_str());
+				break;
+			case OPERATOR:
+				ip_values_[ix]->copy_tooltip(OPER_TIPS.at((oper_value_t)ix).c_str());
+				break;
+			}
 			curr_y += HBUTTON;
 		}
 	}

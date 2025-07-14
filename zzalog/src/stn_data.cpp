@@ -159,9 +159,9 @@ bool stn_data::add_oper(string id, oper_info_t* oper) {
 // Fetch the QTH info
 const qth_info_t* stn_data::get_qth(string id) {
 	if (qths_.find(id) == qths_.end()) {
-		char msg[128];
-		snprintf(msg, sizeof(msg), "STN DATA: No data for QTH \"%s\"", id.c_str());
-		status_->misc_status(ST_ERROR, msg);
+		//char msg[128];
+		//snprintf(msg, sizeof(msg), "STN DATA: No data for QTH \"%s\"", id.c_str());
+		//status_->misc_status(ST_ERROR, msg);
 		return nullptr;
 	}
 	else {
@@ -171,9 +171,9 @@ const qth_info_t* stn_data::get_qth(string id) {
 // Fetch the Operatot info
 const oper_info_t* stn_data::get_oper(string id) {
 	if (opers_.find(id) == opers_.end()) {
-		char msg[128];
-		snprintf(msg, sizeof(msg), "STN DATA: No data for Operator \"%s\"", id.c_str());
-		status_->misc_status(ST_ERROR, msg);
+		//char msg[128];
+		//snprintf(msg, sizeof(msg), "STN DATA: No data for Operator \"%s\"", id.c_str());
+		//status_->misc_status(ST_ERROR, msg);
 		return nullptr;
 	}
 	else {

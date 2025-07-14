@@ -41,6 +41,7 @@ main.cpp - application entry point
 #include "spec_tree.h"
 #include "status.h"
 #include "stn_data.h"
+#include "stn_dialog.h"
 #include "symbols.h"
 #include "tabbed_forms.h"
 #include "ticker.h"
@@ -97,54 +98,60 @@ bool DEBUG_CURL = false;
 bool DEBUG_QUICK = false;
 bool DEBUG_RIGS = false;
 rig_debug_level_e HAMLIB_DEBUG_LEVEL = RIG_DEBUG_ERR;
+// Operation switches - _S versions used to override sticky switch
 bool AUTO_UPLOAD = true;
+bool AUTO_UPLOAD_S = false;
 bool AUTO_SAVE = true;
+bool AUTO_SAVE_S = false;
+bool CLUB_MODE = false;
+bool CLUB_MODE_S = false;
+bool DARK = false;
+bool DARK_S = false;
+bool DISPLAY_VERSION = false;
+bool HELP = false;
+bool NEW_BOOK = false;
+bool NEW_SETTINGS = false;
+bool PRIVATE = false;
 bool READ_ONLY = false;
 bool RESUME_SESSION = false;
 bool VERBOSE = false;
-bool HELP = false;
-bool PRIVATE = false;
-bool DARK = false;
-uchar THEME;
-bool DISPLAY_VERSION = false;
-bool NEW_BOOK = false;
-bool NEW_SETTINGS = false;
 
 // FLTK externals
 extern int FL_NORMAL_SIZE;
 
 // Top level data items - these are declared as externals in each .cpp that uses them
-book* book_ = nullptr;
-import_data* import_data_ = nullptr;
-extract_data* extract_records_ = nullptr;
-book* navigation_book_ = nullptr;
-tabbed_forms* tabbed_forms_ = nullptr;
-menu* menu_ = nullptr;
-toolbar* toolbar_ = nullptr;
-status* status_ = nullptr;
-cty_data* cty_data_ = nullptr;
-spec_data* spec_data_ = nullptr;
-eqsl_handler* eqsl_handler_ = nullptr;
-lotw_handler* lotw_handler_ = nullptr;
-url_handler* url_handler_ = nullptr;
-qrz_handler* qrz_handler_ = nullptr;
-main_window* main_window_ = nullptr;
-intl_dialog* intl_dialog_ = nullptr;
 band_data* band_data_ = nullptr;
-club_handler* club_handler_ = nullptr;
-wsjtx_handler* wsjtx_handler_ = nullptr;
-fllog_emul* fllog_emul_ = nullptr;
-qso_manager* qso_manager_ = nullptr;
-wx_handler* wx_handler_ = nullptr;
-ticker* ticker_ = nullptr;
-fields* fields_ = nullptr;
-qsl_dataset* qsl_dataset_ = nullptr;
-config* config_ = nullptr;
 band_window* band_window_ = nullptr;
-rig_data* rig_data_ = nullptr;
-stn_data* stn_data_ = nullptr;
-contest_data* contest_data_ = nullptr;
 banner* banner_ = nullptr;
+book* book_ = nullptr;
+book* navigation_book_ = nullptr;
+club_handler* club_handler_ = nullptr;
+config* config_ = nullptr;
+contest_data* contest_data_ = nullptr;
+cty_data* cty_data_ = nullptr;
+eqsl_handler* eqsl_handler_ = nullptr;
+extract_data* extract_records_ = nullptr;
+fields* fields_ = nullptr;
+fllog_emul* fllog_emul_ = nullptr;
+import_data* import_data_ = nullptr;
+intl_dialog* intl_dialog_ = nullptr;
+lotw_handler* lotw_handler_ = nullptr;
+main_window* main_window_ = nullptr;
+menu* menu_ = nullptr;
+qrz_handler* qrz_handler_ = nullptr;
+qsl_dataset* qsl_dataset_ = nullptr;
+qso_manager* qso_manager_ = nullptr;
+rig_data* rig_data_ = nullptr;
+spec_data* spec_data_ = nullptr;
+status* status_ = nullptr;
+stn_data* stn_data_ = nullptr;
+tabbed_forms* tabbed_forms_ = nullptr;
+ticker* ticker_ = nullptr;
+toolbar* toolbar_ = nullptr;
+url_handler* url_handler_ = nullptr;
+wsjtx_handler* wsjtx_handler_ = nullptr;
+wx_handler* wx_handler_ = nullptr;
+
 // Recent files opened
 list<string> recent_files_;
 
@@ -394,32 +401,40 @@ int cb_args(int argc, char** argv, int& i) {
 	else if (strcmp("-t", argv[i]) == 0 || strcmp("--test", argv[i]) == 0) {
 		AUTO_UPLOAD = false;
 		AUTO_SAVE = false;
+		AUTO_UPLOAD_S = true;
+		AUTO_SAVE_S = true;
 		i += 1;
 	}
 	// Look for normal mode (-u or --usual) 
 	else if (strcmp("-u", argv[i]) == 0 || strcmp("--usual", argv[i]) == 0) {
 		AUTO_UPLOAD = true;
 		AUTO_SAVE = true;
+		AUTO_UPLOAD_S = true;
+		AUTO_SAVE_S = true;
 		i += 1;
 	}
 	// No auto upload
 	else if (strcmp("-q", argv[i]) == 0 || strcmp("--quiet", argv[i]) == 0) {
 		AUTO_UPLOAD = false;
+		AUTO_UPLOAD_S = true;
 		i += 1;
 	} 
 	// auto upload
 	else if (strcmp("-n", argv[i]) == 0 || strcmp("--noisy", argv[i]) == 0) {
 		AUTO_UPLOAD = true;
+		AUTO_UPLOAD_S = true;
 		i += 1;
 	} 
 	// auto save
 	else if (strcmp("-a", argv[i]) == 0 || strcmp("--auto_save", argv[i]) == 0) {
 		AUTO_SAVE = true;
+		AUTO_SAVE_S = true;
 		i += 1;
 	}
 	// No auto save
 	else if (strcmp("-w", argv[i]) == 0 || strcmp("--wait_save", argv[i]) == 0) {
 		AUTO_SAVE = false;
+		AUTO_SAVE_S = true;
 		i += 1;
 	}
 	// Resume session
@@ -440,26 +455,19 @@ int cb_args(int argc, char** argv, int& i) {
 	// Dark
 	else if (strcmp("-k", argv[i]) == 0 || strcmp("--dark", argv[i]) == 0) {
 		DARK = true;
+		DARK_S = true;
 		i += 1;
 	}
 	// Dark
 	else if (strcmp("-l", argv[i]) == 0 || strcmp("--light", argv[i]) == 0) {
 		DARK = false;
+		DARK_S = true;
 		i += 1;
 	}
 	// Version
 	else if (strcmp("-v", argv[i]) == 0 || strcmp("--version", argv[i]) == 0) {
 		DISPLAY_VERSION = true;
 		i+= 1;
-	}
-	// Colour
-	else if (strncmp("-c=", argv[i], 3) == 0) {
-		THEME = *(argv[i] + 3);
-		i+=1;
-	}
-	else if (strncmp("--colour=", argv[i], 9) == 0) {
-		THEME = *(argv[i] + 9);
-		i+=1;
 	}
 	// New file
 	else if (strcmp("-e", argv[i]) == 0 || strcmp("--new", argv[i]) == 0) {
@@ -470,6 +478,18 @@ int cb_args(int argc, char** argv, int& i) {
 	else if (strcmp("-s", argv[i]) == 0 || strcmp("--new-settings", argv[i]) == 0) {
 		NEW_SETTINGS = true;
 		i+=1;
+	}
+	// Club mode
+	else if (strcmp("-c", argv[i]) == 0 || strcmp("--club", argv[i]) == 0) {
+		CLUB_MODE = true;
+		CLUB_MODE_S = true;
+		i += 1;
+	}
+	// Individual mode
+	else if (strcmp("-i", argv[i]) == 0 || strcmp("--individual", argv[i]) == 0) {
+		CLUB_MODE = false;
+		CLUB_MODE_S = true;
+		i += 1;
 	}
 	// Debug
 	else if (strcmp("-d", argv[i]) == 0 || strcmp("--debug", argv[i]) == 0) {
@@ -549,8 +569,7 @@ void show_help() {
 	"\n"
 	"switches:\n"
 	"\t-a|--auto_save\tDo automatically save each change (sticky)\n"
-	"\t-c=s|--colour=S\tUse colour theme ""s"" (sticky)\n"
-	"\t\ts=[r|g|b|m|c|y|n]\n"
+	"\t-c|--club_mode\tAsks for operater on start-up (sticky)\n"
   	"\t-d|--debug [mode...]\n"
 	"\t\tc|curl\tincrease verbosity from libcurl\n"
 	"\t\t\tnoc|nocurl\n"
@@ -567,6 +586,7 @@ void show_help() {
 	"\t\t\tnot|nothreads\n"
 	"\t-e|--new\tCreate new file\n"
 	"\t-h|--help\tPrint this\n"
+	"\t-i|--individual\tIndividual mode (sticky)\n"
 	"\t-k|--dark\tDark mode (sticky)\n"
 	"\t-l|--light\tLight mode (sticky)\n"
 	"\t-m|--resume\tResume the previous session\n"
@@ -962,8 +982,8 @@ void print_args(int argc, char** argv) {
 	if (PRIVATE) status_->misc_status(ST_WARNING, "ZZALOG: -p - This file not being noted on recent files list");
 	if (DARK) status_->misc_status(ST_NOTE, "ZZALOG: -k - Opening in dark mode");
 	else status_->misc_status(ST_NOTE, "ZZALOG: -l - Opening in normal FLTK colours");
-	snprintf(message, sizeof(message), "ZZALOG: -c=%c - Thematic colour: %s", THEME, colours[THEME].c_str());
-	status_->misc_status(ST_NOTE, message);
+	if (CLUB_MODE) status_->misc_status(ST_NOTE, "ZZALOG: -c - Operating a club station");
+	else status_->misc_status(ST_NOTE, "ZZALOG: -i - Operating an individual's station");
 }
 
 // Returns true if record is within current session.
@@ -1004,67 +1024,6 @@ void customise_fltk() {
 	fl_add_symbol("eyeopen", &draw_eyeopen, true);
 	fl_add_symbol("calendar", &draw_calendar, true);
 	fl_add_symbol("mail", &draw_mail, true);
-	// Customise colours
-	bool vr, vg, vb;
-	switch(THEME) {
-		case 'r': {
-			vr = true;
-			vg = false;
-			vb = false;
-			break;
-		}
-		case 'g': {
-			vr = false;
-			vg = true;
-			vb = false;
-			break;
-		}
-		case 'b': {
-			vr = false;
-			vg = false;
-			vb = true;
-			break;
-		}
-		case 'm': {
-			vr = true;
-			vg = false;
-			vb = true;
-			break;
-		}
-		case 'c': {
-			vr = false;
-			vg = true;
-			vb = true;
-			break;
-		}
-		case 'y': {
-			vr = true;
-			vg = true;
-			vb = false;
-			break;
-		}
-		case 'n':
-		default: {
-			vr = true;
-			vg = true;
-			vb = true;
-			break;
-		}
-	}
-
-	if (DARK) {
-		// Fl::foreground(240, 240, 240);
-		// Fl::background2(vr ? 32 : 0, vg ? 32 : 0, vb ? 32 : 0);
-		// Fl::background(vr ? 64 : 48, vg ? 64 : 48, vb ? 64 : 48);
-		Fl::foreground(vr ? 255 : 240, vg ? 255 : 240, vb ? 255 : 240);
-		Fl::background2(vr ? 16 : 0, vg ? 16 : 0, vb ? 16 : 0);
-		Fl::background(vr ? 64 : 48, vg ? 64 : 48, vb ? 64 : 48);
-	} else {
-		Fl::foreground(vr ? 16 : 0, vg ? 16 : 0, vb ? 16 : 0);
-		Fl::background2(vr ? 255 : 240, vg ? 255 : 240, vb ? 255 : 240);
-		Fl::background(vr ? 192 : 174, vg ? 192 : 174, vb ? 192 : 174);
-	}
-	// Fl::scheme("gleam");
 }
 
 // Some switches get saved between sessions - so-called sticky switches
@@ -1075,25 +1034,33 @@ void read_saved_switches() {
 	char* stemp;
 	char msg[128];
 	memset(msg, 0, sizeof(msg));
+	// Read all the sticky switches
 	strcpy(msg, "ZZALOG: Sticky switches: ");
-	switch_settings.get("Dark Mode", temp, false);
-	DARK = (bool)temp;
-	if (DARK) strcat(msg, "-k ");
-	else strcat(msg, "-l ");
-	switch_settings.get("Theme Colour", stemp, "n");
-	THEME = stemp[0];
-	strcat(msg, "-c=");
-	size_t pos = strlen(msg);
-	msg[pos++] = THEME;
-	msg[pos++] = ' ';
-	switch_settings.get("Auto Update QSOs", temp, false);
-	AUTO_UPLOAD = (bool)temp;
-	if (AUTO_UPLOAD) strcat(msg, "-n ");
-	else strcat(msg, "-q ");
-	switch_settings.get("Auto Save QSOs", temp, false);
-	AUTO_SAVE = (bool)temp;
-	if (AUTO_SAVE) strcat(msg, "-a ");
-	else strcat(msg, "-w ");
+	if (!DARK_S) {
+		switch_settings.get("Dark Mode", temp, false);
+		DARK = (bool)temp;
+		if (DARK) strcat(msg, "-k ");
+		else strcat(msg, "-l ");
+	}
+	if (!AUTO_UPLOAD_S) {
+		switch_settings.get("Auto Update QSOs", temp, false);
+		AUTO_UPLOAD = (bool)temp;
+		if (AUTO_UPLOAD) strcat(msg, "-n ");
+		else strcat(msg, "-q ");
+	}
+	if (!AUTO_SAVE_S) {
+		switch_settings.get("Auto Save QSOs", temp, false);
+		AUTO_SAVE = (bool)temp;
+		if (AUTO_SAVE) strcat(msg, "-a ");
+		else strcat(msg, "-w ");
+	}
+	if (!CLUB_MODE_S) {
+		switch_settings.get("Club Mode", temp, false);
+		CLUB_MODE = (bool)temp;
+		if (CLUB_MODE) strcat(msg, "-c ");
+		else strcat(msg, "-i ");
+	}
+
 	sticky_message_ = msg;
 }
 
@@ -1101,13 +1068,10 @@ void read_saved_switches() {
 void save_switches() {
 	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences switch_settings(settings, "Switches");
-	char temp[2];
-	temp[0] = THEME;
-	temp[1] = '\0';
 	switch_settings.set("Dark Mode", (int)DARK);
-	switch_settings.set("Theme Colour", temp);
 	switch_settings.set("Auto Update QSOs", (int)AUTO_UPLOAD);
 	switch_settings.set("Auto Save QSOs", (bool)AUTO_SAVE);
+	switch_settings.set("Club Mode", (bool)CLUB_MODE);
 }
 
 // Open preferences and save them - it is possible to corrupt the settings
@@ -1187,6 +1151,13 @@ void load_rig_data() {
 	if (!closing_) {
 		rig_data_ = new rig_data;
 	}
+}
+
+// If club-mode open settings screen for operator
+void club_operator() {
+	config_->show();
+	stn_dialog* dlg = (stn_dialog*)config_->get_tab(config::DLG_STATION);
+	dlg->set_tab(stn_dialog::OPERATOR, "");
 }
 
 // The main app entry point
@@ -1291,6 +1262,8 @@ int main(int argc, char** argv)
 		// now show the window
 		main_window_->show(argc, argv);
 		qso_manager_->show();
+		// Now ask for club operator
+		if (CLUB_MODE) club_operator();
 		// Run the application until it is closed
 		code = Fl::run();
 	}

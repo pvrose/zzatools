@@ -77,10 +77,10 @@ public:
 
     // Update QSO from current values
     void update_qso(record* qso);
-
-protected:
     // Populate the choices
     void populate_choices();
+
+protected:
     // Try and evaluate the current operation from QSO
     bool evaluate_qso();
     // Handle new QTH 
