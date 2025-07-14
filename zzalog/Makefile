@@ -108,9 +108,14 @@ debug: $(EXEC_DIR)/$(TARGET_EXEC)
 clean:
 	rm -r $(BUILD_DIR)
 
+# force recompile
+.PHONY: touch_main
+touch_main:
+	@touch ./src/main.cpp
+
 # install
 .PHONY: install
-install: $(INSTALL_DIR)/$(TARGET_EXEC)
+install: touch_main $(INSTALL_DIR)/$(TARGET_EXEC)
 
 $(INSTALL_DIR)/$(TARGET_EXEC): $(EXEC_DIR)/$(TARGET_EXEC)
 	@echo Installing $(INSTALL_DIR)/$(TARGET_EXEC)

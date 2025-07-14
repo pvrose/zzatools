@@ -1038,7 +1038,6 @@ void read_saved_switches() {
 	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences switch_settings(settings, "Switches");
 	int temp;
-	char* stemp;
 	char msg[128];
 	memset(msg, 0, sizeof(msg));
 	// Read all the sticky switches
