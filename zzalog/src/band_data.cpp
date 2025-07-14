@@ -13,7 +13,7 @@ extern string VENDOR;
 extern string PROGRAM_ID;
 extern string default_data_directory_;
 
-// Constructor - calls the Window constructor 
+// Constructor 
 band_data::band_data()
 {
 	load_data();

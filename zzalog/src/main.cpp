@@ -847,8 +847,15 @@ void add_widgets(int& curr_y) {
 	toolbar_->update_items();
 	curr_y += toolbar_->h();
 	// The main views - this is a set of tabs with each view
-	tabbed_forms_ = new tabbed_forms(0, curr_y, WIDTH, HEIGHT - curr_y);
+	tabbed_forms_ = new tabbed_forms(0, curr_y, WIDTH, HEIGHT - curr_y - FOOT_HEIGHT);
 	main_window_->add(tabbed_forms_);
+	curr_y += tabbed_forms_->h();
+	// Add a footer (with copyright
+	Fl_Box* footer = new Fl_Box(0, curr_y, WIDTH, FOOT_HEIGHT);
+	footer->copy_label(string(COPYRIGHT + " " + CONTACT + "    ").c_str());
+	footer->labelsize(FL_NORMAL_SIZE - 1);
+	footer->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
+	main_window_->add(footer);
 	// Display the main window. Don't show it until it's been resized
 	main_window_->end();
 }

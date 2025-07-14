@@ -60,6 +60,8 @@ extern import_data* import_data_;
 extern qrz_handler* qrz_handler_;
 extern main_window* main_window_;
 extern bool closing_;
+extern string COPYRIGHT;
+extern string CONTACT;
 extern string VENDOR;
 extern string PROGRAM_ID;
 
@@ -155,10 +157,15 @@ void qso_manager::create_form(int X, int Y) {
 	max_x = max(max_x, curr_x);
 	max_y = max(max_y, curr_y);
 
+	Fl_Box* b_cr = new Fl_Box(x(), max_y, max_x + GAP - x(), FOOT_HEIGHT);
+	b_cr->copy_label(string(COPYRIGHT + " " + CONTACT + "     ").c_str());
+	b_cr->labelsize(FL_NORMAL_SIZE - 1);
+	b_cr->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
+
 	this->resizable(nullptr);
 	// Now position it within the screen
 	int rw = max_x + GAP - X;
-	int rh = max_y + GAP - Y;
+	int rh = max_y + FOOT_HEIGHT - Y;
 	int rx = x_root();
 	int ry = y_root();
 	int sx, sy, sw, sh;
@@ -168,6 +175,8 @@ void qso_manager::create_form(int X, int Y) {
 	if (ry < sy) ry = sy;
 	else if (ry + rh > sy + sh) ry = sy + sh - rh;
 	this->resize(rx, ry, rw, rh);
+
+	b_cr->box(FL_FLAT_BOX);
 
 	created_ = true;
 

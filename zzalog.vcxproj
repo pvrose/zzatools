@@ -152,6 +152,9 @@
       <ShowProgress>LinkVerbose</ShowProgress>
       <AdditionalLibraryDirectories>C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x64-release-dll-ipv6-sspi-schannel\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PreBuildEvent>
+      <Command>del $(IntDir)main.obj</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="common\src\utils.cpp" />

@@ -19,6 +19,8 @@
 #include <FL/Fl_Tabs.H>
 
 extern config* config_;
+extern string CONTACT;
+extern string COPYRIGHT;
 extern string VENDOR;
 extern string PROGRAM_ID;
 
@@ -42,7 +44,7 @@ config::config(int W, int H, const char* label) :
 
 	children_ids_.clear();
 	// Create the set of tabs_ - leave enough space beneath for OK etc buttons.
-	tabs_ = new Fl_Tabs(0, 0, W, H - HBUTTON - GAP);
+	tabs_ = new Fl_Tabs(0, 0, W, H - HBUTTON - FOOT_HEIGHT);
 	tabs_->callback(cb_tab);
 	tabs_->box(FL_FLAT_BOX);
 	tabs_->handle_overflow(Fl_Tabs::OVERFLOW_PULLDOWN);
@@ -134,6 +136,12 @@ config::config(int W, int H, const char* label) :
 	cancel_bn->tooltip("Cancel changes and close dialog");
 	add(cancel_bn);
 	callback(cb_bn_cal, (long)CA_CANCEL);
+
+	Fl_Box* b_cr = new Fl_Box(x(), y() - FOOT_HEIGHT, w(), FOOT_HEIGHT);
+	b_cr->copy_label(string(COPYRIGHT + " " + CONTACT + "     ").c_str());
+	b_cr->labelsize(FL_NORMAL_SIZE - 1);
+	b_cr->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
+
 
 	resizable(nullptr);
 

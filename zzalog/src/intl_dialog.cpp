@@ -12,6 +12,8 @@
 
 extern status* status_;
 extern menu* menu_;
+extern string CONTACT;
+extern string COPYRIGHT;
 extern string VENDOR;
 extern string PROGRAM_ID;
 extern string default_data_directory_;
@@ -120,7 +122,12 @@ void intl_dialog::add_buttons(int width) {
 	buttons_->resizable(nullptr);
 	buttons_->size(width, height);
 	// Adjust the size of  the window to fit
-	size(buttons_->x() + buttons_->w() + EDGE, buttons_->y() + buttons_->h() + EDGE);
+	Fl_Box* b_cr = new Fl_Box(x(), buttons_->y() + buttons_->h(), width + EDGE, FOOT_HEIGHT * 2);
+	b_cr->copy_label(string(COPYRIGHT + "     \n" + CONTACT + "     ").c_str());
+	b_cr->labelsize(FL_NORMAL_SIZE - 1);
+	b_cr->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
+
+	size(buttons_->x() + buttons_->w() + EDGE, buttons_->y() + buttons_->h() + b_cr->h());
 }
 
 // Desctructor

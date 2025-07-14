@@ -24,6 +24,8 @@ using namespace std;
 
 extern spec_data* spec_data_;
 extern cty_data* cty_data_;
+extern string CONTACT;
+extern string COPYRIGHT;
 extern string VENDOR;
 extern string PROGRAM_ID;
 
@@ -115,7 +117,7 @@ search_dialog::search_dialog() :
 	const int CX0 = EDGE;
 	const int WX0 = CX1 - CX0 - GAP;
 
-	const int H = YGX + HBUTTON + EDGE;
+	const int H = YGX + HBUTTON + FOOT_HEIGHT;
 
 	// now set the correct size
 	size(W, H);
@@ -367,6 +369,12 @@ search_dialog::search_dialog() :
 	bn_cancel->callback(cb_bn_cancel);
 	bn_cancel->when(FL_WHEN_RELEASE);
 	bn_cancel->tooltip("Cancel the search");
+
+	Fl_Box* b_cr = new Fl_Box(x(), YGX + HBUTTON, W, FOOT_HEIGHT);
+	b_cr->copy_label(string(COPYRIGHT + " " + CONTACT + "     ").c_str());
+	b_cr->labelsize(FL_NORMAL_SIZE - 1);
+	b_cr->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
+
 
 	end();
 	// Window close button - acts as Cancel

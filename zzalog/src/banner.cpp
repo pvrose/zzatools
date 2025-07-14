@@ -121,9 +121,10 @@ void banner::create_form() {
 
 	Fl_Box* bx_copyright = new Fl_Box(curr_x, curr_y, max_x - x(), HBUTTON);
 	char msg[128];
-	snprintf(msg, sizeof(msg), "%s %s", COPYRIGHT.c_str(), CONTACT.c_str());
+	snprintf(msg, sizeof(msg), "%s %s     ", COPYRIGHT.c_str(), CONTACT.c_str());
 	bx_copyright->copy_label(msg);
 	bx_copyright->labelsize(FL_NORMAL_SIZE - 1);
+	bx_copyright->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 
 	curr_y += HBUTTON + GAP;
 	h_small_ = curr_y - y();

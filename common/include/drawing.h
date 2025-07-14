@@ -19,6 +19,7 @@ const Fl_Font FONT = FL_HELVETICA;
 // Main window default sizes
 const unsigned int MENU_HEIGHT = 30;
 const unsigned int TOOL_HEIGHT = 20;
+const unsigned int FOOT_HEIGHT = 15;
 const unsigned int TOOL_GAP = 5;
 const unsigned int BORDER_SIZE = 5;
 const unsigned int TAB_HEIGHT = 20;

@@ -3,6 +3,7 @@
 #include "qso_data.h"
 #include "qso_manager.h"
 #include "record.h"
+#include "spec_data.h"
 #include "stn_data.h"
 
 #include "callback.h"
@@ -16,6 +17,7 @@
 
 extern bool CLUB_MODE;
 extern qso_manager* qso_manager_;
+extern spec_data* spec_data_;
 extern stn_data* stn_data_;
 
 stn_dialog::stn_dialog(int X, int Y, int W, int H, const char* L) :
@@ -257,9 +259,29 @@ void stn_dialog::single_tab::enable_widgets() {
 			if (qth_) {
 				ch_id_->value(current_id_.c_str());
 				ip_descr_->value(qth_->description.c_str());
+				int dxcc;
+				bool has_states = true;
+				if (qth_->data.at(DXCC_ID).length()) {
+					dxcc = stoi(qth_->data.at(DXCC_ID));
+					if (!spec_data_->has_states(dxcc)) has_states = false;
+				}
 				for (auto it : QTH_ADIF_MAP) {
 					if (qth_->data.find(it.first) != qth_->data.end()) {
 						ip_values_[(int)it.first]->value(qth_->data.at(it.first).c_str());
+						switch (it.first) {
+						case PRIMARY_SUB:
+						case SECONDARY_SUB:
+							if (has_states) {
+								ip_values_[(int)it.first]->activate();
+							}
+							else {
+								ip_values_[(int)it.first]->deactivate();
+							}
+							break;
+						default:
+							ip_values_[(int)it.first]->activate();
+							break;
+						}
 					}
 					else {
 						ip_values_[(int)it.first]->value("");
