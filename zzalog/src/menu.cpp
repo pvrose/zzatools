@@ -235,6 +235,7 @@ extern string PROGRAM_ID;
 	// Program help features
 	{ "&Help", 0, 0, 0, FL_SUBMENU },
 		{ "&About", 0, menu::cb_mi_help_abt },
+		{ "&User Guide", 0, menu::cb_mi_help_ug },
 		{ 0 },
 	{ 0 }
 	};
@@ -1252,6 +1253,11 @@ void menu::cb_mi_help_abt(Fl_Widget* w, void* v) {
 	dialog->display();
 	//remove_sub_window(dialog);
 	delete dialog;
+}
+
+// Help->User Guide
+void menu::cb_mi_help_ug(Fl_Widget* w, void* v) {
+	status_->misc_status(ST_WARNING, "ZZALOG: User Guide not yet available");
 }
 
 // Enable/disable menu 

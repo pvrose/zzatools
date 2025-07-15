@@ -129,6 +129,8 @@ struct search_criteria_t;
 		static void cb_mi_info_web(Fl_Widget* w, void* v);
 		// Help->About
 		static void cb_mi_help_abt(Fl_Widget* w, void* v);
+		// Help->USer Guide
+		static void cb_mi_help_ug(Fl_Widget* w, void* v);
 
 		// Enable/disable menu
 		void enable(bool active);
