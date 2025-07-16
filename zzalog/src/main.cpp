@@ -1088,7 +1088,10 @@ bool open_settings() {
 	char buffer[128];
 	settings.filename(buffer, sizeof(buffer),
 		Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	default_data_directory_ = directory(buffer) + "/" + PROGRAM_ID + "/";
+	char temp[128];
+	if (settings.getUserdataPath(temp, sizeof(temp))) {
+		default_data_directory_ = temp;
+	}
 
 	printf("ZZALOG: Opened settings %s\n", buffer);
 	for (char c = '8'; c > '0'; c--) {

@@ -30,7 +30,8 @@ extern Fl_PNG_Image main_icon_;
 extern status* status_;
 extern ticker* ticker_;
 
-const Fl_Text_Display::Style_Table_Entry style_table_[] = {
+const int NUMBER_STYLES = 10;
+const Fl_Text_Display::Style_Table_Entry style_table_[NUMBER_STYLES] = {
 	{ STATUS_COLOURS.at(ST_NONE).fg, FL_COURIER, FL_NORMAL_SIZE, Fl_Text_Display::ATTR_BGCOLOR, STATUS_COLOURS.at(ST_NONE).bg },
 	{ STATUS_COLOURS.at(ST_LOG).fg, FL_COURIER, FL_NORMAL_SIZE, Fl_Text_Display::ATTR_BGCOLOR, STATUS_COLOURS.at(ST_LOG).bg },
 	{ STATUS_COLOURS.at(ST_DEBUG).fg, FL_COURIER, FL_NORMAL_SIZE, Fl_Text_Display::ATTR_BGCOLOR, STATUS_COLOURS.at(ST_DEBUG).bg },
@@ -136,7 +137,7 @@ void banner::create_form() {
 	Fl_Text_Buffer* text = new Fl_Text_Buffer;
 	display_->buffer(text);
 	Fl_Text_Buffer* style = new Fl_Text_Buffer;
-	display_->highlight_data(style, &style_table_[0], 11, ' ', nullptr, nullptr);
+	display_->highlight_data(style, &style_table_[0], NUMBER_STYLES, ' ', nullptr, nullptr);
 
 	h_large_ = h_small_ + display_->h() + GAP;
 
