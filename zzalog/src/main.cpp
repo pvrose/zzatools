@@ -264,9 +264,8 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		closing_ = true;
 		// Stop the ticker
 		ticker_->stop_all();
+		banner_->show();
 		status_->misc_status(ST_NOTE, "ZZALOG: Closing...");
-		// Bring banner 
-		// Delete band view
 		// Currently modifying a (potentially new) record
 		if (book_ && (book_->is_dirty_record(book_->get_record()) || book_->new_record()) ) {
 			fl_beep(FL_BEEP_QUESTION);
