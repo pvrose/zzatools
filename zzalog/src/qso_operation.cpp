@@ -23,6 +23,8 @@ qso_operation::qso_operation(int X, int Y, int W, int H, const char *L) : Fl_Gro
 																		  current_qso_(nullptr)
 {
 	tooltip("Displays the current station opertaion: QTH, Operator and callsign used");
+	label("Station");
+	box(FL_BORDER_BOX);
 	create_form();
 	populate_choices();
 	enable_widgets();
@@ -35,9 +37,9 @@ qso_operation::~qso_operation()
 void qso_operation::create_form()
 {
 	int curr_x = x() + GAP;
-	int curr_y = y();
+	int curr_y = y() + GAP;
 
-	curr_x += WLABEL;
+	curr_x += WLABEL + GAP;
 	ch_qth_ = new annotated_choice(curr_x, curr_y, WSMEDIT, HBUTTON, "QTH");
 	ch_qth_->align(FL_ALIGN_LEFT);
 	ch_qth_->callback(cb_qth, &current_qth_);

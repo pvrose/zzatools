@@ -122,8 +122,11 @@ void qso_data::create_form(int X, int Y) {
 	int curr_x = X + GAP;
 
 	g_station_ = new qso_operation(curr_x, curr_y, 10, 10);
+	g_station_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	g_station_->labelfont(FL_BOLD);
+	g_station_->labelsize(FL_NORMAL_SIZE + 2);
 
-	curr_y += g_station_->h();
+	curr_y += g_station_->h() + GAP;
 
 	// One or the other of the three groups below will be shown at a time
 
@@ -426,7 +429,7 @@ void qso_data::enable_widgets() {
 			g_entry_->hide();
 			g_query_->hide();
 			if (visible_r()) g_qy_entry_->show();
-			g_qy_entry_->label("Enter QSO details for search");
+			g_qy_entry_->label("QSO Query - Enter QSO details for search");
 			g_qy_entry_->enable_widgets();
 			g_misc_->activate();
 			g_misc_->qso(current_qso(), current_number());
