@@ -31,9 +31,18 @@
 #include "url_handler.h"
 #include "wsjtx_handler.h"
 
-#include <sstream>
+#include <iostream>
 #include <list>
+#include <sstream>
 #include <string>
+// For launching PDF reader
+#ifdef _WIN32
+#include <windows.h>
+#else 
+#include <cstdlib>
+#endif
+
+
 
 #include <FL/fl_ask.H>
 #include <FL/Fl_Native_File_Chooser.H>
@@ -67,9 +76,10 @@ extern wsjtx_handler* wsjtx_handler_;
 
 extern bool READ_ONLY;
 extern list<string> recent_files_;
-extern time_t session_start_;
-extern string VENDOR;
+extern string default_data_directory_;
 extern string PROGRAM_ID;
+extern string VENDOR;
+extern time_t session_start_;
 
 
 
@@ -1257,7 +1267,24 @@ void menu::cb_mi_help_abt(Fl_Widget* w, void* v) {
 
 // Help->User Guide
 void menu::cb_mi_help_ug(Fl_Widget* w, void* v) {
-	status_->misc_status(ST_WARNING, "ZZALOG: User Guide not yet available");
+	string ug_name = default_data_directory_ + "documents/User Guide.pdf";
+	// OS dependent code to open a PDF
+#ifdef _WIN32
+	HINSTANCE result = ShellExecute(NULL, "open", ug_name.c_str(), NULL, NULL, SW_SHOWNORMAL);
+	if ((intptr_t)result <= 32) {
+		char msg[128];
+		snprintf(msg, sizeof(msg), "ZZALOG: Error opening PDF. Error code: %d", (int)(intptr_t)result);
+		status_->misc_status(ST_ERROR, msg);
+	}
+#else 
+	string cmd = "xdg-open \"" + ug_name + "\"";
+	int res = system(cmd.c_str());
+	if (res != 0) {
+		char msg[128];
+		snprintf(msg, sizeof(msg), "ZZALOG: Error opening PDF. Error code: %d", res);
+		status_->misc_status(ST_ERROR, msg);
+	}
+#endif
 }
 
 // Enable/disable menu 
