@@ -1,16 +1,19 @@
 #include "spec_data.h"
-#include "regices.h"
-#include "specx_reader.h"
-#include "utils.h"
-#include "book.h"
-#include "cty_data.h"
-#include "files.h"
-#include "status.h"
-#include "corr_dialog.h"
-#include "callback.h"
+
 #include "adi_writer.h"
 #include "band.h"
+#include "book.h"
+#include "corr_dialog.h"
+#include "cty_data.h"
+#include "files.h"
 #include "record.h"
+#include "regices.h"
+#include "specx_reader.h"
+#include "status.h"
+#include "url_handler.h"
+
+#include "callback.h"
+#include "utils.h"
 
 #include <fstream>
 #include <ostream>
@@ -33,7 +36,9 @@ extern cty_data* cty_data_;
 extern status* status_;
 extern string VENDOR;
 extern string PROGRAM_ID;
+extern string TARGET_ADIF_VN;
 extern string default_data_directory_;
+extern url_handler* url_handler_;
 
 // Default constructor
 spec_data::spec_data()
@@ -116,12 +121,10 @@ bool spec_data::load_data() {
 	} else {
 		ok = false;
 		char* message = new char[30 + file_name.length()];
-		sprintf(message, "ADIF SPEC: Fail to open %s - finding file", file_name.c_str());
+		sprintf(message, "ADIF SPEC: Fail to open %s", file_name.c_str());
 		status_->misc_status(ST_WARNING, message);
 		file.close();
 		delete reader;
-		ok = find_and_copy_data();
-		ok &= load_data();
 	}
 	if (ok) {
 		// File read in OK
@@ -2352,59 +2355,4 @@ string spec_data::summarise_enumaration(string name, string value) {
 }
 
 bool spec_data::valid() { return data_loaded_; }
-
-// Locate the all.xml file and copy to default data directory
-bool spec_data::find_and_copy_data() {
-	string source;
-	Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
-	chooser->title("Select ADIF Spec all.xml");
-	chooser->filter("XML File\t*.xml");
-	if (chooser->show() == 0) {
-		source = chooser->filename();
-	}
-	delete chooser;
-	string target = get_path() + ADIF_FILE;
-	char msg[128];
-	snprintf(msg, sizeof(msg), "ADIF SPEC: Copying %s", source.c_str());
-	status_->misc_status(ST_NOTE, msg);
-	// In and out streams
-	ifstream in(source);
-	in.seekg(0, in.end);
-	int length = (int)in.tellg();
-	const int increment = 8000;
-	in.seekg(0, in.beg);
-	status_->progress(length, OT_ADIF, "Copying data to backup", "bytes");
-	ofstream out(target);
-	bool ok = in.good() && out.good();
-	char buffer[increment];
-	int count = 0;
-	// Copy file in 7999 byte chunks
-	while (!in.eof() && ok) {
-		in.read(buffer, increment);
-		out.write(buffer, in.gcount());
-		count += (int)in.gcount();
-		ok = out.good() && (in.good() || in.eof());
-		status_->progress(count, OT_ADIF);
-	}
-	if (!ok) {
-		status_->progress("Failed before completion", OT_ADIF);
-	}
-	else {
-		if (count != length) {
-			status_->progress(length, OT_ADIF);
-		}
-	}
-	in.close();
-	out.close();
-	if (!ok) {
-		// Report error
-		status_->misc_status(ST_FATAL, "ADIF SPEC: failed");
-		data_loaded_ = false;
-		return false;
-	}
-	else {
-		status_->misc_status(ST_OK, "ADIF SPEC: Copied");
-		return true;
-	}
-}
 

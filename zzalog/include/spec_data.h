@@ -173,8 +173,6 @@ typedef size_t qso_num_t;
 		string convert_ml_string(const string& data);
 		// Generate report timestamp and fault
 		string report_timestamp(string field, string data);
-		// Find the all.xml file
-		bool find_and_copy_data();
 		// protected attributes
 	protected:
 		// ADIF Version

@@ -89,6 +89,8 @@ string PROG_ID = "ZLG";
 string PROGRAM_VERSION = "3.6.1";
 string VENDOR = "GM3ZZA";
 string TIMESTAMP = string(__DATE__) + " " + string(__TIME__) + " Local";
+// Target ADIF version number
+string TARGET_ADIF_VN = "315";
 
 // switches
 // Debug levels
@@ -186,6 +188,7 @@ string sticky_message_ = "";
 uint32_t seed_ = 0;
 // Defaults config files
 string default_data_directory_ = "";
+string default_user_directory_ = "";
 // Preferences root - system or use
 Fl_Preferences::Root prefs_mode_;
 // Do not close banner
@@ -672,7 +675,7 @@ void add_data() {
 		// Check if loaded
 		if (!spec_data_->valid()) {
 			// This sets a callback to close the app
-			status_->misc_status(ST_FATAL, "Do not have a valid ADIF reference - please copy");
+			status_->misc_status(ST_FATAL, "Do not have a valid ADIF reference - check installation");
 			Fl::check();
 		}
 		else {
@@ -1056,6 +1059,11 @@ void save_switches() {
 bool open_settings() {
 	// Open the settings file 
 	Fl_Preferences sys_settings(Fl_Preferences::SYSTEM_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	char stemp[128];
+	if (sys_settings.getUserdataPath(stemp, sizeof(stemp))) {
+		default_data_directory_ = stemp;
+	}
+
 	char* temp;
 	if (!sys_settings.get("Preferences Mode", temp, "")) {
 		// First use
@@ -1086,9 +1094,8 @@ bool open_settings() {
 	char buffer[128];
 	settings.filename(buffer, sizeof(buffer),
 		prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
-	char stemp[128];
 	if (settings.getUserdataPath(stemp, sizeof(stemp))) {
-		default_data_directory_ = stemp;
+		default_user_directory_ = stemp;
 	}
 
 	printf("ZZALOG: Opened settings %s\n", buffer);

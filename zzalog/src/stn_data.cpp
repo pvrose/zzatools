@@ -4,7 +4,7 @@
 #include "status.h"
 
 extern status* status_;
-extern string default_data_directory_;
+extern string default_user_directory_;
 
 stn_data::stn_data()
 {
@@ -18,7 +18,7 @@ stn_data::~stn_data() {
 
 // Load data from station.xml
 void stn_data::load_data() {
-	string filename = default_data_directory_ + "station.xml";
+	string filename = default_user_directory_ + "station.xml";
 	ifstream is;
 	char msg[128];
 	is.open(filename, ios_base::in);
@@ -43,7 +43,7 @@ void stn_data::load_data() {
 // Store data to station.xml
 void stn_data::store_data() {
 	if (!load_failed_) {
-		string filename = default_data_directory_ + "station.xml";
+		string filename = default_user_directory_ + "station.xml";
 		ofstream os;
 		os.open(filename, ios_base::out);
 		if (os.good()) {

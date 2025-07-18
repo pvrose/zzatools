@@ -164,7 +164,7 @@ bool club_handler::unzip_exception(string filename) {
 	int result = system(cmd);
 #ifdef _WIN32
 	if (result < 0) {
-		status_->misc_status(ST_ERROR, "CLUBLOG: Unzipping failed");
+		status_->misc_status(ST_ERROR, "CLUBLOG: Unzipping failed - check if 7z is available");
 		return false;
 	}
 	// This assumes 7z is the executble

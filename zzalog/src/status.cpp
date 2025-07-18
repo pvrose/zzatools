@@ -30,7 +30,7 @@ extern bool DEBUG_PRETTY;
 extern string VENDOR;
 extern ticker* ticker_;
 extern banner* banner_;
-extern string default_data_directory_;
+extern string default_user_directory_;
 extern bool keep_banner_;
 extern Fl_Preferences::Root prefs_mode_;
 
@@ -41,7 +41,7 @@ status::status() :
 	, file_unusable_(false)
 {
 	// Get report filename from the settings
-	report_filename_ = default_data_directory_ + "status.txt";
+	report_filename_ = default_user_directory_ + "status.txt";
 
 }
 

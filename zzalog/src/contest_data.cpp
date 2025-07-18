@@ -6,7 +6,7 @@
 
 #include <fstream>
 
-extern string default_data_directory_;
+extern string default_user_directory_;
 extern status* status_;
 
 contest_data::contest_data() {
@@ -70,7 +70,7 @@ ct_entry_t* contest_data::get_contest_info(int number) {
 
 // Load data
 bool contest_data::load_data() {
-	string filename = default_data_directory_ + "contests.xml";
+	string filename = default_user_directory_ + "contests.xml";
 	ifstream is;
 	is.open(filename, ios_base::in);
 	if (is.good()) {
@@ -94,7 +94,7 @@ bool contest_data::load_data() {
 
 // Save data
 bool contest_data::save_data() {
-	string filename = default_data_directory_ + "contests.xml";
+	string filename = default_user_directory_ + "contests.xml";
 	ofstream os;
 	os.open(filename, ios_base::out);
 	if (os.good()) {
