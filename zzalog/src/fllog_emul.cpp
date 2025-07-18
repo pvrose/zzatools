@@ -24,6 +24,7 @@ extern spec_data* spec_data_;
 extern qso_manager* qso_manager_;
 extern string VENDOR;
 extern string PROGRAM_ID;
+extern Fl_Preferences::Root prefs_mode_;
 
 // Static - only one instance of this class supported
 fllog_emul* fllog_emul::that_ = nullptr;
@@ -47,7 +48,7 @@ fllog_emul::~fllog_emul() {
 void fllog_emul::run_server() {
 	status_->misc_status(ST_NOTE, "FLLOG: Creating new socket");
 	if (!rpc_handler_) {
-		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+		Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 		Fl_Preferences nw_settings(settings, "Network");
 		Fl_Preferences fllog_settings(nw_settings, "Fllog");
 		int rpc_port = 8421;

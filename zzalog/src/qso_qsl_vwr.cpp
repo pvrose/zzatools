@@ -32,6 +32,7 @@ extern tabbed_forms* tabbed_forms_;
 extern qsl_dataset* qsl_dataset_;
 extern string VENDOR;
 extern string PROGRAM_ID;
+extern Fl_Preferences::Root prefs_mode_;
 
 // Constructor
 qso_qsl_vwr::qso_qsl_vwr(int X, int Y, int W, int H, const char* L) :
@@ -55,7 +56,7 @@ qso_qsl_vwr::~qso_qsl_vwr() {
 
 // Load values
 void qso_qsl_vwr::load_values() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences display_settings(settings, "Display");
 	display_settings.get("Image Type", (int&)selected_image_, QI_NONE);
 	Fl_Preferences datapath(settings, "Datapath");
@@ -78,7 +79,7 @@ void qso_qsl_vwr::load_values() {
 
 // Save values
 void qso_qsl_vwr::save_values() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences display_settings(settings, "Display");
 	display_settings.set("Image Type", selected_image_);
 	Fl_Preferences datapath(settings, "Datapath");

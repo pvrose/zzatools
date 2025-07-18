@@ -38,6 +38,7 @@ extern fields* fields_;
 extern qsl_dataset* qsl_dataset_;
 extern string VENDOR;
 extern string PROGRAM_ID;
+extern Fl_Preferences::Root prefs_mode_;
 
 // Constructor
 eqsl_handler::eqsl_handler()
@@ -271,7 +272,7 @@ string eqsl_handler::card_filename_l(record* record, bool use_default) {
 	string station = use_default ? default_station_ : record->item("STATION_CALLSIGN");
 	de_slash(station);
 	// Location of top-directory for QSL card images
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences datapath_settings(settings, "Datapath");
 	string qsl_directory;
 	char * temp;
@@ -925,7 +926,7 @@ map<string, string> eqsl_handler::parse_warning(string text) {
 
 // Upload single QSO to eQSL.cc
 bool eqsl_handler::upload_single_qso(qso_num_t record_num) {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences qsl_settings(settings, "QSL");
 	Fl_Preferences eqsl_settings(qsl_settings, "eQSL");
 	int upload_qso;

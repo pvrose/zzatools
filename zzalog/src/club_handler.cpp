@@ -31,6 +31,7 @@ extern qsl_dataset* qsl_dataset_;
 extern string VENDOR;
 extern string PROGRAM_ID;
 extern string default_data_directory_;
+extern Fl_Preferences::Root prefs_mode_;
 
 // Constructor 
 club_handler::club_handler() {

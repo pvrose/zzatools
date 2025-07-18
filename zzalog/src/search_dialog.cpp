@@ -28,6 +28,7 @@ extern string CONTACT;
 extern string COPYRIGHT;
 extern string VENDOR;
 extern string PROGRAM_ID;
+extern Fl_Preferences::Root prefs_mode_;
 
 // Constructor
 search_dialog::search_dialog() :
@@ -394,7 +395,7 @@ void search_dialog::load_values() {
 	criteria_ = new search_criteria_t;
 	criteria_->from_date = "";
 	// Get previous criteria from settings
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences search_settings(settings, "Search");
 	char * temp;
 	search_settings.get("By Dates", (int&)criteria_->by_dates, false);
@@ -462,7 +463,7 @@ void search_dialog::save_values() {
 		break;
 	}
 	// Save criteria in settings
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences search_settings(settings, "Search");
 	search_settings.set("By Dates", criteria_->by_dates);
 	search_settings.set("By Comparison", criteria_->comparator);

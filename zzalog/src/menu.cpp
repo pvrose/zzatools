@@ -80,6 +80,7 @@ extern string default_data_directory_;
 extern string PROGRAM_ID;
 extern string VENDOR;
 extern time_t session_start_;
+extern Fl_Preferences::Root prefs_mode_;
 
 
 
@@ -349,7 +350,7 @@ void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 	// Open chooser and open read/write (0) or read only (-1)
 	if (file_id <= 0) {
 		// Open file chooser to get file to load
-		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+		Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 		Fl_Preferences datapath_settings(settings, "Datapath");
 		char* directory;
 		datapath_settings.get("Log Directory", directory, "");
@@ -365,7 +366,7 @@ void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 	}
 	else {
 		// Get the recent file with supplied ID
-		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+		Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 		Fl_Preferences recent_settings(settings, "Recent Files");
 		char * temp;
 		char path[6];
@@ -973,7 +974,7 @@ void menu::cb_mi_imp_file(Fl_Widget* w, void* v) {
 	while (!import_data_->update_complete()) Fl::check();
 	// Get data directory
 	char* directory;
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences datapath_settings(settings, "Datapath");
 	datapath_settings.get("Log Directory", directory, "");
 	// Open file chooser
@@ -1684,7 +1685,7 @@ void menu::update_windows_items() {
 string menu::get_browser() {
 	// Get browser from config
 	char* temp;
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences datapath_settings(settings, "Datapath");
 	datapath_settings.get("Web Browser", temp, "");
 	string browser = temp;

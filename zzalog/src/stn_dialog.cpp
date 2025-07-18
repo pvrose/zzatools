@@ -13,9 +13,10 @@
 #include <FL/Fl_Input_Choice.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Multiline_Input.H>
+#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Tabs.H>
 
-extern bool CLUB_MODE;
+extern Fl_Preferences::Root prefs_mode_;
 extern qso_manager* qso_manager_;
 extern spec_data* spec_data_;
 extern stn_data* stn_data_;
@@ -170,7 +171,7 @@ void stn_dialog::single_tab::create_form() {
 			"as well as information about that location (Locator etc.)");
 		break;
 	case OPERATOR:
-		if (CLUB_MODE) {
+		if (prefs_mode_ == Fl_Preferences::SYSTEM_L) {
 			b_msg->label("Please select or enter the initials of the person intending to operate (NECESSARY for a club station).\n"
 				"Add the operator's name and callsign.");
 		}

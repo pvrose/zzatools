@@ -11,6 +11,7 @@ extern status* status_;
 extern string PROGRAM_ID;
 extern string VENDOR;
 extern string default_data_directory_;
+extern Fl_Preferences::Root prefs_mode_;
 
 using namespace std;
 
@@ -86,7 +87,7 @@ field_list fields::field_names(string name) {
 // Read settings
 void fields::load_data() {
    	// Read the field data from the settings
-    Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+    Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences display_settings(settings, "Display");
 	Fl_Preferences fields_settings(display_settings, "Fields");
 	// Number of field sets (a field set is a set of fields and their ordering)
@@ -205,7 +206,7 @@ void fields::add_collections(Fl_Preferences& settings, string name) {
 // Store settings
 void fields::store_data() {
 	// Read the field data from the registry
-    Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+    Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences display_settings(settings, "Display");
 	Fl_Preferences fields_settings(display_settings, "Fields");
 	// Delete current settings

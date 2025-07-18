@@ -9,6 +9,7 @@
 
 extern string VENDOR;
 extern string PROGRAM_ID;
+extern Fl_Preferences::Root prefs_mode_;
 
 
 // Constructor
@@ -35,7 +36,7 @@ void config_tree::create_tree() {
 	// Remove existing data
 	delete_tree();
 	// Create the root branch
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	add_branch(nullptr, settings);
 }
 

@@ -33,6 +33,7 @@ extern engine* engine_;
 extern key_handler* key_handler_;
 extern logger* logger_;
 extern wave_gen* wave_gen_;
+extern Fl_Preferences::Root prefs_mode_;
 
 const int NO_DEVICE = -1;
 
@@ -354,7 +355,7 @@ void display::create_log(int& curr_x, int& curr_y) {
 
 // Load any saved data
 void display::load_data() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	// This variable is used for char and bool settings.
 	int temp_i;
 	settings.get("Target Freqency", target_freq_, 700.0);
@@ -448,7 +449,7 @@ void display::enable_engine() {
 
 // Store data between application calls
 void display::save_data() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	// This variable is used for char and bool settings.
 	settings.set("Target Freqency", target_freq_);
 	settings.set("Words per Minute", wpm_);

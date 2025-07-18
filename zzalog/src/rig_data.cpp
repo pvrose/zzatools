@@ -15,6 +15,7 @@ extern string VENDOR;
 extern string PROGRAM_ID;
 extern status* status_;
 extern string default_data_directory_;
+extern Fl_Preferences::Root prefs_mode_;
 
 rig_data::rig_data() {
     load_failed_ = false;
@@ -64,7 +65,7 @@ rig_data_t* rig_data::get_rig(string rig) {
 }
 
 void rig_data::load_data() {
-    Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+    Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
     if (!load_xml()) {
         load_failed_ = true;
     }
@@ -72,7 +73,7 @@ void rig_data::load_data() {
 
 bool rig_data::store_data() {
     if (!load_failed_) {
-        Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+        Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
         settings.delete_group("CAT");
         return store_xml();
     }

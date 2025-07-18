@@ -38,6 +38,7 @@ extern bool DARK;
 extern fields* fields_;
 extern string VENDOR;
 extern string PROGRAM_ID;
+extern Fl_Preferences::Root prefs_mode_;
 
 Fl_Font log_table::font_;
 Fl_Fontsize log_table::fontsize_;
@@ -62,7 +63,7 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_app_t 
 	tip_root_y_ = 0;
 
 	// These are static, but will get to the same value each time
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences user_settings(settings, "User Settings");
 	Fl_Preferences log_settings(user_settings, "Log Table");
 	log_settings.get("Font Name", (int&)font_, 0);
@@ -822,7 +823,7 @@ void log_table::dbl_click_column(int col) {
 		current_item_num_ = my_book_->size() - 1 - current_item_num_;
 		display_current();
 		// Save value in settings
-		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+		Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 		Fl_Preferences display_settings(settings, "Display");
 		display_settings.set("Recent First", order_);
 		// Redraw the window

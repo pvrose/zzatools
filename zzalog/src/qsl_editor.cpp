@@ -32,6 +32,7 @@ extern qsl_dataset* qsl_dataset_;
 extern status* status_;
 extern string VENDOR;
 extern string PROGRAM_ID;
+extern Fl_Preferences::Root prefs_mode_;
 
 // Constructor
 qsl_editor::qsl_editor(int X, int Y, int W, int H, const char* L) :
@@ -96,7 +97,7 @@ void qsl_editor::load_values() {
 	}
 	qsl_type_ = qsl_data::LABEL;
 	// Get the display window position
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences windows_settings(settings, "Windows");
 	Fl_Preferences qsl_win_settings(windows_settings, "QSL Design");
 	qsl_win_settings.get("Top", win_y_, 10);
@@ -416,7 +417,7 @@ void qsl_editor::resize() {
 void qsl_editor::save_values() {
 
 	// Sabe the display window position
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences windows_settings(settings, "Windows");
 	Fl_Preferences qsl_win_settings(windows_settings, "QSL Design");
 	qsl_win_settings.set("Top", win_y_);

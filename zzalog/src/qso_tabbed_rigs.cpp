@@ -13,6 +13,7 @@ extern status* status_;
 extern bool closing_;
 extern string VENDOR;
 extern string PROGRAM_ID;
+extern Fl_Preferences::Root prefs_mode_;
 
 // Constructor for the rigs set of tabs
 qso_tabbed_rigs::qso_tabbed_rigs(int X, int Y, int W, int H, const char* L) :
@@ -50,7 +51,7 @@ void qso_tabbed_rigs::load_values() {
 		}
 	}
 	// Load default tab value
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
 	tab_settings.get("Rigs", default_tab_, 0);
 }
@@ -125,7 +126,7 @@ void qso_tabbed_rigs::enable_widgets() {
 
 // Save changes
 void qso_tabbed_rigs::save_values() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
 	// Find the current selected tab and save its index
 	Fl_Widget* w = value();

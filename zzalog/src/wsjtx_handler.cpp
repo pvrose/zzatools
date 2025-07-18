@@ -42,6 +42,7 @@ extern string PROGRAM_ID;
 extern string PROGRAM_VERSION;
 extern string VENDOR;
 extern ticker* ticker_;
+extern Fl_Preferences::Root prefs_mode_;
 
 wsjtx_handler* wsjtx_handler::that_ = nullptr;
 
@@ -396,7 +397,7 @@ bool wsjtx_handler::has_server() {
 // Start the server
 void wsjtx_handler::run_server() {
 	if (!server_) {
-		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+		Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 		Fl_Preferences nw_settings(settings, "Network");
 		Fl_Preferences wsjtx_settings(nw_settings, "WSJT-X");
 		int udp_port = 2237;
@@ -817,7 +818,7 @@ bool wsjtx_handler::parse_all_txt(record* qso, string line) {
 
 // Look for details of the supplied QSO in the "ALL.TXT" file
 bool wsjtx_handler::match_all_txt(record* qso, bool update_qso) {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences datapath_settings(settings, "Datapath");
 	char* temp;
 	datapath_settings.get("WSJT-X", temp, "");

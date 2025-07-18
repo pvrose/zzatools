@@ -26,6 +26,7 @@ extern uint32_t seed_;
 extern string VENDOR;
 extern string PROGRAM_ID;
 extern qsl_dataset* qsl_dataset_;
+extern Fl_Preferences::Root prefs_mode_;
 
 // Constructor
 web_dialog::web_dialog(int X, int Y, int W, int H, const char* label) :
@@ -70,7 +71,7 @@ web_dialog::~web_dialog()
 // Load initial values from settings
 void web_dialog::load_values() {
 	// Get the various settings
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences nw_settings(settings, "Network");
 	Fl_Preferences wsjtx_settings(nw_settings, "WSJT-X");
 	Fl_Preferences fllog_settings(nw_settings, "Fllog");
@@ -749,7 +750,7 @@ void web_dialog::create_email(int rx, int ry, int rw, int rh) {
 // Save values to settings
 void web_dialog::save_values() {
 	// Get settings
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences nw_settings(settings, "Network");
 	Fl_Preferences wsjtx_settings(nw_settings, "WSJT-X");
 	Fl_Preferences fllog_settings(nw_settings, "Fllog");

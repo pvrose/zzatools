@@ -103,14 +103,11 @@ bool AUTO_UPLOAD = true;
 bool AUTO_UPLOAD_S = false;
 bool AUTO_SAVE = true;
 bool AUTO_SAVE_S = false;
-bool CLUB_MODE = false;
-bool CLUB_MODE_S = false;
 bool DARK = false;
 bool DARK_S = false;
 bool DISPLAY_VERSION = false;
 bool HELP = false;
 bool NEW_BOOK = false;
-bool NEW_SETTINGS = false;
 bool PRIVATE = false;
 bool READ_ONLY = false;
 bool RESUME_SESSION = false;
@@ -189,13 +186,15 @@ string sticky_message_ = "";
 uint32_t seed_ = 0;
 // Defaults config files
 string default_data_directory_ = "";
+// Preferences root - system or use
+Fl_Preferences::Root prefs_mode_;
 // Do not close banner
 bool keep_banner_ = false;
 
 // Get the backup filename
 string backup_filename(string source) {
 	// This needs to be int and not bool as the settings.get() would corrupt the stack.
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences backup_settings(settings, "Backup");
 	// Get back-up directory
 	char* temp;
@@ -243,7 +242,7 @@ void restore_backup() {
 	// Remove existing book
 	status_->misc_status(ST_WARNING, "LOG: Closing current book!");
 	menu::cb_mi_file_new(nullptr, nullptr);
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences backup_settings(settings, "Backup");
 	char* temp;
 	backup_settings.get("Last Backup", temp, "");
@@ -367,7 +366,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		}
 
 		// Save the window position
-		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+		Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 		Fl_Preferences windows_settings(settings, "Windows");
 		Fl_Preferences window_settings(windows_settings, "Main");
 		window_settings.set("Left", main_window_->x_root());
@@ -472,23 +471,6 @@ int cb_args(int argc, char** argv, int& i) {
 	else if (strcmp("-e", argv[i]) == 0 || strcmp("--new", argv[i]) == 0) {
 		NEW_BOOK = true;
 		i+=1;
-	}
-	// New settings
-	else if (strcmp("-s", argv[i]) == 0 || strcmp("--new-settings", argv[i]) == 0) {
-		NEW_SETTINGS = true;
-		i+=1;
-	}
-	// Club mode
-	else if (strcmp("-c", argv[i]) == 0 || strcmp("--club", argv[i]) == 0) {
-		CLUB_MODE = true;
-		CLUB_MODE_S = true;
-		i += 1;
-	}
-	// Individual mode
-	else if (strcmp("-i", argv[i]) == 0 || strcmp("--individual", argv[i]) == 0) {
-		CLUB_MODE = false;
-		CLUB_MODE_S = true;
-		i += 1;
 	}
 	// Debug
 	else if (strcmp("-d", argv[i]) == 0 || strcmp("--debug", argv[i]) == 0) {
@@ -606,7 +588,7 @@ string get_file(char * arg_filename) {
 	string result = "";
 	if (!arg_filename || !(*arg_filename)) {
 		// null argument or empty string - get the most recent file. (Recent Files->File1 in settings)
-		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+		Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 		Fl_Preferences recent_settings(settings, "Recent Files");
 		char *filename;
 		if (recent_settings.get("File1", filename, "")) {
@@ -633,7 +615,7 @@ string get_file(char * arg_filename) {
 
 // Add some global properties
 void add_properties() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences user_settings(settings, "User Settings");
 	// Tooltip settings
 	Fl_Preferences tip_settings(user_settings, "Tooltip");
@@ -658,7 +640,7 @@ void add_properties() {
 // Get the recent files from settings
 void recent_files() {
 	recent_files_.clear();
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences recent_settings(settings, "Recent Files");
 	// Read the first four files
 	for (int i = 1; i <= 4; i++) {
@@ -739,7 +721,7 @@ void add_book(char* arg) {
 			string log_file = get_file(arg);
 
 			if (!book_->load_data(log_file)) {
-				Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+				Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 				Fl_Preferences backup_settings(settings, "Backup");
 				char * temp;
 				backup_settings.get("Last Backup", temp, "");
@@ -866,7 +848,7 @@ void resize_window() {
 	int width;
 	int top;
 	int height;
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences windows_settings(settings, "Windows");
 	Fl_Preferences window_settings(windows_settings, "Main");
 	window_settings.get("Left", left, 0);
@@ -978,7 +960,6 @@ void print_args(int argc, char** argv) {
 	status_->misc_status(ST_NOTE, message);
 	if (NEW_BOOK && !filename_) status_->misc_status(ST_NOTE, "ZZALOG: -e - Starting with empty file");
 	if (NEW_BOOK && filename_) status_->misc_status(ST_WARNING, "ZZALOG: -e - filename specified, switch ignored");
-	if (NEW_SETTINGS) status_->misc_status(ST_NOTE, "ZZALOG: -s - Clear settings");
 	if (AUTO_UPLOAD) status_->misc_status(ST_NOTE, "ZZALOG: -n - QSOs uploaded to QSL sites automatically");
 	else status_->misc_status(ST_WARNING, "ZZALOG: -q - QSOs are not being uploaded to QSL sites");
 	if (AUTO_SAVE) status_->misc_status(ST_NOTE, "ZZALOG: -a - QSOs being saved automatically");
@@ -988,8 +969,6 @@ void print_args(int argc, char** argv) {
 	if (PRIVATE) status_->misc_status(ST_WARNING, "ZZALOG: -p - This file not being noted on recent files list");
 	if (DARK) status_->misc_status(ST_NOTE, "ZZALOG: -k - Opening in dark mode");
 	else status_->misc_status(ST_NOTE, "ZZALOG: -l - Opening in normal FLTK colours");
-	if (CLUB_MODE) status_->misc_status(ST_NOTE, "ZZALOG: -c - Operating a club station");
-	else status_->misc_status(ST_NOTE, "ZZALOG: -i - Operating an individual's station");
 }
 
 // Returns true if record is within current session.
@@ -1034,7 +1013,7 @@ void customise_fltk() {
 
 // Some switches get saved between sessions - so-called sticky switches
 void read_saved_switches() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences switch_settings(settings, "Switches");
 	int temp;
 	char msg[128];
@@ -1059,38 +1038,57 @@ void read_saved_switches() {
 		if (AUTO_SAVE) strcat(msg, "-a ");
 		else strcat(msg, "-w ");
 	}
-	if (!CLUB_MODE_S) {
-		switch_settings.get("Club Mode", temp, false);
-		CLUB_MODE = (bool)temp;
-		if (CLUB_MODE) strcat(msg, "-c ");
-		else strcat(msg, "-i ");
-	}
 
 	sticky_message_ = msg;
 }
 
 // Save "sticky" switches
 void save_switches() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences switch_settings(settings, "Switches");
 	switch_settings.set("Dark Mode", (int)DARK);
 	switch_settings.set("Auto Update QSOs", (int)AUTO_UPLOAD);
 	switch_settings.set("Auto Save QSOs", (bool)AUTO_SAVE);
-	switch_settings.set("Club Mode", (bool)CLUB_MODE);
 }
 
 // Open preferences and save them - it is possible to corrupt the settings
 // file if an exception occurs while they are being saved.
 bool open_settings() {
 	// Open the settings file 
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences sys_settings(Fl_Preferences::SYSTEM_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	char* temp;
+	if (!sys_settings.get("Preferences Mode", temp, "")) {
+		// First use
+		switch (fl_choice("ZZALOG: New installation - please select club or individual use?", "Club", "Individual", nullptr)) {
+		case 0:
+			prefs_mode_ = Fl_Preferences::SYSTEM_L;
+			sys_settings.set("Preferences Mode", "Club");
+			break;
+		case 1:
+			prefs_mode_ = Fl_Preferences::USER_L;
+			sys_settings.set("Preferences Mode", "Individual");
+			break;
+		}
+	}
+	else if (strcmp(temp, "Club") == 0) {
+		prefs_mode_ = Fl_Preferences::SYSTEM_L;
+	}
+	else if (strcmp(temp, "Individual") == 0) {
+		prefs_mode_ = Fl_Preferences::USER_L;
+	}
+	else {
+		fl_alert("ZZALOG: Invalid use mode %s - abandoning", temp);
+		return false;
+	}
+
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	// Now set the default app data directory
 	char buffer[128];
 	settings.filename(buffer, sizeof(buffer),
-		Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	char temp[128];
-	if (settings.getUserdataPath(temp, sizeof(temp))) {
-		default_data_directory_ = temp;
+		prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	char stemp[128];
+	if (settings.getUserdataPath(stemp, sizeof(stemp))) {
+		default_data_directory_ = stemp;
 	}
 
 	printf("ZZALOG: Opened settings %s\n", buffer);
@@ -1131,11 +1129,7 @@ bool open_settings() {
 			printf("ZZALOG: Settings saved as %s\n", backup);
 		}
 	}
-	if (NEW_SETTINGS) {
-		settings.clear();
-		settings.flush();
-	}
-	if (NEW_SETTINGS || !ok) {
+	if (!ok) {
 		// No settings file - check a new installation
 		switch(fl_choice("This appears to be a new installation, Continue?", "Yes", "No", nullptr)) {
 			case 0: {
@@ -1176,6 +1170,7 @@ int main(int argc, char** argv)
 	// Parse command-line arguments - accept FLTK standard arguments and custom ones (in cb_args)
 	int i = 1;
 	Fl::args(argc, argv, i, cb_args);
+	customise_fltk();
 	// Create the settings before anything else 
 	if (!open_settings()) {
 		return 255;
@@ -1210,8 +1205,6 @@ int main(int argc, char** argv)
 		show_help();
 		return 0;
 	}
-	// Switches affect the customisation
-	customise_fltk();
 	add_icon(argv[0]);
 
 	// Ctreate status to handle status messages
@@ -1271,7 +1264,7 @@ int main(int argc, char** argv)
 		main_window_->show(argc, argv);
 		qso_manager_->show();
 		// Now ask for club operator
-		if (CLUB_MODE) club_operator();
+		if (prefs_mode_ == Fl_Preferences::SYSTEM_L) club_operator();
 		// Run the application until it is closed
 		code = Fl::run();
 	}
@@ -1326,7 +1319,7 @@ void backup_file() {
 		status_->misc_status(ST_ERROR, "BACKUP: failed");
 	} else {
 		status_->misc_status(ST_OK, "BACKUP: Done");
-		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+		Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 		Fl_Preferences backup_settings(settings, "Backup");
 		backup_settings.set("Last Backup", backup.c_str());
 	}
@@ -1342,7 +1335,7 @@ void set_recent_file(string filename) {
 		recent_files_.push_front(filename);
 
 		// Update recent files in the settings
-		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+		Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 		Fl_Preferences recent_settings(settings, "Recent Files");
 		// Clear the existing settings
 		recent_settings.clear();

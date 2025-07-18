@@ -17,6 +17,7 @@ extern wsjtx_handler* wsjtx_handler_;
 extern bool closing_;
 extern string VENDOR;
 extern string PROGRAM_ID;
+extern Fl_Preferences::Root prefs_mode_;
 
 // Constructor
 qso_clocks::qso_clocks(int X, int Y, int W, int H, const char* L) :
@@ -38,7 +39,7 @@ qso_clocks::~qso_clocks() {
 
 void qso_clocks::load_values() {
 	// Load default tab value
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
 	tab_settings.get("Clocks", default_tab_, 0);
 }
@@ -69,7 +70,7 @@ void qso_clocks::create_form() {
 }
 
 void qso_clocks::save_values() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
 	// Find the current selected tab and save its index
 	Fl_Widget* w = value();

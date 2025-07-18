@@ -23,6 +23,7 @@ extern main_window* main_window_;
 extern qso_manager* qso_manager_;
 extern string VENDOR;
 extern string PROGRAM_ID;
+extern Fl_Preferences::Root prefs_mode_;
 
 // Constructor
 files_dialog::files_dialog(int X, int Y, int W, int H, const char* label) :
@@ -58,7 +59,7 @@ void files_dialog::load_values() {
 	char * temp_string;
 
 	// Settings groups required below
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences qsl_settings(settings, "QSL");
 	Fl_Preferences lotw_settings(qsl_settings, "LotW");
 	Fl_Preferences datapath_settings(settings, "Datapath");
@@ -281,7 +282,7 @@ void files_dialog::create_form(int X, int Y) {
 // save values to the settings
 void files_dialog::save_values() {
 	// Settings groups for below
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences qsl_settings(settings, "QSL");
 	Fl_Preferences lotw_settings(qsl_settings, "LotW");
 	Fl_Preferences datapath_settings(settings, "Datapath");
