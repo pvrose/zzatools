@@ -28,7 +28,7 @@ extern spec_data* spec_data_;
 extern bool closing_;
 extern string VENDOR;
 extern string PROGRAM_ID;
-extern string default_data_directory_;
+extern string default_user_directory_;
 
 // Constructor - Download new data and build database
 cty_data::cty_data() :
@@ -234,7 +234,7 @@ bool cty_data::load_data(string filename) {
 
 // Get the filename {REFERENCE DIR}/cty.xml
 string cty_data::get_filename() {
-	return default_data_directory_ + "cty.xml";
+	return default_user_directory_ + "cty.xml";
 }
 
 // Parse the record
