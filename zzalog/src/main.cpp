@@ -60,19 +60,18 @@ main.cpp - application entry point
 
 // FLTK header files
 #include <FL/Fl.H>
-#include <FL/fl_ask.H>
 #include <FL/Fl_Box.H>
-#include <FL/Fl_Native_File_Chooser.H>
+#include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_Menu_Item.H>
+#include <FL/Fl_Native_File_Chooser.H>
+#include <FL/Fl_PNG_Image.H>
+#include <FL/Fl_Preferences.H>
+#include <FL/Fl_Single_Window.H>
 #include <FL/Fl_Tabs.H>
 #include <FL/Fl_Tooltip.H>
 #include <FL/Fl_Widget.H>
-#include <FL/Fl_Single_Window.H>
-#include <FL/Fl_Progress.H>
-#include <FL/Fl_Preferences.H>
-#include <FL/Fl_PNG_Image.H>
+#include <FL/fl_ask.H>
 #include <FL/fl_draw.H>
-#include <FL/Fl_Help_Dialog.H>
 // included to allow windows specifics to be called
 #include <FL/platform.H>
 
@@ -153,6 +152,8 @@ wx_handler* wx_handler_ = nullptr;
 
 // Recent files opened
 list<string> recent_files_;
+
+Fl_Help_Dialog* help_viewer_ = nullptr;
 
 // Forward declarations
 void backup_file();
@@ -1256,6 +1257,8 @@ int main(int argc, char** argv)
 	// Add qsl_handlers - note add_rig_if() may have added URL handler
 	add_qsl_handlers();
 	int code = 0;
+	// Add Help viewer
+	help_viewer_ = new Fl_Help_Dialog;
 	// We are now initialised
 	initialised_ = true;
 	if (!closing_) {

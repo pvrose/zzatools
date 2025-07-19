@@ -1,47 +1,75 @@
 ﻿
 #include "log_table.h"
+
 #include "book.h"
-#include "record.h"
-#include "spec_data.h"
-#include "utils.h"
-#include "callback.h"
-#include "intl_widgets.h"
-#include "intl_dialog.h"
+#include "cty_data.h"
+#include "extract_data.h"
 #include "field_choice.h"
 #include "fields.h"
-#include "menu.h"
-#include "toolbar.h"
-#include "status.h"
-#include "cty_data.h"
+#include "intl_dialog.h"
+#include "intl_widgets.h"
 #include "main_window.h"
+#include "menu.h"
 #include "qso_manager.h"
-#include "fields.h"
-#include "extract_data.h"
+#include "record.h"
+#include "spec_data.h"
+#include "status.h"
+#include "toolbar.h"
+#include "utils.h"
+
+#include "callback.h"
 
 #include <FL/fl_draw.H>
 #include <FL/Fl_Preferences.H>
 #include <FL/Enumerations.H>
+#include <FL/Fl_Help_Dialog.H>
 #include <FL/fl_ask.H>
 
-extern spec_data* spec_data_;
 extern book* book_;
+extern cty_data* cty_data_;
+extern fields* fields_;
+extern intl_dialog* intl_dialog_;
 extern main_window* main_window_;
 extern menu* menu_;
-extern toolbar* toolbar_;
-extern status* status_;
-extern intl_dialog* intl_dialog_;
-extern time_t session_start_;
-extern cty_data* cty_data_;
 extern qso_manager* qso_manager_;
+extern spec_data* spec_data_;
+extern status* status_;
+extern time_t session_start_;
+extern toolbar* toolbar_;
+
 extern bool in_current_session(record*);
 extern bool DARK;
-extern fields* fields_;
 extern string VENDOR;
 extern string PROGRAM_ID;
+
+extern Fl_Help_Dialog* help_viewer_;
 extern Fl_Preferences::Root prefs_mode_;
 
 Fl_Font log_table::font_;
 Fl_Fontsize log_table::fontsize_;
+
+const char help_text[] =
+"<body>\
+<h1>log_table: Tabular view of log-book data</h1>\
+<h2>Description</h2>\
+This widget displays the log-book view of the data.\
+<h2>Features</h2>\
+<h3>Selecting a record</h3>\
+Clicking on a line will select the record displayed in the line.This will make this record the current record being worked on in all views.\
+<h3>Editing an entry</h3>\
+Double-clicking on an entry will open a edit box that allows for the data within the field of the record to be edited.\
+Right-clicking while the edit box is acive will show the allowable data to be entered.\
+<h3>Displaying details</h3>\
+Right-clicking on a field within a record will display a tooltip explaining what the field is for, and whether the current data within is valid.\
+<h3>Adjusting column widths</h3>\
+Clicking and dragging the right-hand edge of the header of an individual column will vary the width of a column.\
+<h3>Sorting data</h3>\
+Double clicking on the header of a column containing QSO_DATE, TIME_ON, QSO_DATE_OFF or TIME_OFF will switch from chronological\
+order to reverse-chronological order or vice-versa.Double clicking on the header of other columns is only enabled in the\
+extracted-data instance of this widget.In that case the data will be displayed in alphabetical order of the entries in that\
+column.Double-clicking it again will display in reverse alphabetical order.\
+</body>";
+
 
 // constructor - passes parameters  to the two base classes
 log_table::log_table(int X, int Y, int W, int H, const char* label, field_app_t app) :
@@ -397,6 +425,11 @@ int log_table::handle(int event) {
 				Fl::paste(*main_window_, 1);
 				return true;
 			}
+		case FL_F + 1:
+			// F1
+			help_viewer_->value(help_text);
+			help_viewer_->show();
+			return true;
 		}
 		break;
 	case FL_KEYUP:
