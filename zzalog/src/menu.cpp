@@ -1268,7 +1268,7 @@ void menu::cb_mi_help_abt(Fl_Widget* w, void* v) {
 
 // Help->User Guide
 void menu::cb_mi_help_ug(Fl_Widget* w, void* v) {
-	string ug_name = default_data_directory_ + "documents/User Guide.pdf";
+	string ug_name = default_data_directory_ + "User Guide.pdf";
 	// OS dependent code to open a PDF
 #ifdef _WIN32
 	HINSTANCE result = ShellExecute(NULL, "open", ug_name.c_str(), NULL, NULL, SW_SHOWNORMAL);
