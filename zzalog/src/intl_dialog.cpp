@@ -4,11 +4,12 @@
 #include "callback.h"
 #include "menu.h"
 
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Help_Dialog.H>
+#include <FL/Fl_Native_File_Chooser.H>
+#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Text_Editor.H>
-#include <FL/Fl_Native_File_Chooser.H>
 
 extern status* status_;
 extern menu* menu_;
@@ -17,9 +18,27 @@ extern string COPYRIGHT;
 extern string VENDOR;
 extern string PROGRAM_ID;
 extern string default_data_directory_;
+extern Fl_Help_Dialog* help_viewer_;
 
 // Majo
 string DEFAULT_INTL = "";
+
+const char help_text[] =
+"<body>"
+"<h1>intl_dialog - Virtual keyboard for non-ASCII characters</h1>"
+"<h2>Description</h2>"
+"This dialog provides a virtual keyboard for a selection on Latin-based "
+"non-ASCII characters.<p>"
+"<h2>Features</h2>"
+"<h3>Entering a character</h3>"
+"Clicking on any button labelled with a character will paste that character into "
+"any input widget that is currently selected."
+"<h3>Adding more characters</h3>"
+"Copy any chaarcters you want to add into the text input field at the top right."
+"Then click \"Add\"."
+"To save the change, click \"Save\". Saving the changes requires administrator "
+"privileges."
+"</body>";
 
 // Constructs a window 
 intl_dialog::intl_dialog() :
@@ -138,12 +157,30 @@ intl_dialog::~intl_dialog()
 
 // Handle FL_HIDE and FL_SHOW to get menu to update otself
 int intl_dialog::handle(int event) {
-
+	int result;
 	switch (event) {
 	case FL_HIDE:
 	case FL_SHOW:
 		// Get menu to update Windows controls
 		menu_->update_windows_items();
+		break;
+	case FL_FOCUS:
+		return true;
+	case FL_UNFOCUS:
+		// Acknowledge focus events to get the keyboard event
+		return true;
+	case FL_PUSH:
+		// Allow normal click behaviour before changing focus
+		result = win_dialog::handle(event);
+		take_focus();
+		return result;
+	case FL_KEYBOARD:
+		switch (Fl::event_key()) {
+		case FL_F + 1:
+			help_viewer_->value(help_text);
+			help_viewer_->show();
+			return true;
+		}
 		break;
 	}
 

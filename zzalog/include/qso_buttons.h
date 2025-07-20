@@ -19,6 +19,8 @@ public:
 	qso_buttons(int X, int Y, int W, int H, const char* l = nullptr);
 	~qso_buttons();
 
+	virtual int handle(int event);
+
 	// get settings
 	void load_values();
 	// Create form

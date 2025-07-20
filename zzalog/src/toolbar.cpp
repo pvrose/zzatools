@@ -1,40 +1,92 @@
 #include "toolbar.h"
-#include "menu.h"
-#include "import_data.h"
-#include "icons.h"
-#include "callback.h"
+
 #include "book.h"
-#include "tabbed_forms.h"
+#include "callback.h"
 #include "cty_data.h"
-#include "utils.h"
-#include "status.h"
-#include "drawing.h"
-#include "intl_widgets.h"
 #include "extract_data.h"
-#include "main_window.h"
-#include "qso_manager.h"
+#include "icons.h"
 #include "import_data.h"
 #include "intl_dialog.h"
+#include "intl_widgets.h"
+#include "main_window.h"
+#include "menu.h"
+#include "qso_manager.h"
 #include "record.h"
+#include "status.h"
+#include "tabbed_forms.h"
+
+#include "drawing.h"
+#include "utils.h"
 
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_RGB_Image.H>
-#include <FL/fl_ask.H>
-#include <FL/Fl_Tooltip.H>
 #include <FL/Fl_Single_Window.H>
+#include <FL/Fl_Tooltip.H>
+#include <FL/fl_ask.H>
 
-extern menu* menu_;
 extern book* navigation_book_;
 extern book* book_;
-extern extract_data* extract_records_;
-extern tabbed_forms* tabbed_forms_;
 extern cty_data* cty_data_;
-extern status* status_;
-extern main_window* main_window_;
-extern qso_manager* qso_manager_;
+extern extract_data* extract_records_;
 extern import_data* import_data_;
 extern intl_dialog* intl_dialog_;
+extern main_window* main_window_;
+extern menu* menu_;
+extern qso_manager* qso_manager_;
+extern status* status_;
+extern tabbed_forms* tabbed_forms_;
+
 extern bool DARK;
+
+extern Fl_Help_Dialog* help_viewer_;
+
+// Help text
+const char help_text[] =
+"<body>"
+"<h1>toolbar - Main Window Iconised Actions</h1>"
+"<h2>Description</h2"
+"Displays a set of iconised buttons linked to main menu action. There are also a limited"
+" number of search features."
+"<h2>Features</h2"
+"<h3>Iconised Menu Actions</h3>"
+"The majority of buttons contain links to the Menu bar."
+"<dl>"
+"  <li>Closed file icon - File->New"
+"  <li>Open file icon - File->Open"
+"  <li>Floppy disc icon - File->Save"
+"  <li>Floppy disc with pen icom - File->Save As"
+"  <li>Left arrow with bar - Navigate->First"
+"  <li>Left arrow - navigate->Previous"
+"  <li>Right arroe - Navigate->Next"
+"  <li>Right arrow with bar - Navigate->Last"
+"  <li>Blue Magnifying glass - Navigate->Find->New"
+"  <li>Blue double chevron - Navigate->Find->Next"
+"  <li>White open square - Log->New Record"
+"  <li>White square with tick - Log->Save Record"
+"  <li>White square with red cross - Log->Cancel"
+"  <li>Large white square with black cross - Log->Delete Record"
+"  <li>White square containing blue image - Log->Retime Record"
+"  <li>Cyan downward arrow over \"eQSL\" - Import->Download eQSL"
+"  <li>Cyan downward arraow over \"LotW\" - Import->Download LotW"
+"  <li>Blue \"?\" over \"eQSL\" - Extract->eQSL"
+"  <li>Blue \"?\" over \"LotW\" - Extract->LotW"
+"  <li>Blue \"?\" over \"CL\" - Extract->ClubLog"
+"  <li>Upward arrow - Extract->Upload"
+"  <li>Box with three dots - Connect/Disconnect Rig"
+"  <li>Blue \"?\" - Extract->Criteria"
+"  <li>Blue \"?\" with red cross - Extract->Clear"
+"  <li>Blue \"?\" superimposed with horizontal lines - Extract->Display"
+"  <li>Image of world - Information->Google Maps"
+"  <li>\"QRZ.com\" - Information->QRZ.com"
+"  <li>\"&AElig;\" - windows->International Chars"
+"  <li>Text input - Enter callsign for search features"
+"  <li>Bold downward arrow - Find next occurence of callsign"
+"  <li>Downward chevron and bar - Extract all occurences of callsign"
+"  <li>\"DX?\" - Open tooltip with parse detatls of call"
+"</dl>"
+"</body>";
+
 
 // Constructor - most buttons invoke a menu item
 toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
@@ -339,14 +391,14 @@ int toolbar::handle(int event) {
 	case FL_PUSH:
 		take_focus();
 		return true;
-	//case FL_KEYBOARD:
-	//	switch (Fl::event_key()) {
-	//	case FL_F + 1:
-	//		help_viewer_->value(help_text);
-	//		help_viewer_->show();
-	//		return true;
-	//	}
-	//	break;
+	case FL_KEYBOARD:
+		switch (Fl::event_key()) {
+		case FL_F + 1:
+			help_viewer_->value(help_text);
+			help_viewer_->show();
+			return true;
+		}
+		break;
 	}
 	return result;
 }

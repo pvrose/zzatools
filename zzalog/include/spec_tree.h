@@ -27,6 +27,8 @@ struct spec_dataset;
 
 		// inherited from view
 		virtual void update(hint_t hint, qso_num_t record_num_1, qso_num_t record_num_2 = 0);
+		// Inherited from Fl_Tree
+		virtual int handle(int event);
 		// Delete the tree
 		void delete_tree();
 

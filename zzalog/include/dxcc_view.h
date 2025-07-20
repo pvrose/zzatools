@@ -15,6 +15,8 @@ public:
     dxcc_view(int X, int Y, int W, int H, const char* L = nullptr, field_app_t f = FO_LAST);
     ~dxcc_view();
 
+    virtual int handle(int event);
+
     void create_form();
     void enable_widgets();
     void load_data();

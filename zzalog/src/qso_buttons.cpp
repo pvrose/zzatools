@@ -9,12 +9,15 @@
 #include "callback.h"
 #include "record.h"
 
+#include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_Tooltip.H>
 
 extern extract_data* extract_records_;
 extern book* book_;
 extern cty_data* cty_data_;
 extern spec_data* spec_data_;
+
+extern Fl_Help_Dialog* help_viewer_;
 
 // Map showing the buttons available in each qso_data logging_state
 map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
@@ -86,7 +89,7 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::DELETE_QSO, { "Delete QSO", "Delete the selected QSO", qso_buttons::cb_bn_delete_qso, 0 } },
 	{ qso_buttons::WORKED_B4, { "B4?", "Display all previous QSOs with this callsign", qso_buttons::cb_wkb4, 0 } },
 	{ qso_buttons::SAVE_EDIT, { "Save", "Copy changed record back to book", qso_buttons::cb_save, (void*)qso_buttons::SAVE_EDIT}},
-	{ qso_buttons::SAVE_CONTINUE, { "Save && Edit", "Set TIME_OFFand allow continued edit", qso_buttons::cb_save, (void*)qso_buttons::SAVE_CONTINUE}},
+	{ qso_buttons::SAVE_CONTINUE, { "Save && Edit", "Set TIME_OFF and allow continued edit", qso_buttons::cb_save, (void*)qso_buttons::SAVE_CONTINUE}},
 	{ qso_buttons::SAVE_EXIT, { "Save && Exit", "Copy changed record and return to previous activity", qso_buttons::cb_save, (void*)qso_buttons::SAVE_EXIT }},
 	{ qso_buttons::SAVE_VIEW, { "Save && View", "Copy changed record and allow view", qso_buttons::cb_save, (void*)qso_buttons::SAVE_VIEW }},
 	{ qso_buttons::SAVE_NEW, { "Save && New", "Save QSO and start new QSO", qso_buttons::cb_save, (void*)qso_buttons::SAVE_NEW }},
@@ -120,11 +123,77 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::IMPORT_QUERY, { "Test Import", "Test import query", qso_buttons::cb_bn_import_query, 0 }},
 	{ qso_buttons::QRZ_COM, { "@search QRZ.com", "Display details in QRZ.com", qso_buttons::cb_bn_qrz_com, 0}},
 	{ qso_buttons::UPDATE_CAT, { "Update CAT", "Use CAT info where current QSO has no value", qso_buttons::cb_bn_update_cat, (void*)false }},
-	{ qso_buttons::REPLACE_CAT, { "Replaxe CAT", "Use current CAT info", qso_buttons::cb_bn_update_cat, (void*)true }},
+	{ qso_buttons::REPLACE_CAT, { "Replace CAT", "Use current CAT info", qso_buttons::cb_bn_update_cat, (void*)true }},
 	{ qso_buttons::RESTART, { "Restart", "Ditch current QSO and start anew", qso_buttons::cb_bn_restart, 0 }},
 	{ qso_buttons::PARSE_QSO, { "Parse QSO", "Add DXCC, CQ, etc details to QSO", qso_buttons::cb_bn_parse_qso, 0 }},
 	{ qso_buttons::UPDATE_STATION, { "U/d Station", "Add QTH, Operator and station callsigns to QSO", qso_buttons::cb_bn_update_station, 0 }},
 };
+
+const char help_text[] =
+"<body>"
+"<h1>qso_buttons: Control buttons for Dashboard</h1>"
+"<h2>Description</h2>"
+"This pane is a highly configured pane that provides the control buttons that are "
+"relevant to the current state of the Dashboard."
+"Only those buttons that are effective in the current state of the Dashboard are shown "
+"and some may be inactive for other reasons."
+"<h2>Features</h2>"
+"The complete list of buttons:"
+"<dl>"
+"  <li>Activate - Make the dashboard ready to start logging QSOs"
+"  <li>Add Call - Add a new QSO record to the net in the editor view"
+"  <li>Add QSO (Editor mode) - Create a new QSO record without initialising time and rig data."
+"  <li>Add QSO (Query mode) - Add the queried QSO record to the log"
+"  <li>Browse Log - Open the QSO browser (rather than editor) displaying the current QSO."
+"The browser allows all fields to be displayed rather than the limited selection in the editor."
+"  <li>B4? - Extract all QSOs with the callsign in the selected QSO."
+"  <li>Cancel (Query mode) - cancel the query"
+"  <li>Cancel (Read-only edit mode) - Cancel the current read-omnly viewing of the QSO record."
+"  <li>Cancel Edit - Cancel the current edit without saving the changes to the QSO record."
+"  <li>Check - Start the search for the above data"
+"  <li>Clone QSO - Create a new QSO record copying rig data."
+"  <li>Copy QSO - Create a new QSO record copying call and rig data."
+"  <li>Delete QSO - Remove the selected QSO from the log."
+"  <li>Done - Keep the result of any merge action"
+"  <li>DX? - Display the parsing of the callsign in the selected QSO record"
+"  <li>Edit Net - Open all records that could form a net (same frequency, close time) in the editor."
+"  <li>Edit QSO - Opens the QSO record in edit mode."
+"  <li>Keep 1 (Dupe check) - Keep the left hand record"
+"  <li>Keep 1 & 2 (Dupe check) - keep both records. They are not duplicates."
+"  <li>Keep 2 (Dupe check) - Keep the right hand record"
+"  <li>Merge (Dupe check) - Merge data between the two records"
+"  <li>Merge QSO (Query Mode) - Merge data between the queried record and the target record"
+"  <li>Parse QSO - Add DXCC etc detils to the current record."
+"  <li>Query - Open an editor view to allow details for a search to be entered"
+"  <li>Quit - Quit the QSO entry mode"
+"  <li>Quit Browse - Cancel the current browser view."
+"  <li>Quit Net - Cancel editing all records in the editor view"
+"  <li>Quit QSO - Cancel the QSO being entered."
+"  <li>Reject QSO (Query Mode) - Do not add the queried QSO record to the log"
+"  <li>Replace CAT - Replace the rig data in the selected record with data freshly read from the rig"
+"  <li>Restart - Cancel the current QSO entry and start a new one"
+"  <li>Save - Save the QSO being entered or edited. If the QSO hadn't been started, start it first. "
+"If the QSO is being entered, then set the end time."
+"  <li>Save & Edit - Save the QSO (as above), but continue with the QSO record open in edit mode."
+"  <li>Save & New - Save the QSO (as above) and start a new QSO."
+"  <li>Save & View - SAve the QSO (as above), but contine with the QSO record in read-only mode."
+"  <li>Save Net - Save all records in the editor view"
+"  <li>Start Net - Start a QSO, expecting it to be the first of a (say club) net."
+"  <li>Start QSO - Start a real-time (on-air) QSO. This fixes the QSO start date and time "
+"as well as data read from the rig."
+"  <li>Test Import (Query mode) - Start a search to match import record in log"
+"  <li>Update CAT - Copy data from the rig if none exist in the selected record"
+"  <li>U/d Station - Update the record using the current Location, Operator and Station Callsign"
+"  <li>View QSO - Opens the QSO record in read-only mode."
+"  <li>[Left arrow] - Select the previous record"
+"  <li>[Left arrow and bar] - Select the first record - either in the current log extract or in a net edit."
+"  <li>[Reading glass] - Search for a possible match for the query record"
+"  <li>[Reading glass] ALL.TXT - Search the WSJT-X ALL.TXT for evidence of a QSO with the query record"
+"  <li>[Reading glass] QRZ.com - Open the QRZ.com page for the callsign in the selected record"
+"  <li>[Right arrow] - select the next record."
+"  <li>[Right arrow and bar] - Select the last record"
+"</dl>"
+"</body>";
 
 // Constructor
 qso_buttons::qso_buttons(int X, int Y, int W, int H, const char* L) :
@@ -142,6 +211,30 @@ qso_buttons::~qso_buttons() {
 	save_values();
 }
 
+// Handle
+int qso_buttons::handle(int event) {
+	int result = Fl_Group::handle(event);
+	// Now handle F1 regardless
+	switch (event) {
+	case FL_FOCUS:
+		return true;
+	case FL_UNFOCUS:
+		// Acknowledge focus events to get the keyboard event
+		return true;
+	case FL_PUSH:
+		take_focus();
+		return true;
+	case FL_KEYBOARD:
+		switch (Fl::event_key()) {
+		case FL_F + 1:
+			help_viewer_->value(help_text);
+			help_viewer_->show();
+			return true;
+		}
+		break;
+	}
+	return result;
+}
 // Load settings - no actions
 void qso_buttons::load_values() {
 }

@@ -4,11 +4,37 @@
 #include "utils.h"
 
 #include <FL/Fl_Check_Button.H>
+#include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_Preferences.H>
 
 extern string VENDOR;
 extern string PROGRAM_ID;
+extern Fl_Help_Dialog* help_viewer_;
 extern Fl_Preferences::Root prefs_mode_;
+
+const char help_text[] =
+"<body>"
+"<h1>dxcc_view - An analysys of DXCCs worked</h1>"
+"<h2>Description</h2>"
+"This view provides a tabular look at the state of DXCC entities worked."
+"<h2>Features</h2>"
+"At the bottom of the view are some control check buttons."
+"The first four select the information viewed and only 1 may be selected."
+"<dl>"
+"  <li>Total - This summarises the total number of QSOs with each entity."
+"  <li>By Band - This lists the number of QSOs with each entity on each band."
+"  <li>By Mode - This lists the number of QSOs with each entity on each mode (as identified by ADIF)."
+"  <li>By Class - This lists the number of QSOs with each entity per mode class (CW, DATA, FAm and SSB)."
+"</dl>"
+"The next three check buttons filter the counts according to how the QSO has been verified."
+"Any combination of these buttons may be checked and the result an the accumulation: "
+"that is the QSOs have been verified by any of the means."
+"<dl>"
+"  <li>eQSL - The QSOs have been verified using eQSL.cc."
+"  <li>LotW - The QSOs have been verified using Logbook of the World."
+"  <li>Card - The QSOs have been verified by receiving a paper card."
+"</dl>"
+"</body>";
 
 dxcc_view::dxcc_view(int X, int Y, int W, int H, const char* L, field_app_t fo) :
 	view(),
@@ -21,6 +47,31 @@ dxcc_view::dxcc_view(int X, int Y, int W, int H, const char* L, field_app_t fo) 
 
 dxcc_view::~dxcc_view() {
     store_data();
+}
+
+// Handle
+int dxcc_view::handle(int event) {
+    int result = Fl_Group::handle(event);
+    // Now handle F1 regardless
+    switch (event) {
+    case FL_FOCUS:
+        return true;
+    case FL_UNFOCUS:
+        // Acknowledge focus events to get the keyboard event
+        return true;
+    case FL_PUSH:
+        take_focus();
+        return true;
+    case FL_KEYBOARD:
+        switch (Fl::event_key()) {
+        case FL_F + 1:
+            help_viewer_->value(help_text);
+            help_viewer_->show();
+            return true;
+        }
+        break;
+    }
+    return result;
 }
 
 void dxcc_view::create_form() {

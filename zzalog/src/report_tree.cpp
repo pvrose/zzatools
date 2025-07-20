@@ -16,6 +16,7 @@
 #include "utils.h"
 
 #include <FL/fl_draw.H>
+#include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_Preferences.H>
 
 extern book* book_;
@@ -30,7 +31,34 @@ extern tabbed_forms* tabbed_forms_;
 extern bool DARK;
 extern string VENDOR;
 extern string PROGRAM_ID;
+extern Fl_Help_Dialog* help_viewer_;
 extern Fl_Preferences::Root prefs_mode_;
+
+const char help_text[] =
+"<body>"
+"<h1>report_tree - A tree based analysis of the log</h1>"
+"<h2>Description</h2>"
+"This view shows an analysis of the log broken down into a hierarchy based on DXCC "
+"entities bands and modes worked.<P>"
+"The format is controlled by the Report-> set of menu items in the main menu."
+"<h2>Features</h2>"
+"The report may select the follwoing:"
+"<dl>"
+"  <li>All records in the log"
+"  <li>All records using the current sttaion callsign"
+"  <li>All extracted records"
+"  <li>The selected record"
+"</dl>"
+"The tree may be ordered by DXCC, band and mode in any order.<p>"
+"Clicking on a \"+\" opens up one level of the hierarchy beneath that entry.<p>"
+"Clicking on the text of an entry fully opens up the hierarchy beneath that entry.<p>"
+"The entries are colour-coded."
+"<dl>"
+"  <li><font color=green>Green</font> - indicates that at least one QSO has been verified with Logbook of the World."
+"  <li><font color=blue>Blue</font> - indicates that at least one QSO has been verified with eQSL.cc."
+"  <li><font color=red>Red</font> - indicates no QSOs have been verified on LotW or eQSL.cc."
+"</dl>"
+"</body>";
 
 // Constructor
 report_tree::report_tree(int X, int Y, int W, int H, const char* label, field_app_t app) :
@@ -102,6 +130,32 @@ void report_tree::delete_all()
 report_tree::~report_tree() {
 	delete_all();
 }
+
+// Handle
+int report_tree::handle(int event) {
+	int result = Fl_Tree::handle(event);
+	// Now handle F1 regardless
+	switch (event) {
+	case FL_FOCUS:
+		return true;
+	case FL_UNFOCUS:
+		// Acknowledge focus events to get the keyboard event
+		return true;
+	case FL_PUSH:
+		take_focus();
+		return true;
+	case FL_KEYBOARD:
+		switch (Fl::event_key()) {
+		case FL_F + 1:
+			help_viewer_->value(help_text);
+			help_viewer_->show();
+			return true;
+		}
+		break;
+	}
+	return result;
+}
+
 
 // Overloaded view update method
 void report_tree::update(hint_t hint, qso_num_t record_num_1, qso_num_t record_num_2) {

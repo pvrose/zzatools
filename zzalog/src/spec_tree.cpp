@@ -1,21 +1,21 @@
 #include "spec_tree.h"
 
-#include "utils.h"
-#include "tabbed_forms.h"
-#include "callback.h"
-#include "status.h"
 #include "band.h"
-#include "spec_data.h"
 #include "book.h"
+#include "spec_data.h"
+#include "status.h"
+#include "tabbed_forms.h"
+
+#include "callback.h"
+#include "utils.h"
 
 #include <map>
 #include <string>
 #include <vector>
 
 #include <FL/fl_draw.H>
+#include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_Preferences.H>
-
-
 
 
 extern spec_data* spec_data_;
@@ -24,10 +24,24 @@ extern status* status_;
 extern bool DARK;
 extern string VENDOR;
 extern string PROGRAM_ID;
+extern Fl_Help_Dialog* help_viewer_;
 extern Fl_Preferences::Root prefs_mode_;
+
 
 using namespace std;
 
+const char help_text[] =
+"<body>"
+"<h1>spec_tree - A tree based display of the ADIF Specification</h1>"
+"<h2>Description</h2>"
+"This view displays aspects of the ADIF Specification for reference."
+"It shows all the data types used in the specification."
+"It shows all the enumeration values used."
+"It lists all the fields available in an ADIF record."
+"<h2>Features</h2>"
+"Clicking on a \"+\" opens up one level of the hierarchy beneath that entry.<p>"
+"Clicking on the text of an entry fully opens up the hierarchy beneath that entry.<p>"
+"</body>";
 // Constructor
 spec_tree::spec_tree(int X, int Y, int W, int H, const char* label, field_app_t app) :
 	Fl_Tree(X, Y, W, H, label),
@@ -73,6 +87,32 @@ void spec_tree::update(hint_t hint, qso_num_t record_num_1, qso_num_t record_num
 		break;
 	}
 }
+
+// Handle
+int spec_tree::handle(int event) {
+	int result = Fl_Tree::handle(event);
+	// Now handle F1 regardless
+	switch (event) {
+	case FL_FOCUS:
+		return true;
+	case FL_UNFOCUS:
+		// Acknowledge focus events to get the keyboard event
+		return true;
+	case FL_PUSH:
+		take_focus();
+		return true;
+	case FL_KEYBOARD:
+		switch (Fl::event_key()) {
+		case FL_F + 1:
+			help_viewer_->value(help_text);
+			help_viewer_->show();
+			return true;
+		}
+		break;
+	}
+	return result;
+}
+
 
 // Delete the tree
 void spec_tree::delete_tree() {

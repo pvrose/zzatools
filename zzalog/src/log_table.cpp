@@ -344,6 +344,9 @@ int log_table::handle(int event) {
 		real_event = Fl::event_key();
 	}
 	switch (event) {
+	case FL_PUSH:
+		take_focus();
+		break;
 	case FL_FOCUS:
 		// Mouse coming into focus 
 		if (edit_input_->visible()) {

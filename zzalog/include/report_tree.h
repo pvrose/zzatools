@@ -62,6 +62,8 @@ template <class T> class band_map;
 		report_tree(int X, int Y, int W, int H, const char* label, field_app_t app);
 		~report_tree();
 
+		virtual int handle(int event);
+
 		// inherited from view
 		virtual void update(hint_t hint, qso_num_t record_num_1, qso_num_t record_num_2 = 0);
 		// Delete all items

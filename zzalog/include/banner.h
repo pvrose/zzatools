@@ -21,6 +21,8 @@ public:
     banner(int W, int H, const char* L = nullptr);
     ~banner();
 
+    virtual int handle(int event);
+
     void create_form();
     void enable_widgets();
 
