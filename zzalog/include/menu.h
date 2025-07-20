@@ -21,6 +21,9 @@ struct search_criteria_t;
 		menu(int X, int Y, int W, int H, const char* label = 0);
 		virtual ~menu();
 
+		// Handle F1
+		virtual int handle(int event);
+
 		// File->New
 		static void cb_mi_file_new(Fl_Widget* w, void* v);
 		// File->Open

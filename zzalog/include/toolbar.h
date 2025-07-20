@@ -20,6 +20,8 @@ typedef size_t qso_num_t;
 		toolbar(int X, int Y, int W, int H, const char* label = 0);
 		~toolbar();
 
+		virtual int handle(int event);
+
 		// Button callback - calls specific menu callback
 		static void cb_bn_menu(Fl_Widget* w, void* v);
 		// Call back for search button

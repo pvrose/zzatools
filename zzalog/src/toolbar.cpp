@@ -326,6 +326,32 @@ toolbar::~toolbar()
 	}
 }
 
+// Handle
+int toolbar::handle(int event) {
+	int result = Fl_Group::handle(event);
+	// Now handle F1 regardless
+	switch (event) {
+	case FL_FOCUS:
+		return true;
+	case FL_UNFOCUS:
+		// Acknowledge focus events to get the keyboard event
+		return true;
+	case FL_PUSH:
+		take_focus();
+		return true;
+	//case FL_KEYBOARD:
+	//	switch (Fl::event_key()) {
+	//	case FL_F + 1:
+	//		help_viewer_->value(help_text);
+	//		help_viewer_->show();
+	//		return true;
+	//	}
+	//	break;
+	}
+	return result;
+}
+
+
 // Button callback - 
 // v provides the label of the desired menu item
 void toolbar::cb_bn_menu(Fl_Widget*w, void*v) {

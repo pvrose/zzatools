@@ -45,11 +45,11 @@
 
 
 #include <FL/fl_ask.H>
-#include <FL/Fl_Native_File_Chooser.H>
-#include <FL/Fl_Menu_Item.H>
-#include <FL/Fl_Single_Window.H>
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Help_Dialog.H>
+#include <FL/Fl_Menu_Item.H>
+#include <FL/Fl_Native_File_Chooser.H>
+#include <FL/Fl_Preferences.H>
+#include <FL/Fl_Single_Window.H>
 #include <FL/Fl_Tooltip.H>
 
 
@@ -80,6 +80,8 @@ extern string default_data_directory_;
 extern string PROGRAM_ID;
 extern string VENDOR;
 extern time_t session_start_;
+
+extern Fl_Help_Dialog* help_viewer_;
 extern Fl_Preferences::Root prefs_mode_;
 
 
@@ -257,6 +259,156 @@ extern void backup_file();
 extern void restore_backup();
 extern void set_recent_file(string filename);
 
+const char help_text[] =
+"<body>"
+"<h1>menu - Main window menu</h1>"
+"<h2>Description</h2>"
+"Provides access to general application fuunctions"
+"<h2>Features</h2>"
+"<h3>Menu items</h3>"
+"<dl>"
+"<li>File - File-related actions"
+"  <dl>"
+"  <li>New - Create a new book"
+"  <li>Open - Open an existing book"
+"  <li>Read - Open an existing file as read-only"
+"  <li>Save - Save the book and continue"
+"  <li>Save As - SAve the book with a new name"
+"  <li>Close - Close the application"
+"  <li>Print Log - Print the log as it looks"
+"  <li>Recent - Opens a list of recent files that have opened"
+"  <li>Backup - Save a copy of the current log in a known place"
+"  <li>Restore - Open the saved backup"
+"  </dl>"
+"<li>Settings - Access to configuration settings"
+"  <dl>"
+"  <li>Files - Locations of pertinant files"
+"  <li>Web/Network - Access to internet-connected features"
+"  <li>Fields - Specification of which fields are used in the various features"
+"  <li>Station - Define the various station locations, operators and callsigns used in the log"
+"  <li>User Config - Allows limited user configuration of look and feel"
+"  <li>QSL Design - Allows definition of QSL designs for card labels, and e-mails"
+"  <li>Contests - Allows definition of contest algorithms"
+"  <li>All - Displays all configuration data in a tree format"
+"  </dl>"
+"<li>Windows - Control of visibility of windows"
+"  <dl>"
+"  <li>Show All - Make all active windows visible"
+"  <li>Hide All - Minimise all windows"
+"  <li>Main - Toggle vivibility of Main window"
+"  <li>Dashboard - Toggle cisibility of Operating Dashboard"
+"  <li>International Chars - Toggle visibility of the non-ASCII characater virtual keyboard"
+"  </dl>"
+"<li>Navigate - Navigate through the log-book"
+"  <dl>"
+"  <li>First - Select and display the first entry in the log"
+"  <li>Previous - Select and display the entry immediately before the current selection"
+"  <li>Next - Select and displat the entry immediately after the current selection"
+"  <li>Last - Select and display the most recent entry in the log"
+"  <li>Date - Select and display the first entry on or after the entered date"
+"  <li>Record No - Select and display the record numbered as entered"
+"  <li>Find"
+"    <dl>"
+"    <li>New - Select and display the first record matching entered callsign"
+"    <li>Next - Select and display the next record matching the above callsign"
+"    </dl>"
+"  </dl>"
+"<li>Log - Activities affecting the log"
+"  <dl>"
+"  <li>New Record - Create a new QSO - deprecated use dashboard"
+"  <li>Save Record - Save the QSO to the log - deprecated use dashboard"
+"  <li>Retime Record - Update QSO_DATE_OFF and TIME_OFF to the current time"
+"  <li>Cancel - Cancel the current QSO entry - deprecated use dashboard"
+"  <li>Delete Record - Remove the selected record from the log - deprecated use dashbaord"
+"  <li>Parse Record - Decode the call in the selected record and add relevant data to record"
+"  <li>Unparse Record - Remove fields added by parsing"
+"  <li>Reparse Record - Combination of Unparse and Parse Record"
+"  <li>Validate Record - Check all fields of the selected record are ADIF-compliant"
+"  <li>Parse Log - Do \"Parse Record\" on all records in displayed log"
+"  <li>Validate Log - Do \"Validate Record\" on all records in displayed log"
+"  <li>Suspend Save - Toggle whether the log is automatically saved after each QSO"
+"  <li>Bulk Changes - Opens a dialog to perform the same edit operation on each record in the displayed log"
+"  <li>Check Duplicates - Scans the displayed log for any records that may be duplicates"
+"  <li>Edit Header - Opens a dialog to edit the ADIF header record"
+"  <li>Session - set the current operating session - highlighted as..."
+"    <dl>"
+"    <li>Today - include all QSOs with the current date"
+"    <li>Start Session - start the session from the selected record"
+"    <li>Stop Session - "
+"    </dl>"
+"  </dl>"
+"<li>Extract - Extract records from the log, display them and undergo actions on them"
+"  <dl>"
+"  <li>Clear - clear extracted data"
+"  <li>Criteria - Opens dialog to define selection criteria, and extract records accordingly"
+"  <li>Redo - Repeat the previous extraction selection"
+"  <li>Special - Special extraction criteria"
+"    <dl>"
+"    <li>No Name - Extract records with no name"
+"    <li>No QTH - Extract records with no QTH"
+"    <li>Small Locator - Extract records with 0, 2 or 4-character gridsquare locators"
+"    <li>No Image - Extract records with no card image downloaded from eQSL.cc - takes a long time"
+"    </dl>"
+"  <li>Display - Displays a tooltip showing current extraction criteria"
+"  <li>eQSL - Extract records that need uploading to eQSL.cc"
+"  <li>LotW - Extract records that need uploading to Logbook of the World"
+"  <li>Card - Extract records that need labels printing for QSL cards"
+"  <li>e-Mail - Extract records that need response e-mailed QSLs"
+"  <li>Clublog - Extract records that need uploading to Clublog.org"
+"  <li>QRZ.com - Extract records that need uploading to QRZ.com"
+"  <li>Save - Save the extracted records as a separate ADIF file"
+"  <li>upload - Upload records extracted for that purpose - target site set by previous extract"
+"  <li>Print Cards - Print labels for records extracted for that purpose"
+"  <li>Send e-Mail - send e-mails for records extracted for that purpose"
+"  <li>Mark Sent - Mark records extracted for \"Print Cards\" and \"Send e-Mail\" as being done"
+"  <li>Download Images - Download images from eQSL.cc for extracted records"
+"  </dl>"
+"<li>Import - Import records from divers sources"
+"  <dl>"
+"  <li>File - Import (into separate data) new records from a file"
+"  <li>File (Update QSOs) - Import new data for existing records from a file"
+"  <li>File (QRZ.com) - Import data from QRZ.com for existing records"
+"  <li>Download eQSL - Download an update file from eQSL.cc"
+"  <li>Download lotW - Download an update file from Logbook of the World"
+"  <li>Download QRZ.com - Download an update file from QRZ.com"
+"  <li>Clipboard - Import records pastedto the clipboard (as ADIF text)"
+"  <li>WSJT-X UDP - Start importing records sent from WSJT-X"
+"  <li>Merge (New QSOs) - Merge imported records into current log - new records"
+"  <li>Merge (Update QSOs) - Merge imported records into current log - existing records"
+"  <li>Cancel - Remove separate import data"
+"  </dl>"
+"<li>Report - Configure the report view"
+"  <dl>"
+"  <li>Clear - Eemove data from analysis report"
+"  <li>All - Add all data from the log to the analysis report"
+"  <li>All Station - Add all data using the specified station callsign to the report"
+"  <li>Extracted - Add the extracted data to the analysis report"
+"  <li>Selected Record - Add only the selected record to the analysis report"
+"  <li>Level N - Nth level of the analysis tree (For N=1, 2 and 3)"
+"    <dl>"
+"    <li>Entities - DXCC Entities"
+"    <li>Entities/States - DXCC Entities with primary administrative subdivisions"
+"    <li>Bands - Bands"
+"    <li>Modes - Modes used"
+"    <li>Callsigns - Group records with the same callsign"
+"    <li>Custom - Allow a custom selection"
+"    </dl>"
+"  </dl>"
+"<li>Information"
+"  <dl>"
+"  <li>QRZ.com - Open the QRZ.com page for the callsign in the selected record"
+"  <li>Google Maps - Open Google maps at the location indicated by the QTH or Gridsquare in the selected record"
+"  <li>QSO Web-site - Open the web-page specified in the selected record"
+"  </dl>"
+"<li>Help"
+"  <dl>"
+"  <li>About - Opens a dialog displaying the version information of ZZALOG and component libraries"
+"  <li>User Guide - Opens the User Guide"
+"  </dl>"
+"</dl>"
+"</body>";
+
+
 // Constructor
 menu::menu(int X, int Y, int W, int H, const char* label) :
 	Fl_Menu_Bar(X, Y, W, H, label)
@@ -276,6 +428,31 @@ menu::menu(int X, int Y, int W, int H, const char* label) :
 menu::~menu()
 {
 	clear();
+}
+
+// Handle
+int menu::handle(int event) {
+	int result = Fl_Menu_Bar::handle(event);
+	// Now handle F1 regardless
+	switch (event) {
+	case FL_FOCUS:
+		return true;
+	case FL_UNFOCUS:
+		// Acknowledge focus events to get the keyboard event
+		return true;
+	case FL_PUSH:
+		take_focus();
+		return true;
+	case FL_KEYBOARD:
+		switch (Fl::event_key()) {
+		case FL_F + 1:
+			help_viewer_->value(help_text);
+			help_viewer_->show();
+			return true;
+		}
+		break;
+	}
+	return result;
 }
 
 // File->New
