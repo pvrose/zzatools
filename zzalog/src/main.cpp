@@ -1217,6 +1217,8 @@ int main(int argc, char** argv)
 
 	// Ctreate status to handle status messages
 	status_ = new status();
+	// Add Help viewer
+	help_viewer_ = new Fl_Help_Dialog;
 	// Create banner
 	banner_ = new banner(100, 100);
 	string title = PROGRAM_ID + " " + PROGRAM_VERSION;
@@ -1257,8 +1259,6 @@ int main(int argc, char** argv)
 	// Add qsl_handlers - note add_rig_if() may have added URL handler
 	add_qsl_handlers();
 	int code = 0;
-	// Add Help viewer
-	help_viewer_ = new Fl_Help_Dialog;
 	// We are now initialised
 	initialised_ = true;
 	if (!closing_) {
