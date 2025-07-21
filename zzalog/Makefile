@@ -8,7 +8,7 @@ REF_DIR := ../reference
 UG_DIR := ./userguide
 EXEC_DIR = $(BUILD_DIR)/$(BUILD_TYPE)
 INSTALL_DIR := /usr/local/bin
-APPDATA_DIR := /etc/GM3ZZA/ZZALOG
+APPDATA_DIR := /etc/fltk/GM3ZZA/ZZALOG
 
 # Standard compilers and debuggers
 CC = gcc
@@ -122,6 +122,7 @@ $(APPDATA_DIR)/html/index.html : $(UG_DIR)/html/index.html
 	@echo Copying HTML files
 	@sudo mkdir -p $(APPDATA_DIR)/html
 	@sudo cp -r $(UG_DIR)/html/* $(APPDATA_DIR)/html/
+	@sudo cp $(UG_DIR)/images/* $(APPDATA_DIR)/html/
 
 
 $(UG_DIR)/html/index.html: $(UG_DIR)/index.dox
