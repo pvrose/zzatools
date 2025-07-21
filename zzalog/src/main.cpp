@@ -1061,7 +1061,11 @@ void save_switches() {
 // file if an exception occurs while they are being saved.
 bool open_settings() {
 	// Open the settings file 
+#ifdef _WIN32
 	Fl_Preferences sys_settings(Fl_Preferences::SYSTEM_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+#else
+	Fl_Preferences sys_settings("/etc/GM3ZZA", VENDOR.c_str(), PROGRAM_ID.c_str(), Fl_Preferences::SYSTEM_L);
+#endif
 	char stemp[128];
 	if (sys_settings.getUserdataPath(stemp, sizeof(stemp))) {
 		default_data_directory_ = stemp;

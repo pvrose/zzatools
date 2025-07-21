@@ -5,9 +5,10 @@ BUILD_TYPE := Release
 BUILD_DIR := ./build
 SRC_DIRS := ./src ../widgets/src
 REF_DIR := ../reference
-UG_DIR := ./documents
+UG_DIR := ./userguide
 EXEC_DIR = $(BUILD_DIR)/$(BUILD_TYPE)
 INSTALL_DIR := /usr/local/bin
+APPDATA_DIR := /etc/GM3ZZA/ZZALOG
 
 # Standard compilers and debuggers
 CC = gcc
@@ -110,12 +111,25 @@ debug: $(EXEC_DIR)/$(TARGET_EXEC)
 clean:
 	rm -r $(BUILD_DIR)
 
-# Copy reference
-.PHONY: ref_data
-ref_data: $(REF_DIR)/all.xml $(REF_DIR)/band_plan.tsv $(REF_DIR)/intl_chars.txt $(UG_DIR)/*.pdf
-	@echo Copying reference data
-	@sudo cp $(REF_DIR)/* /etc/fltk/GM3ZZA/ZZALOG/
-	@sudo cp $(UG_DIR)/*.pdf /etc/fltk/GM3ZZA/ZZALOG/
+# Copy references
+$(APPDATA_DIR)/%: $(REF_DIR)/%
+	@echo $@
+	@sudo mkdir -p $(APPDATA_DIR)
+	@sudo cp $< $@
+
+# Copy User guide
+$(APPDATA_DIR)/html/index.html : $(UG_DIR)/html/index.html
+	@echo Copying HTML files
+	@sudo mkdir -p $(APPDATA_DIR)/html
+	@sudo cp -r $(UG_DIR)/html/* $(APPDATA_DIR)/html/
+
+
+$(UG_DIR)/html/index.html: $(UG_DIR)/index.dox
+	@echo Creating User Guide
+	@doxygen
+
+.PHONY: userguide
+userguide: $(UG_DIR)/html/index.html
 
 # force recompile
 .PHONY: touch_main
@@ -124,7 +138,7 @@ touch_main:
 
 # install
 .PHONY: install
-install: touch_main ref_data $(INSTALL_DIR)/$(TARGET_EXEC)
+install: touch_main $(APPDATA_DIR)/all.xml $(APPDATA_DIR)/band_plan.tsv $(APPDATA_DIR)/intl_chars.txt $(APPDATA_DIR)/html/index.html $(INSTALL_DIR)/$(TARGET_EXEC)
 
 $(INSTALL_DIR)/$(TARGET_EXEC): $(EXEC_DIR)/$(TARGET_EXEC)
 	@echo Installing $(INSTALL_DIR)/$(TARGET_EXEC)
