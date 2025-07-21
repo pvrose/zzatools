@@ -115,7 +115,7 @@ any card image.
 &ldquo;Rigs&rdquo;
 - Displays the status of any connected rigs.
 &ldquo;Clocks&rdquo;
-- Displays the time in UTC (GMT or Zulu) and local time.
+- Displays the time in UTC (i.e GMT or Zulu) and local time.
 &ldquo;Log&rdquo;
 - Displays the current status of the file.
 &ldquo;QSLs&rdquo;
