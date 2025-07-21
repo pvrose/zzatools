@@ -127,11 +127,11 @@ any card image.
 &ldquo;Bandplan&rdquo;
 - Displays the local bandplan information.
 More details for each pane is
-provided in<B> </B><B></B><B>Detailed User Guide</B> below.
-<DIV ID="Frame2" DIR="LTR" STYLE="float: left; width: 14.88cm; height: 17.65cm; border: none; padding: 0cm; background: #ffffff">
-	<P STYLE="margin-top: 0.21cm"><IMG SRC="UserGuide_html_2a85bca3.png" NAME="graphics5" ALIGN=LEFT WIDTH=555 BORDER=0><BR CLEAR=LEFT><I>Illustration
+provided in \ref Frame2 "Detailed User Guide".
+<a ID="Frame2">
+	<IMG SRC="UserGuide_html_2a85bca3.png" NAME="graphics5" ALIGN=LEFT WIDTH=555 BORDER=0><BR CLEAR=LEFT><I>Illustration
 	4: Dashboard view</I>
-</DIV>
+</a>
 More detail of each pane is
 provided later.
 Finally, if ZZALOG is so
