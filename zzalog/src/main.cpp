@@ -160,6 +160,7 @@ void backup_file();
 void restore_backup();
 void set_recent_file(string filename);
 void save_switches();
+void open_html(const char* file);
 
 // Flag to prevent more than one closure process at the same time
 bool closing_ = false;
@@ -190,6 +191,7 @@ uint32_t seed_ = 0;
 // Defaults config files
 string default_data_directory_ = "";
 string default_user_directory_ = "";
+string default_html_directory_ = "";
 // Preferences root - system or use
 Fl_Preferences::Root prefs_mode_;
 // Do not close banner
@@ -1064,6 +1066,7 @@ bool open_settings() {
 	if (sys_settings.getUserdataPath(stemp, sizeof(stemp))) {
 		default_data_directory_ = stemp;
 	}
+	default_html_directory_ = default_data_directory_ + "html/";
 
 	char* temp;
 	if (!sys_settings.get("Preferences Mode", temp, "")) {
@@ -1361,4 +1364,25 @@ void set_recent_file(string filename) {
 
 	}
 
+}
+
+void open_html(const char* file) {
+	// OS dependent code to open a document
+	string full_filename = default_html_directory_ + string(file);
+#ifdef _WIN32
+	HINSTANCE result = ShellExecute(NULL, "open", full_filename.c_str(), NULL, NULL, SW_SHOWNORMAL);
+	if ((intptr_t)result <= 32) {
+		char msg[128];
+		snprintf(msg, sizeof(msg), "ZZALOG: Error opening PDF. Error code: %d", (int)(intptr_t)result);
+		status_->misc_status(ST_ERROR, msg);
+	}
+#else 
+	string cmd = "xdg-open \"" + full_filename + "\"";
+	int res = system(cmd.c_str());
+	if (res != 0) {
+		char msg[128];
+		snprintf(msg, sizeof(msg), "ZZALOG: Error opening PDF. Error code: %d", res);
+		status_->misc_status(ST_ERROR, msg);
+	}
+#endif
 }
