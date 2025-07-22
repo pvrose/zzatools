@@ -140,6 +140,9 @@ void qso_data::create_form(int X, int Y) {
 	max_y = max(max_y, g_entry_->y() + g_entry_->h());
 	// Multiple QSO entry
 	g_net_entry_ = new qso_net_entry(curr_x, curr_y, 10, 10);
+	g_net_entry_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	g_net_entry_->labelfont(FL_BOLD);
+	g_net_entry_->labelsize(FL_NORMAL_SIZE + 2);
 	max_x = max(max_x, g_net_entry_->x() + g_net_entry_->w());
 	max_y = max(max_y, g_net_entry_->y() + g_net_entry_->h());
 

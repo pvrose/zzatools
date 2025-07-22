@@ -127,6 +127,8 @@ server_data_t* web_dialog::get_server(string name) {
 // Create the dialog
 void web_dialog::create_form(int X, int Y) {
 
+	box(FL_FLAT_BOX);
+
 	// Create a FL_Tabs
 	Fl_Tabs* tabs = new Fl_Tabs(X +GAP, Y + GAP, w() - GAP - GAP, h() - GAP - GAP);
 	tabs->callback(cb_tab);
@@ -188,7 +190,7 @@ void web_dialog::create_eqsl(int rx, int ry, int rw, int rh) {
 	Fl_Group* gp1 = new Fl_Group(rx, ry, rw, rh);
 	gp1->labelsize(FL_NORMAL_SIZE + 2);
 	gp1->labelfont(FL_BOLD);
-	gp1->box(FL_BORDER_BOX);
+	gp1->box(FL_FLAT_BOX);
 	gp1->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 
 	//// Row 1 Col 2 - Date last accessed
@@ -201,7 +203,7 @@ void web_dialog::create_eqsl(int rx, int ry, int rw, int rh) {
 
 	// Leave room for the eQSL enable button
 	int curr_x = rx + GAP + HBUTTON;
-	int curr_y = ry + GAP;
+	int curr_y = ry + GAP + GAP;
 
 	// Row 1 Col 4 - User entry field
 	intl_input* in1_1_4 = new intl_input(curr_x, curr_y, WSMEDIT, HBUTTON, "User");
@@ -352,7 +354,7 @@ void web_dialog::create_lotw(int rx, int ry, int rw, int rh) {
 	Fl_Group* gp2 = new Fl_Group(rx, ry, rw, rh);
 	gp2->labelsize(FL_NORMAL_SIZE + 2);
 	gp2->labelfont(FL_BOLD);
-	gp2->box(FL_BORDER_BOX);
+	gp2->box(FL_FLAT_BOX);
 	gp2->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 
 	// Row 1 Col 2 - Date last accessed
@@ -412,7 +414,7 @@ void web_dialog::create_qrz(int rx, int ry, int rw, int rh) {
 	Fl_Group* gp3 = new Fl_Group(rx, ry, rw, rh);
 	gp3->labelsize(FL_NORMAL_SIZE + 2);
 	gp3->labelfont(FL_BOLD);
-	gp3->box(FL_BORDER_BOX);
+	gp3->box(FL_FLAT_BOX);
 	gp3->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 
 	int curr_x = rx + GAP;
@@ -570,7 +572,7 @@ void web_dialog::create_club(int rx, int ry, int rw, int rh) {
 	Fl_Group* gp4 = new Fl_Group(rx, ry, rw, rh);
 	gp4->labelsize(FL_NORMAL_SIZE + 2);
 	gp4->labelfont(FL_BOLD);
-	gp4->box(FL_BORDER_BOX);
+	gp4->box(FL_FLAT_BOX);
 	gp4->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 
 
@@ -631,7 +633,7 @@ void web_dialog::create_server(int rx, int ry, int rw, int rh) {
 	Fl_Group* gp5 = new Fl_Group(rx, ry, rw, rh);
 	gp5->labelsize(FL_NORMAL_SIZE + 2);
 	gp5->labelfont(FL_BOLD);
-	gp5->box(FL_BORDER_BOX);
+	gp5->box(FL_FLAT_BOX);
 	gp5->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 
 	Fl_Check_Button* bn5_1_1 = new Fl_Check_Button(C1, R5_1, HBUTTON, HBUTTON, "En");
@@ -705,7 +707,7 @@ void web_dialog::create_email(int rx, int ry, int rw, int rh) {
 	Fl_Group* gp6 = new Fl_Group(rx, ry, rw, rh);
 	gp6->labelsize(FL_NORMAL_SIZE + 2);
 	gp6->labelfont(FL_BOLD);
-	gp6->box(FL_BORDER_BOX);
+	gp6->box(FL_FLAT_BOX);
 	gp6->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 
 	int curr_x = rx + GAP + WLABEL;
