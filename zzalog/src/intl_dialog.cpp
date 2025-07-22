@@ -5,7 +5,6 @@
 #include "menu.h"
 
 #include <FL/Fl_Button.H>
-#include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Text_Buffer.H>
@@ -18,27 +17,30 @@ extern string COPYRIGHT;
 extern string VENDOR;
 extern string PROGRAM_ID;
 extern string default_data_directory_;
-extern Fl_Help_Dialog* help_viewer_;
+extern void open_html(const char*);
 
 // Majo
 string DEFAULT_INTL = "";
 
-const char help_text[] =
-"<body>"
-"<h1>intl_dialog - Virtual keyboard for non-ASCII characters</h1>"
-"<h2>Description</h2>"
-"This dialog provides a virtual keyboard for a selection on Latin-based "
-"non-ASCII characters.<p>"
-"<h2>Features</h2>"
-"<h3>Entering a character</h3>"
-"Clicking on any button labelled with a character will paste that character into "
-"any input widget that is currently selected."
-"<h3>Adding more characters</h3>"
-"Copy any chaarcters you want to add into the text input field at the top right."
-"Then click \"Add\"."
-"To save the change, click \"Save\". Saving the changes requires administrator "
-"privileges."
-"</body>";
+/** \page intl_dialog Virtual keyboard for non-ASCII characters
+\section description Description
+This dialog provides a virtual keyboard for a selection on Latin-based 
+non-ASCII characters.
+
+<IMG SRC="../images/intl_dialog_1.png">
+
+\section features Features
+\subsection paste Entering a character
+Clicking on any button labelled with a character will paste that character into 
+the input widget that is currently selected.
+
+\subsection addition Adding more characters
+Copy any chaarcters you want to add into the text input field at the top right.
+Then click "Add".
+To save the change, click "Save". Saving the changes requires administrator 
+privileges.
+
+*/
 
 // Constructs a window 
 intl_dialog::intl_dialog() :
@@ -177,8 +179,7 @@ int intl_dialog::handle(int event) {
 	case FL_KEYBOARD:
 		switch (Fl::event_key()) {
 		case FL_F + 1:
-			help_viewer_->value(help_text);
-			help_viewer_->show();
+			open_html("intl_dialof.html");
 			return true;
 		}
 		break;

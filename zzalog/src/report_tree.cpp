@@ -16,7 +16,6 @@
 #include "utils.h"
 
 #include <FL/fl_draw.H>
-#include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_Preferences.H>
 
 extern book* book_;
@@ -31,34 +30,45 @@ extern tabbed_forms* tabbed_forms_;
 extern bool DARK;
 extern string VENDOR;
 extern string PROGRAM_ID;
-extern Fl_Help_Dialog* help_viewer_;
 extern Fl_Preferences::Root prefs_mode_;
+extern void open_html(const char*);
 
-const char help_text[] =
-"<body>"
-"<h1>report_tree - A tree based analysis of the log</h1>"
-"<h2>Description</h2>"
-"This view shows an analysis of the log broken down into a hierarchy based on DXCC "
-"entities bands and modes worked.<P>"
-"The format is controlled by the Report-> set of menu items in the main menu."
-"<h2>Features</h2>"
-"The report may select the follwoing:"
-"<dl>"
-"  <li>All records in the log"
-"  <li>All records using the current sttaion callsign"
-"  <li>All extracted records"
-"  <li>The selected record"
-"</dl>"
-"The tree may be ordered by DXCC, band and mode in any order.<p>"
-"Clicking on a \"+\" opens up one level of the hierarchy beneath that entry.<p>"
-"Clicking on the text of an entry fully opens up the hierarchy beneath that entry.<p>"
-"The entries are colour-coded."
-"<dl>"
-"  <li><font color=green>Green</font> - indicates that at least one QSO has been verified with Logbook of the World."
-"  <li><font color=blue>Blue</font> - indicates that at least one QSO has been verified with eQSL.cc."
-"  <li><font color=red>Red</font> - indicates no QSOs have been verified on LotW or eQSL.cc."
-"</dl>"
-"</body>";
+/** \page report_tree Analysis of the log
+
+\section description Description
+
+This view shows an analysis of the log broken down into a hierarchy based on DXCC 
+entities bands and modes worked.
+The format is controlled by the Report-> set of menu items in the main menu.
+
+<IMG SRC="../images/report_tree_1.png">
+
+/section features Features
+
+The report may select the following:
+
+- All records in the log
+- All records using the current sttaion callsign
+- All extracted records
+- The selected record
+
+The tree may be ordered by DXCC, band and mode in any order.
+
+Clicking on a "+" opens up one level of the hierarchy beneath that entry.
+
+<IMG SRC="../images/report_tree_2.png">
+
+Clicking on the text of an entry fully opens up the hierarchy beneath that entry.
+
+<IMG SRC="../images/report_tree_3.png">
+
+The entries are colour-coded.
+
+- Green - indicates that at least one QSO has been verified with Logbook of the World.
+- Blue - indicates that at least one QSO has been verified with eQSL.cc.
+- Red - indicates no QSOs have been verified on LotW or eQSL.cc.
+
+*/
 
 // Constructor
 report_tree::report_tree(int X, int Y, int W, int H, const char* label, field_app_t app) :
@@ -147,8 +157,7 @@ int report_tree::handle(int event) {
 	case FL_KEYBOARD:
 		switch (Fl::event_key()) {
 		case FL_F + 1:
-			help_viewer_->value(help_text);
-			help_viewer_->show();
+			open_html("report_tree.html");
 			return true;
 		}
 		break;

@@ -27,10 +27,10 @@ extern string PROGRAM_ID;
 extern string PROGRAM_VERSION;
 extern string CONTACT;
 extern string COPYRIGHT;
-extern Fl_Help_Dialog* help_viewer_;
 extern Fl_PNG_Image main_icon_;
 extern status* status_;
 extern ticker* ticker_;
+extern void open_html(const char*);
 
 const int NUMBER_STYLES = 10;
 const Fl_Text_Display::Style_Table_Entry style_table_[NUMBER_STYLES] = {
@@ -46,38 +46,51 @@ const Fl_Text_Display::Style_Table_Entry style_table_[NUMBER_STYLES] = {
 	{ STATUS_COLOURS.at(ST_FATAL).fg, FL_COURIER, FL_NORMAL_SIZE, Fl_Text_Display::ATTR_BGCOLOR, STATUS_COLOURS.at(ST_FATAL).bg }
 };
 
-const char help_text[] =
-"<body>"
-"<h1>banner - Progress banner</h1>"
-"<h2>Description</h2>"
-"Displays any status messages and progress reports output by ZZALOG."
-"<h2>Features</h2>"
-"This window comprises from top to bottom.<p>"
-"This displays the status messages output by ZZALOG that are at most of warning severity."
-"Only the last message output is displayed here.<p>"
-"The second displays status messages that are of error severity or higher."
-"Again only the last such message is output here.<p>"
-"The third comprises three items. Firstly a text output showing a progress message output by ZZALOG."
-"Below this is a numeric representation of progress - e.g. \"1096 out of 2677 bytes.\""
-"On the left is a graphical representation in the form of a clock dial, showing "
-"proportion complete. The clock-dial is colour-coded indicating the activity being progressed."
-"<h3>Displaying the whole report.</h3>"
-"Bottom left of the window is the button marked \"Full\"."
-"Clicking this toggles the display of the full status.<p>"
-"Messages are colour-coded according to severity."
-"<dl>"
-"  <li>Blue - lowest severity"
-"  <li>Light blue - Messages to be logged for information"
-"  <li>Light magenta - Messages added for debug purposes"
-"  <li>Light cyan - Message logged as notes"
-"  <li>Grey - Messages logged for progress"
-"  <li>Light green - message logged indicating completion of an activity"
-"  <li>Yellow - message logged as a warning"
-"  <li>Red on black - message logged as an error - processing can continue"
-"  <li>Red on white - message logged as a severe error - processing is stopped"
-"  <li>Black on red - message logged as a fatal error - processing is stopeed"
-"</dl>"
-"</body>";
+/** \page banner Application Status Banner
+\section description Description
+Displays any status messages and progress reports output by ZZALOG.
+
+<IMG SRC="../images/banner_1.png">
+
+\section features Features
+This window comprises from top to bottom.
+
+This displays the status messages output by ZZALOG that are at most of warning severity.
+Only the last message output is displayed here.
+
+<IMG SRC="../images/banner_2.png">
+
+The second displays status messages that are of error severity or higher.
+Again only the last such message is output here.
+
+<IMG SRC="../images/banner_3.png">
+
+The third comprises three items. Firstly a text output showing a progress message output by ZZALOG.
+Below this is a numeric representation of progress
+On the left is a graphical representation in the form of a clock dial, showing 
+proportion complete. The clock-dial is colour-coded indicating the activity being progressed.
+
+<IMG SRC="../images/banner_4.png">
+
+\subsection full Displaying the whole report.
+Bottom left of the window is the button marked "Full"
+Clicking this toggles the display of the full status.
+
+<IMG SRC="../images/banner_5.png">
+
+Messages are colour-coded according to severity.
+- Blue - lowest severity
+- Light blue - Messages to be logged for information
+- Light magenta - Messages added for debug purposes
+- Light cyan - Message logged as notes
+- Grey - Messages logged for progress
+- Light green - message logged indicating completion of an activity
+- Yellow - message logged as a warning
+- Red on black - message logged as an error - processing can continue
+- Red on white - message logged as a severe error - processing is stopped
+- Black on red - message logged as a fatal error - processing is stopeed
+
+*/
 
 std::thread::id main_thread_id_ = std::this_thread::get_id();
 
@@ -114,8 +127,7 @@ int banner::handle(int event) {
 	case FL_KEYBOARD:
 		switch (Fl::event_key()) {
 		case FL_F + 1:
-			help_viewer_->value(help_text);
-			help_viewer_->show();
+			open_html("banner.html");
 			return true;
 		}
 		break;
