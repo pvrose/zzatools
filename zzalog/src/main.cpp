@@ -61,7 +61,6 @@ main.cpp - application entry point
 // FLTK header files
 #include <FL/Fl.H>
 #include <FL/Fl_Box.H>
-#include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_Menu_Item.H>
 #include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Fl_PNG_Image.H>
@@ -152,8 +151,6 @@ wx_handler* wx_handler_ = nullptr;
 
 // Recent files opened
 list<string> recent_files_;
-
-Fl_Help_Dialog* help_viewer_ = nullptr;
 
 // Forward declarations
 void backup_file();
@@ -1221,8 +1218,6 @@ int main(int argc, char** argv)
 
 	// Ctreate status to handle status messages
 	status_ = new status();
-	// Add Help viewer
-	help_viewer_ = new Fl_Help_Dialog;
 	// Create banner
 	banner_ = new banner(100, 100);
 	string title = PROGRAM_ID + " " + PROGRAM_VERSION;

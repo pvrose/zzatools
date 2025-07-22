@@ -7,6 +7,7 @@
 - \ref page_5
   - \ref main_window
   - \ref qso_manager
+  - \ref banner
   - \ref intl_dialog
   - \ref config
   - \ref search_dialog
@@ -310,23 +311,13 @@ the logging and removes the QSO from the log.
 
 The aplication provides a number of windows:
 
-- \ref main Main Window: This contains the main menu, a toolbar and a set of views. 
-These views offer log-book style views of the whole book and various other sets of QSOs;
-an ADIF reference; and analyses of the log-book. 
-  - \ref menu
-  - \ref toolbar
-  - \ref log_table
-  - \ref spec_tree
-  - \ref report_tree
-  - \ref dxcc_view
-- \ref qso_manager Dashboard: This provides all the interaction necessary for running QSOs 
-and managing the data within the log-book.
-  - \ref qso_operation
-  - \ref qso_entry
-  - \ref qso_browse
-  - \ref qso_query
-  - \ref qso_netentry
-  - ...etc the rest.
+- \ref main_window
+- \ref qso_manager
+- \ref banner
+- \ref intl_dialog
+- \ref config
+- \ref search_dialog
+- \ref change_dialog
 
 
 

@@ -24,24 +24,35 @@ extern status* status_;
 extern bool DARK;
 extern string VENDOR;
 extern string PROGRAM_ID;
-extern Fl_Help_Dialog* help_viewer_;
 extern Fl_Preferences::Root prefs_mode_;
+extern void open_html(const char*);
 
 
 using namespace std;
 
-const char help_text[] =
-"<body>"
-"<h1>spec_tree - A tree based display of the ADIF Specification</h1>"
-"<h2>Description</h2>"
-"This view displays aspects of the ADIF Specification for reference."
-"It shows all the data types used in the specification."
-"It shows all the enumeration values used."
-"It lists all the fields available in an ADIF record."
-"<h2>Features</h2>"
-"Clicking on a \"+\" opens up one level of the hierarchy beneath that entry.<p>"
-"Clicking on the text of an entry fully opens up the hierarchy beneath that entry.<p>"
-"</body>";
+/** \page spec_tree ADIF Information
+
+\section description Description
+
+This view displays aspects of the ADIF Specification for reference.
+It shows all the data types used in the specification.
+It shows all the enumeration values used.
+It lists all the fields available in an ADIF record.
+
+<IMG SRC="../images/spec_tree_1.png">
+
+\secion features Features
+
+Clicking on a "+" opens up one level of the hierarchy beneath that entry.
+
+<IMG SRC="../images/spec_tree_2.png">
+
+Clicking on the text of an entry fully opens up the hierarchy beneath that entry.
+
+<IMG SRC="../images/spec_tree_3.png">
+
+*/
+
 // Constructor
 spec_tree::spec_tree(int X, int Y, int W, int H, const char* label, field_app_t app) :
 	Fl_Tree(X, Y, W, H, label),
@@ -104,8 +115,7 @@ int spec_tree::handle(int event) {
 	case FL_KEYBOARD:
 		switch (Fl::event_key()) {
 		case FL_F + 1:
-			help_viewer_->value(help_text);
-			help_viewer_->show();
+			open_html("spec_tree.html");
 			return true;
 		}
 		break;
