@@ -9,6 +9,17 @@
 
 extern status* status_;
 extern book* book_;
+extern void open_html(const char*);
+
+/** \page qso_net_entry Entry of Concurrent QSOs (Net)
+
+\section description Description
+
+This pane enables the entry of concurrent QSOs.
+
+<IMG SRC="../images/qso_net_entry_1.png">
+
+*/
 
 // Constructor
 qso_net_entry::qso_net_entry(int X, int Y, int W, int H, const char* L) :
@@ -21,6 +32,30 @@ qso_net_entry::qso_net_entry(int X, int Y, int W, int H, const char* L) :
 // Destructor
 qso_net_entry::~qso_net_entry() {
 	save_values();
+}
+
+// Handle
+int qso_net_entry::handle(int event) {
+	int result = Fl_Group::handle(event);
+	// Now handle F1 regardless
+	switch (event) {
+	case FL_FOCUS:
+		return true;
+	case FL_UNFOCUS:
+		// Acknowledge focus events to get the keyboard event
+		return true;
+	case FL_PUSH:
+		take_focus();
+		return true;
+	case FL_KEYBOARD:
+		switch (Fl::event_key()) {
+		case FL_F + 1:
+			open_html("qso_net_entry.html");
+			return true;
+		}
+		break;
+	}
+	return result;
 }
 
 // get settings

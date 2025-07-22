@@ -19,6 +19,8 @@ public:
     qso_net_entry(int X, int Y, int W, int H, const char* L = nullptr);
     ~qso_net_entry();
 
+	virtual int handle(int event);
+
 	// Call back for entries
 	static void cb_entries(Fl_Widget* w, void* v);
 
