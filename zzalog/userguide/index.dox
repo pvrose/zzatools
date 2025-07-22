@@ -5,8 +5,12 @@
 - \ref page_3
 - \ref page_4
 - \ref page_5
-  - Main Window
-    - \ref menu
+  - \ref main_window
+  - \ref qso_manager
+  - \ref intl_dialog
+  - \ref config
+  - \ref search_dialog
+  - \ref change_dialog
 
 \page page_1 Introduction
 
@@ -19,7 +23,7 @@ that provides the following functionality:
 - Allows the real-time and
 	off-line entry of QSO records.
 - Allows the user to monitor
-	&ldquo;worked-before&rdquo; status in real-time.
+	"worked-before" status in real-time.
 - Exchanges data with QSL
 	web-sites such as eQSL.cc and Logbook of the World.
 - Tracks the status of
@@ -39,10 +43,10 @@ support for all Unicode characters coded in UTF-8 format. Exchange of
 such data with other applications may result in errors.
 This document can be opened at
 any time from the menu:
-<DIV ID="Frame15" DIR="LTR" STYLE="float: left; width: 13.97cm; height: 2.8cm; border: none; padding: 0cm; background: #ffffff">
-	<P STYLE="margin-top: 0.21cm"><IMG SRC="UserGuide_html_m6467ee96.png" NAME="graphics16" ALIGN=LEFT WIDTH=528 BORDER=0><BR CLEAR=LEFT><I>Illustration
+<A ID="Frame15">
+	<IMG SRC="../images/UserGuide_html_m6467ee96.png" NAME="graphics16" ALIGN=LEFT WIDTH=528 BORDER=0><BR CLEAR=LEFT><I>Illustration
 	1: Opening this document from the menu</I>
-</DIV><BR CLEAR=LEFT>
+</A>
 
 
 \page page_2 Installation
@@ -56,109 +60,106 @@ for Windows and Linux environments.
 
 \page page_3 Quick-start Guide
 
-\section starting Starting ZZALOG</H2>
+\section starting Starting ZZALOG
 On Windows, ZZALOG may be started
 by double clicking on the icon. It may also be started from a
 terminal by advanced users.
 On starting, a banner window is
 displayed:
-<DIV ID="Frame14" DIR="LTR" STYLE="float: left; width: 11.59cm; height: 4.96cm; border: none; padding: 0cm; background: #ffffff">
-	<P STYLE="margin-top: 0.21cm"><IMG SRC="UserGuide_html_414f707a.png" NAME="graphics2" ALIGN=LEFT WIDTH=410 BORDER=0><BR CLEAR=LEFT><I>Illustration
+
+<A ID="Frame14">
+	<IMG SRC="../images/UserGuide_html_414f707a.png" NAME="graphics2" ALIGN=LEFT WIDTH=410 BORDER=0><BR CLEAR=LEFT><I>Illustration
 	2: Banner</I>
-</DIV>
-Illustration 2: Banner shows the
+</A>
+
+\ref Frame14 "Illustration 2: Banner" shows the
 progress of the application as it is loading all the data needed to
 run. This window shows the latest message output, the latest error
 message output and the progress of each stage. In the above image,
 the application is reading in the latest callsign parsing information
 file and the banner shows the progress in numerical form and in a
-clock dial form. The &ldquo;Full&rdquo; button, when clicked, expands
+clock dial form. The "Full" button, when clicked, expands
 the display to show a scrollable output of all the messages output. 
 
 Once ZZALOG has loaded then two
 or three more windows are displayed. Firstly there is a log-book
 style view of the log data:
-<DIV ID="Frame1" DIR="LTR" STYLE="float: left; width: 16.5cm; height: 10.16cm; border: none; padding: 0cm; background: #ffffff">
-	<P STYLE="margin-top: 0.21cm"><IMG SRC="UserGuide_html_4a79518e.png" NAME="graphics3" ALIGN=LEFT WIDTH=624 BORDER=0><BR CLEAR=LEFT><I>Illustration
+
+<A ID="Frame1">
+	<IMG SRC="../images/UserGuide_html_4a79518e.png" NAME="graphics3" ALIGN=LEFT WIDTH=624 BORDER=0><BR CLEAR=LEFT><I>Illustration
 	3: Log-book view</I>
-</DIV>
-In <B>Illustration 3: Log-book view</B>
+</A>
+
+In \ref Frame1 "Illustration 3: Log-book view"
 a page of the log-book showing the most recent entries is
 displayed. In this view the data that is presented can be configured
 by selecting different fields to be displayed. The data can be
 displayed either in chronological order or in reverse chronological
-order. More information about this window is provided in<B> </B><B></B><B>Detailed User Guide</B>
+order. More information about this window is provided in \ref page_5 "Application Details".
 below.
 Secondly, a dashboard view is
-available: in <B>Illustration 4: Dashboard view</B> ZZALOG provides
+available: in \ref Frame2 "Illustration 4: Dashboard view" ZZALOG provides
 the user with the ability to enter new QSOs, edit existing QSOs,
 browse the log and manage all the data exchange functionality.
 Briefly, the various panes in this window show:
-&ldquo;Station&rdquo;
--  Location, operator and callsign of current operation.
-&ldquo;QSO
-Entry&rdquo; - Viewing and editing pane for QSO records. In come
-operations this is replaced by a &ldquo;QSO Query&rdquo; or &ldquo;QSO
-Browse&rdquo; view.
-&ldquo;Previous&rdquo;
-- Displays any previous QSOs with the entered callsign.
-&ldquo;DX?&rdquo;
-- Shows the &ldquo;worked-before&rdquo; status of the DXCC entity
+- "Station": Location, operator and callsign of current operation.
+- "QSO Entry": Viewing and editing pane for QSO records. In come
+operations this is replaced by a "QSO Query" or "QSO
+Browse" view.
+- "Previous": Displays any previous QSOs with the entered callsign.
+- "DX?": Shows the "worked-before" status of the DXCC entity
 etc.
-&ldquo;QSL&rdquo;
-- Displays the QSL status for this QSO &ndash; including displaying
+- "QSL": Displays the QSL status for this QSO &ndash; including displaying
 any card image.
-&ldquo;Contest&rdquo;
-- Is used for contest operating.
-&ldquo;Controls&rdquo;
-- Displays all the operations available in the current state.
-&ldquo;Rigs&rdquo;
-- Displays the status of any connected rigs.
-&ldquo;Clocks&rdquo;
-- Displays the time in UTC (i.e GMT or Zulu) and local time.
-&ldquo;Log&rdquo;
-- Displays the current status of the file.
-&ldquo;QSLs&rdquo;
-- Allows the control of data exchange with on-line QSL services.
-&ldquo;Apps&rdquo;
-- Provides control of other applications such as digital modems.
-&ldquo;WX&rdquo;
-- Displays the local weather obtained from openweather.org.
-&ldquo;Bandplan&rdquo;
-- Displays the local bandplan information.
+- "Contest": Is used for contest operating.
+- "Controls": Displays all the operations available in the current state.
+- "Rigs": Displays the status of any connected rigs.
+- "Clocks": Displays the time in UTC (i.e GMT or Zulu) and local time.
+- "Log": Displays the current status of the file.
+- "QSLs": Allows the control of data exchange with on-line QSL services.
+- "Apps": Provides control of other applications such as digital modems.
+- "WX": Displays the local weather obtained from openweather.org.
+- "Bandplan": Displays the local bandplan information.
+
 More details for each pane is
 provided in \ref Frame2 "Detailed User Guide".
+
 <a ID="Frame2">
-	<IMG SRC="UserGuide_html_2a85bca3.png" NAME="graphics5" ALIGN=LEFT WIDTH=555 BORDER=0><BR CLEAR=LEFT><I>Illustration
+	<IMG SRC="../images/UserGuide_html_2a85bca3.png" NAME="graphics5" ALIGN=LEFT WIDTH=555 BORDER=0><BR CLEAR=LEFT><I>Illustration
 	4: Dashboard view</I>
 </a>
+
 More detail of each pane is
 provided later.
 Finally, if ZZALOG is so
 configured, a third window is displayed. This is used, for example,
 for a club operation where the information about individual operators
 is required:
-<DIV ID="Frame3" DIR="LTR" STYLE="float: left; width: 15.9cm; height: 13.97cm; border: none; padding: 0cm; background: #ffffff">
-	<P STYLE="margin-top: 0.21cm"><IMG SRC="UserGuide_html_5e16a7e3.png" NAME="graphics4" ALIGN=LEFT WIDTH=601 BORDER=0><BR CLEAR=LEFT><I>Illustration
+
+<A ID="Frame3">
+	<IMG SRC="../images/UserGuide_html_5e16a7e3.png" NAME="graphics4" ALIGN=LEFT WIDTH=601 BORDER=0><BR CLEAR=LEFT><I>Illustration
 	5: Operator selection</I>
-</DIV>
-In <B>Illustration 5: Operator selection</B>
+</A>
+
+In \ref Frame3 "Illustration 5: Operator selection"
 the user is being asked to identify themselves. The field labeled
-&ldquo;Id&rdquo; has a drop-down menu so that the user can select
+"Id" has a drop-down menu so that the user can select
 themselves or if not listed type in their initials (or callsign
 suffix). The user can then enter their name and callsign if mandated
-by the station policy. In <B>Illustration 6: Filled in operator details</B>
+by the station policy. In \ref Frame4 "Illustration 6: Filled in operator details"
 below this information has been filled in.
-<DIV ID="Frame4" DIR="LTR" STYLE="float: left; width: 6.64cm; height: 3.73cm; border: none; padding: 0cm; background: #ffffff">
-	<P STYLE="margin-top: 0.21cm"><IMG SRC="UserGuide_html_m26e6c1cd.png" NAME="graphics6" ALIGN=LEFT WIDTH=251 BORDER=0><BR CLEAR=LEFT><I>Illustration
+
+<A ID="Frame4">
+	<IMG SRC="../images/UserGuide_html_m26e6c1cd.png" NAME="graphics6" ALIGN=LEFT WIDTH=251 BORDER=0><BR CLEAR=LEFT><I>Illustration
 	6: Filled in operator details</I>
-</DIV>
+</A>
+
 To start operating we shall need
 to connect to a rig.
 
 \page page_4 Operating
 
-\section conn_rig Connecting to a rig.</H2>
+\section conn_rig Connecting to a rig.
 ZZALOG uses the hamlib library
 for its rig connectivity. The hamlib library is an suite of procedure
 calls that provides a common interface for most rigs' CAT interfaces.
@@ -172,21 +173,22 @@ ZZALOG can provide a means of
 starting this helper application, which requires the use of scripts.
 The rest of this page assumes that Flrig has been launched. 
 
-<DIV ID="Frame5" DIR="LTR" STYLE="float: left; width: 5.74cm; height: 8.47cm; border: none; padding: 0cm; background: #ffffff">
-	<P STYLE="margin-top: 0.21cm"><IMG SRC="UserGuide_html_m4911387.png" NAME="graphics7" ALIGN=LEFT WIDTH=217 BORDER=0><BR CLEAR=LEFT><I>Illustration
+<A ID="Frame5">
+	<IMG SRC="../images/UserGuide_html_m4911387.png" NAME="graphics7" ALIGN=LEFT WIDTH=217 BORDER=0><BR CLEAR=LEFT><I>Illustration
 	7: Rig control</I>
-</DIV>
+</A>
+
 In the
-bottom left of the dashboard is <B>Illustration 7: Rig control</B>
+bottom left of the dashboard is \ref Frame5 "Illustration 7: Rig control"
 screen. The user should select the rig that they are interested in.
-In this case an ICOM IC-7300. The &ldquo;Start&rdquo; button will
+In this case an ICOM IC-7300. The "Start" button will
 lunch a script, if written, to open up the FLRig application. The
-&ldquo;Select&rdquo; button allows configuration of the interface.
-These two features will be described is provided in<B> </B><B></B><B>Detailed User Guide</B>
+"Select" button allows configuration of the interface.
+These two features will be described is provided in \ref page_5 "Application Details".
 below.
 
-Assuming that FLRig has been launched then clicking the &ldquo;Connect&rdquo;
-button will connect to that application. <B>Illustration 8: FLRig connected</B>
+Assuming that FLRig has been launched then clicking the "Connect"
+button will connect to that application. \ref Frame6 "Illustration 8: FLRig connected"
 shows ZZALOG connected to FLRig and the latter's display alongside.
 ZZALOG is showing the same frequency, mode, TX power and S-meter
 reading as FLRig, and as the rig itself. ZZALOG will normally show
@@ -194,106 +196,137 @@ the highest S-meter and TX power meter readings over the most recent
 few polls of the rig, and retain the last S-meter reading from a RX
 period and the last TX Power reading from a TX period.
 Note
-that the &ldquo;Connect&rdquo; button has become a &ldquo;Disconnect&rdquo;
+that the "Connect" button has become a "Disconnect"
 button.
-<DIV ID="Frame6" DIR="LTR" STYLE="float: left; width: 17cm; height: 9.24cm; border: none; padding: 0cm; background: #ffffff">
-	<P STYLE="margin-top: 0.21cm"><IMG SRC="UserGuide_html_me4bb4f5.png" NAME="graphics8" ALIGN=LEFT WIDTH=643 BORDER=0><BR CLEAR=LEFT><I>Illustration
+
+<A ID="Frame6">
+	<IMG SRC="../images/UserGuide_html_me4bb4f5.png" NAME="graphics8" ALIGN=LEFT WIDTH=643 BORDER=0><BR CLEAR=LEFT><I>Illustration
 	8: FLRig connected</I>
-</DIV>
-\section oper Operating</H2>
+</A>
+
+\section oper Operating
 To operate, the user must place
 ZZALOG into the correct mode. This is achieved by clicking the
-&ldquo;Activate&rdquo; button on the &ldquo;Controls&rdquo; page &ndash;
-see <B>Illustration 4: Dashboard view</B>. This changes the &ldquo;QSO
-Entry&rdquo; page:
-<DIV ID="Frame7" DIR="LTR" STYLE="float: left; width: 11.3cm; height: 11.2cm; border: none; padding: 0cm; background: #ffffff">
-	<P STYLE="margin-top: 0.21cm"><IMG SRC="UserGuide_html_m4c6cfb94.png" NAME="graphics9" ALIGN=LEFT WIDTH=384 BORDER=0><BR CLEAR=LEFT><I>Illustration
-	9: Dashboard ready for operation (&ldquo;Active&rdquo;)</I>
-</DIV>
-Illustration 9: Dashboard ready for operation (&ldquo;Active&rdquo;)
-shows the &ldquo;QSO Entry&rdquo; page ready for entry. All the
+"Activate" button on the "Controls" page &ndash;
+see \ref Frame3 "Illustration 4: Dashboard view". This changes the "QSO
+Entry" page:
+
+<A ID="Frame7">
+	<IMG SRC="../images/UserGuide_html_m4c6cfb94.png" NAME="graphics9" ALIGN=LEFT WIDTH=384 BORDER=0><BR CLEAR=LEFT><I>Illustration
+	9: Dashboard ready for operation ("Active")</I>
+</A>
+
+\ref Frame7 "Illustration 9: Dashboard ready for operation (Active)"
+shows the "QSO Entry" page ready for entry. All the
 fields shown may be swapped for other fields by selecting the
 drop-down arrow alongside each. Each field has an associated data
 entry widget: for some of these the drop-down arrow opens up a menu
 of possible values:
-<DIV ID="Frame8" DIR="LTR" STYLE="float: left; width: 5.79cm; height: 3.65cm; border: none; padding: 0cm; background: #ffffff">
-	<P STYLE="margin-top: 0.21cm"><IMG SRC="UserGuide_html_557fd7e5.png" NAME="graphics10" ALIGN=LEFT WIDTH=219 BORDER=0><BR CLEAR=LEFT><I>Illustration
-	10: Menu of choices</I>
-</DIV>
-<DIV ID="Frame9" DIR="LTR" STYLE="float: left; width: 5.58cm; height: 3.57cm; border: none; padding: 0cm; background: #ffffff">
-	<P STYLE="margin-top: 0.21cm"><IMG SRC="UserGuide_html_m6ae6db20.png" NAME="graphics11" ALIGN=LEFT WIDTH=211 BORDER=0><BR CLEAR=LEFT><I>Illustration
-	11: Menu of formats</I>
-</DIV>
 
-Illustration 10: Menu of choices
-and <B>Illustration 11: Menu of formats</B><B> </B>show examples of
+<A ID="Frame8">
+	<IMG SRC="../images/UserGuide_html_557fd7e5.png" NAME="graphics10"><I>Illustration
+	10: Menu of choices</I>
+</A>
+<A ID="Frame9">
+	<IMG SRC="../images/UserGuide_html_m6ae6db20.png" NAME="graphics11"><I>Illustration
+	11: Menu of formats</I>
+</A>
+
+\ref Frame8 "Illustration 10: Menu of choices"
+and \ref Frame9 "Illustration 11: Menu of formats" how examples of
 this selection.
 At this point it is also possible
-to check on the &ldquo;worked-before&rdquo; status of a call. Typing
+to check on the "worked-before" status of a call. Typing
 in a callsign that has been copied will result in that call being
 checked against the history contained in the log. Examples are below:
-<DIV ID="Frame10" DIR="LTR" STYLE="float: left; width: 15.24cm; height: 7.03cm; border: none; padding: 0cm; background: #ffffff">
-	<P STYLE="margin-top: 0.21cm"><IMG SRC="UserGuide_html_ab32828.png" NAME="graphics12" ALIGN=LEFT WIDTH=576 BORDER=0><BR CLEAR=LEFT><I>Illustration
+
+<A ID="Frame10">
+	<IMG SRC="../images/UserGuide_html_ab32828.png" NAME="graphics12" ALIGN=LEFT WIDTH=576 BORDER=0><BR CLEAR=LEFT><I>Illustration
 	12: Checking &quot;worked-before&quot; status for a call</I>
-</DIV>
-Illustration 12: Checking &quot;worked-before&quot; status for a call
+</A>
+
+\ref Frame10 "Illustration 12: Checking &quot;worked-before&quot; status for a call"
 shows the callsign being checked. In this case the station has been
 worked before but not on the band on the rig (10m &ndash; whereas
 they were worked before on 40m) or on the mode (FT8 versus CW).
-Illustration 13: Checking &quot;worked-before&quot; status for a DXCC entity
+\ref Frame11 "Illustration 13: Checking &quot;worked-before&quot; status for a DXCC entity"
 shows the call being decoded as in DXCC Suriname, continent SA (South
 America) and CQ Zone 9. All three of these have been worked before,
 but this shows that Suriname is a new DXCC on 10m and also on CW.
 Similarly for CQ Zone 9. South America has been worked on 10m but is
 a new continent on CW. As the Locator (Gridsquare) information has
 not been supplied, it cannot be checked.
-<DIV ID="Frame11" DIR="LTR" STYLE="float: left; width: 15.18cm; height: 7.43cm; border: none; padding: 0cm; background: #ffffff">
-	<P STYLE="margin-top: 0.21cm"><IMG SRC="UserGuide_html_m75dc8f06.png" NAME="graphics13" ALIGN=LEFT WIDTH=574 BORDER=0><BR CLEAR=LEFT><I>Illustration
+
+<A ID="Frame11">
+	<IMG SRC="../images/UserGuide_html_m75dc8f06.png" NAME="graphics13" ALIGN=LEFT WIDTH=574 BORDER=0><BR CLEAR=LEFT><I>Illustration
 	13: Checking &quot;worked-before&quot; status for a DXCC entity</I>
-</DIV>
-<H2>Logging the QSO</H2>
-<DIV ID="Frame12" DIR="LTR" STYLE="float: left; width: 16.5cm; height: 1.97cm; border: none; padding: 0cm; background: #ffffff">
-	<P STYLE="margin-top: 0.21cm"><IMG SRC="UserGuide_html_m112f565d.png" NAME="graphics14" ALIGN=LEFT WIDTH=624 BORDER=0><BR CLEAR=LEFT><I>Illustration
+</A>
+
+\section qs_logging "Logging the QSO"
+
+<A ID="Frame12">
+	<IMG SRC="../images/UserGuide_html_m112f565d.png" NAME="graphics14" ALIGN=LEFT WIDTH=624 BORDER=0><BR CLEAR=LEFT><I>Illustration
 	14: Commands in &quot;Active&quot; state</I>
-</DIV>
-In the &ldquo;Active&rdquo; state
+</A>
+
+In the "Active" state
 the commands available are:
-&ldquo;Start QSO&rdquo; - moves
-ZZALOG to &ldquo;Enter QSO&rdquo; state with any details already
+"Start QSO" - moves
+ZZALOG to "Enter QSO" state with any details already
 typed in are kept.
-&ldquo;Add QSO&rdquo; - will
+"Add QSO" - will
 start logging a QSO that has already occurred.
-&ldquo;Edit QSO&rdquo; - will
+"Edit QSO" - will
 enable editing a QSO that has already been logged.
-&ldquo;Delete QSO&rdquo; - will
+"Delete QSO" - will
 remove the QSO from the log.
-&ldquo;View QSO&rdquo; - will
+"View QSO" - will
 open the selected QSO for viewing &ndash; and checking DXCC status
 etc.
-Clicking &ldquo;Start QSO&rdquo;
+Clicking "Start QSO"
 will cause the QSO date and time and the information obtained from
 the rig to become fixed. It also makes a new set of commands
 available:
-<DIV ID="Frame13" DIR="LTR" STYLE="float: left; width: 16.5cm; height: 1.98cm; border: none; padding: 0cm; background: #ffffff">
-	<P STYLE="margin-top: 0.21cm"><IMG SRC="UserGuide_html_m49d19ab4.png" NAME="graphics15" ALIGN=LEFT WIDTH=624 BORDER=0><BR CLEAR=LEFT><I>Illustration
+
+<A ID="Frame13">
+	<IMG SRC="../images/UserGuide_html_m49d19ab4.png" NAME="graphics15" ALIGN=LEFT WIDTH=624 BORDER=0><BR CLEAR=LEFT><I>Illustration
 	15: Commands in &quot;Enter QSO&quot; state</I>
-</DIV>
-&ldquo;Save&rdquo; - completes
-the logging, by setting TIME_OFF field and reverts to &ldquo;Active&rdquo;
+</A>
+
+"Save" - completes
+the logging, by setting TIME_OFF field and reverts to "Active"
 state.
-&ldquo;Save &amp; View&rdquo; -
+"Save &amp; View" -
 saves the logging, and keeps the QSO open for viewing.
-&ldquo;Save &amp; New&rdquo; -
+"Save &amp; New" -
 saves the logging, and starts a new QSO.
-&ldquo;Save &amp; Edit&rdquo; -
+"Save &amp; Edit" -
 saves the logging, but keeps the QSO in edit mode for further
 updates.
-&ldquo;Quit QSO&rdquo; - cancels
+"Quit QSO" - cancels
 the logging and removes the QSO from the log.
 
-\page page_5 Detailed User Guide
+\page page_5 Application Details
 
-- \ref menu
+The aplication provides a number of windows:
+
+- \ref main Main Window: This contains the main menu, a toolbar and a set of views. 
+These views offer log-book style views of the whole book and various other sets of QSOs;
+an ADIF reference; and analyses of the log-book. 
+  - \ref menu
+  - \ref toolbar
+  - \ref log_table
+  - \ref spec_tree
+  - \ref report_tree
+  - \ref dxcc_view
+- \ref qso_manager Dashboard: This provides all the interaction necessary for running QSOs 
+and managing the data within the log-book.
+  - \ref qso_operation
+  - \ref qso_entry
+  - \ref qso_browse
+  - \ref qso_query
+  - \ref qso_netentry
+  - ...etc the rest.
 
 
 
