@@ -81,7 +81,7 @@ public:
 	void save_values();
 
 	// Handle override
-	int handle(int event);
+	virtual int handle(int event);
 	// Clock ticker
 	static void cb_ticker(void* v);
 
