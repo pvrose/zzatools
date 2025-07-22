@@ -1369,7 +1369,7 @@ void open_html(const char* file) {
 	HINSTANCE result = ShellExecute(NULL, "open", full_filename.c_str(), NULL, NULL, SW_SHOWNORMAL);
 	if ((intptr_t)result <= 32) {
 		char msg[128];
-		snprintf(msg, sizeof(msg), "ZZALOG: Error opening PDF. Error code: %d", (int)(intptr_t)result);
+		snprintf(msg, sizeof(msg), "ZZALOG: Error opening HTML. Error code: %d", (int)(intptr_t)result);
 		status_->misc_status(ST_ERROR, msg);
 	}
 #else 
@@ -1377,7 +1377,7 @@ void open_html(const char* file) {
 	int res = system(cmd.c_str());
 	if (res != 0) {
 		char msg[128];
-		snprintf(msg, sizeof(msg), "ZZALOG: Error opening PDF. Error code: %d", res);
+		snprintf(msg, sizeof(msg), "ZZALOG: Error opening HTML. Error code: %d", res);
 		status_->misc_status(ST_ERROR, msg);
 	}
 #endif

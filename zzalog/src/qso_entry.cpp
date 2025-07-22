@@ -22,6 +22,7 @@ extern book* book_;
 extern bool DARK;
 extern ticker* ticker_;
 extern fields* fields_;
+extern void open_html(const char*);
 
 extern double prev_freq_;
 
@@ -34,6 +35,43 @@ int qso_entry::focus_ix_ = 0;
 // N rows of NUMBER_PER_ROW
 const int NUMBER_PER_ROW = 2;
 
+/** \page qso_entry QSO Editor/Viewer
+
+\section description Description
+This pane allows the editing (or viewing) of the QSO fields. It comprises a number
+of pull-down choices and an associated text input widget. In viewing mode (i.e. 
+read-only) the text input widgets are inactive - and shown greyed out.
+
+<IMG SRC="../images/qso_entry_1.png">
+
+\section features Features
+
+\subsection fields Changing Fields
+
+It is possible to change the fields that are being displayed by clicking the pull-down 
+arrow next to the field name display.
+
+<IMG SRC="../images/qso_entry_2.png">
+
+\subsection data Entering Data
+
+Data may be typed into the text input box.
+
+<IMG SRC="../images/qso_entry_3.png">
+
+Certain fields have a limited choice of
+data that may be entered. In these cases there is a drop-down arrow next 
+to the text input, which offers the values available.
+
+<IMG SRC="../images/qso_entry_4.png">
+
+Fields that contain strings may also have a drop-down arrow next to the text input.
+This allows limited case correction: all upper-case, all lower-case or each word with
+their initial letter capitalised (mixed-case).
+
+<IMG SRC="../images/qso_entry_5.png">
+
+*/
 // Constructor
 qso_entry::qso_entry(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
@@ -75,6 +113,21 @@ int qso_entry::handle(int event) {
 	switch (event) {
 	case FL_SHOW:
 		set_focus_saved();
+		break;
+	case FL_FOCUS:
+		return true;
+	case FL_UNFOCUS:
+		// Acknowledge focus events to get the keyboard event
+		return true;
+	case FL_PUSH:
+		take_focus();
+		return true;
+	case FL_KEYBOARD:
+		switch (Fl::event_key()) {
+		case FL_F + 1:
+			open_html("qso_entry.html");
+			return true;
+		}
 		break;
 	}
 	return result;
