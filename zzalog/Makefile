@@ -111,6 +111,10 @@ debug: $(EXEC_DIR)/$(TARGET_EXEC)
 clean:
 	rm -r $(BUILD_DIR)
 
+.PHONY: clean_ug
+clean_ug:
+	sudo rm -r $(APPDATA_DIR)/html $(APPDATA_DIR)/images
+
 # Copy references
 $(APPDATA_DIR)/%: $(REF_DIR)/%
 	@echo $@
@@ -122,7 +126,8 @@ $(APPDATA_DIR)/html/index.html : $(UG_DIR)/html/index.html
 	@echo Copying HTML files
 	@sudo mkdir -p $(APPDATA_DIR)/html
 	@sudo cp -r $(UG_DIR)/html/* $(APPDATA_DIR)/html/
-	@sudo cp $(UG_DIR)/images/* $(APPDATA_DIR)/html/
+	@sudo mkdir -p $(APPDATA_DIR)/images
+	@sudo cp $(UG_DIR)/images/* $(APPDATA_DIR)/images/
 
 
 $(UG_DIR)/html/index.html: $(UG_DIR)/index.dox
