@@ -113,6 +113,7 @@ clean:
 
 .PHONY: clean_ug
 clean_ug:
+	rm -r $(UG_DIR)/html
 	sudo rm -r $(APPDATA_DIR)/html $(APPDATA_DIR)/images
 
 # Copy references
