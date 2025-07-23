@@ -22,26 +22,6 @@ extern void open_html(const char*);
 // Majo
 string DEFAULT_INTL = "";
 
-/** \page intl_dialog Virtual keyboard for non-ASCII characters
-\section description Description
-This dialog provides a virtual keyboard for a selection on Latin-based 
-non-ASCII characters.
-
-<IMG SRC="../images/intl_dialog_1.png">
-
-\section features Features
-\subsection paste Entering a character
-Clicking on any button labelled with a character will paste that character into 
-the input widget that is currently selected.
-
-\subsection addition Adding more characters
-Copy any chaarcters you want to add into the text input field at the top right.
-Then click "Add".
-To save the change, click "Save". Saving the changes requires administrator 
-privileges.
-
-*/
-
 // Constructs a window 
 intl_dialog::intl_dialog() :
 	win_dialog(640, 480, "International character set")

@@ -48,69 +48,6 @@ extern Fl_Preferences::Root prefs_mode_;
 Fl_Font log_table::font_;
 Fl_Fontsize log_table::fontsize_;
 
-/** \page log_table Log Book Viewer
-* 
-<IMG SRC="../images/log_table_1.png">
-
-\section description Description
-
-This widget displays the log-book view of the data.
-
-\section features Features
-
-\subsection select Selecting a record
-
-Clicking on a line will select the record displayed in the line.
-This will make this record the current record being worked on in all views.
-
-\subsection edit Editing an entry
-
-Double-clicking on an entry will open a edit box that allows for the 
-data within the field of the record to be edited.
-
-<IMG SRC="../images/log_table_2.png">
-
-Clicking the drop-down arrow while the edit box is acive will show the 
-allowable data to be entered.
-
-<IMG SRC="../images/log_table_3.png">
-
-\subsection tooltip Displaying details
-
-Right-clicking on a field within a record will display a 
-tooltip explaining what the field is for, and whether the current data within is valid.
-
-<IMG SRC="../images/log_table_4.png">
-
-\subsection widths Adjusting column widths
-
-Clicking and dragging the right-hand edge of the header of an individual 
-column will vary the width of a column.
-
-\subsection sorting Sorting data
-
-Double clicking on the header of a column containing QSO_DATE, TIME_ON, QSO_DATE_OFF or TIME_OFF will switch from chronological
-order to reverse-chronological order or vice-versa.Double clicking on the header of other columns is only enabled in the
-extracted-data instance of this widget.In that case the data will be displayed in alphabetical order of the entries in that
-column.Double-clicking it again will display in reverse alphabetical order.
-
-\subsection import Import Data
-
-The second nstance of the Log-book view is to present the contents of a file or data 
-being imported. The image below shows the import of a log produced from WSJT-X.
-
-<IMG SRC="../images/log_table_5.png">
-
-\subsection extract Extracted 
-
-The third instance of the log-book view shows a list of extracted records. 
-The image below shows an extraction of all records with stations in Denmark.
-
-<IMG SRC="../images/log_table_6.png">
-
-*/
-
-
 // constructor - passes parameters  to the two base classes
 log_table::log_table(int X, int Y, int W, int H, const char* label, field_app_t app) :
   Fl_Table_Row(X, Y, W, H, label)

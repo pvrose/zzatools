@@ -66,38 +66,6 @@ extern string VENDOR;
 extern string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
 
-/** \page qso_manager Operating Dashboard
-*
-\section description Description
-
-This provides all the interaction necessary for running QSOs
-and managing the data within the log-book.
-
-<IMG SRC="../images/qso_manager_1.png">
-
-  - \ref qso_operation
-  - QSO viewer/editors
-    - \ref qso_entry
-    - \ref qso_query
-    - \ref qso_net_entry
-  - QSO status
-	- \ref qso_details
-	- \ref qso_dxcc
-	- \ref qso_qsl_vwr
-	- \ref contest_scorer
-  - \ref qso_buttons
-  - \ref qso_rig
-  - \ref qso_clock
-  - Miscellaneous
-    - \ref qso_log_info
-	- \ref qso_qsl
-	- \ref qso_log_info
-	- \ref qso_apps
-	- \ref qso_wx
-	- \ref qso_bands
-	
-*/
-
 
 // The main dialog constructor
 qso_manager::qso_manager(int W, int H, const char* label) :

@@ -46,52 +46,6 @@ const Fl_Text_Display::Style_Table_Entry style_table_[NUMBER_STYLES] = {
 	{ STATUS_COLOURS.at(ST_FATAL).fg, FL_COURIER, FL_NORMAL_SIZE, Fl_Text_Display::ATTR_BGCOLOR, STATUS_COLOURS.at(ST_FATAL).bg }
 };
 
-/** \page banner Application Status Banner
-\section description Description
-Displays any status messages and progress reports output by ZZALOG.
-
-<IMG SRC="../images/banner_1.png">
-
-\section features Features
-This window comprises from top to bottom.
-
-This displays the status messages output by ZZALOG that are at most of warning severity.
-Only the last message output is displayed here.
-
-<IMG SRC="../images/banner_2.png">
-
-The second displays status messages that are of error severity or higher.
-Again only the last such message is output here.
-
-<IMG SRC="../images/banner_3.png">
-
-The third comprises three items. Firstly a text output showing a progress message output by ZZALOG.
-Below this is a numeric representation of progress
-On the left is a graphical representation in the form of a clock dial, showing 
-proportion complete. The clock-dial is colour-coded indicating the activity being progressed.
-
-<IMG SRC="../images/banner_4.png">
-
-\subsection full Displaying the whole report.
-Bottom left of the window is the button marked "Full"
-Clicking this toggles the display of the full status.
-
-<IMG SRC="../images/banner_5.png">
-
-Messages are colour-coded according to severity.
-- Blue - lowest severity
-- Light blue - Messages to be logged for information
-- Light magenta - Messages added for debug purposes
-- Light cyan - Message logged as notes
-- Grey - Messages logged for progress
-- Light green - message logged indicating completion of an activity
-- Yellow - message logged as a warning
-- Red on black - message logged as an error - processing can continue
-- Red on white - message logged as a severe error - processing is stopped
-- Black on red - message logged as a fatal error - processing is stopeed
-
-*/
-
 std::thread::id main_thread_id_ = std::this_thread::get_id();
 
 banner::banner(int W, int H, const char* L) :

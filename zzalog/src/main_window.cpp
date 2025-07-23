@@ -8,26 +8,6 @@
 extern menu* menu_;
 extern import_data* import_data_;
 
-/** \page main_window Main Window
-* 
-\section description Description
-
-This contains the main menu, a toolbar and a set of views.
-These views offer log-book style views of the whole book and various other sets of QSOs;
-an ADIF reference; and analyses of the log-book.
-
-  <IMG SRC="../images/main_window_1.png">
-
-  - \ref menu
-  - \ref toolbar
-  - Individual views
-    - \ref log_table
-    - \ref spec_tree
-    - \ref report_tree
-    - \ref dxcc_view
-
-*/
-
 
 // Create the window
 main_window::main_window(int W, int H, const char* label) :

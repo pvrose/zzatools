@@ -19,46 +19,6 @@ extern status *status_;
 extern stn_data *stn_data_;
 extern void open_html(const char*);
 
-/** \page qso_operation Station Operation
- 
-\section description Description
-
-This provides the information for the location of the operation, the operator 
-and the callsign being used.
-
-<IMG SRC="../images/qso_operation_1.png">
-
-\section features Features
-The same features are used for the three attributes. 
-Firstly, there is a text input with a 
-drop-down menu. This menu provides a list of existing values that can be used.
-If a new value is required then it can be typed into the text input.
-Typing this in will open up the Configuration window to allow details to be edited.
-The button marked "Show" will also open up the Configuration window to display 
-the details currently entered.
-
-\subsection qth QTH
-
-<IMG SRC="../images/qso_operation_2.png">
-
-The QTH (or location) attribute provides a quick way of adding location information 
-such as MY_CITY, MY_GRIDSQUARE etc to the record.
-
-\subsection operator Operator
-
-<IMG SRC="../images/qso_operation_3.png">
-
-The operator attribute allows the addition of MY_NAME and OPERATOR fields to the record.
-
-\subsection callsign Station Callsign
-
-<IMG SRC="../images/qso_operation_4.png">
-
-This allows the STATION_CALLSIGN field to be specified if the logbook is being used 
-for operations using different callsigns - eg different RSIs within the UK or /P operation."
-
-*/
-
 qso_operation::qso_operation(int X, int Y, int W, int H, const char *L) : Fl_Group(X, Y, W, H, L),
 																		  current_qth_(""),
 																		  current_oper_(""),

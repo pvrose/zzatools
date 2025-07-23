@@ -33,43 +33,6 @@ extern string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
 extern void open_html(const char*);
 
-/** \page report_tree Analysis of the log
-
-\section description Description
-
-This view shows an analysis of the log broken down into a hierarchy based on DXCC 
-entities bands and modes worked.
-The format is controlled by the Report-> set of menu items in the main menu.
-
-<IMG SRC="../images/report_tree_1.png">
-
-/section features Features
-
-The report may select the following:
-
-- All records in the log
-- All records using the current sttaion callsign
-- All extracted records
-- The selected record
-
-The tree may be ordered by DXCC, band and mode in any order.
-
-Clicking on a "+" opens up one level of the hierarchy beneath that entry.
-
-<IMG SRC="../images/report_tree_2.png">
-
-Clicking on the text of an entry fully opens up the hierarchy beneath that entry.
-
-<IMG SRC="../images/report_tree_3.png">
-
-The entries are colour-coded.
-
-- Green - indicates that at least one QSO has been verified with Logbook of the World.
-- Blue - indicates that at least one QSO has been verified with eQSL.cc.
-- Red - indicates no QSOs have been verified on LotW or eQSL.cc.
-
-*/
-
 // Constructor
 report_tree::report_tree(int X, int Y, int W, int H, const char* label, field_app_t app) :
 	Fl_Tree(X, Y, W, H, label),

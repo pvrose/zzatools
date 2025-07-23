@@ -11,56 +11,6 @@ extern book* book_;
 extern fields* fields_;
 extern void open_html(const char*);
 
-/** \page qso_query Querying QSOs
-
-\section description Description
-
-The QSO Query pane provides a means for checking imported records against
-a record in the log. 
-
-\section examples Examples
-
-The first example is from the duplicate record check. Two records have been added to the 
-query view. They 
-might be duplicates. They probably are as the two records only differ in the one 
-callsign is the /P version of the other and most other fields agree. The control buttons
-offer the choice for keeping one, the other or both as well as merging the two records.
-
-<IMG SRC="../images/qso_query_1.png">
-
-The second example is from a putative import of records from an on-line QSL site.
-The imported record appears not to match a record in the log.
-In this case, no potential match was found, so only the imported records is added
-to the query. The control buttons have changed to offer 
-a choice of accepting or rejecting the QSO as well as a number of search functions.
-
-<IMG SRC="../images/qso_query_2.png">
-
-The third example is the result of clicking the "search log" button. Now it has found a
-record that differs in a few fields (but a critical one - CALL, the other station's
-callsign). Now three records have been added to the query. In the first column, the 
-potential match found in the log. In the second column, the import record. The third 
-column contains a copy of the record from the log.
-
-<IMG SRC="../images/qso_query_3.png">
-
-On the right hand of the pane is a scroll bar. This enables the user to look at all the
-fields in the records. As well as the CALL fields differing another is seen to do so.
-Highlighted below is the field EQSL_QSL_RDATE - a housekeeping field for QSL checking.
-
-<IMG SRC="../images/qso_query_4.png">
-
-A feature of this use of the QSO Query pane is the ability to move data from one record
-to another. In this case, double-clicking on the field value in the import record
-has copied the value to the log record.
-
-<IMG SRC="../images/qso_query_5.png">
-
-Note that it will be possible to restore the original log entry value for this field
-by double-clicking on the entry in the third column.
-
-*/
-
 // Constrctor
 qso_query::qso_query(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L),

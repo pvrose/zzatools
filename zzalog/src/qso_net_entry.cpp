@@ -11,16 +11,6 @@ extern status* status_;
 extern book* book_;
 extern void open_html(const char*);
 
-/** \page qso_net_entry Entry of Concurrent QSOs (Net)
-
-\section description Description
-
-This pane enables the entry of concurrent QSOs.
-
-<IMG SRC="../images/qso_net_entry_1.png">
-
-*/
-
 // Constructor
 qso_net_entry::qso_net_entry(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
