@@ -414,6 +414,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="reference\Prefix.lst" />
+    <None Include="zzalog\Doxyfile" />
     <None Include="zzalog\Makefile" />
     <None Include="zzalog\userguide\index.dox" />
   </ItemGroup>

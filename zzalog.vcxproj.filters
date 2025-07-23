@@ -772,6 +772,7 @@
     <None Include="reference\Prefix.lst" />
     <None Include="zzalog\Makefile" />
     <None Include="zzalog\userguide\index.dox" />
+    <None Include="zzalog\Doxyfile" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="zzalog.ico">
