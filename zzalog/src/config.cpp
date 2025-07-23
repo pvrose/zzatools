@@ -138,10 +138,10 @@ config::config(int W, int H, const char* label) :
 	add(cancel_bn);
 	callback(cb_bn_cal, (long)CA_CANCEL);
 
-	Fl_Box* b_cr = new Fl_Box(x(), y() - FOOT_HEIGHT, w(), FOOT_HEIGHT);
+	Fl_Box* b_cr = new Fl_Box(0, H - FOOT_HEIGHT, W, FOOT_HEIGHT);
 	b_cr->copy_label(string(COPYRIGHT + " " + CONTACT + "     ").c_str());
 	b_cr->labelsize(FL_NORMAL_SIZE - 1);
-	b_cr->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
+	b_cr->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 
 
 	resizable(nullptr);

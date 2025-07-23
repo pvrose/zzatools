@@ -159,7 +159,7 @@ void qso_manager::create_form(int X, int Y) {
 	max_x = max(max_x, curr_x);
 	max_y = max(max_y, curr_y);
 
-	Fl_Box* b_cr = new Fl_Box(x(), max_y, max_x + GAP - x(), FOOT_HEIGHT);
+	Fl_Box* b_cr = new Fl_Box(X, max_y, max_x + GAP - X, FOOT_HEIGHT);
 	b_cr->copy_label(string(COPYRIGHT + " " + CONTACT + "     ").c_str());
 	b_cr->labelsize(FL_NORMAL_SIZE - 1);
 	b_cr->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
