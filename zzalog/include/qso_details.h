@@ -23,6 +23,8 @@ public:
     qso_details(int X, int Y, int W, int H, const char* L = nullptr);
     ~qso_details();
 
+    virtual int handle(int event);
+
     void create_form();
     void enable_widgets();
 

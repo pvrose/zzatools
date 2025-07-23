@@ -19,6 +19,7 @@ extern book* book_;
 extern status* status_;
 extern spec_data* spec_data_;
 extern bool DARK;
+extern void open_html(const char*);
 
 // Constructor
 qso_details::qso_details(int X, int Y, int W, int H, const char* L) :
@@ -35,6 +36,30 @@ qso_details::qso_details(int X, int Y, int W, int H, const char* L) :
 
 // Destructor
 qso_details::~qso_details() {}
+
+// Handle
+int qso_details::handle(int event) {
+	int result = Fl_Group::handle(event);
+	// Now handle F1 regardless
+	switch (event) {
+	case FL_FOCUS:
+		return true;
+	case FL_UNFOCUS:
+		// Acknowledge focus events to get the keyboard event
+		return true;
+	case FL_PUSH:
+		take_focus();
+		return true;
+	case FL_KEYBOARD:
+		switch (Fl::event_key()) {
+		case FL_F + 1:
+			open_html("qso_details.html");
+			return true;
+		}
+		break;
+	}
+	return result;
+}
 
 // Create the widgets
 void qso_details::create_form() {
