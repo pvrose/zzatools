@@ -12,6 +12,8 @@ public:
     qso_clocks(int X, int Y, int W, int H, const char* L);
     ~qso_clocks();
 
+    virtual int handle(int event);
+
     void load_values();
     void create_form();
     void save_values();

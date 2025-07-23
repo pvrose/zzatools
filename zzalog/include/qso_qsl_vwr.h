@@ -40,6 +40,8 @@ public:
 	qso_qsl_vwr(int X, int Y, int W, int H, const char* L = nullptr);
 	~qso_qsl_vwr();
 
+	virtual int handle(int event);
+
 	// get settings
 	void load_values();
 	// Create form

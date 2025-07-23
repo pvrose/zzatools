@@ -61,6 +61,8 @@ public:
     qso_dxcc(int X, int Y, int W, int H, const char* L = nullptr);
     ~qso_dxcc();
 
+    virtual int handle(int event);
+
     // Create the widgets
     void create_form();
     // Configure them

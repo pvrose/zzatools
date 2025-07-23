@@ -998,6 +998,132 @@ is likely to be use of /P or /A or a different RSI (UK Stations).
 
 <IMG SRC="../images/qso_details_2.png">
 
+\page qso_dxcc DXCC Status 
+
+This pane shows the DXCC status for the callsign in the selected record.
+
+<IMG SRC="../images/qso_dxcc_1.png">
+
+In the image below the information encased in red is based on the decode on the callsign.
+In this case it has decoded the callsign XV9XX as belonging to Vietnam, whose usual prefix
+is 3W. The DXCC has been directly decoded from the callsign. The next line provides some
+geographic information: continent, CQ zone and longitude and latitude. The third line
+shows approximate distance and bearing.
+
+The information shows the worked-before status of that DXCC entity for the current 
+station callsign. It shows that Vietnam, CQ zone 26 and Asia have all been worked before,
+but not on the current band (2m) or mode (FM).
+
+<IMG SRC="../images/qso_dxcc_2.png">
+
+There are a few cases where it is not possible to decode the DXCC entity from the callsign.
+One such example is the use of the GB prefix. By default this decodes to "G: England", but
+it is possible to temporarily override this by use of an exception applied in one
+of the on-line directories as shown below.
+
+<IMG SRC="../images/qso_dxcc_3.png">
+
+\page qso_qsl_vwr QSL Status
+
+This pane shows the QSL status for the selected QSO record. It has three sub-panes. This 
+image shows the image recieved from eQSL.cc for that QSO.
+
+<IMG SRC="../images/qso_qsl_vwr_1.png">
+
+This sub-pane "Display" shows images of received QSLs as well as images to be sent. The six 
+buttons select:
+
+- eQSL: the image received from eQSL.cc for that QSO.
+- Front: the image on the front of a paper card received for that QSO.
+- Back: the image on the back of a paper card received for that QSO.
+- eMail(R): the image received in an e-mail QSL.
+- Label: the image to be printed on a label to be applied to an outgoing paper card.
+- eMail(S): the image that coule be sent as an e-mail QSL.
+
+In the image below the "Label" button has been clicked and that image is now displayed.
+
+<IMG SRC="../images/qso_qsl_vwr_2.png">
+
+The second sub-pane "Status" shows the QSL status. It shows whether QSLs have been 
+received (column "R") or sent (column "S") through the various QSL mechanisms: the
+four internet QSL servers (eQSL.cc, Logbook of the World, QRZ.com and Clublog.org),
+and by paper card (Bureau or direct) or e-mail.
+
+<IMG SRC="../images/qso_qsl_vwr_3.png">
+
+The third sub-pane "Edit" isonly active if the main QSO entry pane is in edit-mode. 
+It allows the record to be updated when a QSL status changes. The top three buttons,
+encased in red, allow the fact that a QSL card has been received via the Bureau, e-mail
+or direct to be recorded. The bottom three buttons, encased in blue, have the following
+actions:
+
+- Fetch: Fetch an image from eQSL.cc for the QSO. This is normally automatic, but this
+feature is provided if a glitch has prevented the automatic download.
+- Requested: The operator of the other station has requested a paper QSL card.
+- Declined: The operator of the other station has specifically declines a paper
+QSL card. Typically this may be a special event station that sends cards out but does
+not want one in return.
+
+<IMG SRC="../images/qso_qsl_vwr_4.png">
+
+To see a full size version of an image, simply click on the image. A separate window will
+open containing that image.
+
+<IMG SRC="../images/qso_qsl_vwr_5.png">
+
+\page contest_scorer Contests
+
+This pane provides details of the current or most recent contest. It is currently 
+in development.
+
+<IMG SRC = "../images/contest_scorer_1.png">
+
+The pane comprises three section. The top section, encased in red, allows the choice
+of the contest. The drop-down list will indicate the specific contest and its
+occasion. It also lists the start and finish times of the contest and the current state
+of activity in the contest.
+
+The middle section, encased in blue, allows the contestant to enter the received exchange
+and generate the exchange to send. The button "Parse" will decompose the received
+exchange and update the record accordingly. The current serial number is displayed in 
+the box pointed to. If used in the contest this will automatically increment
+on each QSO, but the left and right chevrons allow manual adjustment of the serial number.
+
+The bottom section, encased in green, provides the current score card for the contest.
+In columns, it shows QSO-points, multiplier and total. In rows it shows the score
+accumulated so far; the delta that the current QSO will add; and the total as a
+result of that.
+
+<IMG SRC="../images/contest_scorer_2.png">
+
+Support for individual contests needs to be coded separately. This code needs to 
+implement an algorithm for parsing and generating exchanges. It also needs to
+implement an algorithm for scoring.
+
+\page qso_clocks Station Clock
+
+This pane provides the station clock. It displays the time either in UTC (otherwise known
+as GMT or Zulu) and in local time as defined by the operating system.
+
+<IMG SRC="../images/qso_clocks_1.png">
+
+How local time is named is dependent on the operating system. On the left is Windows 11 and 
+on the right Debian Bookworm.
+
+<IMG SRC="../images/qso_clocks_2.png"><IMG SRC="../images/qso_clocks_3.png">
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 */

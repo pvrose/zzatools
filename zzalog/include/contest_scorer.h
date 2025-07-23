@@ -36,6 +36,9 @@ public:
     contest_scorer(int X, int Y, int W, int H, const char* L = nullptr);
     ~contest_scorer();
 
+    virtual int handle(int event);
+
+
     void load_data();
     void create_form();
     void save_data();
