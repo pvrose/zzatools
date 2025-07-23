@@ -320,7 +320,7 @@ The aplication provides a number of windows:
 
 /** \page main_window Main Window
 * 
-\section description Description
+\section description_1 Description
 
 This contains the main menu, a toolbar and a set of views.
 These views offer log-book style views of the whole book and various other sets of QSOs;
@@ -338,13 +338,13 @@ an ADIF reference; and analyses of the log-book.
 
 \page menu Menu Bar
  
-\section description Description
+\section description_2 Description
 Provides access to general application functions. The menu bar is situated at the
 top of the Main Window.
 
 <IMG SRC="../images/menu_1.png">
 
-\section features Features
+\section features_2 Features
 \subsection Menu Items
 
   - File - File-related actions
@@ -482,14 +482,14 @@ top of the Main Window.
     - User Guide - Opens the User Guide
 
 \page toolbar Tool Bar (Action Icons)
-\section description Description
+\section description_3 Description
 
 Displays a set of iconised buttons linked to main menu action. There are also a limited
  number of search features.
 
  <IMG SRC="../images/toolbar_1.png">
 
-\section features Features
+\section features_3 Features
 \subsection actions Iconised Menu Actions
 The majority of buttons contain links to the Menu bar.
 
@@ -541,11 +541,11 @@ The majority of buttons contain links to the Menu bar.
  
 <IMG SRC="../images/log_table_1.png">
 
-\section description Description
+\section description_4 Description
 
 This widget displays the log-book view of the data.
 
-\section features Features
+\section features_4 Features
 
 \subsection select Selecting a record
 
@@ -599,7 +599,7 @@ The image below shows an extraction of all records with stations in Denmark.
 
 \page spec_tree ADIF Information
 
-\section description Description
+\section description_5 Description
 
 This view displays aspects of the ADIF Specification for reference.
 It shows all the data types used in the specification.
@@ -608,7 +608,7 @@ It lists all the fields available in an ADIF record.
 
 <IMG SRC="../images/spec_tree_1.png">
 
-\secion features Features
+\section features_5 Features
 
 Clicking on a "+" opens up one level of the hierarchy beneath that entry.
 
@@ -620,7 +620,7 @@ Clicking on the text of an entry fully opens up the hierarchy beneath that entry
 
 \page report_tree Analysis of the log
 
-\section description Description
+\section description_6 Description
 
 This view shows an analysis of the log broken down into a hierarchy based on DXCC 
 entities bands and modes worked.
@@ -628,7 +628,7 @@ The format is controlled by the Report-> set of menu items in the main menu.
 
 <IMG SRC="../images/report_tree_1.png">
 
-/section features Features
+/section features_6 Features
 
 The report may select the following:
 
@@ -655,12 +655,12 @@ The entries are colour-coded.
 
 \page dxcc_view An analysys of DXCCs worked
 
-\section description Description
+\section description_7 Description
 This view provides a tabular look at the state of DXCC entities worked.
 
 <IMG SRC="../images/dxcc_view_1.png">
 
-\section features Features
+\section features_7 Features
 
 At the bottom of the view are some control check buttons.
 The first four select the information viewed and only 1 may be selected.
@@ -686,12 +686,12 @@ that is the QSOs have been verified by any of the means.
 
 \page banner Application Status Banner
 
-\section description Description
+\section description_8 Description
 Displays any status messages and progress reports output by ZZALOG.
 
 <IMG SRC="../images/banner_1.png">
 
-\section features Features
+\section features_8 Features
 This window comprises from top to bottom.
 
 This displays the status messages output by ZZALOG that are at most of warning severity.
@@ -731,13 +731,13 @@ Messages are colour-coded according to severity.
 
 \page intl_dialog Virtual keyboard for non-ASCII characters
 
-\section description Description
+\section description_9 Description
 This dialog provides a virtual keyboard for a selection on Latin-based 
 non-ASCII characters.
 
 <IMG SRC="../images/intl_dialog_1.png">
 
-\section features Features
+\section features_9 Features
 \subsection paste Entering a character
 Clicking on any button labelled with a character will paste that character into 
 the input widget that is currently selected.
@@ -750,7 +750,7 @@ privileges.
 
 \page qso_manager Operating Dashboard
 
-\section description Description
+\section description_10 Description
 
 This provides all the interaction necessary for running QSOs
 and managing the data within the log-book.
@@ -780,14 +780,14 @@ and managing the data within the log-book.
 	
 \page qso_operation Station Operation
  
-\section description Description
+\section description_11 Description
 
 This provides the information for the location of the operation, the operator 
 and the callsign being used.
 
 <IMG SRC="../images/qso_operation_1.png">
 
-\section features Features
+\section features_11 Features
 The same features are used for the three attributes. 
 Firstly, there is a text input with a 
 drop-down menu. This menu provides a list of existing values that can be used.
@@ -818,14 +818,14 @@ for operations using different callsigns - eg different RSIs within the UK or /P
 
 \page qso_entry QSO Editor/Viewer
 
-\section description Description
+\section description_12 Description
 This pane allows the editing (or viewing) of the QSO fields. It comprises a number
 of pull-down choices and an associated text input widget. In viewing mode (i.e. 
 read-only) the text input widgets are inactive - and shown greyed out.
 
 <IMG SRC="../images/qso_entry_1.png">
 
-\section features Features
+\section features_12 Features
 
 \subsection fields Changing Fields
 
@@ -854,7 +854,7 @@ their initial letter capitalised (mixed-case).
 
 \page qso_query Querying QSOs
 
-\section description Description
+\section description_13 Description
 
 The QSO Query pane provides a means for checking imported records against
 a record in the log. 
@@ -902,14 +902,14 @@ by double-clicking on the entry in the third column.
 
 \page qso_net_entry Entry of Concurrent QSOs (Net)
 
-\section description Description
+\section description_14 Description
 
 This pane enables the entry of concurrent QSOs.
 
 <IMG SRC="../images/qso_net_entry_1.png">
 
 \page qso_buttons Control buttons for Dashboard
-\section description Description
+\section description_15 Description
 
 This pane is a highly configured pane that provides the control buttons that are 
 relevant to the current state of the Dashboard.
@@ -919,7 +919,7 @@ relevant to the current state of the Dashboard.
 Only those buttons that are effective in the current state of the Dashboard are shown 
 and some may be inactive for other reasons.
 
-\section features Features
+\section features_1 Features
 
 The complete list of buttons:
 
