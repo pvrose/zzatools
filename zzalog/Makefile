@@ -131,7 +131,7 @@ $(APPDATA_DIR)/html/index.html : $(UG_DIR)/html/index.html
 	@sudo cp $(UG_DIR)/images/* $(APPDATA_DIR)/images/
 
 
-$(UG_DIR)/html/index.html: $(UG_DIR)/index.dox
+$(UG_DIR)/html/index.html: $(UG_DIR)/index.dox ./Doxyfile
 	@echo Creating User Guide
 	@doxygen
 
