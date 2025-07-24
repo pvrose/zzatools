@@ -169,9 +169,10 @@ void club_stn_dlg::add_callsign() {
 void club_stn_dlg::store_data() {
 	// Get club details from settings
 	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences club_settings(settings, "Club");
-	club_settings.set("Name", club_name_.c_str());
-	club_settings.set("Callsign", club_call_.c_str());
+	Fl_Preferences station_settings(settings, "Station");
+	station_settings.set("Name", club_name_.c_str());
+	station_settings.set("Callsign", club_call_.c_str());
+	station_settings.set("Location", club_location_.c_str());
 }
 
 void club_stn_dlg::cb_bn_login(Fl_Widget* w, void* v) {
