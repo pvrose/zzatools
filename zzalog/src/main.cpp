@@ -18,6 +18,7 @@ main.cpp - application entry point
 #include "banner.h"
 #include "book.h"
 #include "club_handler.h"
+#include "club_stn_dlg.h"
 #include "config.h"
 #include "contest_data.h"
 #include "cty_data.h"
@@ -193,6 +194,8 @@ string default_html_directory_ = "";
 Fl_Preferences::Root prefs_mode_;
 // Do not close banner
 bool keep_banner_ = false;
+// New installation
+bool new_installation_ = false;
 
 // Get the backup filename
 string backup_filename(string source) {
@@ -600,6 +603,8 @@ string get_file(char * arg_filename) {
 			free(filename);
 		}
 		else {
+			new_installation_ = true;
+			status_->misc_status(ST_WARNING, "ZZALOG: No log file - assuming a new installation.");
 			free(filename);
 			Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
 			chooser->title("Select log file name");
@@ -723,7 +728,8 @@ void add_book(char* arg) {
 			// Get filename and load the data
 			string log_file = get_file(arg);
 
-			if (!book_->load_data(log_file)) {
+
+			if (!new_installation_ && !book_->load_data(log_file)) {
 				Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 				Fl_Preferences backup_settings(settings, "Backup");
 				char * temp;
@@ -1068,6 +1074,7 @@ bool open_settings() {
 
 	char* temp;
 	if (!sys_settings.get("Preferences Mode", temp, "")) {
+		new_installation_ = true;
 		// First use
 		switch (fl_choice("ZZALOG: New installation - please select club or individual use?", "Club", "Individual", nullptr)) {
 		case 0:
@@ -1138,20 +1145,6 @@ bool open_settings() {
 			printf("ZZALOG: Settings saved as %s\n", backup);
 		}
 	}
-	if (!ok) {
-		// No settings file - check a new installation
-		switch(fl_choice("This appears to be a new installation, Continue?", "Yes", "No", nullptr)) {
-			case 0: {
-				printf("ZZALOG: No settings file - creating new settings\n");
-				break;
-			}
-			case 1: {
-				printf("ZZALOG: Corrupt settings - abandoning\n");
-				return false;
-			}
-			
-		}
-	}
 	return true;
 }
 
@@ -1166,9 +1159,9 @@ void load_rig_data() {
 
 // If club-mode open settings screen for operator
 void club_operator() {
-	config_->show();
-	stn_dialog* dlg = (stn_dialog*)config_->get_tab(config::DLG_STATION);
-	dlg->set_tab(stn_dialog::OPERATOR, "");
+	club_stn_dlg* dlg = new club_stn_dlg();
+	dlg->show();
+	while (dlg->visible()) Fl::check();
 }
 
 // The main app entry point
@@ -1255,6 +1248,8 @@ int main(int argc, char** argv)
 		config_ = new config(WCONFIG, HCONFIG, "Configuration");
 		config_->hide();
 	}
+	// Now ask for club operator
+	if (prefs_mode_ == Fl_Preferences::SYSTEM_L) club_operator();
 	// Add qsl_handlers - note add_rig_if() may have added URL handler
 	add_qsl_handlers();
 	int code = 0;
@@ -1272,8 +1267,6 @@ int main(int argc, char** argv)
 		// now show the window
 		main_window_->show(argc, argv);
 		qso_manager_->show();
-		// Now ask for club operator
-		if (prefs_mode_ == Fl_Preferences::SYSTEM_L) club_operator();
 		// Run the application until it is closed
 		code = Fl::run();
 	}

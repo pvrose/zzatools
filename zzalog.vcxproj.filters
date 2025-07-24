@@ -369,6 +369,9 @@
     <ClCompile Include="zzalog\src\contests\iaru_hf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zzalog\src\club_stn_dlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zzalog\include\about_dialog.h">
@@ -765,6 +768,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\include\contests\iaru_hf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalog\include\club_stn_dlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

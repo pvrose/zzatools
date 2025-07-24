@@ -34,7 +34,6 @@ void stn_data::load_data() {
 		}
 	}
 	else {
-		load_failed_ = true;
 		snprintf(msg, sizeof(msg), "STN DATA: File %s may not exist", filename.c_str());
 		status_->misc_status(ST_WARNING, msg);
 	}

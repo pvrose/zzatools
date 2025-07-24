@@ -159,7 +159,7 @@ int intl_dialog::handle(int event) {
 	case FL_KEYBOARD:
 		switch (Fl::event_key()) {
 		case FL_F + 1:
-			open_html("intl_dialof.html");
+			open_html("intl_dialog.html");
 			return true;
 		}
 		break;

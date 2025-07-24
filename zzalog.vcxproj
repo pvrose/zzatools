@@ -168,6 +168,7 @@
     <ClCompile Include="zzalog\src\banner.cpp" />
     <ClCompile Include="zzalog\src\calendar_input.cpp" />
     <ClCompile Include="zzalog\src\calendar_table.cpp" />
+    <ClCompile Include="zzalog\src\club_stn_dlg.cpp" />
     <ClCompile Include="zzalog\src\config.cpp" />
     <ClCompile Include="zzalog\src\contests\basic.cpp" />
     <ClCompile Include="zzalog\src\contests\iaru_hf.cpp" />
@@ -294,6 +295,7 @@
     <ClInclude Include="zzalog\include\calendar_input.h" />
     <ClInclude Include="zzalog\include\calendar_table.h" />
     <ClInclude Include="zzalog\include\callback.h" />
+    <ClInclude Include="zzalog\include\club_stn_dlg.h" />
     <ClInclude Include="zzalog\include\config.h" />
     <ClInclude Include="zzalog\include\contests\iaru_hf.h" />
     <ClInclude Include="zzalog\include\contests\basic.h" />
