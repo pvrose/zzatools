@@ -1,0 +1,13 @@
+/** \page qso_clocks Station Clock
+
+This pane provides the station clock. It displays the time either in UTC (otherwise known
+as GMT or Zulu) and in local time as defined by the operating system.
+
+<IMG SRC="../images/qso_clocks_1.png">
+
+How local time is named is dependent on the operating system. On the left is Windows 11 and 
+on the right Debian Bookworm.
+
+<IMG SRC="../images/qso_clocks_2.png"><IMG SRC="../images/qso_clocks_3.png">
+
+*/

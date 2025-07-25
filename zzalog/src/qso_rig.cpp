@@ -37,6 +37,7 @@ extern bool DARK;
 extern ticker* ticker_;
 extern string VENDOR;
 extern string PROGRAM_ID;
+extern void open_html(const char*);
 
 
 // Constructor
@@ -81,6 +82,31 @@ qso_rig::~qso_rig() {
 	delete rig_;
 	ticker_->remove_ticker(this);
 }
+
+// Handle
+int qso_rig::handle(int event) {
+	int result = Fl_Group::handle(event);
+	// Now handle F1 regardless
+	switch (event) {
+	case FL_FOCUS:
+		return true;
+	case FL_UNFOCUS:
+		// Acknowledge focus events to get the keyboard event
+		return true;
+	case FL_PUSH:
+		take_focus();
+		return true;
+	case FL_KEYBOARD:
+		switch (Fl::event_key()) {
+		case FL_F + 1:
+			open_html("qso_rig.html");
+			return true;
+		}
+		break;
+	}
+	return result;
+}
+
 
 // Get initial data from settings
 void qso_rig::load_values() {

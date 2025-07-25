@@ -1,0 +1,30 @@
+/** \page contest_scorer Contests
+
+This pane provides details of the current or most recent contest. It is currently 
+in development.
+
+<IMG SRC = "../images/contest_scorer_1.png">
+
+The pane comprises three section. The top section, encased in red, allows the choice
+of the contest. The drop-down list will indicate the specific contest and its
+occasion. It also lists the start and finish times of the contest and the current state
+of activity in the contest.
+
+The middle section, encased in blue, allows the contestant to enter the received exchange
+and generate the exchange to send. The button "Parse" will decompose the received
+exchange and update the record accordingly. The current serial number is displayed in 
+the box pointed to. If used in the contest this will automatically increment
+on each QSO, but the left and right chevrons allow manual adjustment of the serial number.
+
+The bottom section, encased in green, provides the current score card for the contest.
+In columns, it shows QSO-points, multiplier and total. In rows it shows the score
+accumulated so far; the delta that the current QSO will add; and the total as a
+result of that.
+
+<IMG SRC="../images/contest_scorer_2.png">
+
+Support for individual contests needs to be coded separately. This code needs to 
+implement an algorithm for parsing and generating exchanges. It also needs to
+implement an algorithm for scoring.
+
+*/

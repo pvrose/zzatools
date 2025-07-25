@@ -1,0 +1,13 @@
+/** \page page_5 Application Details
+
+The aplication provides a number of windows:
+
+- \subpage main_window
+- \subpage qso_manager
+- \subpage banner
+- \subpage intl_dialog
+- \subpage config
+- \subpage search_dialog
+- \subpage change_dialog
+
+*/

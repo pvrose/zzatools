@@ -1,0 +1,26 @@
+/** \page qso_dxcc DXCC Status 
+
+This pane shows the DXCC status for the callsign in the selected record.
+
+<IMG SRC="../images/qso_dxcc_1.png">
+
+In the image below the information encased in red is based on the decode on the callsign.
+In this case it has decoded the callsign XV9XX as belonging to Vietnam, whose usual prefix
+is 3W. The DXCC has been directly decoded from the callsign. The next line provides some
+geographic information: continent, CQ zone and longitude and latitude. The third line
+shows approximate distance and bearing.
+
+The information shows the worked-before status of that DXCC entity for the current 
+station callsign. It shows that Vietnam, CQ zone 26 and Asia have all been worked before,
+but not on the current band (2m) or mode (FM).
+
+<IMG SRC="../images/qso_dxcc_2.png">
+
+There are a few cases where it is not possible to decode the DXCC entity from the callsign.
+One such example is the use of the GB prefix. By default this decodes to "G: England", but
+it is possible to temporarily override this by use of an exception applied in one
+of the on-line directories as shown below.
+
+<IMG SRC="../images/qso_dxcc_3.png">
+
+*/

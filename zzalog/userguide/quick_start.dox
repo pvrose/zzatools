@@ -1,0 +1,100 @@
+/** \page page_3 Quick-start Guide
+
+\section starting Starting ZZALOG
+On Windows, ZZALOG may be started
+by double clicking on the icon. It may also be started from a
+terminal by advanced users.
+On starting, a banner window is
+displayed:
+
+<A ID="Frame14">
+	<IMG SRC="../images/UserGuide_html_414f707a.png" NAME="graphics2" ALIGN=LEFT WIDTH=410 BORDER=0><BR CLEAR=LEFT><I>Illustration
+	2: Banner</I>
+</A>
+
+\subpage Frame14 "Illustration 2: Banner" shows the
+progress of the application as it is loading all the data needed to
+run. This window shows the latest message output, the latest error
+message output and the progress of each stage. In the above image,
+the application is reading in the latest callsign parsing information
+file and the banner shows the progress in numerical form and in a
+clock dial form. The "Full" button, when clicked, expands
+the display to show a scrollable output of all the messages output. 
+
+Once ZZALOG has loaded then two
+or three more windows are displayed. Firstly there is a log-book
+style view of the log data:
+
+<A ID="Frame1">
+	<IMG SRC="../images/UserGuide_html_4a79518e.png" NAME="graphics3" ALIGN=LEFT WIDTH=624 BORDER=0><BR CLEAR=LEFT><I>Illustration
+	3: Log-book view</I>
+</A>
+
+In \ref Frame1 "Illustration 3: Log-book view"
+a page of the log-book showing the most recent entries is
+displayed. In this view the data that is presented can be configured
+by selecting different fields to be displayed. The data can be
+displayed either in chronological order or in reverse chronological
+order. More information about this window is provided in \ref page_5 "Application Details".
+below.
+Secondly, a dashboard view is
+available: in \ref Frame2 "Illustration 4: Dashboard view" ZZALOG provides
+the user with the ability to enter new QSOs, edit existing QSOs,
+browse the log and manage all the data exchange functionality.
+Briefly, the various panes in this window show:
+- "Station": Location, operator and callsign of current operation.
+- "QSO Entry": Viewing and editing pane for QSO records. In come
+operations this is replaced by a "QSO Query" or "QSO
+Browse" view.
+- "Previous": Displays any previous QSOs with the entered callsign.
+- "DX?": Shows the "worked-before" status of the DXCC entity
+etc.
+- "QSL": Displays the QSL status for this QSO &ndash; including displaying
+any card image.
+- "Contest": Is used for contest operating.
+- "Controls": Displays all the operations available in the current state.
+- "Rigs": Displays the status of any connected rigs.
+- "Clocks": Displays the time in UTC (i.e GMT or Zulu) and local time.
+- "Log": Displays the current status of the file.
+- "QSLs": Allows the control of data exchange with on-line QSL services.
+- "Apps": Provides control of other applications such as digital modems.
+- "WX": Displays the local weather obtained from openweather.org.
+- "Bandplan": Displays the local bandplan information.
+
+More details for each pane is
+provided in \ref Frame2 "Detailed User Guide".
+
+<a ID="Frame2">
+	<IMG SRC="../images/UserGuide_html_2a85bca3.png" NAME="graphics5" ALIGN=LEFT WIDTH=555 BORDER=0><BR CLEAR=LEFT><I>Illustration
+	4: Dashboard view</I>
+</a>
+
+More detail of each pane is
+provided later.
+Finally, if ZZALOG is so
+configured, a third window is displayed. This is used, for example,
+for a club operation where the information about individual operators
+is required:
+
+<A ID="Frame3">
+	<IMG SRC="../images/UserGuide_html_5e16a7e3.png" NAME="graphics4" ALIGN=LEFT WIDTH=601 BORDER=0><BR CLEAR=LEFT><I>Illustration
+	5: Operator selection</I>
+</A>
+
+In \ref Frame3 "Illustration 5: Operator selection"
+the user is being asked to identify themselves. The field labeled
+"Id" has a drop-down menu so that the user can select
+themselves or if not listed type in their initials (or callsign
+suffix). The user can then enter their name and callsign if mandated
+by the station policy. In \ref Frame4 "Illustration 6: Filled in operator details"
+below this information has been filled in.
+
+<A ID="Frame4">
+	<IMG SRC="../images/UserGuide_html_m26e6c1cd.png" NAME="graphics6" ALIGN=LEFT WIDTH=251 BORDER=0><BR CLEAR=LEFT><I>Illustration
+	6: Filled in operator details</I>
+</A>
+
+To start operating we shall need
+to connect to a rig.
+
+*/

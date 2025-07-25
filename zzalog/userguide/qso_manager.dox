@@ -1,0 +1,31 @@
+/** \page qso_manager Operating Dashboard
+
+\section description_10 Description
+
+This provides all the interaction necessary for running QSOs
+and managing the data within the log-book.
+
+<IMG SRC="../images/qso_manager_1.png">
+
+  - \subpage qso_operation
+  - QSO viewer/editors
+    - \subpage qso_entry
+    - \subpage qso_query
+    - \subpage qso_net_entry
+  - QSO status
+	- \subpage qso_details
+	- \subpage qso_dxcc
+	- \subpage qso_qsl_vwr
+	- \subpage contest_scorer
+  - \subpage qso_buttons
+  - \subpage qso_rig
+  - \subpage qso_clocks
+  - Miscellaneous
+    - \subpage qso_log_info
+	- \subpage qso_qsl
+	- \subpage qso_log_info
+	- \subpage qso_apps
+	- \subpage qso_wx
+	- \subpage qso_bands
+	
+*/

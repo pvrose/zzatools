@@ -1,0 +1,57 @@
+/** \page toolbar Tool Bar (Action Icons)
+\section description_3 Description
+
+Displays a set of iconised buttons linked to main menu action. There are also a limited
+ number of search features.
+
+ <IMG SRC="../images/toolbar_1.png">
+
+\section features_3 Features
+\subsection actions Iconised Menu Actions
+The majority of buttons contain links to the Menu bar.
+
+<IMG SRC="../images/toolbar_set1.png">
+-  Closed file icon - File->New
+-  Open file icon - File->Open
+-  Floppy disc icon - File->Save
+-  Floppy disc with pen icon - File->Save As
+
+<IMG SRC="../images/toolbar_set2.png">
+-  Left arrow with bar - Navigate->First
+-  Left arrow - navigate->Previous
+-  Right arroe - Navigate->Next
+-  Right arrow with bar - Navigate->Last
+-  Blue Magnifying glass - Navigate->Find->New
+-  Blue double chevron - Navigate->Find->Next
+
+<IMG SRC="../images/toolbar_set3.png">
+-  White open square - Log->New Record
+-  White square with tick - Log->Save Record
+-  White square with red cross - Log->Cancel
+-  Large white square with black cross - Log->Delete Record
+-  White square containing blue image - Log->Retime Record
+
+<IMG SRC="../images/toolbar_set4.png">
+-  Cyan downward arrow over "eQSL" - Import->Download eQSL
+-  Cyan downward arraow over "LotW" - Import->Download LotW
+-  Blue "?" over "eQSL" - Extract->eQSL
+-  Blue "?" over "LotW" - Extract->LotW
+-  Blue "?" over "CL" - Extract->ClubLog
+-  Upward arrow - Extract->Upload
+
+<IMG SRC="../images/toolbar_set5.png">
+-  Box with three dots - Connect/Disconnect Rig
+-  Blue "?" - Extract->Criteria
+-  Blue "?" with red cross - Extract->Clear
+-  Blue "?" superimposed with horizontal lines - Extract->Display
+-  Image of world - Information->Google Maps
+-  "QRZ.com" - Information->QRZ.com
+-  &quot;&AElig;&quot; - Windows->International Chars
+
+<IMG SRC="../images/toolbar_set6.png">
+-  Text input - Enter callsign for search features
+-  Bold downward arrow - Find next occurence of callsign
+-  Downward chevron and bar - Extract all occurences of callsign
+-  "DX?" - Display parsing of the callsign
+
+*/

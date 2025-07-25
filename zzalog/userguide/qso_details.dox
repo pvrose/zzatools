@@ -1,0 +1,23 @@
+/** \page qso_details Previous Contacts
+
+This pane shows previous contacts with the callsign of the selected record.
+
+<IMG SRC="../images/qso_details_1.png">
+
+The label of the pane, circled red in the image below, indicates whether there has been any 
+previous contact. A cross indicates there has been no previous contact. A bare tick indicates
+that a contact has been previously made, but on a different band or mode. An enclosed tick,
+as shown below, indicates that a contact has been made on the same band and mode.
+
+The data circled in blue indicates information gleaned from previous contacts or from
+QSL information. Information in <B>bold text</B> is from the current record.
+
+The data circled in green shows the previous contacts with this call. Information in 
+<b>bold text</B shows the same band and mode as the current record. Information in
+<I>italic text</I> (not shown here) indicates that either the callsign of the contacted 
+station or the callsign used by the logging station differs in a slight way. This
+is likely to be use of /P or /A or a different RSI (UK Stations).
+
+<IMG SRC="../images/qso_details_2.png">
+
+*/

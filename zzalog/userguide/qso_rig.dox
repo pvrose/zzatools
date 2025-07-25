@@ -1,0 +1,108 @@
+/** \page qso_rig Rig Control
+
+\section description_rig Description
+
+This pane allows the user to specify how to connect a rig to ZZALOG. 
+
+<IMG SRC="../images/qso_rig_1.png">
+
+\section features_rig Features
+\subsection rig_1 Selecting the Rig
+
+Most modern rigs have computer control (CAT - Computer Aided Transceiver). 
+Each major manufacturer has their proprietary protocols and each rig has a unique
+set of features that require additional decodes within those protocols. Like 
+many other applications, ZZALOG uses a standard library 'hamlib'. This library
+provides a standard interface (API) to access all the common features of all
+but the most recent rigs. Rigs are grouped according to their manufacturer 
+with a couple of miscellaneous interfaces. There are number of other 
+applications that provide rig access - some of these can also be connected
+to using hamlib.
+
+Click the "Select" button. This will put the rig control into a 'select' mode
+which allows the user to select the rig directly or one of the other
+applications. Click the button next to the rig input to open a drop-down
+menu. As can be seen the menu is grouped by manufacturer. In the umage below,
+the Icom IC-705 transceiver has been selected.
+
+<IMG SRC="../images/qso_rig_2.png">
+
+\subsection rig_ports Defining connection
+
+Note that the "Connection" tab below the rig selection is now enabled. This allows
+the path to the rig to be selected. Commonly, as the case here, the rig connection
+uses a serial interface or an emulation of such over USB. In this case the port and
+connection speed (baud rate) need to be specified. This can be done using drop-down
+menus which are opened up by the buttons next to the inputs. In the images below the port
+and baud-rate menus have been opened.
+
+<IMG SRC="../images/qso_rig_3.png"><IMG SRC="../images/qso_rig_4.png">
+
+An example using the application FlRig is shown below. In this case communication 
+between ZZALIB and FlRig uses a protocol known as XML-RPC (Remote procedure call using
+XML) over an HTTP link. In the case below, this HTTP link is within the same computer
+(localhost - blue pointer) but it can be over a network. Also ZZALOG can start the other application
+using scripts, but the other application can be started by invoking its command. In
+the case below a script is available as indicated by the lit "Use" button (red pointer).
+
+<IMG SRC="../images/qso_rig_5.png">
+
+\subsection rig_auto Starting and connecting automatically
+
+The "Auto" pane allows the control of automatically starting the other application and then
+connecting to the rig. In the image below, The application is not started automatically
+when ZZALOG starts, but ZZALOG will then attempt to connect after a delay of 2.5 seconds after
+the application has been started. This delay is obtained through a process of "trial and
+error" to see when the application will accept the first command after being started.
+
+<IMG SRC="../images/qso_rig_6.png">
+
+\subsection rig_defaults No CAT? Specify power and frequency 
+
+The "Defaults" pane allows defining default power and frequency when these values
+cannot be read using CAT. In the image below, the user has decided to override the
+default CAT mechanism of reading power, by clicking the "O/R" check box and opening
+the drop-down menu that has been enabled.
+
+<IMG SRC="../images/qso_rig_7.png">
+
+\subsection rig_accessories Specify amplifier or transceiver
+
+The "Accessories" pane allows accessories such as a linear amplifier or transverter
+to be added to the rig. The power and frequency that the rig reports must be changed
+before being logged. In the image below left, the two check boxes for "Amplifier" and
+"Transverter" have been clicked, this enabling the inputs below. For an ammplifier
+its gain should be specified in dB. For a transverter its frequency shift should be specified in MHz 
+and its power output in W. 
+
+<IMG SRC="../images/qso_rig_8.png">
+
+\subsection rig_misc Miscellaneous features
+
+The "Timeouts etc" pane allows the user to specify miscellaneous features.
+- Timeout: This specifies the time in seconds that ZZALOG waits before deciding that the rig
+will not honour a request that has been made.
+- S-meter stack: When ZZALOG displays the S-meter value, it displayes the maximum value
+in its stack of readings. This input allows the depth of the stack to be configured.
+- TO Count: This soecifies the number of timeouts allowed before ZZALOG decides that
+the rig does not support the function.
+
+<IMG SRC="../images/qso_rig_9.png">
+
+\subsection rig_conn Connected
+
+The image below shows the connected rig. At the top, encased in red, indicates the rig
+state - here in receive indicated the green circle. For transmit the circle would be red. 
+This is followed by a brief description of the band and band-plan allocation. In this case
+the frequency lies in the FM and Digital Voice section of the 2m band. 
+
+Encased in blue is the rig display. It shows frequency (in MHz), mode, power and S-meter
+reading. The power reading is the highest read in the previous transmit period. The S-meter
+reading is the highest read over the last few readings in the previous receive period.
+
+Arrowed in green is a check box "Display instantaneous". If checked, the power and S-meter 
+readings will be the instantaneous values, rather than the smoothed values described above.
+
+<IMG SRC="../images/qso_rig_10.png">
+
+*/

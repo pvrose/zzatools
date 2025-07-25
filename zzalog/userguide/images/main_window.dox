@@ -1,0 +1,19 @@
+/** \page main_window Main Window
+* 
+\section description_1 Description
+
+This contains the main menu, a toolbar and a set of views.
+These views offer log-book style views of the whole book and various other sets of QSOs;
+an ADIF reference; and analyses of the log-book.
+
+  <IMG SRC="../images/main_window_1.png">
+
+  - \subpage menu
+  - \subpage toolbar
+  - Individual views
+    - \subpage log_table
+    - \subpage spec_tree
+    - \subpage report_tree
+    - \subpage dxcc_view
+
+*/

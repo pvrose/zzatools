@@ -1,0 +1,69 @@
+/** \page qso_buttons Control buttons for Dashboard
+\section description_15 Description
+
+This pane is a highly configured pane that provides the control buttons that are 
+relevant to the current state of the Dashboard.
+
+<IMG SRC="../images/qso_buttons_1.png">
+
+Only those buttons that are effective in the current state of the Dashboard are shown 
+and some may be inactive for other reasons.
+
+\section features_1 Features
+
+The complete list of buttons:
+
+- Activate - Make the dashboard ready to start logging QSOs
+- Add Call - Add a new QSO record to the net in the editor view
+- Add QSO (Editor mode) - Create a new QSO record without initialising time and rig data.
+- Add QSO (Query mode) - Add the queried QSO record to the log
+- Browse Log - Open the QSO browser (rather than editor) displaying the current QSO.
+The browser allows all fields to be displayed rather than the limited selection in the editor.
+- B4? - Extract all QSOs with the callsign in the selected QSO.
+- Cancel (Query mode) - cancel the query
+- Cancel (Read-only edit mode) - Cancel the current read-omnly viewing of the QSO record.
+- Cancel Edit - Cancel the current edit without saving the changes to the QSO record.
+- Check - Start the search for the above data
+- Clone QSO - Create a new QSO record copying rig data.
+- Copy QSO - Create a new QSO record copying call and rig data.
+- Delete QSO - Remove the selected QSO from the log.
+- Done - Keep the result of any merge action
+- DX? - Display the parsing of the callsign in the selected QSO record
+- Edit Net - Open all records that could form a net (same frequency, close time) in the editor.
+- Edit QSO - Opens the QSO record in edit mode.
+- Keep 1 (Dupe check) - Keep the left hand record
+- Keep 1 & 2 (Dupe check) - keep both records. They are not duplicates.
+- Keep 2 (Dupe check) - Keep the right hand record
+- Merge (Dupe check) - Merge data between the two records
+- Merge QSO (Query Mode) - Merge data between the queried record and the target record
+- Parse QSO - Add DXCC etc detils to the current record.
+- Query - Open an editor view to allow details for a search to be entered
+- Quit - Quit the QSO entry mode
+- Quit Browse - Cancel the current browser view.
+- Quit Net - Cancel editing all records in the editor view
+- Quit QSO - Cancel the QSO being entered.
+- Reject QSO (Query Mode) - Do not add the queried QSO record to the log
+- Replace CAT - Replace the rig data in the selected record with data freshly read from the rig
+- Restart - Cancel the current QSO entry and start a new one
+- Save - Save the QSO being entered or edited. If the QSO hadn't been started, start it first. 
+If the QSO is being entered, then set the end time.
+- Save & Edit - Save the QSO (as above), but continue with the QSO record open in edit mode.
+- Save & New - Save the QSO (as above) and start a new QSO.
+- Save & View - SAve the QSO (as above), but contine with the QSO record in read-only mode.
+- Save Net - Save all records in the editor view
+- Start Net - Start a QSO, expecting it to be the first of a (say club) net.
+- Start QSO - Start a real-time (on-air) QSO. This fixes the QSO start date and time 
+as well as data read from the rig.
+- Test Import (Query mode) - Start a search to match import record in log
+- Update CAT - Copy data from the rig if none exist in the selected record
+- U/d Station - Update the record using the current Location, Operator and Station Callsign
+- View QSO - Opens the QSO record in read-only mode.
+- [Left arrow] - Select the previous record
+- [Left arrow and bar] - Select the first record - either in the current log extract or in a net edit.
+- [Reading glass] - Search for a possible match for the query record
+- [Reading glass] ALL.TXT - Search the WSJT-X ALL.TXT for evidence of a QSO with the query record
+- [Reading glass] QRZ.com - Open the QRZ.com page for the callsign in the selected record
+- [Right arrow] - select the next record.
+- [Right arrow and bar] - Select the last record
+
+*/

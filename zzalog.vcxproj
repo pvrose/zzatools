@@ -418,7 +418,32 @@
     <None Include="reference\Prefix.lst" />
     <None Include="zzalog\Doxyfile" />
     <None Include="zzalog\Makefile" />
+    <None Include="zzalog\userguide\application.dox" />
+    <None Include="zzalog\userguide\banner.dox" />
+    <None Include="zzalog\userguide\contest_scorer.dox" />
+    <None Include="zzalog\userguide\images\dxcc_view.dox" />
+    <None Include="zzalog\userguide\images\main_window.dox" />
+    <None Include="zzalog\userguide\images\qso_buttons.dox" />
+    <None Include="zzalog\userguide\images\toolbar.dox" />
     <None Include="zzalog\userguide\index.dox" />
+    <None Include="zzalog\userguide\installation.dox" />
+    <None Include="zzalog\userguide\intl_dialog.dox" />
+    <None Include="zzalog\userguide\introduction.dox" />
+    <None Include="zzalog\userguide\log_table.dox" />
+    <None Include="zzalog\userguide\menu.dox" />
+    <None Include="zzalog\userguide\operating.dox" />
+    <None Include="zzalog\userguide\qso_clocks.dox" />
+    <None Include="zzalog\userguide\qso_details.dox" />
+    <None Include="zzalog\userguide\qso_entry.dox" />
+    <None Include="zzalog\userguide\qso_manager.dox" />
+    <None Include="zzalog\userguide\qso_net_entry.dox" />
+    <None Include="zzalog\userguide\qso_operation.dox" />
+    <None Include="zzalog\userguide\qso_dxcc.dox" />
+    <None Include="zzalog\userguide\qso_qsl_vwr.dox" />
+    <None Include="zzalog\userguide\qso_query.dox" />
+    <None Include="zzalog\userguide\qso_rig.dox" />
+    <None Include="zzalog\userguide\quick_start.dox" />
+    <None Include="zzalog\userguide\report_tree.dox" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="zzalog.ico" />

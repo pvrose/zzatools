@@ -1,0 +1,151 @@
+/** \page page_4 Operating
+
+\section conn_rig Connecting to a rig.
+ZZALOG uses the hamlib library
+for its rig connectivity. The hamlib library is an suite of procedure
+calls that provides a common interface for most rigs' CAT interfaces.
+It can also interface with a number of other applications that
+provide access to rigs' CAT interfaces. Most CAT interfaces use some
+form of serial interface, and shared access to a serial interface by
+different applications (such as ZZALOG and any digital modem
+applications &ndash; PSK, FT8, SSTV etc) requires another helper
+application such as flrig.
+ZZALOG can provide a means of
+starting this helper application, which requires the use of scripts.
+The rest of this page assumes that Flrig has been launched. 
+
+<A ID="Frame5">
+	<IMG SRC="../images/UserGuide_html_m4911387.png" NAME="graphics7" ALIGN=LEFT WIDTH=217 BORDER=0><BR CLEAR=LEFT><I>Illustration
+	7: Rig control</I>
+</A>
+
+In the
+bottom left of the dashboard is \ref Frame5 "Illustration 7: Rig control"
+screen. The user should select the rig that they are interested in.
+In this case an ICOM IC-7300. The "Start" button will
+lunch a script, if written, to open up the FLRig application. The
+"Select" button allows configuration of the interface.
+These two features will be described is provided in \ref page_5 "Application Details".
+below.
+
+Assuming that FLRig has been launched then clicking the "Connect"
+button will connect to that application. \ref Frame6 "Illustration 8: FLRig connected"
+shows ZZALOG connected to FLRig and the latter's display alongside.
+ZZALOG is showing the same frequency, mode, TX power and S-meter
+reading as FLRig, and as the rig itself. ZZALOG will normally show
+the highest S-meter and TX power meter readings over the most recent
+few polls of the rig, and retain the last S-meter reading from a RX
+period and the last TX Power reading from a TX period.
+Note
+that the "Connect" button has become a "Disconnect"
+button.
+
+<A ID="Frame6">
+	<IMG SRC="../images/UserGuide_html_me4bb4f5.png" NAME="graphics8" ALIGN=LEFT WIDTH=643 BORDER=0><BR CLEAR=LEFT><I>Illustration
+	8: FLRig connected</I>
+</A>
+
+\section oper Operating
+To operate, the user must place
+ZZALOG into the correct mode. This is achieved by clicking the
+"Activate" button on the "Controls" page &ndash;
+see \ref Frame3 "Illustration 4: Dashboard view". This changes the "QSO
+Entry" page:
+
+<A ID="Frame7">
+	<IMG SRC="../images/UserGuide_html_m4c6cfb94.png" NAME="graphics9" ALIGN=LEFT WIDTH=384 BORDER=0><BR CLEAR=LEFT><I>Illustration
+	9: Dashboard ready for operation ("Active")</I>
+</A>
+
+\ref Frame7 "Illustration 9: Dashboard ready for operation (Active)"
+shows the "QSO Entry" page ready for entry. All the
+fields shown may be swapped for other fields by selecting the
+drop-down arrow alongside each. Each field has an associated data
+entry widget: for some of these the drop-down arrow opens up a menu
+of possible values:
+
+<A ID="Frame8">
+	<IMG SRC="../images/UserGuide_html_557fd7e5.png" NAME="graphics10"><I>Illustration
+	10: Menu of choices</I>
+</A>
+<A ID="Frame9">
+	<IMG SRC="../images/UserGuide_html_m6ae6db20.png" NAME="graphics11"><I>Illustration
+	11: Menu of formats</I>
+</A>
+
+\ref Frame8 "Illustration 10: Menu of choices"
+and \ref Frame9 "Illustration 11: Menu of formats" how examples of
+this selection.
+At this point it is also possible
+to check on the "worked-before" status of a call. Typing
+in a callsign that has been copied will result in that call being
+checked against the history contained in the log. Examples are below:
+
+<A ID="Frame10">
+	<IMG SRC="../images/UserGuide_html_ab32828.png" NAME="graphics12" ALIGN=LEFT WIDTH=576 BORDER=0><BR CLEAR=LEFT><I>Illustration
+	12: Checking &quot;worked-before&quot; status for a call</I>
+</A>
+
+\ref Frame10 "Illustration 12: Checking &quot;worked-before&quot; status for a call"
+shows the callsign being checked. In this case the station has been
+worked before but not on the band on the rig (10m &ndash; whereas
+they were worked before on 40m) or on the mode (FT8 versus CW).
+\ref Frame11 "Illustration 13: Checking &quot;worked-before&quot; status for a DXCC entity"
+shows the call being decoded as in DXCC Suriname, continent SA (South
+America) and CQ Zone 9. All three of these have been worked before,
+but this shows that Suriname is a new DXCC on 10m and also on CW.
+Similarly for CQ Zone 9. South America has been worked on 10m but is
+a new continent on CW. As the Locator (Gridsquare) information has
+not been supplied, it cannot be checked.
+
+<A ID="Frame11">
+	<IMG SRC="../images/UserGuide_html_m75dc8f06.png" NAME="graphics13" ALIGN=LEFT WIDTH=574 BORDER=0><BR CLEAR=LEFT><I>Illustration
+	13: Checking &quot;worked-before&quot; status for a DXCC entity</I>
+</A>
+
+\section qs_logging "Logging the QSO"
+
+<A ID="Frame12">
+	<IMG SRC="../images/UserGuide_html_m112f565d.png" NAME="graphics14" ALIGN=LEFT WIDTH=624 BORDER=0><BR CLEAR=LEFT><I>Illustration
+	14: Commands in &quot;Active&quot; state</I>
+</A>
+
+In the "Active" state
+the commands available are:
+"Start QSO" - moves
+ZZALOG to "Enter QSO" state with any details already
+typed in are kept.
+"Add QSO" - will
+start logging a QSO that has already occurred.
+"Edit QSO" - will
+enable editing a QSO that has already been logged.
+"Delete QSO" - will
+remove the QSO from the log.
+"View QSO" - will
+open the selected QSO for viewing &ndash; and checking DXCC status
+etc.
+Clicking "Start QSO"
+will cause the QSO date and time and the information obtained from
+the rig to become fixed. It also makes a new set of commands
+available:
+
+<A ID="Frame13">
+	<IMG SRC="../images/UserGuide_html_m49d19ab4.png" NAME="graphics15" ALIGN=LEFT WIDTH=624 BORDER=0><BR CLEAR=LEFT><I>Illustration
+	15: Commands in &quot;Enter QSO&quot; state</I>
+</A>
+
+"Save" - completes
+the logging, by setting TIME_OFF field and reverts to "Active"
+state.
+"Save &amp; View" -
+saves the logging, and keeps the QSO open for viewing.
+"Save &amp; New" -
+saves the logging, and starts a new QSO.
+"Save &amp; Edit" -
+saves the logging, but keeps the QSO in edit mode for further
+updates.
+"Quit QSO" - cancels
+the logging and removes the QSO from the log.
+
+
+*/
