@@ -65,6 +65,7 @@ void club_stn_dlg::create_form() {
 	w_edit_qth_->callback(cb_edit_qth);
 	w_edit_qth_->tooltip("Opens a dialog to edit QTH details");
 
+	curr_x = save_x;
 	curr_y += HBUTTON + GAP;
 	w_operator_ = new Fl_Input_Choice(curr_x, curr_y, WSMEDIT, HBUTTON, "Operator");
 	w_operator_->callback(cb_operator);
@@ -155,7 +156,6 @@ void club_stn_dlg::add_login() {
 		oper_info_t* info = new oper_info_t;
 		stn_data_->add_oper(nickname_, info);
 	}
-	const oper_info_t* info = stn_data_->get_oper(nickname_);
 	stn_data_->add_oper_item(nickname_, NAME, string(w_name_->value()));
 	stn_data_->add_oper_item(nickname_, CALLSIGN, string(w_call_->value()));
 }
@@ -200,7 +200,6 @@ void club_stn_dlg::cb_edit_qth(Fl_Widget* w, void* v) {
 
 void club_stn_dlg::populate_login() {
 	const map<string, oper_info_t*>* opers = stn_data_->get_opers();
-	char l[64];
 	w_operator_->add("");
 	for (auto it : *opers)
 	{
