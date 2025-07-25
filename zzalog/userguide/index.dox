@@ -1,17 +1,10 @@
 /** \mainpage User Guide
 
-- \ref page_1
-- \ref page_2
-- \ref page_3
-- \ref page_4
-- \ref page_5
-  - \ref main_window
-  - \ref qso_manager
-  - \ref banner
-  - \ref intl_dialog
-  - \ref config
-  - \ref search_dialog
-  - \ref change_dialog
+- \subpage page_1
+- \subpage page_2
+- \subpage page_3
+- \subpage page_4
+- \subpage page_5
 
 \page page_1 Introduction
 
@@ -34,6 +27,12 @@ that provides the following functionality:
 	weather report and band plan view.
 - Interfaces with a number of
 	modem applications (WSJT-X, FLDIGI etc).
+
+<A ID="Frame15">
+	<IMG SRC="../images/UserGuide_html_m6467ee96.png" NAME="graphics16" ALIGN=LEFT WIDTH=528 BORDER=0><BR CLEAR=LEFT><I>Illustration
+	1: Opening this document from the menu</I>
+</A>
+
 ZZALOG maintains the QSO records
 in the ADIF .adi format. This allows manual editing, if done
 carefully. ZZALOG may not be tolerant of error introduced by manual
@@ -44,10 +43,6 @@ support for all Unicode characters coded in UTF-8 format. Exchange of
 such data with other applications may result in errors.
 This document can be opened at
 any time from the menu:
-<A ID="Frame15">
-	<IMG SRC="../images/UserGuide_html_m6467ee96.png" NAME="graphics16" ALIGN=LEFT WIDTH=528 BORDER=0><BR CLEAR=LEFT><I>Illustration
-	1: Opening this document from the menu</I>
-</A>
 
 \page page_2 Installation
 
@@ -72,7 +67,7 @@ displayed:
 	2: Banner</I>
 </A>
 
-\ref Frame14 "Illustration 2: Banner" shows the
+\subpage Frame14 "Illustration 2: Banner" shows the
 progress of the application as it is loading all the data needed to
 run. This window shows the latest message output, the latest error
 message output and the progress of each stage. In the above image,
@@ -310,13 +305,13 @@ the logging and removes the QSO from the log.
 
 The aplication provides a number of windows:
 
-- \ref main_window
-- \ref qso_manager
-- \ref banner
-- \ref intl_dialog
-- \ref config
-- \ref search_dialog
-- \ref change_dialog
+- \subpage main_window
+- \subpage qso_manager
+- \subpage banner
+- \subpage intl_dialog
+- \subpage config
+- \subpage search_dialog
+- \subpage change_dialog
 
 /** \page main_window Main Window
 * 
@@ -328,13 +323,13 @@ an ADIF reference; and analyses of the log-book.
 
   <IMG SRC="../images/main_window_1.png">
 
-  - \ref menu
-  - \ref toolbar
+  - \subpage menu
+  - \subpage toolbar
   - Individual views
-    - \ref log_table
-    - \ref spec_tree
-    - \ref report_tree
-    - \ref dxcc_view
+    - \subpage log_table
+    - \subpage spec_tree
+    - \subpage report_tree
+    - \subpage dxcc_view
 
 \page menu Menu Bar
  
@@ -757,26 +752,26 @@ and managing the data within the log-book.
 
 <IMG SRC="../images/qso_manager_1.png">
 
-  - \ref qso_operation
+  - \subpage qso_operation
   - QSO viewer/editors
-    - \ref qso_entry
-    - \ref qso_query
-    - \ref qso_net_entry
+    - \subpage qso_entry
+    - \subpage qso_query
+    - \subpage qso_net_entry
   - QSO status
-	- \ref qso_details
-	- \ref qso_dxcc
-	- \ref qso_qsl_vwr
-	- \ref contest_scorer
-  - \ref qso_buttons
-  - \ref qso_rig
-  - \ref qso_clock
+	- \subpage qso_details
+	- \subpage qso_dxcc
+	- \subpage qso_qsl_vwr
+	- \subpage contest_scorer
+  - \subpage qso_buttons
+  - \subpage qso_rig
+  - \subpage qso_clocks
   - Miscellaneous
-    - \ref qso_log_info
-	- \ref qso_qsl
-	- \ref qso_log_info
-	- \ref qso_apps
-	- \ref qso_wx
-	- \ref qso_bands
+    - \subpage qso_log_info
+	- \subpage qso_qsl
+	- \subpage qso_log_info
+	- \subpage qso_apps
+	- \subpage qso_wx
+	- \subpage qso_bands
 	
 \page qso_operation Station Operation
  
