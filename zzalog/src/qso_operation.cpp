@@ -13,11 +13,16 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_Input_Choice.H>
+#include <FL/Fl_Preferences.H>
 
 extern config *config_;
 extern status *status_;
 extern stn_data *stn_data_;
+
+extern string PROGRAM_ID;
+extern string VENDOR;
 extern void open_html(const char*);
+extern Fl_Preferences::Root prefs_mode_;
 
 qso_operation::qso_operation(int X, int Y, int W, int H, const char *L) : Fl_Group(X, Y, W, H, L),
 																		  current_qth_(""),
@@ -27,6 +32,7 @@ qso_operation::qso_operation(int X, int Y, int W, int H, const char *L) : Fl_Gro
 	tooltip("Displays the current station opertaion: QTH, Operator and callsign used");
 	label("Station");
 	box(FL_BORDER_BOX);
+	load_data();
 	create_form();
 	populate_choices();
 	enable_widgets();
@@ -34,6 +40,7 @@ qso_operation::qso_operation(int X, int Y, int W, int H, const char *L) : Fl_Gro
 
 qso_operation::~qso_operation()
 {
+	store_data();
 }
 
 // Handle
@@ -108,12 +115,38 @@ void qso_operation::create_form()
 // Update the widget values
 void qso_operation::enable_widgets()
 {
+	store_data();
 	ch_qth_->value(current_qth_.c_str());
 	ch_oper_->value(current_oper_.c_str());
 	ch_call_->value(current_call_.c_str());
 	ch_qth_->activate();
 	ch_oper_->activate();
 	ch_call_->activate();
+}
+
+// Load data
+void qso_operation::load_data() {
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences station_settings(settings, "Station");
+	char* temp;
+	station_settings.get("Name", temp, "");
+	current_oper_ = temp;
+	free(temp);
+	station_settings.get("Callsign", temp, "");
+	current_call_ = to_upper(string(temp));
+	free(temp);
+	station_settings.get("Location", temp, "");
+	current_qth_ = temp;
+	free(temp);
+}
+
+// Store data
+void qso_operation::store_data() {
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences station_settings(settings, "Station");
+	station_settings.set("Name", current_oper_.c_str());
+	station_settings.set("Callsign", current_call_.c_str());
+	station_settings.set("Location", current_qth_.c_str());
 }
 
 // QTH button clicked
@@ -186,7 +219,6 @@ void qso_operation::cb_show(Fl_Widget *w, void *v)
 void qso_operation::qso(record *qso)
 {
 	current_qso_ = qso;
-	evaluate_qso();
 	enable_widgets();
 }
 
@@ -260,138 +292,6 @@ void qso_operation::populate_choices()
 	}
 }
 
-// Local matching method
-bool match(string lhs, string rhs)
-{
-	if (lhs == rhs)
-		return true;
-	else if (rhs == "")
-		return true;
-	else if (lhs == "")
-		return true;
-	else
-		return false;
-}
-
-// Try and evaluate the current operation from QSO
-bool qso_operation::evaluate_qso()
-{
-	// Try an analyse existing QTHs for match
-	set<string> matching_qths;
-	bool ok = true;
-	if (current_qso_)
-	{
-		bool nodata = true;
-		for (auto it : *stn_data_->get_qths())
-		{
-			bool possible = true;
-			for (auto ita : it.second->data)
-			{
-				string data;
-				switch (ita.first)
-				{
-				case STREET:
-				case CITY:
-					data = ita.second;
-					break;
-				default:
-					data = to_upper(ita.second);
-					break;
-				}
-				if (!match(current_qso_->item(QTH_ADIF_MAP.at(ita.first)), data))
-					possible = false;
-				if (current_qso_->item(QTH_ADIF_MAP.at(ita.first)).length())
-					nodata = false;
-			}
-			if (possible)
-				matching_qths.insert(it.first);
-		}
-		if (nodata)
-		{
-			// Probably a new QSO
-			ok = true;
-		}
-		else
-		{
-			switch (matching_qths.size())
-			{
-			case 0:
-				status_->misc_status(ST_WARNING, "DASH: No QTHs match current QSO");
-				current_qth_ = "";
-				ok = false;
-				break;
-			case 1:
-				current_qth_ = *matching_qths.begin();
-				break;
-			default:
-				status_->misc_status(ST_WARNING, "DASH: Multiple QTHs match QSO - using first match");
-				current_qth_ = *matching_qths.begin();
-				break;
-			}
-		}
-		// Try an analyse existing Operators for match
-		set<string> matching_opers;
-		nodata = true;
-		for (auto it : *stn_data_->get_opers())
-		{
-			bool possible = true;
-			for (auto ita : it.second->data)
-			{
-				string data;
-				switch (ita.first)
-				{
-				case NAME:
-					data = ita.second;
-					break;
-				default:
-					data = to_upper(ita.second);
-					break;
-				}
-				if (!match(current_qso_->item(OPER_ADIF_MAP.at(ita.first)), data))
-					possible = false;
-				if (current_qso_->item(OPER_ADIF_MAP.at(ita.first)).length())
-					nodata = false;
-			}
-			if (possible)
-				matching_opers.insert(it.first);
-		}
-		if (nodata)
-		{
-			// Probably a new QSO
-			ok = true;
-		}
-		else
-		{
-			switch (matching_opers.size())
-			{
-			case 0:
-				status_->misc_status(ST_WARNING, "DASH: No Operators match current QSO");
-				current_oper_ = "";
-				ok = false;
-				break;
-			case 1:
-				current_oper_ = *matching_opers.begin();
-				break;
-			default:
-				status_->misc_status(ST_WARNING, "DASH: Multiple Operators match QSO - using first match");
-				current_oper_ = *matching_opers.begin();
-				break;
-			}
-		}
-		// Just use the current station callsign
-		current_call_ = current_qso_->item("STATION_CALLSIGN");
-		if (!current_call_.length())
-		{
-			status_->misc_status(ST_WARNING, "DASH: No Station callsign in current QSO");
-		}
-	}
-	else
-	{
-		// No QSL to evaluate
-		ok = false;
-	}
-	return ok;
-}
 
 // Handle new QTH
 void qso_operation::new_qth()

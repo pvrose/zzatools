@@ -62,6 +62,8 @@ public:
 
     void create_form();
     void enable_widgets();
+    void load_data();
+    void store_data();
 
     static void cb_qth(Fl_Widget* w, void* v);
     static void cb_oper(Fl_Widget* w, void* v);
@@ -83,8 +85,6 @@ public:
     void populate_choices();
 
 protected:
-    // Try and evaluate the current operation from QSO
-    bool evaluate_qso();
     // Handle new QTH 
     void new_qth();
     // handle new Operator
