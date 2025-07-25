@@ -81,6 +81,8 @@ public:
 
     // Update QSO from current values
     void update_qso(record* qso);
+    // Update station details
+    void update_details();
     // Populate the choices
     void populate_choices();
 

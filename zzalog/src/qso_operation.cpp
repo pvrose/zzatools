@@ -129,7 +129,7 @@ void qso_operation::load_data() {
 	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences station_settings(settings, "Station");
 	char* temp;
-	station_settings.get("Name", temp, "");
+	station_settings.get("Operator", temp, "");
 	current_oper_ = temp;
 	free(temp);
 	station_settings.get("Callsign", temp, "");
@@ -144,7 +144,7 @@ void qso_operation::load_data() {
 void qso_operation::store_data() {
 	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences station_settings(settings, "Station");
-	station_settings.set("Name", current_oper_.c_str());
+	station_settings.set("Operator", current_oper_.c_str());
 	station_settings.set("Callsign", current_call_.c_str());
 	station_settings.set("Location", current_qth_.c_str());
 }
@@ -358,4 +358,11 @@ void qso_operation::update_qso(record *qso)
 		status_->misc_status(ST_ERROR, msg);
 	}
 	qso->item("STATION_CALLSIGN", current_call_);
+}
+
+// Station details have been changed - update everything
+void qso_operation::update_details() {
+	load_data();
+	populate_choices();
+	enable_widgets();
 }

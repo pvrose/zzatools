@@ -26,7 +26,7 @@ extern string VENDOR;
 extern Fl_Preferences::Root prefs_mode_;
 
 club_stn_dlg::club_stn_dlg() :
-	win_dialog(640, 480, "Club operator log-in") {
+	win_dialog(640, 480, "Club log-in") {
 	load_data();
 	create_form();	
 	enable_widgets();
@@ -102,7 +102,7 @@ void club_stn_dlg::load_data() {
 	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences station_settings(settings, "Station");
 	char* temp;
-	station_settings.get("Name", temp, "");
+	station_settings.get("Club Name", temp, "");
 	club_name_ = temp;
 	free(temp);
 	station_settings.get("Callsign", temp, "");
@@ -115,6 +115,9 @@ void club_stn_dlg::load_data() {
 	station_settings.get("Location", temp, "");
 	club_location_ = temp;
 	free(temp);
+	station_settings.get("Operator", temp, "");
+	nickname_ = temp;
+	free(temp);
 }
 
 // Enable widgets
@@ -122,23 +125,30 @@ void club_stn_dlg::enable_widgets() {
 	// If we expect to change them 
 	if (club_name_.length() == 0 || new_installation_) {
 		w_club_name_->type(FL_NORMAL_INPUT);
+		w_club_name_->color(FL_BACKGROUND2_COLOR);
 	}
 	else {
 		w_club_name_->type(FL_NORMAL_OUTPUT);
+		w_club_name_->color(FL_BACKGROUND_COLOR);
 	}
 	if (club_call_.length() == 0 || new_installation_) {
 		w_club_call_->type(FL_NORMAL_INPUT);
+		w_club_call_->color(FL_BACKGROUND2_COLOR);
 	}
 	else {
 		w_club_call_->type(FL_NORMAL_OUTPUT);
+		w_club_call_->color(FL_BACKGROUND_COLOR);
 	}
 	if (club_location_.length() == 0 || new_installation_) {
 		w_club_location_->type(FL_NORMAL_INPUT);
+		w_club_location_->color(FL_BACKGROUND2_COLOR);
 	}
 	else {
 		w_club_location_->type(FL_NORMAL_OUTPUT);
+		w_club_location_->color(FL_BACKGROUND_COLOR);
 	}
 	const oper_info_t* info = stn_data_->get_oper(nickname_);
+	w_operator_->value(nickname_.c_str());
 	if (info) {
 		w_name_->value(info->data.at(NAME).c_str());
 		w_call_->value(info->data.at(CALLSIGN).c_str());
@@ -170,9 +180,10 @@ void club_stn_dlg::store_data() {
 	// Get club details from settings
 	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences station_settings(settings, "Station");
-	station_settings.set("Name", club_name_.c_str());
+	station_settings.set("Club Name", club_name_.c_str());
 	station_settings.set("Callsign", club_call_.c_str());
 	station_settings.set("Location", club_location_.c_str());
+	station_settings.set("Operator", nickname_.c_str());
 }
 
 void club_stn_dlg::cb_bn_login(Fl_Widget* w, void* v) {
@@ -180,8 +191,8 @@ void club_stn_dlg::cb_bn_login(Fl_Widget* w, void* v) {
 	that->club_call_ = to_upper(that->club_call_);
 	that->add_callsign();
 	that->add_login();
-	qso_manager_->data()->update_station_choices();
 	that->store_data();
+	qso_manager_->data()->update_station_choices();
 	that->default_callback(that, v);
 }
 

@@ -2126,5 +2126,5 @@ void qso_data::update_station_fields(record* qso) {
 
 // Update the choices available for station information
 void qso_data::update_station_choices() {
-	g_station_->populate_choices();
+	g_station_->update_details();
 }
