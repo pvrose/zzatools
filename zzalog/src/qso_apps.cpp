@@ -458,7 +458,7 @@ int qso_apps::handle(int event) {
     case FL_KEYBOARD:
         switch (Fl::event_key()) {
         case FL_F + 1:
-            open_html("qso_app.html");
+            open_html("qso_apps.html");
             return true;
         }
         break;
