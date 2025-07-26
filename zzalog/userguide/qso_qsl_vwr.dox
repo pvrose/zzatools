@@ -16,17 +16,19 @@ buttons select:
 - eMail(S): the image that coule be sent as an e-mail QSL.
 
 In the image below the "Label" button has been clicked and that image is now displayed.
+This image will be used when printing labels to apply to paper QSL cards.
 
 <IMG SRC="../images/qso_qsl_vwr_2.png">
 
 The second sub-pane "Status" shows the QSL status. It shows whether QSLs have been 
 received (column "R") or sent (column "S") through the various QSL mechanisms: the
 four internet QSL servers (eQSL.cc, Logbook of the World, QRZ.com and Clublog.org),
-and by paper card (Bureau or direct) or e-mail.
+and by paper card (Bureau or direct) or e-mail. The last cases 
+are distinguished by the letter 'B' or 'E' next to the check boxes.
 
 <IMG SRC="../images/qso_qsl_vwr_3.png">
 
-The third sub-pane "Edit" isonly active if the main QSO entry pane is in edit-mode. 
+The third sub-pane "Edit" is only active if the main QSO entry pane is in edit-mode. 
 It allows the record to be updated when a QSL status changes. The top three buttons,
 encased in red, allow the fact that a QSL card has been received via the Bureau, e-mail
 or direct to be recorded. The bottom three buttons, encased in blue, have the following
@@ -35,7 +37,7 @@ actions:
 - Fetch: Fetch an image from eQSL.cc for the QSO. This is normally automatic, but this
 feature is provided if a glitch has prevented the automatic download.
 - Requested: The operator of the other station has requested a paper QSL card.
-- Declined: The operator of the other station has specifically declines a paper
+- Declined: The operator of the other station has specifically declined a paper
 QSL card. Typically this may be a special event station that sends cards out but does
 not want one in return.
 

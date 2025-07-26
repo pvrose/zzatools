@@ -22,7 +22,7 @@ to using hamlib.
 Click the "Select" button. This will put the rig control into a 'select' mode
 which allows the user to select the rig directly or one of the other
 applications. Click the button next to the rig input to open a drop-down
-menu. As can be seen the menu is grouped by manufacturer. In the umage below,
+menu. As can be seen the menu is grouped by manufacturer. In the image below,
 the Icom IC-705 transceiver has been selected.
 
 <IMG SRC="../images/qso_rig_2.png">
@@ -41,18 +41,19 @@ and baud-rate menus have been opened.
 An example using the application FlRig is shown below. In this case communication 
 between ZZALIB and FlRig uses a protocol known as XML-RPC (Remote procedure call using
 XML) over an HTTP link. In the case below, this HTTP link is within the same computer
-(localhost - blue pointer) but it can be over a network. Also ZZALOG can start the other application
-using scripts, but the other application can be started by invoking its command. In
-the case below a script is available as indicated by the lit "Use" button (red pointer).
+(localhost - green pointer) but it can be over a network. Also ZZALOG can start the other application
+using scripts (blue pointer), but the other application can be started by invoking its command. In
+the case below a script is available as indicated by the indicated "Use" button (red pointer).
 
 <IMG SRC="../images/qso_rig_5.png">
 
 \subsection rig_auto Starting and connecting automatically
 
 The "Auto" pane allows the control of automatically starting the other application and then
-connecting to the rig. In the image below, The application is not started automatically
+connecting to the rig. In the image below, because the button is unchecked the 
+application is not started automatically
 when ZZALOG starts, but ZZALOG will then attempt to connect after a delay of 2.5 seconds after
-the application has been started. This delay is obtained through a process of "trial and
+the application has been started. The value for this delay is obtained through a process of "trial and
 error" to see when the application will accept the first command after being started.
 
 <IMG SRC="../images/qso_rig_6.png">
@@ -71,7 +72,7 @@ the drop-down menu that has been enabled.
 The "Accessories" pane allows accessories such as a linear amplifier or transverter
 to be added to the rig. The power and frequency that the rig reports must be changed
 before being logged. In the image below left, the two check boxes for "Amplifier" and
-"Transverter" have been clicked, this enabling the inputs below. For an ammplifier
+"Transverter" have been clicked, this enabling the inputs below. For an amplifier
 its gain should be specified in dB. For a transverter its frequency shift should be specified in MHz 
 and its power output in W. 
 
@@ -79,7 +80,7 @@ and its power output in W.
 
 \subsection rig_misc Miscellaneous features
 
-The "Timeouts etc" pane allows the user to specify miscellaneous features.
+The "Timeout etc" pane allows the user to specify miscellaneous features.
 - Timeout: This specifies the time in seconds that ZZALOG waits before deciding that the rig
 will not honour a request that has been made.
 - S-meter stack: When ZZALOG displays the S-meter value, it displayes the maximum value

@@ -1,10 +1,70 @@
 /** \page page_2 Installation
 
-Installation can currently only
-be done on an ad-hoc basis. This document currently assumes that
-installation has already been done by the application's author. 
+\section win_install Windows Installation
 
-The application has been compiled
-for Windows and Linux environments.
+A file zzalog.msi is available from the author. Please follow
+instructions to install this. ZZALOG will be installed in
+"C:\Program Files\GM3ZZA\ZZALOG\". 
+Data used by ZZALOG will be installed in 
+"C:\ProgramData\GM3ZZA\ZZALOG\"
+
+\section linux_install Linux Installation
+
+ZZALOG is available in source form. It may be cloned from 
+"https://github.com/pvrose/zzatools". It has dependencies on the 
+external libraries: fltk, hamlib and libcurl.
+
+To compile:
+
+<code>
+cd [install directory]\n
+make
+</code>
+
+To generate user guide:
+
+<code>
+make userguide
+</code>
+
+To install:
+
+<code>
+make install
+</code>
+
+\section initial_run First-time Run
+
+The first time ZZALOG is run, a dialog opens asking whether the
+imstallation id for a club or individual.
+
+<IMG SRC="../images/init_1.png">
+
+Please select which version the installation is for. A dialog then opens 
+asking for a directory to store QSL card images. Cancel this if this
+feature is not required, otherwise navigate to where the images should be
+stored and select "OK". 
+
+A dialog then opens asking for the name of the file to use to store 
+the log-book. Navigate to where the log-book is to be located and
+type in the filename.
+
+\subsection init_club Club Initialisation.
+
+If the installation is for a club station, a dialog opens up to allow
+the user to enter the following:
+- Club Name.
+- Club callsign.
+- Club location identifier.
+
+This dialog also acts a login dialog when using ZZALOG. This allows
+the operator to enter
+- Their nickname.
+- Their name.
+- Their callsign - this is required for logging.
+
+The image below shows the completed dialog
+
+<IMG SRC="../images/init_4.png">
 
 */

@@ -32,15 +32,15 @@ Clicking this toggles the display of the full status.
 <IMG SRC="../images/banner_5.png">
 
 Messages are colour-coded according to severity.
-- Blue - lowest severity
-- Light blue - Messages to be logged for information
-- Light magenta - Messages added for debug purposes
-- Light cyan - Message logged as notes
-- Grey - Messages logged for progress
-- Light green - message logged indicating completion of an activity
-- Yellow - message logged as a warning
-- Red on black - message logged as an error - processing can continue
-- Red on white - message logged as a severe error - processing is stopped
-- Black on red - message logged as a fatal error - processing is stopeed
+- Blue - lowest severity.
+- Light blue - Messages to be logged for information.
+- Light magenta - Messages added for debug purposes.
+- Light cyan - Message logged as notes.
+- Grey - Messages logged for progress.
+- Light green - message logged indicating completion of an activity.
+- Yellow - message logged as a warning.
+- Red on black - message logged as an error - processing can continue.
+- Red on white - message logged as a severe error - processing is stopped.
+- Black on red - message logged as a fatal error - processing is stopeed.
 
 */

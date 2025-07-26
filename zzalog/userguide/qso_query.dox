@@ -9,7 +9,7 @@ a record in the log.
 
 The first example is from the duplicate record check. Two records have been added to the 
 query view. They 
-might be duplicates. They probably are as the two records only differ in the one 
+might be duplicates. in this case they probably are as the two records only differ in the one 
 callsign is the /P version of the other and most other fields agree. The control buttons
 offer the choice for keeping one, the other or both as well as merging the two records.
 

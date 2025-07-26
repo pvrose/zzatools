@@ -432,6 +432,7 @@
     <None Include="zzalog\userguide\log_table.dox" />
     <None Include="zzalog\userguide\menu.dox" />
     <None Include="zzalog\userguide\operating.dox" />
+    <None Include="zzalog\userguide\qso_buttons.dox" />
     <None Include="zzalog\userguide\qso_clocks.dox" />
     <None Include="zzalog\userguide\qso_details.dox" />
     <None Include="zzalog\userguide\qso_entry.dox" />
@@ -444,6 +445,7 @@
     <None Include="zzalog\userguide\qso_rig.dox" />
     <None Include="zzalog\userguide\quick_start.dox" />
     <None Include="zzalog\userguide\report_tree.dox" />
+    <None Include="zzalog\userguide\toolbar.dox" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="zzalog.ico" />

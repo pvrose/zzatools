@@ -4,7 +4,7 @@
 
 \section description_4 Description
 
-This widget displays the log-book view of the data.
+This pane displays the log-book view of the data.
 
 \section features_4 Features
 
@@ -40,9 +40,10 @@ column will vary the width of a column.
 \subsection sorting Sorting data
 
 Double clicking on the header of a column containing QSO_DATE, TIME_ON, QSO_DATE_OFF or TIME_OFF will switch from chronological
-order to reverse-chronological order or vice-versa.Double clicking on the header of other columns is only enabled in the
+order to reverse-chronological order or vice-versa. Double clicking on the header of other columns is only enabled in the
 extracted-data instance of this widget.In that case the data will be displayed in alphabetical order of the entries in that
-column.Double-clicking it again will display in reverse alphabetical order.
+column. Double-clicking it again will display in reverse alphabetical order. 
+<B>NB</B> Switching order like this will take a long time.
 
 \subsection import Import Data
 

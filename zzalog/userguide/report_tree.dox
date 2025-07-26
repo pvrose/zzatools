@@ -4,7 +4,7 @@
 
 This view shows an analysis of the log broken down into a hierarchy based on DXCC 
 entities bands and modes worked.
-The format is controlled by the Report-> set of menu items in the main menu.
+The format is controlled by the "Report->" set of menu items in the main menu.
 
 <IMG SRC="../images/report_tree_1.png">
 
@@ -12,10 +12,10 @@ The format is controlled by the Report-> set of menu items in the main menu.
 
 The report may select the following:
 
-- All records in the log
-- All records using the current sttaion callsign
-- All extracted records
-- The selected record
+- All records in the log.
+- All records using the current sttaion callsign.
+- All extracted records.
+- The selected record.
 
 The tree may be ordered by DXCC, band and mode in any order.
 

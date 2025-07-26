@@ -804,6 +804,8 @@
     <None Include="zzalog\userguide\contest_scorer.dox" />
     <None Include="zzalog\userguide\qso_clocks.dox" />
     <None Include="zzalog\userguide\qso_rig.dox" />
+    <None Include="zzalog\userguide\toolbar.dox" />
+    <None Include="zzalog\userguide\qso_buttons.dox" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="zzalog.ico">

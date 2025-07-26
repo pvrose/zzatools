@@ -5,13 +5,13 @@ ZZALOG uses the hamlib library
 for its rig connectivity. The hamlib library is an suite of procedure
 calls that provides a common interface for most rigs' CAT interfaces.
 It can also interface with a number of other applications that
-provide access to rigs' CAT interfaces. Most CAT interfaces use some
+provide access to these interfaces. Most CAT interfaces use some
 form of serial interface, and shared access to a serial interface by
 different applications (such as ZZALOG and any digital modem
 applications &ndash; PSK, FT8, SSTV etc) requires another helper
 application such as flrig.
 ZZALOG can provide a means of
-starting this helper application, which requires the use of scripts.
+starting this helper application, although requires the use of scripts.
 The rest of this page assumes that Flrig has been launched. 
 
 <A ID="Frame5">
@@ -20,16 +20,14 @@ The rest of this page assumes that Flrig has been launched.
 </A>
 
 In the
-bottom left of the dashboard is \ref Frame5 "Illustration 7: Rig control"
-screen. The user should select the rig that they are interested in.
+bottom left of the dashboard is rig_control screen (see above). The user should select the rig that they are interested in.
 In this case an ICOM IC-7300. The "Start" button will
 lunch a script, if written, to open up the FLRig application. The
 "Select" button allows configuration of the interface.
-These two features will be described is provided in \ref page_5 "Application Details".
-below.
+These two features will be described is provided in \ref qso_rig.
 
 Assuming that FLRig has been launched then clicking the "Connect"
-button will connect to that application. \ref Frame6 "Illustration 8: FLRig connected"
+button will connect to that application. The image below
 shows ZZALOG connected to FLRig and the latter's display alongside.
 ZZALOG is showing the same frequency, mode, TX power and S-meter
 reading as FLRig, and as the rig itself. ZZALOG will normally show
@@ -48,8 +46,7 @@ button.
 \section oper Operating
 To operate, the user must place
 ZZALOG into the correct mode. This is achieved by clicking the
-"Activate" button on the "Controls" page &ndash;
-see \ref Frame3 "Illustration 4: Dashboard view". This changes the "QSO
+"Activate" button on the "Controls" page. This changes the "QSO
 Entry" page:
 
 <A ID="Frame7">
@@ -57,7 +54,7 @@ Entry" page:
 	9: Dashboard ready for operation ("Active")</I>
 </A>
 
-\ref Frame7 "Illustration 9: Dashboard ready for operation (Active)"
+The image above
 shows the "QSO Entry" page ready for entry. All the
 fields shown may be swapped for other fields by selecting the
 drop-down arrow alongside each. Each field has an associated data
@@ -73,12 +70,11 @@ of possible values:
 	11: Menu of formats</I>
 </A>
 
-\ref Frame8 "Illustration 10: Menu of choices"
-and \ref Frame9 "Illustration 11: Menu of formats" how examples of
+The images above show how examples of
 this selection.
 At this point it is also possible
 to check on the "worked-before" status of a call. Typing
-in a callsign that has been copied will result in that call being
+in a callsign that has been received will result in that call being
 checked against the history contained in the log. Examples are below:
 
 <A ID="Frame10">
@@ -86,11 +82,11 @@ checked against the history contained in the log. Examples are below:
 	12: Checking &quot;worked-before&quot; status for a call</I>
 </A>
 
-\ref Frame10 "Illustration 12: Checking &quot;worked-before&quot; status for a call"
+The above image
 shows the callsign being checked. In this case the station has been
 worked before but not on the band on the rig (10m &ndash; whereas
 they were worked before on 40m) or on the mode (FT8 versus CW).
-\ref Frame11 "Illustration 13: Checking &quot;worked-before&quot; status for a DXCC entity"
+The image below
 shows the call being decoded as in DXCC Suriname, continent SA (South
 America) and CQ Zone 9. All three of these have been worked before,
 but this shows that Suriname is a new DXCC on 10m and also on CW.
@@ -112,18 +108,19 @@ not been supplied, it cannot be checked.
 
 In the "Active" state
 the commands available are:
-"Start QSO" - moves
+- "Start QSO" - moves
 ZZALOG to "Enter QSO" state with any details already
 typed in are kept.
-"Add QSO" - will
+- "Add QSO" - will
 start logging a QSO that has already occurred.
-"Edit QSO" - will
+- "Edit QSO" - will
 enable editing a QSO that has already been logged.
-"Delete QSO" - will
+- "Delete QSO" - will
 remove the QSO from the log.
-"View QSO" - will
+- "View QSO" - will
 open the selected QSO for viewing &ndash; and checking DXCC status
 etc.
+
 Clicking "Start QSO"
 will cause the QSO date and time and the information obtained from
 the rig to become fixed. It also makes a new set of commands
@@ -134,17 +131,17 @@ available:
 	15: Commands in &quot;Enter QSO&quot; state</I>
 </A>
 
-"Save" - completes
+- "Save" - completes
 the logging, by setting TIME_OFF field and reverts to "Active"
 state.
-"Save &amp; View" -
+- "Save & View" -
 saves the logging, and keeps the QSO open for viewing.
-"Save &amp; New" -
+- "Save & New" -
 saves the logging, and starts a new QSO.
-"Save &amp; Edit" -
+- "Save & Edit" -
 saves the logging, but keeps the QSO in edit mode for further
 updates.
-"Quit QSO" - cancels
+- "Quit QSO" - cancels
 the logging and removes the QSO from the log.
 
 
