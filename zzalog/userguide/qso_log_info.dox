@@ -1,0 +1,26 @@
+/** \page qso_log_info Log Status
+
+\section description_log_info Description
+
+This pane allows the use to monitor the status of the log.
+
+<IMG SRC="../images/qso_log_info_1.png">
+
+The top line, enclosed in red below, indicates the status of the log. The circle indicates the status
+of the log-book in local memory, and is accompanied by the equivalent text:
+
+- Background colour - "No Data": there is no data.
+- Changing from background to green - "Loading": loading data.
+- Green - "Unmodified" : data has not been modified, or has been written back.
+- Red - "Modified": data has been modified.
+- Changing from red to green - "Storing": writing data.
+
+The check-box, labeled "Save/QSO" when checked indicates that the log will be written back
+after the completion of every QSO, or at other times when a record has been changed. Clicking
+this check-box off will disable writing back of the log. At certain states of the application, 
+the application will suspend writing back to reduce the number of unnecessary updates. When 
+this happens, the check-box wll be unchecked. 
+
+The button, "Save", when clicked will write back the log.
+
+*/

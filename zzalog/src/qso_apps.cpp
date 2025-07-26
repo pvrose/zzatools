@@ -23,6 +23,7 @@ extern status* status_;
 extern string VENDOR;
 extern string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
+extern void open_html(const char*);
 
 // Constructor for one set of modem controls
 app_grp::app_grp(int X, int Y, int W, int H, const char* L) :
@@ -440,6 +441,31 @@ qso_apps::qso_apps(int X, int Y, int W, int H, const char* L) :
 qso_apps::~qso_apps() {
     save_values();
 }
+
+// Handle
+int qso_apps::handle(int event) {
+    int result = Fl_Group::handle(event);
+    // Now handle F1 regardless
+    switch (event) {
+    case FL_FOCUS:
+        return true;
+    case FL_UNFOCUS:
+        // Acknowledge focus events to get the keyboard event
+        return true;
+    case FL_PUSH:
+        take_focus();
+        return true;
+    case FL_KEYBOARD:
+        switch (Fl::event_key()) {
+        case FL_F + 1:
+            open_html("qso_app.html");
+            return true;
+        }
+        break;
+    }
+    return result;
+}
+
 
 // Load settings
 void qso_apps::load_values() {

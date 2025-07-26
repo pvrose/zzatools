@@ -55,7 +55,7 @@ any card image. See \ref qso_qsl_vwr.
 See \ref qso_buttons.
 - "Rigs": Displays the status of any connected rigs. See \ref qso_rig.
 - "Clocks": Displays the time in UTC (i.e GMT or Zulu) and local time. See \ref qso_clocks.
-- "Log": Displays the current status of the file. See \ref qso_log.
+- "Log": Displays the current status of the file. See \ref qso_log_info.
 - "QSLs": Allows the control of data exchange with on-line QSL services. See \ref qso_qsl.
 - "Apps": Provides control of other applications such as digital modems. See \ref qso_apps.
 - "WX": Displays the local weather obtained from openweather.org. See \ref qso_wx.

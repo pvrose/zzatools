@@ -806,6 +806,10 @@
     <None Include="zzalog\userguide\qso_rig.dox" />
     <None Include="zzalog\userguide\toolbar.dox" />
     <None Include="zzalog\userguide\qso_buttons.dox" />
+    <None Include="zzalog\userguide\main_window.dox" />
+    <None Include="zzalog\userguide\qso_log_info.dox" />
+    <None Include="zzalog\userguide\qso_qsl.dox" />
+    <None Include="zzalog\userguide\qso_apps.dox" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="zzalog.ico">

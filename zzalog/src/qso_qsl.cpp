@@ -42,6 +42,7 @@ extern qrz_handler* qrz_handler_;
 extern qsl_dataset* qsl_dataset_;
 extern string VENDOR;
 extern string PROGRAM_ID;
+extern void open_html(const char*);
 
 // Constructor
 qso_qsl::qso_qsl(int X, int Y, int W, int H, const char* L) :
@@ -82,6 +83,31 @@ void qso_qsl::load_values() {
 	server_data_t* qrz_data = qsl_dataset_->get_server_data("QRZ");
 	auto_qrz_ = qrz_data->upload_per_qso;
 }
+
+// Handle
+int qso_qsl::handle(int event) {
+	int result = Fl_Group::handle(event);
+	// Now handle F1 regardless
+	switch (event) {
+	case FL_FOCUS:
+		return true;
+	case FL_UNFOCUS:
+		// Acknowledge focus events to get the keyboard event
+		return true;
+	case FL_PUSH:
+		take_focus();
+		return true;
+	case FL_KEYBOARD:
+		switch (Fl::event_key()) {
+		case FL_F + 1:
+			open_html("qso_qsl.html");
+			return true;
+		}
+		break;
+	}
+	return result;
+}
+
 
 // Draw the widgets
 void qso_qsl::create_form() {

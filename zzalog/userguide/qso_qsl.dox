@@ -1,0 +1,82 @@
+/** \page qso_qsl Interfacing QSL Websites
+
+\section description_qsl Description
+
+This pane allows interaction with the online QSL servers: eQSL.cc, 
+Logbook of the World, Clublog.org and QRZ.com. In addition it allows
+processing of e-mail and paper QSLs.
+
+<IMG SRC="../images/qso_qsl_1.png">
+
+The top check box, labeled "Only handle selected QSO", allows the processing
+of the selected QSO record. Only buttons triggering actions relevant
+to an individual QSO record will be activated.
+
+The first column, enclosed in red below, identifies the various QSL sources.
+The check boxes besides the online servers indicate, when checked, that 
+QSOs are uploaded automatically after each QSO is complete. This upload
+is started as a background activity, so should not interfere with normal
+logging activity.
+
+<IMG SRC="../images/qso_qsl_2.png">
+
+\subsection qsl_download Downloading data
+
+The second column, shown below, contains buttons that start QSL data downloads.
+In the case of the three online servers that support it, clicking the button
+starts a download of records received by the server of putative QSOs with 
+this station. These are labeled with a downward arrow. The fourth button, labeled
+"OQRS", downloads requests for paper QSLs from the "Online QSL Request Service"
+managed by Clublog.org. 
+
+For all downloads, processing of the data is started automatically. When necessary,
+requests for confirmation are handled by \ref qso_query. The appropriate fields
+are added to the QSO records indicating either the QSL status with respect to the 
+server, or that a QSL request has been received for OQRS.
+
+<IMG SRC="../images/qso_qsl_3.png">
+
+\subsection qsl_extract Extracting QSL data
+
+The third column, shown below, contains buttons that extract data for sending to the
+online servers or other processing. The bottom button, labeled with a backward looping
+arrow, remoces the extract.
+
+<IMG SRC="../images/qso_qsl_4.png">
+
+\subsection qsl_processing Processing QSL data
+
+The fourth column, shown below, contains buttons that process data. 
+
+For QRZ.com, the extracted data is written to a file for manual upload to QRZ.com as this server
+does not support direct bulk upload from an application.
+
+For Cards, a label os printed for each of the records in the extracted data.
+
+Foe e-Mails, an QSL image is generated for each of the records in the extracted data.
+
+<IMG SRC="../images/qso_qsl_5.png">
+
+\subsection qsl_upload Uploading QSL data
+
+The fifth column, shown below, contains buttons that upload data.
+
+For the three online servers that support bulk data upload (eQSL.cc, Logbook of the World
+and Clublog.org) the extracted data is uploaded to the server.
+
+For all four online servers individual QSOs can be uploaded.
+
+For e-Mails, the button will send e-mails with the previously generated images
+for each record in the extracted data.
+
+<IMG SRC="../images/qso_qsl_6.png">
+
+\subsection qsl_done Updating records with "Done"
+
+The last column, shown below, contains buttons, lebaled "Done". For those activities
+that require manual intervention: uploading data; posting cards and sending e-mails, 
+clicking "Done" will update the records that the activity is complete.
+
+<IMG SRC="../images/qso_qsl_7.png">
+
+*/

@@ -115,6 +115,8 @@ public:
     qso_apps(int X, int Y, int W, int H, const char* L = nullptr);
     ~qso_apps();
 
+    virtual int handle(int event);
+
     // Load settings
     void load_values();
     // Create widgets

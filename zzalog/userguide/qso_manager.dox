@@ -23,7 +23,6 @@ and managing the data within the log-book.
   - Miscellaneous
     - \subpage qso_log_info
 	- \subpage qso_qsl
-	- \subpage qso_log_info
 	- \subpage qso_apps
 	- \subpage qso_wx
 	- \subpage qso_bands

@@ -1,0 +1,57 @@
+/** \page qso_apps Handling 3rd-party applications
+
+This pane enables the user to set up other applications. ZZALOG currently
+supports interactions with WSTJT-X and FlDigi. For these ZZALOG acts as a 
+log-book server. ZZALOG can be configured to launch and configure other
+applications.
+
+<IMG SRC="../images/qso_apps_1.png">
+
+\section apps_new Selecting a new application
+
+Enclosed in red below, the "New App" button allows an application to be
+declared to ZZALOG. The data to entered here shall be a "label" for the 
+application: in the example here GT2 is used as a label for GridTracker v2.
+
+<IMG SRC="../images/qso_apps_2.png">
+
+ZZALOG requires scripts to launch these applications. Applications may require 
+different configuration depending on the rig and how the rig is connected to ZZALOG.
+The buttons circled below are used to control this.
+- ALl rigs: the application has the same configuration for all rigs.
+- Rig: the application needs a different configuration for each rig.
+- Rig+CAT: the application needs a different configuration for each rig and its
+CAT mechanism.
+
+<IMG SRC="../images/qso_apps_3.png">
+
+ZZALOG can act as a log server for WSJT-X and FlDigi. To enable this feature click the
+button labeled "Server". This button will light to indicate it is enabled. The
+button labeled "Listen" when lit indicates that traffic has been received from the application.
+
+The text below the button summarises how the application is configured.
+
+<IMG SRC="../images/qso_apps_4.png">
+<IMG SRC="../images/qso_apps_5.png">
+
+\section apps_script Using scripts
+
+The script is specified as below. The input field has an associated file browse button. The 
+script name can either be typed in or navigated using a file browser opened by that button.
+The "Show" button will open up a text editor allowing the script to be viewed or edited.
+
+<IMG SRC="../images/qso_apps_6.png">
+
+In some cases a script may be required to undo the action of the above script. In the next image,
+the button labeled with a backward looping arrow can be used to enable this feature. When enabled
+this button will be lit and the other buttons and input enabled.
+
+<IMG SRC="../images/qso_apps_7.png">
+
+Some scripts may require to be run in administrrator or superuser mode. In the image below,
+the button labeled "Adm" enables this. Enter the password into the input field. Clicking the button 
+labeled with a closed eye will show the password in clear.
+
+<IMG SRC="../images/qso_apps_8.png">
+
+*/

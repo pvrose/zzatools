@@ -16,6 +16,7 @@ extern book* book_;
 extern import_data* import_data_;
 extern ticker* ticker_;
 extern bool AUTO_SAVE;
+extern void open_html(const char*);
 
 // Constructor
 qso_log_info::qso_log_info(int X, int Y, int W, int H, const char* l) :
@@ -38,6 +39,30 @@ qso_log_info::qso_log_info(int X, int Y, int W, int H, const char* l) :
 // Destructor
 qso_log_info::~qso_log_info() {
 	ticker_->remove_ticker(this);
+}
+
+// Handle F1
+int qso_log_info::handle(int event) {
+	int result = Fl_Group::handle(event);
+	// Now handle F1 regardless
+	switch (event) {
+	case FL_FOCUS:
+		return true;
+	case FL_UNFOCUS:
+		// Acknowledge focus events to get the keyboard event
+		return true;
+	case FL_PUSH:
+		take_focus();
+		return true;
+	case FL_KEYBOARD:
+		switch (Fl::event_key()) {
+		case FL_F + 1:
+			open_html("qso_log_info.html");
+			return true;
+		}
+		break;
+	}
+	return result;
 }
 
 // get settings 

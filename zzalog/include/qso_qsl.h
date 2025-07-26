@@ -18,6 +18,8 @@ public:
     qso_qsl(int X, int Y, int W, int H, const char* L);
     ~qso_qsl();
 
+    virtual int handle(int event);
+
     // Load settings
     void load_values();
     // Create the widgets

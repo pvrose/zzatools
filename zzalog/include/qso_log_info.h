@@ -21,6 +21,8 @@ public:
 	qso_log_info(int X, int Y, int W, int H, const char* l = nullptr);
 	~qso_log_info();
 
+	virtual int handle(int event);
+
 	// get settings 
 	void load_values();
 	// Create form
