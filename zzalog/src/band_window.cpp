@@ -16,7 +16,8 @@ band_window::band_window(int X, int Y, int W, int H, const char* L) :
 	bw_->type(band_widget::BAND_FULL | band_widget::ZOOMABLE);
 	bw_->selection_color(selection_color());
 
-	Fl_Box* b_cr = new Fl_Box(X, Y - FOOT_HEIGHT, W, FOOT_HEIGHT);
+	Fl_Box* b_cr = new Fl_Box(0, H - FOOT_HEIGHT, W, FOOT_HEIGHT);
+	b_cr->box(FL_FLAT_BOX);
 	b_cr->copy_label(string(COPYRIGHT + " " + CONTACT + "     ").c_str());
 	b_cr->labelsize(FL_NORMAL_SIZE - 1);
 	b_cr->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
