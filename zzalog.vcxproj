@@ -250,7 +250,6 @@
     <ClCompile Include="zzalog\src\extract_data.cpp" />
     <ClCompile Include="zzalog\src\fields_dialog.cpp" />
     <ClCompile Include="zzalog\src\field_choice.cpp" />
-    <ClCompile Include="zzalog\src\files_dialog.cpp" />
     <ClCompile Include="zzalog\src\fllog_emul.cpp" />
     <ClCompile Include="zzalog\src\import_data.cpp" />
     <ClCompile Include="zzalog\src\intl_dialog.cpp" />
@@ -383,7 +382,6 @@
     <ClInclude Include="zzalog\include\fields_dialog.h" />
     <ClInclude Include="zzalog\include\field_choice.h" />
     <ClInclude Include="zzalog\include\files.h" />
-    <ClInclude Include="zzalog\include\files_dialog.h" />
     <ClInclude Include="zzalog\include\fllog_emul.h" />
     <ClInclude Include="zzalog\include\icons.h" />
     <ClInclude Include="zzalog\include\import_data.h" />

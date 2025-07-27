@@ -106,7 +106,6 @@ extern Fl_Preferences::Root prefs_mode_;
 
 	// Settings operations
 	{ "&Settings", 0, 0, 0, FL_SUBMENU },
-		{ "Fi&les", 0, menu::cb_mi_settings, (void*)config::DLG_FILES },
 		{ "&Web/Network", 0, menu::cb_mi_settings, (void*)config::DLG_WEB },
 		{ "&Fields", 0, menu::cb_mi_settings, (void*)config::DLG_COLUMN },
 		{ "&Station", 0, menu::cb_mi_settings, (void*)config::DLG_STATION },

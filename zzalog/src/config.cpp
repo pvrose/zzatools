@@ -3,7 +3,6 @@
 #include "config_tree.h"
 #include "contest_dialog.h"
 #include "fields_dialog.h"
-#include "files_dialog.h"
 #include "page_dialog.h"
 #include "qsl_editor.h"
 #include "user_dialog.h"
@@ -56,12 +55,6 @@ config::config(int W, int H, const char* label) :
 	int rh = 0;
 	// get client area 
 	tabs_->client_area(rx, ry, rw, rh, 0);
-	// File location config
-	files_dialog* files = new files_dialog(rx, ry, rw, rh, "File Locations");
-	files->labelfont(FL_BOLD);
-	files->labelsize(FL_NORMAL_SIZE + 2);
-	files->tooltip("Allows the specification of the locations of various resources used by zzalog");
-	children_ids_.push_back(DLG_FILES);
 	// Web URLs, user-names and passwords
 	web_dialog* aweb = new web_dialog(rx, ry, rw, rh, "Web/Network");
 	aweb->labelfont(FL_BOLD);
@@ -234,9 +227,6 @@ Fl_Widget* config::get_tab(cfg_dialog_t active) {
 void config::set_label(config::cfg_dialog_t active) {
 
 	switch (active) {
-	case DLG_FILES:
-		label("Configuration: Define location of various data files");
-		break;
 	case DLG_WEB:
 		label("Configuration: Define web locations of QSL and other services");
 		break;

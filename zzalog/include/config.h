@@ -27,7 +27,6 @@ const int HCONFIG = 500;
 
 		// The tab types in the config dialog - order is speific!
 		enum cfg_dialog_t {
-			DLG_FILES,
 			DLG_WEB,
 			DLG_COLUMN,
 			DLG_STATION,
