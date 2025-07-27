@@ -1,0 +1,111 @@
+/** \page web_dialog On-line services and functions
+
+This dialog allows the user to configure all necessary on-line services and functions.
+
+\section web_eqsl eQSL.cc
+
+This tab allows the user to configure their use of eQSL.cc. Clicking the "En" check box enables
+using eQSL.cc. The user can enter the eQSL user and password in these fields. The button with the
+closed eye icon will make text in the password input fied visible. 
+
+If the user wants to update the QSO record to eQSL after each QSL, then tick the "Update each QSO"
+check box. This feature is also available in \ref qso_qsl. If the user wants all QSL requests from
+eQSL.cc to be downloaded leave the "Download Confirmed" unchecked. If this is checked only 
+QSL requests that already match uploaded QSO records will be downloaded.
+
+eQSL.cc manages each callsign that the user operates as separate log-books. This dialog has
+been populated with all the callsigns the user has used. Each callsign has associated with it 
+a flag saying that that callsign has an eQSL log-book ("Used") and the last time a download
+request was made ("Last Downloaded"). ZZALOG remembers the last download date: this feature
+allows the user to override this.
+
+The ability to use the QSO_MSG field is provided. Different messages may be added for SWL
+and QSO QSL records.
+
+<IMG SRC="../images/web_dialog_1.png">
+
+\section web_lotw Logbook of the World
+
+This tab allows the user to configure their use of ARRL's Logbook of the World (LotW). 
+Clicking the "En" check-box enables the use of LotW. The user can enter the LotW user and password
+in these fields. The button with the
+closed eye icon will make text in the password input fied visible. 
+
+If the user wants to update the QSO record to LotW after each QSL, then tick the "Update each QSO"
+check box. This feature is also available in \ref qso_qsl. 
+ZZALOG remembers the last download date: the field "Last accessed" 
+allows the user to override this.
+
+
+<IMG SRC="../images/web_dialog_2.png">
+
+\section wrb_qrx QRZ.com
+
+This tab allows the user to configure their use of QRZ.com.
+
+QRZ.com offers XML subscribers access to its database. This allows the user to download
+data about a contacted station. To use this feature the user clicks the check-box "Use XML Database"
+and enters their user and password in the field. The button with the
+closed eye icon will make text in the password input fied visible. 
+
+QRZ.com offers a programming interface. ZZAOG uses this to upload a QSO record after each QSO is 
+complete and for bulk download of data. To use, the user clicks the check-box "API Enable". 
+If the user wants to update the QSO record to QRZ.com after each QSL, then tick the "Update each QSO"
+check box. This feature is also available in \ref qso_qsl.
+
+QRZ.com maintains separate log-books for each callsign used. It requires a separate key for each 
+log-book. This key is typed into the "Key" field. ZZALOG remembers the last download date: 
+the "Last Downloaded" field
+allows the user to override this.
+
+<IMG SRC="../images/web_dialog_3.png">
+
+\section web_clublog Clublog.com
+
+This tab allows the user to configure their use of Clublog.com.
+
+Clicking the "En" check-box enables the use of Clublog. The user can enter the their e-mail 
+address and password
+in these fields. The button with the
+closed eye icon will make text in the password input fied visible. 
+
+If the user wants to update the QSO record to Clublog after each QSL, then tick the "Update each QSO"
+check box. This feature is also available in \ref qso_qsl. 
+
+Clublog also provide the database of callsigns that ZZALOG uses. For this feature the API key
+enabling this is hard-coded within ZZALOG.
+
+<IMG SRC="../images/web_dialog_4.png">
+
+\section web_network Log client addresses
+
+This tab allows the user to configure ZZALOG to act as a log-book server for the
+applications WSJT-X and FlDigi. See \ref qso_apps.
+
+<IMG SRC="../images/web_dialog_5.png">
+
+ZZALOG listens to requests from WSJT-X. The address and port eneterd here should match that set
+in WSJT-X (see below). Note that other applications also make use of this feature. In this case 
+rather than using the localhost address (127.0.0.1), a multicast address (such as 224.0.0.1) should
+be used. This allows more than one application to receive a data packet sent out on this port. 
+WSJT-X sends completed QSO records to ZZALOG for automatic logging.
+
+<IMG SRC="../images/web_dialog_7.png">
+
+ZZALOG can emulate the application FlLog. This is an application which is part of the FlDigi
+suite of programs and is used by FlDigi to check worked-before status and log completed QSOs.
+The address and port that FlDigi uses appears to be hardwired as 127.0.0.1:8421. To enable
+FlDigi to use this, FlDigi must be told to use a log server - see below.
+
+<IMG SRC="../images/web_dialog_8.png">
+
+\section web_email E-Mail server
+
+ZZALOG can send QSLs by e-mail. This tab allows the user to enter their e-mail server
+details. The user should enter the server address (eg mail.btinternet.com) and the user and password
+they use. An additional e-mail address can be specified to receive the e-mail as a CC recipient. 
+
+<IMG SRC="../images/web_dialog_6.png">
+
+
+*/

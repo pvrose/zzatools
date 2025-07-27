@@ -75,6 +75,8 @@ public:
     fields_dialog(int X, int Y, int W, int H, const char* L = nullptr);
     virtual ~fields_dialog();
 
+    virtual int handle(int event);
+
     // Load values from settings
     virtual void load_values();
     // Used to create the form

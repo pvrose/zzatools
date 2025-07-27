@@ -15,6 +15,7 @@
 
 extern book* book_;
 extern fields* fields_;
+extern void open_html(const char*);
 
 // Constructor
 fields_table::fields_table(int X, int Y, int W, int H, const char* L) :
@@ -302,6 +303,31 @@ fields_dialog::fields_dialog(int X, int Y, int W, int H, const char* L) :
 
 // Destructor
 fields_dialog::~fields_dialog() {}
+
+// Handle
+int fields_dialog::handle(int event) {
+    int result = page_dialog::handle(event);
+    // Now handle F1 regardless
+    switch (event) {
+    case FL_FOCUS:
+        return true;
+    case FL_UNFOCUS:
+        // Acknowledge focus events to get the keyboard event
+        return true;
+    case FL_PUSH:
+        take_focus();
+        return true;
+    case FL_KEYBOARD:
+        switch (Fl::event_key()) {
+        case FL_F + 1:
+            open_html("fields_dialog.html");
+            return true;
+        }
+        break;
+    }
+    return result;
+}
+
 
 // Load data from settings
 void fields_dialog::load_values() {

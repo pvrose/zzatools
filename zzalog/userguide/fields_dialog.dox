@@ -1,0 +1,21 @@
+/** \page fields_dialog Configuring used fields
+
+This pane allows the user to configure which fields are displayed in the 
+instances of \ref log_table log table. It also includes the fields used
+in the various \ref contest_scorer contest algorithms and the \ref qso_entry
+QSO entry view.
+
+<IMG SRC="../images/fields_dialog_1.png">
+
+A set of fields is known as a collection. This pane allows the collection to 
+be specified. Double-clicking on a field name in the table opens up a drop-down
+menu to choose a new field name to replace the one clicked. Double-clicking on
+the blank field name allows a field to be added. 
+
+The value in the "Header" cell is used as the text in the column header in the
+\ref log_table log table instance. The value in the "Width" cell is the width 
+of the column in pixels in that log table instance.
+
+To be continued...
+
+*/

@@ -421,6 +421,7 @@
     <None Include="zzalog\userguide\change_dialog.dox" />
     <None Include="zzalog\userguide\config.dox" />
     <None Include="zzalog\userguide\contest_scorer.dox" />
+    <None Include="zzalog\userguide\fields_dialog.dox" />
     <None Include="zzalog\userguide\images\dxcc_view.dox" />
     <None Include="zzalog\userguide\images\main_window.dox" />
     <None Include="zzalog\userguide\images\qso_buttons.dox" />
@@ -453,6 +454,7 @@
     <None Include="zzalog\userguide\report_tree.dox" />
     <None Include="zzalog\userguide\search_dialog.dox" />
     <None Include="zzalog\userguide\toolbar.dox" />
+    <None Include="zzalog\userguide\web_dialog.dox" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="zzalog.ico" />

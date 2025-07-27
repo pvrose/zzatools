@@ -809,6 +809,8 @@
     <None Include="zzalog\userguide\search_dialog.dox" />
     <None Include="zzalog\userguide\change_dialog.dox" />
     <None Include="zzalog\userguide\config.dox" />
+    <None Include="zzalog\userguide\web_dialog.dox" />
+    <None Include="zzalog\userguide\fields_dialog.dox" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="zzalog.ico">

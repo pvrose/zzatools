@@ -1,7 +1,7 @@
 /** \page config Configuration
 
 This window enables the user to configure aspects of the application.
-It has the follwoing tabs:
+It has the following tabs:
 
   - \subpage web_dialog
   - \subpage fields_dialog
