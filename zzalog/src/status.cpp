@@ -133,6 +133,7 @@ void status::misc_status(status_t status, const char* label) {
 	switch(status) {
 	case ST_SEVERE:
 		// Open status file viewer and update it.
+		banner_->show();
 		fl_beep(FL_BEEP_ERROR);
 		// A severe error - ask the user whether to continue
 		if (fl_choice("An error that resulted in reduced functionality occurred:\n%s\n\nDo you want to try to continue or quit?", "Continue", "Quit", nullptr, label, report_filename_.c_str()) == 1) {
@@ -143,6 +144,7 @@ void status::misc_status(status_t status, const char* label) {
 		break;
 	case ST_FATAL:
 		// Open status file viewer and update it. Set the flag to keep it displayed after other windows have been hidden
+		banner_->show();
 		fl_beep(FL_BEEP_ERROR);
 		// A fatal error - quit the application
 		fl_message("An unrecoverable error has occurred, closing down - check status log");
@@ -152,6 +154,7 @@ void status::misc_status(status_t status, const char* label) {
 		break;
 	case ST_ERROR:
 		// Open status file viewer and continue
+		banner_->show();
 		fl_beep(FL_BEEP_ERROR);
 		break;
 	default:
