@@ -420,6 +420,7 @@
     <None Include="zzalog\Makefile" />
     <None Include="zzalog\userguide\application.dox" />
     <None Include="zzalog\userguide\banner.dox" />
+    <None Include="zzalog\userguide\change_dialog.dox" />
     <None Include="zzalog\userguide\contest_scorer.dox" />
     <None Include="zzalog\userguide\images\dxcc_view.dox" />
     <None Include="zzalog\userguide\images\main_window.dox" />
@@ -434,6 +435,7 @@
     <None Include="zzalog\userguide\menu.dox" />
     <None Include="zzalog\userguide\operating.dox" />
     <None Include="zzalog\userguide\qso_apps.dox" />
+    <None Include="zzalog\userguide\qso_bands.dox" />
     <None Include="zzalog\userguide\qso_buttons.dox" />
     <None Include="zzalog\userguide\qso_clocks.dox" />
     <None Include="zzalog\userguide\qso_details.dox" />
@@ -447,8 +449,10 @@
     <None Include="zzalog\userguide\qso_qsl_vwr.dox" />
     <None Include="zzalog\userguide\qso_query.dox" />
     <None Include="zzalog\userguide\qso_rig.dox" />
+    <None Include="zzalog\userguide\qso_wx.dox" />
     <None Include="zzalog\userguide\quick_start.dox" />
     <None Include="zzalog\userguide\report_tree.dox" />
+    <None Include="zzalog\userguide\search_dialog.dox" />
     <None Include="zzalog\userguide\toolbar.dox" />
   </ItemGroup>
   <ItemGroup>

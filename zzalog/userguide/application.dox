@@ -1,6 +1,6 @@
 /** \page page_5 Application Details
 
-The aplication provides a number of windows:
+The application provides a number of windows:
 
 - \subpage main_window
 - \subpage qso_manager
@@ -9,5 +9,9 @@ The aplication provides a number of windows:
 - \subpage config
 - \subpage search_dialog
 - \subpage change_dialog
+
+There is also a command-line interface:
+
+- \subpage cli
 
 */

@@ -14,6 +14,8 @@ public:
     qso_wx(int X, int Y, int W, int H, const char* L = nullptr);
     ~qso_wx();
 
+	virtual int handle(int event);
+
 	// LLoad settings
     void load_values();
 	// Create widgets

@@ -22,6 +22,8 @@ class Fl_Widget;
 		change_dialog(const char* label = 0);
 		virtual ~change_dialog();
 
+		virtual int handle(int event);
+
 		// Create the dialog
 		void create_form();
 		// Get the user action

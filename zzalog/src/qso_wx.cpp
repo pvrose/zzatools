@@ -18,6 +18,7 @@ extern wx_handler* wx_handler_;
 extern string VENDOR;
 extern string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
+extern void open_html(const char*);
 
 // Weather group - constructor
 qso_wx::qso_wx
@@ -43,6 +44,30 @@ qso_wx::~qso_wx()
 	save_values();
 	// Delete any created images
 	bn_direction_->image(nullptr);
+}
+
+// Handle
+int qso_wx::handle(int event) {
+	int result = Fl_Group::handle(event);
+	// Now handle F1 regardless
+	switch (event) {
+	case FL_FOCUS:
+		return true;
+	case FL_UNFOCUS:
+		// Acknowledge focus events to get the keyboard event
+		return true;
+	case FL_PUSH:
+		take_focus();
+		return true;
+	case FL_KEYBOARD:
+		switch (Fl::event_key()) {
+		case FL_F + 1:
+			open_html("qso_wx.html");
+			return true;
+		}
+		break;
+	}
+	return result;
 }
 
 // get settings

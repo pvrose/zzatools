@@ -12,6 +12,8 @@ public:
     qso_bands(int X, int Y, int W, int H, const char* L = nullptr);
     ~qso_bands();
 
+    virtual int handle(int event);
+
     // LLoad settings
     void load_values();
     // Create widgets

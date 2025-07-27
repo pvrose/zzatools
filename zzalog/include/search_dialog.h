@@ -22,6 +22,8 @@ using namespace std;
 		search_dialog();
 		virtual ~search_dialog();
 
+		virtual int handle(int event);
+
 		// get the extract criteria
 		search_criteria_t* criteria();
 		// set extract fail message

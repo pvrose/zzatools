@@ -1,0 +1,23 @@
+/** \page qso_wx Weather Report
+
+This pane displays the latest weather report from openweather.com. The report is
+read when ZZALOG is launched and every 30 minutes thereafter.
+
+<IMG SRC="../images/qso_wx_1.png">
+
+The above image shows from top to bottom:
+- Location and latitude and longitude provided by the report server. This is in response to a 
+request providing the station's latitude and longitude.
+- Iconic and textual summaries of the current weather condition.
+- Weather statistics:
+	- Temperature - clicking on the value toggles between &deg;C and &deg;F.
+	- Wind speed - clicking cycles between miles per hour, metres per second, 
+kilometres per hour and knots.
+	- Wind direction - clicking cycles between an arrow indicating direction, compass point and compass degrees.
+	- Atmospheric pressure - clicking cycles between hectopascals, millimetres of mercury, inches of mercury and
+millibars.
+	- Cloud coverage - clicking cycles between a chart symbol, percentage cloud cover and okta values.
+- Sun rise and sun set in local time.
+- Time of last update (local time).
+
+*/

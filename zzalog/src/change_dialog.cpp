@@ -18,6 +18,7 @@ using namespace std;
 
 
 extern spec_data* spec_data_;
+extern void open_html(const char*);
 
 // Constructor - calls the dialog constructor with placeholders for size
 change_dialog::change_dialog(const char* label) :
@@ -191,6 +192,31 @@ void change_dialog::create_form() {
 change_dialog::~change_dialog()
 {
 }
+
+// Handle
+int change_dialog::handle(int event) {
+	int result = win_dialog::handle(event);
+	// Now handle F1 regardless
+	switch (event) {
+	case FL_FOCUS:
+		return true;
+	case FL_UNFOCUS:
+		// Acknowledge focus events to get the keyboard event
+		return true;
+	case FL_PUSH:
+		take_focus();
+		return true;
+	case FL_KEYBOARD:
+		switch (Fl::event_key()) {
+		case FL_F + 1:
+			open_html("change_dialog.html");
+			return true;
+		}
+		break;
+	}
+	return result;
+}
+
 
 // Get the data entered by the user.
 void change_dialog::get_data(change_action_t& action, string& old_field_name, string& new_field_name, string& new_text) {

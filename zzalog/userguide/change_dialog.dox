@@ -1,0 +1,29 @@
+/** \page change_dialog Bulk editing of records
+
+It is possible to undertake a bulk edit of the records. This will operate on
+a single field within each record. If a set of extracted records exists then
+this function will act only on the records that have been extracted. Otherwise
+it will act on all records in the log-book.
+
+<IMG SRC="../images/change_dialog_1.png">
+
+The various elements of this dialog are:
+
+- "Change field" - this specifies which field is to be operated on.
+- "Rename field" - selecting a field and clicking "OK" or "Action" will result in this
+field being renamed in all the extracted records.
+- "Delete field" - clicking "OK" or "Action" will result in this field being removed from
+all extracted records.
+- "Add field" - selecting this will enable either the "Value" or "Enum. Value"
+inputs: clicking "OK" or "Action" will add the value entered to be added to all extracted
+records that currently do not have a value in this field.
+- "Change field" - selecting this will enable either the "Value" or "Enum. Value"
+inputs: clicking "OK" or "Action" will add the value entered to be added to all extracted
+records whether they have an existing value or not.
+
+The buttons at the bottom:
+- "OK" - do the operation and close the dialog.
+- "Action" - do the operation, but leave the dialog open.
+- "Cancel" - clsoe the dialog withoiut doing the operation.
+
+*/
