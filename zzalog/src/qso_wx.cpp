@@ -266,7 +266,7 @@ void qso_wx::enable_widgets() {
 			break;
 		}
 		case METRE_PER_SECOND: {
-			snprintf(label, sizeof(label), "%0.0f\nm/s", wind_speed * 1760 * 36 *25.4 / 3600000);
+			snprintf(label, sizeof(label), "%0.0f\nm s\342\201\273\302\271", wind_speed * 1760 * 36 *25.4 / 3600000);
 			break;
 		}
 		case KM_PER_HOUR: {
