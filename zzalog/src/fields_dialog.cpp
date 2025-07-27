@@ -454,6 +454,7 @@ void fields_dialog::cb_collection(Fl_Widget* w, void* v) {
         // New collection - initialise as copy of "Default"
         that->collection_ = ch->value();
         (void)fields_->collection(that->collection_, "Default");
+        ch->add(that->collection_.c_str());
     }
     else {
         char* temp = new char[32];
