@@ -808,6 +808,7 @@
     <None Include="zzalog\userguide\qso_bands.dox" />
     <None Include="zzalog\userguide\search_dialog.dox" />
     <None Include="zzalog\userguide\change_dialog.dox" />
+    <None Include="zzalog\userguide\config.dox" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="zzalog.ico">

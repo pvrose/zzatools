@@ -1,0 +1,14 @@
+/** \page config Configuration
+
+This window enables the user to configure aspects of the application.
+It has the follwoing tabs:
+
+  - \subpage web_dialog
+  - \subpage fields_dialog
+  - \subpage stn_dialog
+  - \subpage user_dialog
+  - \subpage qsl_editor
+  - \subpage contest_dialog
+  - \subpage config_tree
+
+  */

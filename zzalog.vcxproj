@@ -419,6 +419,7 @@
     <None Include="zzalog\userguide\application.dox" />
     <None Include="zzalog\userguide\banner.dox" />
     <None Include="zzalog\userguide\change_dialog.dox" />
+    <None Include="zzalog\userguide\config.dox" />
     <None Include="zzalog\userguide\contest_scorer.dox" />
     <None Include="zzalog\userguide\images\dxcc_view.dox" />
     <None Include="zzalog\userguide\images\main_window.dox" />
