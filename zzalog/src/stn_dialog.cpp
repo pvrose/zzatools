@@ -262,7 +262,7 @@ void stn_dialog::single_tab::enable_widgets() {
 				ip_descr_->value(qth_->description.c_str());
 				int dxcc;
 				bool has_states = true;
-				if (qth_->data.at(DXCC_ID).length()) {
+				if (qth_->data.find(DXCC_ID) != qth_->data.end() && qth_->data.at(DXCC_ID).length()) {
 					dxcc = stoi(qth_->data.at(DXCC_ID));
 					if (!spec_data_->has_states(dxcc)) has_states = false;
 				}
