@@ -201,14 +201,14 @@ void stn_dialog::single_tab::create_form() {
 	if (type() == QTH) {
 		curr_x += ch_id_->w() + GAP;
 		int save_x = curr_x;
+		curr_x += WLLABEL;
 		bn_update_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "Update from call");
-
-		bn_update_->align(FL_ALIGN_RIGHT);
+		bn_update_->align(FL_ALIGN_LEFT);
 		bn_update_->value(update_from_call_);
 		bn_update_->callback(cb_update, &update_from_call_);
 		bn_update_->tooltip("If checked, selecting a call will update DXCC etc");
 
-		curr_x += WLLABEL;
+		curr_x += HBUTTON;
 		ch_call_ = new Fl_Input_Choice(curr_x, curr_y, WBUTTON, HBUTTON);
 		ch_call_->callback(cb_ch_call);
 		ch_call_->tooltip("Selecting a call will update DXCC etc");
