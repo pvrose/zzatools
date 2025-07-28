@@ -891,9 +891,9 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 // Specify the fields requested by eQSL.cc
 void eqsl_handler::set_adif_fields() {
 	// Ser default values if necessary
-	(void)fields_->collection("eQSL Upload", EQSL_FIELDS);
+	(void)fields_->collection("Upload/eQSL", EQSL_FIELDS);
 	// Now copy to the set 
-	adif_fields_ = fields_->field_names("eQSL Upload");
+	adif_fields_ = fields_->field_names("Upload/eQSL");
 	// And write the settings back
 }
 

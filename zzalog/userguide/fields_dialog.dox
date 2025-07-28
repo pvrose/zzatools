@@ -7,6 +7,8 @@ QSO entry view.
 
 <IMG SRC="../images/fields_dialog_1.png">
 
+\section fd_modify Modifying an existing set of fields
+
 A set of fields is known as a collection. This pane allows the collection to 
 be specified. Double-clicking on a field name in the table opens up a drop-down
 menu to choose a new field name to replace the one clicked. Double-clicking on
@@ -16,6 +18,16 @@ The value in the "Header" cell is used as the text in the column header in the
 \ref log_table log table instance. The value in the "Width" cell is the width 
 of the column in pixels in that log table instance.
 
-To be continued...
+To change the position of a field use the buttons labeled "Up" and "Down".
+
+\section fd_new Specifying a new set of fields
+
+The user should select the application first. This enables then to type in
+the name of the collection. Once typed in, entering the value creates a new collection
+with that name. The use can then edit the contents of the collection as 
+described above.
+
+Clicking the button labeled "Linked" will then associate the collection
+with the selected application.
 
 */

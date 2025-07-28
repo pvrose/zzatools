@@ -146,69 +146,72 @@ void fields_table::data(collection_t* d) {
 void fields_table::cb_table(Fl_Widget* w, void* v) {
     // Get the row and column
     fields_table* that = (fields_table*)w;
-    int row = that->callback_row();
-    int col = that->callback_col();
-    // Get the position of the cell
-    int X, Y, W, H;
-    that->find_cell(CONTEXT_TABLE, row, col, X, Y, W, H);
-    switch(that->callback_context()) {
+    if (that->type() == Fl_Table_Row::SELECT_SINGLE) {
+        int row = that->callback_row();
+        int col = that->callback_col();
+        // Get the position of the cell
+        int X, Y, W, H;
+        that->find_cell(CONTEXT_TABLE, row, col, X, Y, W, H);
+        switch (that->callback_context()) {
         case CONTEXT_CELL: {
             switch (Fl::event_button()) {
-                case FL_LEFT_MOUSE: {
-                    // Hide any existing editor
-                    that->ch_field_->hide();
-                    that->ip_header_->hide();
-                    that->ip_width_->hide();
-                    that->edit_col_ = -1;
-                    that->edit_row_ = -1;
-                    if (Fl::event_clicks()) {
-                        // Double clich left button - open edit widget
-                        // get the data
-                        if (row == that->data_->size()) {
-                            field_info_t* newi = new field_info_t;
-                            that->data_->push_back(*newi);
-                        }
-                        field_info_t& info = (*that->data_)[row];
-                        // Which column
-                        Fl_Widget* edit = nullptr;
-                        switch(col) {
-                            case 0: {
-                                edit = that->ch_field_;
-                                that->ch_field_->value(info.field.c_str());
-                                break;
-                            }
-                            case 1: {
-                                edit = that->ip_header_;
-                                that->ip_header_->value(info.header.c_str());
-                                break;
-                            }
-                            case 2: {
-                                edit = that->ip_width_;
-                                char t[10];
-                                snprintf(t, sizeof(t), "%d", info.width);
-                                that->ip_width_->value(t);
-                                break;
-                            }
-                        }
-                        if (edit) {
-                            edit->resize(X, Y, W, H);
-                            edit->user_data((void*)(intptr_t)row);
-                            edit->show();
-                        }
-                        that->edit_row_ = row;
-                        that->edit_col_ = col;
-                    } else {
-                        that->select_row(row);
-                        that->selected_row_ = row;
+            case FL_LEFT_MOUSE: {
+                // Hide any existing editor
+                that->ch_field_->hide();
+                that->ip_header_->hide();
+                that->ip_width_->hide();
+                that->edit_col_ = -1;
+                that->edit_row_ = -1;
+                if (Fl::event_clicks()) {
+                    // Double clich left button - open edit widget
+                    // get the data
+                    if (row == that->data_->size()) {
+                        field_info_t* newi = new field_info_t;
+                        that->data_->push_back(*newi);
                     }
-                    ancestor_view<fields_dialog>(that)->enable_widgets();
-                    that->damage(FL_DAMAGE_ALL);
-                    that->redraw();
+                    field_info_t& info = (*that->data_)[row];
+                    // Which column
+                    Fl_Widget* edit = nullptr;
+                    switch (col) {
+                    case 0: {
+                        edit = that->ch_field_;
+                        that->ch_field_->value(info.field.c_str());
+                        break;
+                    }
+                    case 1: {
+                        edit = that->ip_header_;
+                        that->ip_header_->value(info.header.c_str());
+                        break;
+                    }
+                    case 2: {
+                        edit = that->ip_width_;
+                        char t[10];
+                        snprintf(t, sizeof(t), "%d", info.width);
+                        that->ip_width_->value(t);
+                        break;
+                    }
+                    }
+                    if (edit) {
+                        edit->resize(X, Y, W, H);
+                        edit->user_data((void*)(intptr_t)row);
+                        edit->show();
+                    }
+                    that->edit_row_ = row;
+                    that->edit_col_ = col;
                 }
+                else {
+                    that->select_row(row);
+                    that->selected_row_ = row;
+                }
+                ancestor_view<fields_dialog>(that)->enable_widgets();
+                that->damage(FL_DAMAGE_ALL);
+                that->redraw();
+            }
             }
         }
         default:
             break;
+        }
     }
 }
 
@@ -377,6 +380,7 @@ void fields_dialog::create_form(int X, int Y) {
     int curr_w = w102->x() + w102->w() - w101->x();
 
     fields_table* w200 = new fields_table(curr_x, curr_y, curr_w, 300, "Fields");
+    w200->type(Fl_Table_Row::SELECT_SINGLE);
     w200->align(FL_ALIGN_CENTER | FL_ALIGN_TOP);
     w200->tooltip("Table defining the fields, and their headers and widths in the current collection");
 
@@ -415,20 +419,35 @@ void fields_dialog::enable_widgets() {
     ch_coll_->update_menubutton();
     collection_t* coll = fields_->collection(collection_);
     table_->data(coll);
-    // Inhibit up or down buttons
-    if (table_->selected_row() == 0) {
+    if (collection_.substr(0, 7) == "Contest" || collection_.substr(0, 6) == "Upload") {
+        table_->type(Fl_Table_Row::SELECT_NONE);
         bn_up_->deactivate();
-    } else {
-        bn_up_->activate();
-    }
-    if (table_->selected_row() == coll->size() - 1) {
         bn_down_->deactivate();
-    } else {
-        bn_down_->activate();
+    }
+    else {
+        table_->type(Fl_Table_Row::SELECT_SINGLE);
+        // Inhibit up or down buttons
+        if (table_->selected_row() == 0) {
+            bn_up_->deactivate();
+        }
+        else {
+            bn_up_->activate();
+        }
+        if (table_->selected_row() == coll->size() - 1) {
+            bn_down_->deactivate();
+        }
+        else {
+            bn_down_->activate();
+        }
     }
     bn_linked_->value(linked_);
     char title[50];
     snprintf(title, sizeof(title), "Fields - %s", collection_.c_str());
+    if (table_->type() == Fl_Table_Row::SELECT_NONE) {
+        // ensure concatenation stays within the length
+        int len = sizeof(title) - strlen(title);
+        strncat(title, " - read only", len);
+    }
     table_->copy_label(title);
     redraw();
 }

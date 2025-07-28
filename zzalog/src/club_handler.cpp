@@ -333,9 +333,9 @@ string club_handler::to_adif(record* this_record, field_list &fields) {
 // Specify the fields requested by eQSL.cc
 void club_handler::set_adif_fields() {
 	// Ser default values if necessary
-	(void)fields_->collection("ClubLog Upload", CLUBLOG_FIELDS);
+	(void)fields_->collection("Upload/ClubLog", CLUBLOG_FIELDS);
 	// Now copy to the set 
-	adif_fields_ = fields_->field_names("ClubLog Upload");
+	adif_fields_ = fields_->field_names("Upload/ClubLog");
 }
 
 // Download the OQRS list of QSL requests

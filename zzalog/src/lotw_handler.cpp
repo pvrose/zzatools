@@ -414,9 +414,9 @@ void lotw_handler::cb_upload_done(void* v) {
 // Specify the fields requested by eQSL.cc
 void lotw_handler::set_adif_fields() {
 	// Ser default values if necessary
-	(void)fields_->collection("LotW Upload", LOTW_FIELDS);
+	(void)fields_->collection("Upload/LotW", LOTW_FIELDS);
 	// Now copy to the set 
-	adif_fields_ = fields_->field_names("LotW Upload");
+	adif_fields_ = fields_->field_names("Upload/LotW");
 }
 
 
