@@ -200,7 +200,6 @@ void stn_dialog::single_tab::create_form() {
 
 	if (type() == QTH) {
 		curr_x += ch_id_->w() + GAP;
-		int save_x = curr_x;
 		curr_x += WLLABEL;
 		bn_update_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "Update from call");
 		bn_update_->align(FL_ALIGN_LEFT);
@@ -212,12 +211,6 @@ void stn_dialog::single_tab::create_form() {
 		ch_call_ = new Fl_Input_Choice(curr_x, curr_y, WBUTTON, HBUTTON);
 		ch_call_->callback(cb_ch_call);
 		ch_call_->tooltip("Selecting a call will update DXCC etc");
-
-		curr_y += HBUTTON;
-		curr_x = save_x;
-		bn_clear_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Clear");
-		bn_clear_->callback(cb_clear);
-		bn_clear_->tooltip("Clear all entries");
 	}
 
 	curr_x = x() + GAP + WLABEL;
@@ -227,6 +220,14 @@ void stn_dialog::single_tab::create_form() {
 		Fl_Box* b2 = new Fl_Box(x() + GAP, curr_y, w() - GAP - GAP, HBUTTON, "Enter data below if you want the information saved in the log file");
 		b2->box(FL_FLAT_BOX);
 		b2->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+		curr_y += HBUTTON;
+	}
+
+	if (type() == QTH) {
+		curr_x = x() + GAP + WLABEL;
+		bn_clear_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Clear");
+		bn_clear_->callback(cb_clear);
+		bn_clear_->tooltip("Clear all entries");
 		curr_y += HBUTTON;
 	}
 
