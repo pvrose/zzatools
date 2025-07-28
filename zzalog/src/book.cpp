@@ -1191,11 +1191,6 @@ void book::deprecate_macros(record* use_record) {
 			}
 		}
 		use_record->item("APP_ZZA_QTH", string(""));
-		string descr = use_record->item("APP_ZZA_QTH_DESCR");
-		if (descr.length()) {
-			stn_data_->add_qth_descr(qth_id, descr);
-			use_record->item("APP_ZZA_QTH_DESCR", string(""));
-		}
 	}
 	// If APP_ZZA_OP is present - take its values and send to stn_data
 	string oper_id = use_record->item("APP_ZZA_OP");
@@ -1223,11 +1218,6 @@ void book::deprecate_macros(record* use_record) {
 			}
 		}
 		use_record->item("APP_ZZA_OP", string(""));
-		string descr = use_record->item("APP_ZZA_OP_DESCR");
-		if (descr.length()) {
-			stn_data_->add_oper_descr(oper_id, descr);
-			use_record->item("APP_ZZA_OP_DESCR", string(""));
-		}
 	}
 	// Not strictly a macro, but part of the operation parameters
 	string call = use_record->item("STATION_CALLSIGN");

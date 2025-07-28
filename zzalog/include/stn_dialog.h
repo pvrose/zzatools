@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+class Fl_Button;
+class Fl_Check_Button;
 class Fl_Group;
 class Fl_Input;
 class Fl_Input_Choice;
@@ -63,6 +65,10 @@ protected:
 
 		static void cb_ch_id(Fl_Widget* w, void* v);
 
+		static void cb_ch_call(Fl_Widget* w, void* v);
+		static void cb_clear(Fl_Widget* w, void* v);
+		static void cb_update(Fl_Widget* w, void* v);
+
 		virtual void type(char t);
 		virtual char type();
 
@@ -71,7 +77,11 @@ protected:
 
 	protected:
 		// Populate the choice
-		void populate_choice();
+		void populate_choice(Fl_Input_Choice* ch, tab_type t);
+
+		void update_from_call();
+
+		void clear_entry();
 
 		// Number of individual input widgets
 		int num_inputs_;
@@ -86,9 +96,17 @@ protected:
 		// Current data id
 		string current_id_;
 
+		// Update from call
+		bool update_from_call_;
+
 		// Widgets
 		Fl_Input_Choice* ch_id_;
-		Fl_Multiline_Input* ip_descr_;
+		// Update from call
+		Fl_Check_Button* bn_update_;
+		// Separate call choice for QTH
+		Fl_Input_Choice* ch_call_;
+		// Clear all
+		Fl_Button* bn_clear_;
 		// Array of input widgets
 		Fl_Input** ip_values_;
 	};

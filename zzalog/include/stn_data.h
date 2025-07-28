@@ -24,7 +24,6 @@ enum qth_value_t : char {
 
 struct qth_info_t {
 	map<qth_value_t, string> data;
-	string description;
 };
 
 const map<qth_value_t, string> QTH_ADIF_MAP = {
@@ -50,7 +49,6 @@ enum oper_value_t : char {
 
 struct oper_info_t {
 	map< oper_value_t, string> data;
-	string description;
 };
 
 const map<oper_value_t, string> OPER_ADIF_MAP = {
@@ -70,18 +68,16 @@ public:
 	void store_data();
 	// Add a specific item - returns true if added
 	bool add_qth_item(string id, qth_value_t item, string value);
-	// Add description
-	bool add_qth_descr(string id, string description);
+	// Remove QTH item
+	void remove_qth_item(string id, qth_value_t item);
 	// Add a new QTH
 	bool add_qth(string id, qth_info_t* qth);
 	// Add a specific item
 	bool add_oper_item(string id, oper_value_t item, string value);
-	// Add description
-	bool add_oper_descr(string id, string description);
 	// Add a new operator
 	bool add_oper(string id, oper_info_t* oper);
 	// Add a new station callsign
-	bool add_call(string call, string description = "");
+	bool add_call(string call);
 	// Fetch the QTH info
 	const qth_info_t* get_qth(string id);
 	// Fetch the Operatot info

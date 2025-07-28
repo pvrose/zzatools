@@ -1,5 +1,6 @@
 #include "stn_dialog.h"
 
+#include "cty_data.h"
 #include "qso_data.h"
 #include "qso_manager.h"
 #include "record.h"
@@ -10,6 +11,8 @@
 #include "drawing.h"
 #include "utils.h"
 
+#include <FL/Fl_Button.H>
+#include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Input_Choice.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Multiline_Input.H>
@@ -17,6 +20,7 @@
 #include <FL/Fl_Tabs.H>
 
 extern Fl_Preferences::Root prefs_mode_;
+extern cty_data* cty_data_;
 extern qso_manager* qso_manager_;
 extern spec_data* spec_data_;
 extern stn_data* stn_data_;
@@ -126,6 +130,7 @@ stn_dialog::single_tab::single_tab(int rx, int ry, int rw, int rh, char type,
 	const char* l) :
 	Fl_Group(rx, ry, rw, rh, l) {
 	single_tab::type(type);
+	update_from_call_ = false;
 	load_data();
 	create_form();
 	enable_widgets();
@@ -193,16 +198,30 @@ void stn_dialog::single_tab::create_form() {
 	ch_id_->callback(cb_ch_id, &current_id_);
 	ch_id_->tooltip("Select the Id (or Call)");
 
+	if (type() == QTH) {
+		curr_x += ch_id_->w() + GAP;
+		int save_x = curr_x;
+		bn_update_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "Update from call");
+
+		bn_update_->align(FL_ALIGN_RIGHT);
+		bn_update_->value(update_from_call_);
+		bn_update_->callback(cb_update, &update_from_call_);
+		bn_update_->tooltip("If checked, selecting a call will update DXCC etc");
+
+		curr_x += WLLABEL;
+		ch_call_ = new Fl_Input_Choice(curr_x, curr_y, WBUTTON, HBUTTON);
+		ch_call_->callback(cb_ch_call);
+		ch_call_->tooltip("Selecting a call will update DXCC etc");
+
+		curr_y += HBUTTON;
+		curr_x = save_x;
+		bn_clear_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Clear");
+		bn_clear_->callback(cb_clear);
+		bn_clear_->tooltip("Clear all entries");
+	}
+
 	curr_x = x() + GAP + WLABEL;
 	curr_y += HBUTTON;
-
-	ip_descr_ = new Fl_Multiline_Input(curr_x, curr_y, WEDIT, 2 * HBUTTON, "Brief\nComment");
-	ip_descr_->align(FL_ALIGN_LEFT);
-	ip_descr_->wrap(true);
-	ip_descr_->tooltip("Enter a brief description of the item");
-
-	curr_y += ip_descr_->h();
-	curr_x = x() + GAP + WLABEL;
 
 	if (type() != CALLSIGN) {
 		Fl_Box* b2 = new Fl_Box(x() + GAP, curr_y, w() - GAP - GAP, HBUTTON, "Enter data below if you want the information saved in the log file");
@@ -248,7 +267,10 @@ void stn_dialog::single_tab::create_form() {
 			curr_y += HBUTTON;
 		}
 	}
-	populate_choice();
+	populate_choice(ch_id_, (tab_type)type());
+	if (type() == QTH) {
+		populate_choice(ch_call_, CALLSIGN);
+	}
 	end();
 	show();
 }
@@ -259,7 +281,6 @@ void stn_dialog::single_tab::enable_widgets() {
 		case QTH:
 			if (qth_) {
 				ch_id_->value(current_id_.c_str());
-				ip_descr_->value(qth_->description.c_str());
 				int dxcc;
 				bool has_states = true;
 				if (qth_->data.find(DXCC_ID) != qth_->data.end() && qth_->data.at(DXCC_ID).length()) {
@@ -291,16 +312,20 @@ void stn_dialog::single_tab::enable_widgets() {
 			}
 			else {
 				ch_id_->value(current_id_.c_str());
-				ip_descr_->value("");
 				for (auto it : QTH_ADIF_MAP) {
 					ip_values_[(int)it.first]->value("");
 				}
+			}
+			if (update_from_call_) {
+				ch_call_->activate();
+			}
+			else {
+				ch_call_->deactivate();
 			}
 			break;
 		case OPERATOR:
 			if (oper_) {
 				ch_id_->value(current_id_.c_str());
-				ip_descr_->value(oper_->description.c_str());
 				for (auto it : OPER_ADIF_MAP) {
 					if (oper_->data.find(it.first) != oper_->data.end()) {
 						ip_values_[(int)it.first]->value(oper_->data.at(it.first).c_str());
@@ -312,7 +337,6 @@ void stn_dialog::single_tab::enable_widgets() {
 			}
 			else {
 				ch_id_->value(current_id_.c_str());
-				ip_descr_->value("");
 				for (auto it : OPER_ADIF_MAP) {
 					ip_values_[(int)it.first]->value("");
 				}
@@ -320,7 +344,6 @@ void stn_dialog::single_tab::enable_widgets() {
 			break;
 		case CALLSIGN:
 			ch_id_->value(current_id_.c_str());
-			ip_descr_->value(call_descr_.c_str());
 			break;
 		}
 		show();
@@ -353,7 +376,6 @@ void stn_dialog::single_tab::save_data() {
 				stn_data_->add_qth(current_id_, info);
 			}
 			qth_ = stn_data_->get_qth(current_id_);
-			stn_data_->add_qth_descr(current_id_, ip_descr_->value());
 			for (auto it : QTH_ADIF_MAP) {
 				string data;
 				switch (it.first) {
@@ -374,7 +396,6 @@ void stn_dialog::single_tab::save_data() {
 				stn_data_->add_oper(current_id_, info);
 			}
 			oper_ = stn_data_->get_oper(current_id_);
-			stn_data_->add_oper_descr(current_id_, ip_descr_->value());
 			for (auto it : OPER_ADIF_MAP) {
 				string data;
 				switch (it.first) {
@@ -390,10 +411,10 @@ void stn_dialog::single_tab::save_data() {
 			break;
 		case CALLSIGN:
 			if (!stn_data_->known_call(current_id_)) {
-				stn_data_->add_call(current_id_, "");
+				stn_data_->add_call(current_id_);
 			}
 			call_descr_ = stn_data_->get_call_descr(current_id_);
-			stn_data_->add_call(current_id_, to_upper(ip_descr_->value()));
+			stn_data_->add_call(current_id_);
 			break;
 		}
 	}
@@ -407,6 +428,26 @@ void stn_dialog::single_tab::cb_ch_id(Fl_Widget* w, void* v) {
 	that->id(s);
 	that->enable_widgets();
 }
+
+// Selecting a callsign in QTH
+void stn_dialog::single_tab::cb_ch_call(Fl_Widget* w, void* v) {
+	single_tab* that = ancestor_view<single_tab>(w);
+	that->update_from_call();
+}
+
+// Clearing the values
+void stn_dialog::single_tab::cb_clear(Fl_Widget* w, void* v) {
+	single_tab* that = ancestor_view<single_tab>(w);
+	that->clear_entry();
+}
+
+// Set update from callsign
+void stn_dialog::single_tab::cb_update(Fl_Widget* w, void* v) {
+	cb_value<Fl_Check_Button, bool>(w, v);
+	single_tab* that = ancestor_view<single_tab>(w);
+	that->enable_widgets();
+}
+
 
 // Set type value and configure dialog
 void stn_dialog::single_tab::type(char t) {
@@ -451,15 +492,15 @@ void stn_dialog::single_tab::id(string s) {
 	enable_widgets();
 }
 
-void stn_dialog::single_tab::populate_choice() {
-	ch_id_->clear();
-	ch_id_->add("");
-	switch (type()) {
+void stn_dialog::single_tab::populate_choice(Fl_Input_Choice* ch, tab_type t) {
+	ch->clear();
+	ch->add("");
+	switch (t) {
 	case QTH:
 	{
 		const map<string, qth_info_t*>* qths = stn_data_->get_qths();
 		for (auto it : *qths) {
-			ch_id_->add(escape_menu(it.first).c_str());
+			ch->add(escape_menu(it.first).c_str());
 		}
 		break;
 	}
@@ -467,7 +508,7 @@ void stn_dialog::single_tab::populate_choice() {
 	{
 		const map<string, oper_info_t*>* opers = stn_data_->get_opers();
 		for (auto it : *opers) {
-			ch_id_->add(escape_menu(it.first).c_str());
+			ch->add(escape_menu(it.first).c_str());
 		}
 		break;
 	}
@@ -475,9 +516,37 @@ void stn_dialog::single_tab::populate_choice() {
 	{
 		const map<string, string>* calls = stn_data_->get_calls();
 		for (auto it : *calls) {
-			ch_id_->add(escape_menu(it.first).c_str());
+			ch->add(escape_menu(it.first).c_str());
 		}
 		break;
 	}
 	}
+}
+
+// Update values from call
+void stn_dialog::single_tab::update_from_call() {
+	switch (type()) {
+	case QTH: {
+		record* dummy_qso = qso_manager_->dummy_qso();
+		dummy_qso->item("CALL", string(ch_call_->value()));
+		cty_data_->update_qso(dummy_qso, true);
+		for (auto it : QTH_ADIF_MAP) {
+			if (dummy_qso->item(it.second).length()) {
+				stn_data_->add_qth_item(current_id_, it.first, dummy_qso->item(it.second));
+			}
+		}
+		enable_widgets();
+	}
+	}
+}
+
+// Clear values
+void stn_dialog::single_tab::clear_entry() {
+	switch (type()) {
+	case QTH:
+		for (auto it : QTH_ADIF_MAP) {
+			stn_data_->remove_qth_item(current_id_, it.first);
+		}
+	}
+	enable_widgets();
 }

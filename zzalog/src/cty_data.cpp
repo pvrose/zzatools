@@ -439,17 +439,25 @@ cty_data::parse_source_t cty_data::get_source(record* qso) {
 }
 
 // Update record based on parsing
-bool cty_data::update_qso(record* qso) {
+bool cty_data::update_qso(record* qso, bool my_call) {
 	// Remove previous QSO as it falsely keeps previous parse result.
 	qso_ = nullptr;
 
 	parse(qso);
 	// Use the values in the exceptions entry
-	qso->item("DXCC", to_string(entity(qso_)));
-	if (cq_zone(qso_) > 0) qso->item("CQZ", to_string(cq_zone(qso_)));
-	qso->item("COUNTRY", name(qso));
-	qso->item("CONT", continent(qso));
-	qso->update_bearing();
+	if (my_call) {
+		qso->item("MY_DXCC", to_string(entity(qso_)));
+		if (cq_zone(qso_) > 0) qso->item("MY_CQ_ZONE", to_string(cq_zone(qso_)));
+		qso->item("MY_COUNTRY", name(qso));
+		qso->item("APP_ZZA_MY_CONT", continent(qso));
+	}
+	else {
+		qso->item("DXCC", to_string(entity(qso_)));
+		if (cq_zone(qso_) > 0) qso->item("CQZ", to_string(cq_zone(qso_)));
+		qso->item("COUNTRY", name(qso));
+		qso->item("CONT", continent(qso));
+		qso->update_bearing();
+	}
 	if (parse_result_->invalid) return false;
 	return true;
 }

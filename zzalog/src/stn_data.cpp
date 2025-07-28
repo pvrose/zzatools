@@ -64,7 +64,6 @@ bool stn_data::add_qth_item(string id, qth_value_t item, string value) {
 		// New QTH
 		qth_info_t* info = new qth_info_t;
 		info->data = { { item, value } };
-		info->description = "";
 		qths_[id] = info;
 		return true;
 	} else {
@@ -80,14 +79,10 @@ bool stn_data::add_qth_item(string id, qth_value_t item, string value) {
 	}
 }
 
-// Add description
-bool stn_data::add_qth_descr(string id, string description) {
-	if (qths_.find(id) == qths_.end()) {
-		return false;
-	}
-	else {
-		qths_.at(id)->description = description;
-		return true;
+// remove an item
+void stn_data::remove_qth_item(string id, qth_value_t item) {
+	if (qths_.find(id) != qths_.end()) {
+		qths_.at(id)->data.erase(item);
 	}
 }
 
@@ -112,7 +107,6 @@ bool stn_data::add_oper_item(string id, oper_value_t item, string value) {
 		// New QTH
 		oper_info_t* info = new oper_info_t;
 		info->data = { { item, value } };
-		info->description = "";
 		opers_[id] = info;
 		return true;
 	}
@@ -126,17 +120,6 @@ bool stn_data::add_oper_item(string id, oper_value_t item, string value) {
 			opers_.at(id)->data.at(item) = value;
 			return true;
 		}
-	}
-}
-
-// Add description
-bool stn_data::add_oper_descr(string id, string description) {
-	if (opers_.find(id) == opers_.end()) {
-		return false;
-	}
-	else {
-		opers_.at(id)->description = description;
-		return true;
 	}
 }
 
@@ -191,12 +174,12 @@ const map<string, oper_info_t*>* stn_data::get_opers() {
 }
 
 // Add a new callsign
-bool stn_data::add_call(string call, string description) {
+bool stn_data::add_call(string call) {
 	if (calls_.find(call) != calls_.end()) {
 		return false;
 	}
 	else {
-		calls_[call] = description;
+		calls_[call] = "";
 		return true;
 	}
 }

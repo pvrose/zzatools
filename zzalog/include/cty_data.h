@@ -161,7 +161,7 @@ public:
 	// Get location
 	lat_long_t location(record* qso);
 	// Update record based on parsing
-	bool update_qso(record* qso);
+	bool update_qso(record* qso, bool my_call = false);
 	// Get location details
 	string get_tip(record* qso);
 	// Parsing source

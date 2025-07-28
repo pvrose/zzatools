@@ -86,7 +86,6 @@ bool stn_reader::start_location(xml_wreader* rdr, map<string, string>* attribute
 	rdr->elements_.push_back(STN_LOCATION);
 	stn_reader* that = (stn_reader*)rdr;
 	char msg[128];
-	string description = "";
 	// Getthe name
 	for (auto it : *attributes) {
 		string name = to_upper(it.first);
@@ -102,9 +101,6 @@ bool stn_reader::start_location(xml_wreader* rdr, map<string, string>* attribute
 			that->qth_ = new qth_info_t;
 			(*that->qths_)[it.second] = that->qth_;
 		}
-		else if (name == "DESCRIPTION") {
-			description = it.second;
-		}
 		else {
 			// else
 			char msg[128];
@@ -114,7 +110,6 @@ bool stn_reader::start_location(xml_wreader* rdr, map<string, string>* attribute
 			return false;
 		}
 	}
-	that->qth_->description = description;
 	return true;
 
 }
@@ -155,7 +150,6 @@ bool stn_reader::start_operator(xml_wreader* rdr, map<string, string>* attribute
 	rdr->elements_.push_back(STN_OPERATOR);
 	stn_reader* that = (stn_reader*)rdr;
 	char msg[128];
-	string description;
 	// Getthe name
 	for (auto it : *attributes) {
 		string name = to_upper(it.first);
@@ -171,9 +165,6 @@ bool stn_reader::start_operator(xml_wreader* rdr, map<string, string>* attribute
 			that->oper_ = new oper_info_t;
 			(*that->opers_)[it.second] = that->oper_;
 		}
-		else if (name == "DESCRIPTION") {
-			description = it.second;
-		}
 		else {
 			// else
 			char msg[128];
@@ -183,7 +174,6 @@ bool stn_reader::start_operator(xml_wreader* rdr, map<string, string>* attribute
 			return false;
 		}
 	}
-	that->oper_->description = description;
 	return true;
 }
 

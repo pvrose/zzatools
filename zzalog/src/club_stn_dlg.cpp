@@ -172,7 +172,7 @@ void club_stn_dlg::add_login() {
 
 void club_stn_dlg::add_callsign() {
 	if (!stn_data_->known_call(club_call_)) {
-		stn_data_->add_call(club_call_, club_name_);
+		stn_data_->add_call(club_call_);
 	}
 }
 

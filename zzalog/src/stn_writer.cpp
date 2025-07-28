@@ -97,7 +97,6 @@ bool stn_writer::write_element(stn_element_t element) {
             name = "location";
             attributes = new map<string, string>;
             (*attributes)["id"] = qth_name_;
-            (*attributes)["description"] = qth_->description;
             if (!start_element(name, attributes)) return false;
             for (auto iu : qth_->data) {
                 if (!write_item(qth_value_map_.at(iu.first), iu.second)) return false;
@@ -112,7 +111,6 @@ bool stn_writer::write_element(stn_element_t element) {
             name = "operator";
             attributes = new map<string, string>;
             (*attributes)["id"] = oper_name_;
-            (*attributes)["description"] = oper_->description;
             if (!start_element(name, attributes)) return false;
             for (auto iu : oper_->data) {
                 if (!write_item(oper_value_map_.at(iu.first), iu.second)) return false;
@@ -125,7 +123,6 @@ bool stn_writer::write_element(stn_element_t element) {
             name = "scallsign";
             attributes = new map<string, string>;
             (*attributes)["call"] = it.first;
-            (*attributes)["description"] = it.second;
             if (!start_element(name, attributes)) return false;
             if (!end_element(name)) return false;
         }
