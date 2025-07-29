@@ -31,7 +31,8 @@ collection_t* fields::collection(field_app_t app) {
         string coll = app_map_.at(app);
         return collection(coll);
     } else {
-        return nullptr;
+        app_map_[app] = "Default";
+        return collection("Default");
     }
 }
 
@@ -86,22 +87,6 @@ field_list fields::field_names(string name) {
 
 // Read settings
 void fields::load_data() {
-   	// Read the field data from the settings
-    Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences display_settings(settings, "Display");
-	Fl_Preferences fields_settings(display_settings, "Fields");
-	// Number of field sets (a field set is a set of fields and their ordering)
-	// Then get the field sets for each
-	char app_path[128];
-	char* temp;
-	// For each field ordering application
-	for (int i = 0; i < FO_LAST; i++) {
-		// Get the field set name
-		sprintf(app_path, "App%d", i);
-		fields_settings.get(app_path, temp, "Default");
-		app_map_[(field_app_t)i] = string(temp);
-		free(temp);
-	}
 	// Delete the existing field data
 	for (auto it = app_map_.begin(); it != app_map_.end(); it++) {
         if (coll_map_.find(it->second) != coll_map_.end()) {
@@ -109,9 +94,9 @@ void fields::load_data() {
         }
     }
 	coll_map_.clear();
-    if (!load_collections(fields_settings)) {
+    if (!load_collections()) {
         // Read all the field field sets
-        add_collections(fields_settings, "");
+        return;
     }
     if (coll_map_.find("Default") == coll_map_.end()) {
         // Create the default collection
@@ -125,7 +110,7 @@ void fields::load_data() {
 }
 
 // Read - <Prefs path>.fields.tsv
-bool fields::load_collections(Fl_Preferences& settings) {
+bool fields::load_collections() {
     filename_ = default_user_directory_ + "fields.tsv";
     fl_make_path_for_file(filename_.c_str());
     ifstream ip;
@@ -133,7 +118,7 @@ bool fields::load_collections(Fl_Preferences& settings) {
     if (!ip.good()) {
         char msg[128];
         snprintf(msg, sizeof(msg), 
-            "FIELDS: Failed to open %s, defaulting to looking in Preferences", 
+            "FIELDS: Failed to open %s", 
             filename_.c_str());
         status_->misc_status(ST_WARNING, msg);
         return false;
@@ -163,54 +148,9 @@ bool fields::load_collections(Fl_Preferences& settings) {
     return true;
 }
 
-// Adding collections needs to iterate to cope with collections named "Contest/*"
-void fields::add_collections(Fl_Preferences& settings, string name) {
-    // For all the field sets in the settings
-    for (int i = 0; i < settings.groups(); i++) {
-        collection_t* field_set = new collection_t;
-        // Get the name of the i'th field set
-        string colln_name = settings.group(i);
-        string full_name = (name.length()) ? name + "/" + colln_name : colln_name;
-        Fl_Preferences colln_settings(settings, colln_name.c_str());
-        // Test for further iteration - first group name != "Field #"
-        string field_id = colln_settings.group(0);
-        if (field_id.length() <= 6 || field_id.substr(0, 6) != "Field ") {
-            add_collections(colln_settings, full_name);
-        }
-        else {
-            // Create an initial array for the number of fields in the settings
-            int num_fields = colln_settings.groups();
-            field_set->resize(num_fields);
-            // For each field in the field set
-            for (int j = 0; j < num_fields; j++) {
-                // Read the field info: name, width and heading from the settings
-                field_info_t field;
-                string field_id = colln_settings.group(j);
-                Fl_Preferences field_settings(colln_settings, field_id.c_str());
-                field_settings.get("Width", (int&)field.width, 50);
-                char* temp;
-                field_settings.get("Header", temp, "");
-                field.header = temp;
-                free(temp);
-                field_settings.get("Name", temp, "");
-                field.field = temp;
-                free(temp);
-                (*field_set)[j] = field;
-            }
-            // Add the field set to the list of field sets
-            coll_map_[full_name] = field_set;
-        }
-    }
-}
-
 // Store settings
 void fields::store_data() {
-	// Read the field data from the registry
-    Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences display_settings(settings, "Display");
-	Fl_Preferences fields_settings(display_settings, "Fields");
 	// Delete current settings
-	fields_settings.clear();
     if (filename_.length() == 0) {
          filename_ = default_user_directory_ + "fields.tsv";
         fl_make_path_for_file(filename_.c_str());

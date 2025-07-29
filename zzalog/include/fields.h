@@ -112,9 +112,7 @@ protected:
 	// Store settings
 	void store_data();
 	// Load collections
-	void add_collections(Fl_Preferences& settings, string name);
-	// Load collections
-	bool load_collections(Fl_Preferences& settings);
+	bool load_collections();
 
 	// The data - mapping app to collection name
 	map<field_app_t, string> app_map_;
