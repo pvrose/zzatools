@@ -938,6 +938,7 @@ bool qso_data::action_save(bool continuing) {
 		book_->add_use_data(qso);
 		extract_records_->check_add_record(qso_number);
 
+		book_->new_record(false);
 		book_->enable_save(true, "Saving QSO");
 
 		// Upload QSO to QSL servers
