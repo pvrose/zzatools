@@ -393,25 +393,25 @@ string qsl_display::convert_date(string value) {
 	case qsl_data::FMT_Y4MD_ADIF:
 		// "20240621"
 		result = value;
-			return result;
-		case qsl_data::FMT_Y4MD:
-		// "2024/06/21"
-			result = value.substr(0, 4) + '/' + value.substr(4, 2) + '/' + value.substr(6, 2);
-			return result;
-		case qsl_data::FMT_Y2MD:
-		// "24/06/21"
-			result = value.substr(0, 4) + '/' + value.substr(4, 2) + '/' + value.substr(6, 2);
-			return result;
-		// case qsl_data::FMT_DMY2:
-		// // "21/06/24"
-		// 	result = value.substr(6,2) + '/' + value.substr(4,2) + '/' + value.substr(2,2);
-		// 	return result;
-		// case qsl_data::FMT_MDY2:
-		// // ""06/21/24"
-		// 	result = value.substr(4,2) + '/' + value.substr(6,2) + '/' + value.substr(2,2);
-		// 	return result;
-		default:
-			return "Invalid";
+		return result;
+	case qsl_data::FMT_Y4MD:
+	// "2024/06/21"
+		result = value.substr(0, 4) + '/' + value.substr(4, 2) + '/' + value.substr(6, 2);
+		return result;
+	case qsl_data::FMT_Y2MD:
+	// "24/06/21"
+		result = value.substr(2, 2) + '/' + value.substr(4, 2) + '/' + value.substr(6, 2);
+		return result;
+	 case qsl_data::FMT_DMY2:
+	 // "21/06/24"
+	 	result = value.substr(6,2) + '/' + value.substr(4,2) + '/' + value.substr(2,2);
+	 	return result;
+	 case qsl_data::FMT_MDY2:
+	 // "06/21/24"
+	 	result = value.substr(4,2) + '/' + value.substr(6,2) + '/' + value.substr(2,2);
+	 	return result;
+	default:
+		return "Invalid";
 	}
 }
 

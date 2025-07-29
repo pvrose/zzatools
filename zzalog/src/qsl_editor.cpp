@@ -186,6 +186,7 @@ void qsl_editor::create_form(int X, int Y) {
 	// Group 2.1 - radio buttons for units
 	Fl_Group* g_201 = new Fl_Group(curr_x, curr_y, WBUTTON, HBUTTON * 3);
 	g_201->box(FL_FLAT_BOX);
+	g_dim_ = g_201;
 	// Radio to select inches
 	Fl_Radio_Round_Button* w_20101 = new Fl_Radio_Round_Button(curr_x, curr_y, HBUTTON, HBUTTON, "inch");
 	w_20101->value(data_->unit == qsl_data::INCH);
@@ -193,6 +194,7 @@ void qsl_editor::create_form(int X, int Y) {
 	w_20101->align(FL_ALIGN_RIGHT);
 	w_20101->callback(cb_radio_dim, (void*)qsl_data::INCH);
 	w_20101->tooltip("Measurements in inches");
+	bn_inch_ = w_20101;
     curr_y += HBUTTON;
 	// Radio to select millimetres
 	Fl_Radio_Round_Button* w_20102 = new Fl_Radio_Round_Button(curr_x, curr_y, HBUTTON, HBUTTON, "mm");
@@ -201,6 +203,7 @@ void qsl_editor::create_form(int X, int Y) {
 	w_20102->align(FL_ALIGN_RIGHT);
 	w_20102->callback(cb_radio_dim, (void*)qsl_data::MILLIMETER);
 	w_20102->tooltip("Measurements in millimetres");
+	bn_mm_ = w_20102;
 	// Radio to select points
     curr_y += HBUTTON;
 	Fl_Radio_Round_Button* w_20103 = new Fl_Radio_Round_Button(curr_x, curr_y, HBUTTON, HBUTTON, "point");
@@ -209,6 +212,7 @@ void qsl_editor::create_form(int X, int Y) {
 	w_20103->align(FL_ALIGN_RIGHT);
 	w_20103->callback(cb_radio_dim, (void*)qsl_data::POINT);
 	w_20103->tooltip("Measurements in printer points");
+	bn_point_ = w_20103;
 	g_201->end();
 
     curr_x += g_201->w();
@@ -876,6 +880,23 @@ void qsl_editor::update_size() {
 
 // Restore user_data fpor all widgets thatrequire access to data
 void qsl_editor::update_dimensions() {
+	switch (data_->unit) {
+	case qsl_data::INCH:
+		bn_inch_->value(true);
+		bn_mm_->value(false);
+		bn_point_->value(false);
+		break;
+	case qsl_data::MILLIMETER:
+		bn_inch_->value(false);
+		bn_mm_->value(true);
+		bn_point_->value(false);
+		break;
+	case qsl_data::POINT:
+		bn_inch_->value(false);
+		bn_mm_->value(false);
+		bn_point_->value(true);
+		break;
+	}
 	ip_cols_->user_data(&data_->columns);
 	ip_cols_->value(data_->columns);
 	ip_width_->user_data(&data_->width);

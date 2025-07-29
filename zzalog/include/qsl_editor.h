@@ -2,21 +2,24 @@
 
 #include "page_dialog.h"
 #include "qsl_data.h"
-#include "utils.h"
-#include "callback.h"
 
+#include "callback.h"
+#include "utils.h"
+
+class field_input;
+class filename_input;
 class qsl_display;
 class qsl_widget;
 class record;
-class filename_input;
-class field_input;
-class Fl_Choice;
-class Fl_Widget;
-class Fl_Group;
-class Fl_Window;
-class Fl_Output;
-class Fl_Value_Input;
+
 class Fl_Check_Button;
+class Fl_Choice;
+class Fl_Group;
+class Fl_Output;
+class Fl_Radio_Round_Button;
+class Fl_Value_Input;
+class Fl_Widget;
+class Fl_Window;
 
 // This class provides the dialog to edit the card label parameters
 // and define the items used in drawing the card label
@@ -147,6 +150,10 @@ protected:
     Fl_Check_Button* bn_loadtsv_;
 
     // Inputs to define size and formats
+    Fl_Group* g_dim_;
+    Fl_Radio_Round_Button* bn_inch_;
+    Fl_Radio_Round_Button* bn_mm_;
+    Fl_Radio_Round_Button* bn_point_;
     Fl_Group* g_2_;
     Fl_Value_Input* ip_cols_;
     Fl_Value_Input* ip_width_;

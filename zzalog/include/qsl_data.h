@@ -88,9 +88,9 @@ struct qsl_data {
         FMT_Y4MD_ADIF,     // 20240618
         FMT_Y4MD,          // 2024/06/18
         FMT_Y2MD,          // 24/06/18
+        FMT_DMY2,          // 18/06/24
+        FMT_MDY2,          // 06/18/24
         FMT_INVALID_DATA,
-        // FMT_DMY2,          // 18/06/24
-        // FMT_MDY2           // 06/18/24
     };
 
     // Time format
@@ -119,11 +119,13 @@ struct qsl_data {
     string filename{ "" };            // Filename of layout data file - relative to  QSL datapath
     vector<item_def*> items;          // layout items read in from file 
 
-    qsl_data() {
-        items.clear();
-    }
+    //qsl_data() {
+    //    items.clear();
+    //}
 };
 
 // Initialise the 
 const string QSL_TYPES[qsl_data::MAX_TYPE] = {"Label", "File"};
+
+
 

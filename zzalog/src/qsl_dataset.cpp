@@ -18,6 +18,47 @@ extern string VENDOR;
 extern string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
 
+const qsl_data LABEL_QSL_DATA =
+{ 
+	qsl_data::MILLIMETER, // unit
+	101.6,                // width
+	67.7,                 // height
+	4,                    // rows
+	2,                    // columns
+	101.6,                // col_width
+	67.7,                 // row_height
+	12.9,                 // row_top
+	4.6,                  // col_left
+	1,                    // max_qsos
+	qsl_data::FMT_Y4MD_ADIF,   // date_format
+	qsl_data::FMT_HMS_ADIF,    // time_format
+	false,                // filename_valid
+	string(""),           // filename
+	{}                    // items
+};
+const qsl_data FILE_QSL_DATA =
+{
+	qsl_data::POINT,      // unit
+	900,                  // width
+	600,                  // height
+	1,                    // rows
+	1,                    // columns
+	0,                    // col_width
+	0,                    // row_height
+	0,                    // row_top
+	0,                    // col_left
+	1,                    // max_qsos
+	qsl_data::FMT_Y4MD_ADIF,   // date_format
+	qsl_data::FMT_HMS_ADIF,    // time_format
+	false,                // filename_valid
+	"",                   // filename
+	{}                    // items
+};
+const map<qsl_data::qsl_type, qsl_data> DEFAULT_QSL_DATA = {
+	{ qsl_data::LABEL, LABEL_QSL_DATA },
+	{ qsl_data::FILE, FILE_QSL_DATA }
+};
+
 qsl_dataset::qsl_dataset() {
 	load_failed_ = false;
 	load_data();
@@ -35,7 +76,7 @@ qsl_data* qsl_dataset::get_card(string callsign, qsl_data::qsl_type type, bool c
 			return call_map->at(callsign);
 		}
 	}
-	qsl_data* data = new qsl_data;
+	qsl_data* data = new qsl_data(DEFAULT_QSL_DATA.at(type));
 	if (create) {
 		if (data_.find(type) == data_.end()) {
 			map<string, qsl_data*>* call_map = new map<string, qsl_data* >;
