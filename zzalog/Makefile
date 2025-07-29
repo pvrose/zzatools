@@ -34,6 +34,9 @@ OBJS := $(SRCS:%=$(EXEC_DIR)/%.o)
 # As an example, ./build/hello.cpp.o turns into ./build/hello.cpp.d
 DEPS := $(OBJS:.o=.d)
 
+# Doxygen source
+DOXS := $(shell find $(UG_DIR) -name '*.dox')
+
 # tar file
 TARFILE = $(TARGET_EXEC:.exe=.tgz)
 
@@ -131,7 +134,7 @@ $(APPDATA_DIR)/html/index.html : $(UG_DIR)/html/index.html
 	@sudo cp $(UG_DIR)/images/* $(APPDATA_DIR)/images/
 
 
-$(UG_DIR)/html/index.html: $(UG_DIR)/index.dox ./Doxyfile
+$(UG_DIR)/html/index.html: $(UG_DIR)/index.dox ./Doxyfile $(DOXS)
 	@echo Creating User Guide
 	@doxygen
 
