@@ -15,6 +15,9 @@ class Fl_Widget;
 	public:
 		user_dialog(int X, int Y, int W, int H, const char* label);
 		virtual ~user_dialog();
+
+		virtual int handle(int event);
+
 		// Load values from settings
 		virtual void load_values();
 		// Used to create the form

@@ -1,0 +1,103 @@
+/** \page qsl_editor Editing QSL cards for labels and e-mails
+
+This dialog enables the user to produce QSL designs. The images below 
+show the dialog and the design it describes.
+
+<IMG SRC="../images/qsl_editor_1.png">
+<IMG SRC="../images/qsl_editor_3.png">
+
+The dialog has three parts highlighted below.
+
+<IMG SRC="../images/qsl_editor_2.png">
+
+\section qd_call Specifying target call and usage.
+
+The top section, enclosed in red, allows the user to specify the 
+callsign with which a QSO is made and the use of the design. The uses
+of the design are:
+
+- Label: A design that can be printed onto labels: typically a number
+of labels can be printed on a single, A4 say, sheet of paper.
+- File: A design that can be exported as a PNG file, say as an
+attachment to an e-mail.
+
+\section qd_dims Specifying image dimensions and print layout.
+
+The middle section, enclosed in blue, allows the user to specify the
+dimensions of the image, layout of labels on the sheet and a 
+few sundry items.
+
+There are three radio buttons, that is only one can selected at nce:
+
+- inch: dimensions are given in inches: 1 inch = 25.4 mm.
+- mm: dimensions are given in millimetres.
+- point: dimensions are given in points: 72 points = 1 inch.
+
+The inputs to the right of these allow the user to input, from left to right
+on subsequent rows:
+
+- Columns: the number of columns of labels in a printed sheet.
+- Width: the width of each column.
+- Position: the position of the left edge of the left-most column.
+- Spacing: the spacing between columns.
+- Rows: the number of rows of labels in a printed sheet.
+- Height: the height of each row.
+- Position: the position of the top-edge of the top-most row.
+- Spacing: the spacing between rows.
+- QSOs/Card: the number of QSOs that can be printed on a single label.
+- Size in pt: the size of the image in points (information only - read-only).
+
+The next controls are:
+- Date Format: a drop-down menu of available date formats: the current date is used as an example.
+- Time Format: a drop-down menu of available time formats: the current rime is used as an example.
+- Use Example QSO: when checked the displayed image uses the selected QSO record if the station
+callsign matches.
+- Actual size: the image display window can be resized: clicking this button will restore 
+the window to the specified size.
+
+\section qd_items Specifying the design
+
+The bottom section, encased in green above, allows the user to specify the objects to be placed 
+on the QSL design. Below are three such objects in the specification and as they appear in
+the design.
+
+<IMG SRC="../images/qsl_editor_5.png">
+<IMG SRC="../images/qsl_editor_4.png">
+
+There are three types of object that can be placed in the design. Each as a number of parameters
+whose labels are across the top.
+
+- Field: the field from the QSO record is placed in the design together with a label.
+  - X: the horizontal position of the top-left of the field.
+  - Y: the vertical position of the top-left of the field.
+  - Contents data: this has 4 controls.
+	- input for label text.
+	- button that opens a dialog that allows the user to specify the font and size of the label.
+	- a drop-down list of fields.
+	- button that opens a dialog that allows the user to specify the font and size of the field's value.
+  - V: when checked, the label is placed above the field value, otherwise to the left of it.
+  - MQ: when more than one QSO is printed on the card, values for this field are printed together,
+  in the alignemnt defined by 'V' above.
+  - B: when checked, a box is displayed outside the field.
+  - DE: when checked, the field with its label is displayed even if the value is an empty string.
+- Text: the entered text is displayed in the image: the text may contain field names, indicated
+by angle brackets, which are replaced by the field value.
+  - X: as above.
+  - Y: as above.
+  - Contents data: the text to be printed.
+  - V: as above.
+- Image: an image contained in a file is copied into the design: the supported file formats are
+PNG, JPG and BMP.
+  - X: as above.
+  - Y: as above:
+  - Contents data: an input containing a filename: there is a button which will open
+  up a file browser.
+
+  To add a new item, click the drop-down menu labeled "New".
+
+  */
+
+
+
+
+
