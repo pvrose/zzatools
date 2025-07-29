@@ -7,6 +7,7 @@
 #include "intl_widgets.h"
 #include "qso_data.h"
 #include "qso_manager.h"
+#include "qso_net_entry.h"
 #include "qso_rig.h"
 #include "record.h"
 #include "rig_if.h"
@@ -88,7 +89,12 @@ int qso_entry::handle(int event) {
 	case FL_KEYBOARD:
 		switch (Fl::event_key()) {
 		case FL_F + 1:
-			open_html("qso_entry.html");
+			qso_net_entry* qn = ancestor_view<qso_net_entry>(this);
+			if (qn) {
+				open_html("qso_net_entry.html");
+			} else {
+				open_html("qso_entry.html");
+			}
 			return true;
 		}
 		break;

@@ -2,7 +2,7 @@
 
 \section description_14 Description
 
-This pane enables the entry of concurrent QSOs.
+This pane enables the entry of concurrent QSOs. For individual record editing see \ref qso_entry.
 
 <IMG SRC="../images/qso_net_entry_1.png">
 

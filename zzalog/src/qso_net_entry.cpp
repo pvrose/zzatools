@@ -24,30 +24,6 @@ qso_net_entry::~qso_net_entry() {
 	save_values();
 }
 
-// Handle
-int qso_net_entry::handle(int event) {
-	int result = Fl_Group::handle(event);
-	// Now handle F1 regardless
-	switch (event) {
-	case FL_FOCUS:
-		return true;
-	case FL_UNFOCUS:
-		// Acknowledge focus events to get the keyboard event
-		return true;
-	case FL_PUSH:
-		take_focus();
-		return true;
-	case FL_KEYBOARD:
-		switch (Fl::event_key()) {
-		case FL_F + 1:
-			open_html("qso_net_entry.html");
-			return true;
-		}
-		break;
-	}
-	return result;
-}
-
 // get settings
 void qso_net_entry::load_values() {
 	// Nothing yet
