@@ -24,6 +24,7 @@ extern cty_data* cty_data_;
 extern qso_manager* qso_manager_;
 extern spec_data* spec_data_;
 extern stn_data* stn_data_;
+extern void open_html(const char*);
 
 stn_dialog::stn_dialog(int X, int Y, int W, int H, const char* L) :
 	page_dialog(X, Y, W, H, L),
@@ -38,6 +39,30 @@ stn_dialog::stn_dialog(int X, int Y, int W, int H, const char* L) :
 }
 
 stn_dialog::~stn_dialog() {}
+
+// Handle
+int stn_dialog::handle(int event) {
+	int result = page_dialog::handle(event);
+	// Now handle F1 regardless
+	switch (event) {
+	case FL_FOCUS:
+		return true;
+	case FL_UNFOCUS:
+		// Acknowledge focus events to get the keyboard event
+		return true;
+	case FL_PUSH:
+		take_focus();
+		return true;
+	case FL_KEYBOARD:
+		switch (Fl::event_key()) {
+		case FL_F + 1:
+			open_html("stn_dialog.html");
+			return true;
+		}
+		break;
+	}
+	return result;
+}
 
 // inherited methods
 // Standard methods - need to be written for each

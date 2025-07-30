@@ -18,6 +18,9 @@ class Fl_Preferences;
 	public:
 		config_tree(int X, int Y, int W, int H, const char* label = nullptr);
 		virtual ~config_tree();
+
+		virtual int handle(int event);
+
 		// Create the view
 		void create_tree();
 

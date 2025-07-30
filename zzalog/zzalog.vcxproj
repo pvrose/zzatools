@@ -413,7 +413,10 @@
     <None Include="userguide\application.dox" />
     <None Include="userguide\banner.dox" />
     <None Include="userguide\change_dialog.dox" />
+    <None Include="userguide\cli.dox" />
     <None Include="userguide\config.dox" />
+    <None Include="userguide\config_tree.dox" />
+    <None Include="userguide\contest_dialog.dox" />
     <None Include="userguide\contest_scorer.dox" />
     <None Include="userguide\fields_dialog.dox" />
     <None Include="userguide\images\dxcc_view.dox" />
@@ -448,6 +451,7 @@
     <None Include="userguide\quick_start.dox" />
     <None Include="userguide\report_tree.dox" />
     <None Include="userguide\search_dialog.dox" />
+    <None Include="userguide\stn_dialog.dox" />
     <None Include="userguide\toolbar.dox" />
     <None Include="userguide\user_dialog.dox" />
     <None Include="userguide\web_dialog.dox" />

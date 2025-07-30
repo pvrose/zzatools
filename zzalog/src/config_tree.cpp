@@ -10,6 +10,7 @@
 extern string VENDOR;
 extern string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
+extern void open_html(const char*);
 
 
 // Constructor
@@ -29,6 +30,30 @@ config_tree::config_tree(int X, int Y, int W, int H, const char* label) :
 config_tree::~config_tree()
 {
 	delete_tree();
+}
+
+// Handle
+int config_tree::handle(int event) {
+	int result = Fl_Tree::handle(event);
+	// Now handle F1 regardless
+	switch (event) {
+	case FL_FOCUS:
+		return true;
+	case FL_UNFOCUS:
+		// Acknowledge focus events to get the keyboard event
+		return true;
+	case FL_PUSH:
+		take_focus();
+		return true;
+	case FL_KEYBOARD:
+		switch (Fl::event_key()) {
+		case FL_F + 1:
+			open_html("config_tree.html");
+			return true;
+		}
+		break;
+	}
+	return result;
 }
 
 // Called to (re)create the tree

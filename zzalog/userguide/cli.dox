@@ -1,0 +1,75 @@
+/** \page cli Command-line interface
+
+The user may start ZZALOG with switches typed in on the command-line. This is more
+typically used on Linux, but it is possible to do so with Windows. They are used mostly for
+diagnostic analysis, but some may be used to define default behaviour and are remebered from
+one call of ZZALOG to the next (called 'sticky' switches and noted below).
+
+<IMG SRC="../images/cli_1.png">
+
+- <B>-a|--auto_save</B> With this switch the log is automatically saved after each change to the log,
+although some changes are aggregated by ZZALOG to prevent unnecessary updates (sticky).
+- <B>-c|--club_mode</B> Launches ZZALOG in club mode. This requires the operator to log in to the application 
+whenever it is started (sticky).
+- <B>-d|--debug [mode...]</B> 
+  Applies a debug feature to be invoked for the run. 
+  - <B>-d c|curl</B>
+  Increases verbosity from the libcurl library used for network access.
+  - <B>-d noc|nocurl</B>
+  Restores normal verbosity from libcurl.
+  - <B>-d e|errors</B>
+  Provides more details on errors.
+  - <B>-d noe|noerrors</B> Restores normal error reporting.
+  - <B>-d h=<I>N</I>|hamlib=<I>N</I></B>	  
+Sets the hamlib debug level (default ERRORS). This is set by the following 'C' enumerated type used
+in hamlib. <I>N</I> values as below:
+    - 0: No debug reporting
+    - 1: Report serious bugs
+    - 2: Report errors
+    - 3: Report warnings
+    - 4: Verbose
+    - 5: Tracing
+    - 6: Report cache behaviour
+  - <B>-d p|pretty</B>  
+Sets the terminal to display formated status message (Needs terminal support).
+  - <B>-d nop|nopretty</B>
+Sets the terminal to display unformatted status messages.
+  - <B>-d q|quick</B>  
+Shortens long timeout and polling intervals.
+  - <B>-d r|rig</B>  
+Prints rig diagnostics
+  - <B>-d t|threads</B>	
+Provides debug tracing on thread use.
+  - <B>-d not|nothreads</B>
+Removes debug tracing on threads.
+- <B>-e|--new</B>
+Creates a new file
+- <B>-h|--help</B>
+Displays the help message.
+- <B>-i|--individual</B>
+Starts the app in Individual mode (sticky).
+- <B>-k|--dark</B>
+Runs the app in dark mode with daek background and light text and icons (sticky).
+- <B>-l|--light</B>
+Runs the app in light mode with light background and dark text and icons (sticky).
+- <B>-m|--resume</B>
+Starts ZZALOG and resumes the previous session.
+- <B>-n|--noisy</B>
+Uploads QSO records to the on-line QSL servers.
+- <B>-p|--private</B>
+Does not update the recent files list.
+- <B>-q|--quiet</B>
+Does not update QSO records to the on-line QSO servers (sticky).
+- <B>-r|--read_only</B>
+Opens the file in read only mode.
+- <B>-s|--new-settings</B>
+Opens the application with empty configuration file.
+- <B>-t|--test</B>
+Opens the application in test mode: infers -q -w.
+- <B>-u|--usual</B>
+Opens the application in normal mode (ie not test mode): infers -a -n.
+- <B>-w|--wait_save</B>
+Does not automatically save each change (sticky).
+
+
+*/

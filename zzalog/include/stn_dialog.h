@@ -27,6 +27,8 @@ public:
     stn_dialog(int X, int Y, int W, int H, const char* L = nullptr);
     ~stn_dialog();
 
+	virtual int handle(int event);
+
 	// inherited methods
 	// Standard methods - need to be written for each
 	// Load values

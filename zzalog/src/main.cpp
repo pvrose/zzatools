@@ -85,7 +85,7 @@ string CONTACT2 = "gm3zza@btinternet.com";
 string DATA_COPYRIGHT = "\302\251 Philip Rose %s. This data may be copied for the purpose of correlation and analysis";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string PROGRAM_VERSION = "3.6.3";
+string PROGRAM_VERSION = "3.6.4";
 string VENDOR = "GM3ZZA";
 string TIMESTAMP = string(__DATE__) + " " + string(__TIME__) + " Local";
 // Target ADIF version number
@@ -567,8 +567,6 @@ void show_help() {
 	"\t\tnop|nopretty\n"
 	"\t\tq|quick\tShorten long timeout and polling intervals\n"
 	"\t\tr|rig\tPrint rig diagnostics\n"
-	"\t\ts|status\tPrint status messages to terminal\n"
-	"\t\t\tnos|nostatus\n"
 	"\t\tt|threads\tProvide debug tracing on thread use\n"
 	"\t\t\tnot|nothreads\n"
 	"\t-e|--new\tCreate new file\n"

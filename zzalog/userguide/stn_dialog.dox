@@ -1,0 +1,66 @@
+/** \page stn_dialog Setting this station details
+
+This dialog allows the user to set various parameters about the current station. It has three tabs: #
+QTH, Operator and Station callsign.
+
+\section sd_qth Specifying QTH details
+
+The first tab, QTH provides the user with the ability to define a number of QSO record fields under
+a single identifier.
+
+The station location, or QTH, should be identified by one or two words. A new location can be typed into 
+the control labeled "Id", or an existing location can be selected from the drop-down list.
+
+The user can then enter as much or as little information about the location in the fields in the dialog:
+
+- "Street": the street name as part of the postal address of the station (QSO field MY_STREET).
+- "City": the town or city name as part of the postal address (QSO field MY_CITY).
+- "Postcode": the postal code (QSO field MY_POSTAL_CODE),
+- "Locator": the Maidenhead locator or grid square: this can be to any desired accuracy (QSO field MY_GRIDSQUARE).
+- "Country": the name of the DXCC entity (QSO field MY_COUNTRY).
+- "DXCC": the equivalent numeric index of the DXCC entity (QSO field MY_DXCC).
+- "Prim'y Sub": the primary administrative subdivision of the DXCC entity (e.g. US State or Canadian province -
+QSO field MY_STATE) - disabled if not relevant to the DXCC entity.
+- "Sec'y Sub": the secondary administrative subdivision of the DXCC entity (e.g. US county or Russian RDA -
+QSO field MY_CNTY) - disabled if not relevant to the DXCC entity.
+- "CQ Zone" - the zone number for CQ Magazine awards and contests (QSO field MY_CQ_ZONE).
+- "ITU Zone" - the zone number alloacted by ITU and used for IARU awards and contests (QSO fiels MY_ITU_ZONE).
+- "Continent" - the abbtreviation of the continent (QSO field APP_ZZA_MY_CONT).
+- "IOTA" - the designation of the island group for Islands on the Air awards (QSO field MY_IOTA).
+- "WAB" - the Ordnance Survey location for Worked all Britain awards (QSO field APP_ZZA_MY_WAB).
+
+It is possible to populate some of the fields by decoding the station callsign being used
+at this location. If the user clicks the check box "Update from call" a drop-down menu
+of callsigns current used in the log is presented. If the user selects a callsign then the following
+fields: Country, DXCC, CQ Zone and Continent are entered automatically.
+
+<IMG SRC="./images/stn_dialog_1.png">
+
+\section sd_oper Specifying an Operator
+
+The second tab, Operators, allows the user to add operators entitled to use the station.
+
+The user or operator may enter their initials into the control labeled "Id", or select them from
+the drop-down list.
+
+The user can then enter as much or as little information about the location in the fields in the dialog:
+
+- "Name": the name of the operator as can be exchanged in the QSO (QSO field MY_NAME).
+- "Callsign": the callsign of the operator (QSO field OPERATOR).
+
+<IMG SRC="../images/stn_dialog_2.png">
+
+\section sd_call Specifying the station callsign
+
+The third tab, Callsigns, allows the user to add any callsigns being used by the station and 
+which share the log-book.
+
+The user can enter a callsign into the control labeled "Call", or select a call from the drop-down
+list. 
+
+<IMG SRC="../images/stn_dialog_3.png">
+
+*/
+
+
+

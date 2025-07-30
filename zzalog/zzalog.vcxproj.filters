@@ -15,360 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="zzalog\src\about_dialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\adi_reader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\adi_writer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\adx_reader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\adx_writer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\book.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\calendar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\change_dialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\config_tree.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\corr_dialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\eqsl_handler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\extract_data.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\fields_dialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\field_choice.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\import_data.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\intl_dialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\log_table.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\lotw_handler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\menu.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\printer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\record.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\record_table.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\report_tree.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\search_dialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\specx_reader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\spec_data.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\spec_tree.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\status.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qso_manager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\tabbed_forms.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\toolbar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\view.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\web_dialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\intl_widgets.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qrz_handler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\club_handler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\cty_data.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\cty_reader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\user_dialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\wsjtx_handler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\fllog_emul.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\main_window.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\page_dialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\rig_if.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\rpc_data_item.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\rpc_handler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\serial.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\socket_server.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\url_handler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\win_dialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qso_rig.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qso_clock.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qso_data.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qso_entry.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qso_query.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qso_buttons.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qso_tabbed_rigs.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qso_net_entry.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qso_misc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qso_details.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qso_dxcc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qso_log_info.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qso_log.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qso_clocks.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qso_qsl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\band_data.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qso_qsl_vwr.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\wx_handler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qso_wx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qsl_display.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qsl_editor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\font_dialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\ticker.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\fields.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qso_apps.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\config.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\symbols.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\password_input.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\calendar_input.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\calendar_table.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qsl_dataset.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qsl_widget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qsl_image.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\png_writer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qsl_emailer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="widgets\src\filename_input.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="common\src\utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\file_viewer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\dxcc_table.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\dxcc_view.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\band_widget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\band_window.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qso_bands.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\rig_data.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\rig_reader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\rig_writer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="common\src\xml_element.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="common\src\xml_reader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="common\src\xml_writer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qsl_reader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qsl_writer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\xml_wreader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\stn_data.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\stn_reader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\stn_writer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qso_operation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\stn_dialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\banner.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\contest_data.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\contest_reader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\contest_writer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\contest_dialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\contest_scorer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\contest_algorithm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\contests\basic.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\contests\iaru_hf.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\club_stn_dlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\contests\basic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -708,402 +354,27 @@
     <ClCompile Include="src\xml_wreader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\src\utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\src\xml_element.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\src\xml_reader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\src\xml_writer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\widgets\src\filename_input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="zzalog\include\about_dialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\adi_reader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\adi_writer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\adx_reader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\adx_writer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\book.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\calendar.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\change_dialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\config_tree.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\corr_dialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\eqsl_handler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\extract_data.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\fields.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\fields_dialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\field_choice.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\files.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\icons.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\import_data.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\intl_dialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\log_table.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\lotw_handler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\menu.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\pfx_data.old.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\prefix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\printer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\record.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\record_table.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\report_tree.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\search.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\search_dialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\specx_reader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\spec_data.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\spec_tree.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\status.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qso_manager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\tabbed_forms.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\toolbar.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\view.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\web_dialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\intl_widgets.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\club_handler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\cty_data.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\cty_reader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\edit_input.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\user_dialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\wsjtx_handler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\fllog_emul.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\main_window.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="packages\pthreads.2.9.1.4\build\native\include\pthread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zzalog\include\callback.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\formats.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\page_dialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\rig_if.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\rpc_data_item.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\rpc_handler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\serial.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\socket_server.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\url_handler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\win_dialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qso_rig.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qso_clock.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qso_data.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qso_entry.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qso_query.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qso_buttons.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qso_tabbed_rigs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qso_net_entry.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\drawing.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qso_misc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qso_details.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qso_dxcc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qso_log_info.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qso_log.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qso_clocks.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qso_qsl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\band_data.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qso_qsl_vwr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\regices.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\logo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\wx_handler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qso_wx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qsl_display.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qsl_editor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\font_dialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\ticker.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qso_apps.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\config.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\symbols.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\password_input.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\calendar_input.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\calendar_table.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qsl_dataset.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qsl_data.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qsl_widget.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qsl_image.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\png_writer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qsl_emailer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="widgets\include\filename_input.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="widgets\include\button_input.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\file_viewer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\dxcc_table.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\dxcc_view.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\band_widget.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\band_window.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qso_bands.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\rig_data.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\rig_reader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\rig_writer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="common\include\xml_element.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="common\include\xml_reader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qsl_reader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qsl_writer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\xml_wreader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="common\include\utils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\stn_data.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\stn_reader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\stn_writer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qso_operation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\stn_dialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\banner.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qrz_handler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\contest_data.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\contest_reader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\contest_writer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\contest_dialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\contest_scorer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="common\include\xml_writer.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\contest_algorithm.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\contests\basic.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\contests\iaru_hf.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\club_stn_dlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\contests\basic.h">
@@ -1466,52 +737,74 @@
     <ClInclude Include="include\xml_wreader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\include\utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\include\xml_element.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\include\xml_reader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\include\xml_writer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\widgets\include\button_input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\widgets\include\filename_input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="reference\Prefix.lst" />
-    <None Include="zzalog\Makefile" />
-    <None Include="zzalog\userguide\index.dox" />
-    <None Include="zzalog\Doxyfile" />
-    <None Include="zzalog\userguide\introduction.dox" />
-    <None Include="zzalog\userguide\installation.dox" />
-    <None Include="zzalog\userguide\quick_start.dox" />
-    <None Include="zzalog\userguide\operating.dox" />
-    <None Include="zzalog\userguide\application.dox" />
-    <None Include="zzalog\userguide\images\main_window.dox" />
-    <None Include="zzalog\userguide\menu.dox" />
-    <None Include="zzalog\userguide\images\toolbar.dox" />
-    <None Include="zzalog\userguide\log_table.dox" />
-    <None Include="zzalog\userguide\report_tree.dox" />
-    <None Include="zzalog\userguide\images\dxcc_view.dox" />
-    <None Include="zzalog\userguide\banner.dox" />
-    <None Include="zzalog\userguide\intl_dialog.dox" />
-    <None Include="zzalog\userguide\qso_manager.dox" />
-    <None Include="zzalog\userguide\qso_operation.dox" />
-    <None Include="zzalog\userguide\qso_entry.dox" />
-    <None Include="zzalog\userguide\qso_query.dox" />
-    <None Include="zzalog\userguide\qso_net_entry.dox" />
-    <None Include="zzalog\userguide\images\qso_buttons.dox" />
-    <None Include="zzalog\userguide\qso_details.dox" />
-    <None Include="zzalog\userguide\qso_dxcc.dox" />
-    <None Include="zzalog\userguide\qso_qsl_vwr.dox" />
-    <None Include="zzalog\userguide\contest_scorer.dox" />
-    <None Include="zzalog\userguide\qso_clocks.dox" />
-    <None Include="zzalog\userguide\qso_rig.dox" />
-    <None Include="zzalog\userguide\toolbar.dox" />
-    <None Include="zzalog\userguide\qso_buttons.dox" />
-    <None Include="zzalog\userguide\main_window.dox" />
-    <None Include="zzalog\userguide\qso_log_info.dox" />
-    <None Include="zzalog\userguide\qso_qsl.dox" />
-    <None Include="zzalog\userguide\qso_apps.dox" />
-    <None Include="zzalog\userguide\qso_wx.dox" />
-    <None Include="zzalog\userguide\qso_bands.dox" />
-    <None Include="zzalog\userguide\search_dialog.dox" />
-    <None Include="zzalog\userguide\change_dialog.dox" />
-    <None Include="zzalog\userguide\config.dox" />
-    <None Include="zzalog\userguide\web_dialog.dox" />
-    <None Include="zzalog\userguide\fields_dialog.dox" />
-    <None Include="zzalog\userguide\user_dialog.dox" />
-    <None Include="zzalog\userguide\qsl_editor.dox" />
+    <None Include="..\reference\Prefix.lst" />
+    <None Include="Doxyfile" />
+    <None Include="Makefile" />
+    <None Include="userguide\application.dox" />
+    <None Include="userguide\banner.dox" />
+    <None Include="userguide\change_dialog.dox" />
+    <None Include="userguide\config.dox" />
+    <None Include="userguide\contest_scorer.dox" />
+    <None Include="userguide\fields_dialog.dox" />
+    <None Include="userguide\images\dxcc_view.dox" />
+    <None Include="userguide\images\main_window.dox" />
+    <None Include="userguide\images\qso_buttons.dox" />
+    <None Include="userguide\images\toolbar.dox" />
+    <None Include="userguide\index.dox" />
+    <None Include="userguide\installation.dox" />
+    <None Include="userguide\intl_dialog.dox" />
+    <None Include="userguide\introduction.dox" />
+    <None Include="userguide\log_table.dox" />
+    <None Include="userguide\main_window.dox" />
+    <None Include="userguide\menu.dox" />
+    <None Include="userguide\operating.dox" />
+    <None Include="userguide\qsl_editor.dox" />
+    <None Include="userguide\qso_apps.dox" />
+    <None Include="userguide\qso_bands.dox" />
+    <None Include="userguide\qso_buttons.dox" />
+    <None Include="userguide\qso_clocks.dox" />
+    <None Include="userguide\qso_details.dox" />
+    <None Include="userguide\qso_entry.dox" />
+    <None Include="userguide\qso_manager.dox" />
+    <None Include="userguide\qso_net_entry.dox" />
+    <None Include="userguide\qso_log_info.dox" />
+    <None Include="userguide\qso_operation.dox" />
+    <None Include="userguide\qso_dxcc.dox" />
+    <None Include="userguide\qso_qsl.dox" />
+    <None Include="userguide\qso_qsl_vwr.dox" />
+    <None Include="userguide\qso_query.dox" />
+    <None Include="userguide\qso_rig.dox" />
+    <None Include="userguide\qso_wx.dox" />
+    <None Include="userguide\quick_start.dox" />
+    <None Include="userguide\report_tree.dox" />
+    <None Include="userguide\search_dialog.dox" />
+    <None Include="userguide\toolbar.dox" />
+    <None Include="userguide\user_dialog.dox" />
+    <None Include="userguide\web_dialog.dox" />
+    <None Include="userguide\stn_dialog.dox" />
+    <None Include="userguide\contest_dialog.dox" />
+    <None Include="userguide\config_tree.dox" />
+    <None Include="userguide\cli.dox" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="zzalog.ico">
