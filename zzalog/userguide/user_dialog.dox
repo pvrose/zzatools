@@ -1,0 +1,27 @@
+/** \page user_dialog Defining Fonts etc.
+
+This pane allows the user to configure fonts on a number of windows and panes.
+
+<IMG SRC="../images/user_dialog_1.png">
+
+\section ud_logtable Configuring log-book view.
+
+The user can change the font used to display the log-book views. 
+
+In the log-book view, QSO records within the current session are highlighted with a grey 
+background. This dialog allows the user how long a gap in operating is needed to define
+a new session. The slider control labeled "Session elapse time" allows them to do this.
+
+\section ud_tooltip Configuring tool-tips.
+
+Tool-tips are windows that appear when the user hovers the mouse over a control. The
+user can change the font used in tool-tips.
+
+The user can also specify the length of time for which a tool-tip appears.
+
+\section ud_tbles Configuring tree views
+
+The two views labeled "Specifications" and "Log Analysis" are tree views.
+The user can change the font used to display these tree views.
+
+*/

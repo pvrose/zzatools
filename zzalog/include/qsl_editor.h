@@ -31,7 +31,7 @@ public:
 
     qsl_editor(int x, int Y, int W, int H, const char* L = nullptr);
     ~qsl_editor();
- 
+
 protected:
     // Load the settings
     void load_values();

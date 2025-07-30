@@ -434,6 +434,7 @@
     <None Include="zzalog\userguide\main_window.dox" />
     <None Include="zzalog\userguide\menu.dox" />
     <None Include="zzalog\userguide\operating.dox" />
+    <None Include="zzalog\userguide\qsl_editor.dox" />
     <None Include="zzalog\userguide\qso_apps.dox" />
     <None Include="zzalog\userguide\qso_bands.dox" />
     <None Include="zzalog\userguide\qso_buttons.dox" />
@@ -454,6 +455,7 @@
     <None Include="zzalog\userguide\report_tree.dox" />
     <None Include="zzalog\userguide\search_dialog.dox" />
     <None Include="zzalog\userguide\toolbar.dox" />
+    <None Include="zzalog\userguide\user_dialog.dox" />
     <None Include="zzalog\userguide\web_dialog.dox" />
   </ItemGroup>
   <ItemGroup>

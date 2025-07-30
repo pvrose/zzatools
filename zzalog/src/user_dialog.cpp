@@ -19,6 +19,7 @@ extern tabbed_forms* tabbed_forms_;
 extern string VENDOR;
 extern string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
+extern void open_html(const char*);
 
 // constructor
 user_dialog::user_dialog(int X, int Y, int W, int H, const char* label) :
@@ -39,6 +40,31 @@ user_dialog::user_dialog(int X, int Y, int W, int H, const char* label) :
 
 // Destructor
 user_dialog::~user_dialog() {}
+
+// Handle
+int user_dialog::handle(int event) {
+	int result = page_dialog::handle(event);
+	// Now handle F1 regardless
+	switch (event) {
+	case FL_FOCUS:
+		return true;
+	case FL_UNFOCUS:
+		// Acknowledge focus events to get the keyboard event
+		return true;
+	case FL_PUSH:
+		take_focus();
+		return true;
+	case FL_KEYBOARD:
+		switch (Fl::event_key()) {
+		case FL_F + 1:
+			open_html("user_dialog.html");
+			return true;
+		}
+		break;
+	}
+	return result;
+}
+
 
 // Load values from settings
 void user_dialog::load_values() {

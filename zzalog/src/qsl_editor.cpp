@@ -33,6 +33,7 @@ extern status* status_;
 extern string VENDOR;
 extern string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
+extern void open_html(const char*);
 
 // Constructor
 qsl_editor::qsl_editor(int X, int Y, int W, int H, const char* L) :
@@ -70,6 +71,7 @@ qsl_editor::~qsl_editor() {
 
 // Overload of handle() to intercept ACTIVATE and DEACTIVATE events
 int qsl_editor::handle(int event) {
+	int result = page_dialog::handle(event);
 	switch(event) {
 	case FL_DEACTIVATE:
 	case FL_HIDE: {
@@ -84,9 +86,24 @@ int qsl_editor::handle(int event) {
 		create_items();
 		break;
 	}
+	case FL_FOCUS:
+		return true;
+	case FL_UNFOCUS:
+		// Acknowledge focus events to get the keyboard event
+		return true;
+	case FL_PUSH:
+		take_focus();
+		return true;
+	case FL_KEYBOARD:
+		switch (Fl::event_key()) {
+		case FL_F + 1:
+			open_html("qsl_editor.html");
+			return true;
+		}
+		break;
 	}
 	// Pass all events to page_dialog
-	return page_dialog::handle(event);
+	return result;
 }
 
 // Load the settings
