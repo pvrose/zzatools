@@ -426,6 +426,7 @@
     <None Include="userguide\index.dox" />
     <None Include="userguide\installation.dox" />
     <None Include="userguide\intl_dialog.dox" />
+    <None Include="userguide\introduction.dox" />
     <None Include="userguide\log_table.dox" />
     <None Include="userguide\main_window.dox" />
     <None Include="userguide\menu.dox" />
