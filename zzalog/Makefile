@@ -96,7 +96,7 @@ else
 	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 endif
 # Create the logo includefile
-$(INC_DIRS)/logo.h: ../rose.png
+./include/logo.h: ../rose.png
 	@echo Creating $@
 	@xxd -i $< > $@
 	
@@ -134,7 +134,7 @@ $(APPDATA_DIR)/html/index.html : $(UG_DIR)/html/index.html
 	@sudo cp $(UG_DIR)/images/* $(APPDATA_DIR)/images/
 
 
-$(UG_DIR)/html/index.html: $(UG_DIR)/index.dox ./Doxyfile $(DOXS)
+$(UG_DIR)/html/index.html: ./Doxyfile $(DOXS)
 	@echo Creating User Guide
 	@doxygen
 
