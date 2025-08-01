@@ -8,6 +8,7 @@ REF_DIR := ../reference
 UG_DIR := ./userguide
 EXEC_DIR = $(BUILD_DIR)/$(BUILD_TYPE)
 INSTALL_DIR := /usr/local/bin
+LIBRARY_DIR := /usr/local/lib
 APPDATA_DIR := /etc/fltk/GM3ZZA/ZZALOG
 
 # Standard compilers and debuggers
@@ -50,7 +51,7 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 FLTK_FLAGS := `fltk-config --use-images --ldflags` 
 
 # Hamlib flags
-HAMLIB_FLAGS := -L/usr/local/lib -lhamlib -Wl,-rpath -Wl,/usr/local/lib
+HAMLIB_FLAGS := -L$(LIBRARY_DIR) -lhamlib -Wl,-rpath -Wl,$(LIBRARY_DIR)
 # Curl flags
 CURL_FLAGS := -lcurl
 
@@ -73,7 +74,7 @@ endif
 # DEBUG_FLAG := -Og
 
 # The final build step.
-$(EXEC_DIR)/$(TARGET_EXEC): $(OBJS) ${INSTALL_DIR}/fltk-config
+$(EXEC_DIR)/$(TARGET_EXEC): $(OBJS) ${INSTALL_DIR}/fltk-config $(LIBRARY_DIR)/libhamlib.so
 	@echo Linking $@
 	@$(CXX) $(OBJS) -o $@ $(LDFLAGS)
 
