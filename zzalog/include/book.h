@@ -75,6 +75,7 @@ using namespace std;
 		WK_DXCC,                  // DXCC
 		WK_GRID4,                 // 4-character gridsquares
 		WK_CQZ,                   // CQ Zone
+		WK_ITUZ,                  // ITU Zone
 		WK_CONT,                  // Continent
 		WK_PAS,                   // Prmary Admin: Subdiv: (eg US State)
 	};

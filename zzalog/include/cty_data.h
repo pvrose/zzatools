@@ -17,7 +17,7 @@ class record;
 class cty_data
 {
 
-protected:
+public:
 
 	// Capabailities
 	enum cty_caps_t {
@@ -26,6 +26,8 @@ protected:
 		HAS_TIMEZONE = 1 << 1,
 		HAS_HISTORY = 1 << 2,
 	};
+
+protected:
 
 	cty_caps_t capabilities_;
 

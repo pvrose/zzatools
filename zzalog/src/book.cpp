@@ -1081,6 +1081,7 @@ void book::add_use_data(record* use_record) {
 		if (grid.length() < 4) grid = "";
 		else grid = grid.substr(0, 4);
 		string cqz = use_record->item("CQZ");
+		string ituz = use_record->item("ITUZ");
 		string cont = use_record->item("CONT");
 
 		if (band == "") {
@@ -1095,10 +1096,12 @@ void book::add_use_data(record* use_record) {
 			bands_[call][WK_DXCC][dxcc].insert(band);
 			bands_[call][WK_GRID4][grid].insert(band);
 			bands_[call][WK_CQZ][cqz].insert(band);
+			bands_[call][WK_ITUZ][ituz].insert(band);
 			bands_[call][WK_CONT][cont].insert(band);
 			bands_[""][WK_DXCC][dxcc].insert(band);
 			bands_[""][WK_GRID4][grid].insert(band);
 			bands_[""][WK_CQZ][cqz].insert(band);
+			bands_[""][WK_ITUZ][ituz].insert(band);
 			bands_[""][WK_CONT][cont].insert(band);
 		}
 		string mode = use_record->item("MODE");
@@ -1107,10 +1110,12 @@ void book::add_use_data(record* use_record) {
 			modes_[call][WK_DXCC][dxcc].insert(mode);
 			modes_[call][WK_GRID4][grid].insert(mode);
 			modes_[call][WK_CQZ][cqz].insert(mode);
+			modes_[call][WK_ITUZ][ituz].insert(mode);
 			modes_[call][WK_CONT][cont].insert(mode);
 			modes_[""][WK_DXCC][dxcc].insert(mode);
 			modes_[""][WK_GRID4][grid].insert(mode);
 			modes_[""][WK_CQZ][cqz].insert(mode);
+			modes_[""][WK_ITUZ][ituz].insert(mode);
 			modes_[""][WK_CONT][cont].insert(mode);
 		}
 		string submode = use_record->item("SUBMODE");
@@ -1122,10 +1127,12 @@ void book::add_use_data(record* use_record) {
 			submodes_[call][WK_DXCC][dxcc].insert(submode);
 			submodes_[call][WK_GRID4][grid].insert(submode);
 			submodes_[call][WK_CQZ][cqz].insert(submode);
+			submodes_[call][WK_ITUZ][ituz].insert(submode);
 			submodes_[call][WK_CONT][cont].insert(submode);
 			submodes_[""][WK_DXCC][dxcc].insert(submode);
 			submodes_[""][WK_GRID4][grid].insert(submode);
 			submodes_[""][WK_CQZ][cqz].insert(submode);
+			submodes_[""][WK_ITUZ][ituz].insert(submode);
 			submodes_[""][WK_CONT][cont].insert(submode);
 		}
 		string rig = use_record->item("MY_RIG");

@@ -113,11 +113,18 @@ void qso_dxcc::create_form() {
 	curr_y += ROW_HEIGHT;
 
 	// Display geographic information
-	op_geo_ = new Fl_Output(curr_x, curr_y, avail_width, ROW_HEIGHT);
-	op_geo_->box(FL_FLAT_BOX);
-	op_geo_->color(FL_BACKGROUND_COLOR);
-	op_geo_->tooltip("Shows geographical data for the DXCC");
+	op_zones_ = new Fl_Output(curr_x, curr_y, avail_width, ROW_HEIGHT);
+	op_zones_->box(FL_FLAT_BOX);
+	op_zones_->color(FL_BACKGROUND_COLOR);
+	op_zones_->tooltip("Shows continent and zone data for the DXCC");
 	curr_y += ROW_HEIGHT;
+
+	op_coords_ = new Fl_Output(curr_x, curr_y, avail_width, ROW_HEIGHT);
+	op_coords_->box(FL_FLAT_BOX);
+	op_coords_->color(FL_BACKGROUND_COLOR);
+	op_coords_->tooltip("Shows latitude and longitude for the DXCC");
+	curr_y += ROW_HEIGHT;
+
 
 	// Display geographic information
 	op_dist_bear_ = new Fl_Output(curr_x, curr_y, avail_width, ROW_HEIGHT);
@@ -171,7 +178,7 @@ void qso_dxcc::enable_widgets() {
 			op_source_->color(FL_BACKGROUND_COLOR);
 			break;
 		case cty_data::ZONE_EXCEPTION:
-			op_source_->value("CQ Zone Exception");
+			op_source_->value("Zone Exception");
 			op_source_->color(FL_BACKGROUND_COLOR);
 			break;
 		case cty_data::DEFAULT:
@@ -179,8 +186,13 @@ void qso_dxcc::enable_widgets() {
 			op_source_->color(FL_BACKGROUND_COLOR);
 			break;
 		}
+		snprintf(text, sizeof(text), "%s: CQ Zone %d. ITU Zone %s.",
+			continent_.c_str(),
+			cq_zone_,
+			cty_data_->capabilities() & cty_data::HAS_ITU_ZONE ? to_string(itu_zone_).c_str() : "N/A");
+		op_zones_->value(text);
 		if (location_.is_nan()) {
-			snprintf(text, sizeof(text), "CQ Zone %d.", cq_zone_);
+			op_coords_->value("");
 		} else {
 			char ls[10];
 			switch(loc_source_) {
@@ -197,13 +209,12 @@ void qso_dxcc::enable_widgets() {
 					strcpy(ls, "(GRID)");
 					break;
 			}
-			snprintf(text, sizeof(text), "%s: CQ Zone %d. Loc: %.0f\302\260%c %.0f\302\260%c %s",
-				continent_.c_str(), cq_zone_, 
+			snprintf(text, sizeof(text), "Loc: %.0f\302\260%c %.0f\302\260%c %s",
 				abs(location_.latitude), location_.latitude > 0 ? 'N' : 'S',
 				abs(location_.longitude), location_.longitude > 0 ? 'E' : 'W',
 				ls);
+			op_coords_->value(text);
 		}
-		op_geo_->value(text);
 		if (location_.is_nan() || my_location_.is_nan()) {
 			snprintf(text, sizeof(text), "Distance N/A");
 		} else {
@@ -219,7 +230,8 @@ void qso_dxcc::enable_widgets() {
 		op_call_->value("No contact");
 		op_prefix_->value("Prefix N/A");
 		op_source_->value("Decode N/A");
-		op_geo_->value("Location N/A");
+		op_zones_->value("Zones N/A");
+		op_coords_->value("Coords N/A");
 		op_dist_bear_->value("Distance N/A");
 	}
 }
@@ -238,6 +250,7 @@ void qso_dxcc::set_data(record* qso) {
 		name_ = cty_data_->name(qso_);
 		source_ = cty_data_->get_source(qso_);
 		cq_zone_ = cty_data_->cq_zone(qso_);
+		itu_zone_ = cty_data_->itu_zone(qso_);
 		location_ = qso_->location(false, loc_source_);
 		dxcc_ = cty_data_->entity(qso_);
 		my_location_ = qso_->location(true);
@@ -257,7 +270,7 @@ void qso_dxcc::cb_bn_qrz(Fl_Widget* w, void* v) {
 qso_dxcc::wb4_table::wb4_table(int X, int Y, int W, int H, const char* L) :
 	Fl_Table(X, Y, W, H, L) 
 {
-	rows(4);
+	rows(5);
 	cols(3);
 	col_header(true);
 	row_header(true);
@@ -296,6 +309,9 @@ void qso_dxcc::wb4_table::draw_cell(TableContext context, int R, int C, int X, i
 				break;
 			case WK_CQZ:
 				fl_draw("CQ Zone", X, Y, W, H, FL_ALIGN_CENTER);
+				break;
+			case WK_ITUZ:
+				fl_draw("ITU Zone", X, Y, W, H, FL_ALIGN_CENTER);
 				break;
 			case WK_CONT:
 				fl_draw("Continent", X, Y, W, H, FL_ALIGN_CENTER);
@@ -443,6 +459,24 @@ void qso_dxcc::wb4_table::set_data() {
 		wkd_matrix_[WK_CQZ].mode = true;
 	}
 	wkd_matrix_[WK_CQZ].text = qd->cq_zone_ > 0 ? "CQZ " + to_string(qd->cq_zone_) : "";
+
+	band_set* ituz_b = book_->used_bands(WK_ITUZ, qd->itu_zone_, qd->station_);
+	set<string>* ituz_m = book_->used_modes(WK_ITUZ, qd->itu_zone_, qd->station_);
+	if (ituz_b) {
+		wkd_matrix_[WK_ITUZ].any = (bool)ituz_b->size() == 0;
+		wkd_matrix_[WK_ITUZ].band = ituz_b->find(band) == ituz_b->end();
+	}
+	else {
+		wkd_matrix_[WK_ITUZ].any = true;
+		wkd_matrix_[WK_ITUZ].band = true;
+	}
+	if (ituz_m) {
+		wkd_matrix_[WK_ITUZ].mode = ituz_m->find(mode) == ituz_m->end();
+	}
+	else {
+		wkd_matrix_[WK_ITUZ].mode = true;
+	}
+	wkd_matrix_[WK_ITUZ].text = qd->itu_zone_ > 0 ? "ITUZ " + to_string(qd->itu_zone_) : "";
 
 	band_set* cont_b = book_->used_bands(WK_CONT, qd->continent_, qd->station_);
 	set<string>* cont_m = book_->used_modes(WK_CONT, qd->continent_, qd->station_);

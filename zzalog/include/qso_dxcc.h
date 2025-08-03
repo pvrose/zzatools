@@ -82,7 +82,8 @@ protected:
     // Prefix data
     Fl_Output* op_source_;
     Fl_Output* op_prefix_;
-    Fl_Output* op_geo_;
+    Fl_Output* op_zones_;
+    Fl_Output* op_coords_;
     Fl_Output* op_dist_bear_;
     // 
     // Buttons showing worked before
@@ -98,6 +99,7 @@ protected:
     string name_;
     // The CQ zone
     int cq_zone_;
+    int itu_zone_;
     // The DXCC number per ADIF
     int dxcc_;
     // The latitude and longitude of the DXCC centre
