@@ -1,8 +1,7 @@
-#ifndef __EXC_READER__
-#define __EXC_READER__
+#pragma once
 
 #include "xml_reader.h"
-#include "cty_data.h"
+#include "cty1_data.h"
 
 #include <list>
 #include <string>
@@ -11,12 +10,12 @@
 using namespace std;
 
 	// This class reads the XML cty.xml file obtained from Clublog
-	class cty_reader :
+	class cty1_reader :
 		public xml_reader
 	{
 	public:
-		cty_reader();
-		~cty_reader();
+		cty1_reader();
+		~cty1_reader();
 
 		// Overloadable XML handlers
 		// Start 
@@ -31,7 +30,7 @@ using namespace std;
 		virtual bool characters(string content);
 
 		// Load data from specified file into and add each record to the map
-		bool load_data(cty_data* data, istream& in, string& version);
+		bool load_data(cty1_data* data, istream& in, string& version);
 		// Protected methods
 	protected:
 
@@ -45,13 +44,13 @@ using namespace std;
 		// File timestamp
 		string timestamp_;
 		// Current elements
-		cty_data::exc_entry* current_exception_;
-		cty_data::invalid_entry* current_invalid_;
-		cty_data::zone_entry* current_zone_exc_;
-		cty_data::entity_entry* current_entity_;
-		cty_data::prefix_entry* current_prefix_;
+		cty1_data::exc_entry* current_exception_;
+		cty1_data::invalid_entry* current_invalid_;
+		cty1_data::zone_entry* current_zone_exc_;
+		cty1_data::entity_entry* current_entity_;
+		cty1_data::prefix_entry* current_prefix_;
 		// The data being read
-		cty_data* data_;
+		cty1_data* data_;
 		// Value of element
 		string value_;
 		// Pointer to file
@@ -62,5 +61,4 @@ using namespace std;
 
 	};
 
-#endif
 

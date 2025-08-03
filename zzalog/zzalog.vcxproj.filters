@@ -96,10 +96,10 @@
     <ClCompile Include="src\corr_dialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\cty_data.cpp">
+    <ClCompile Include="src\cty1_data.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\cty_reader.cpp">
+    <ClCompile Include="src\cty1_reader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\dxcc_table.cpp">
@@ -464,7 +464,7 @@
     <ClInclude Include="include\cty_data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\cty_reader.h">
+    <ClInclude Include="include\cty1_reader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\dxcc_table.h">
@@ -753,6 +753,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\widgets\include\filename_input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\cty1_data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

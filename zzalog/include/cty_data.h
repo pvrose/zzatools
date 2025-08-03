@@ -1,5 +1,4 @@
-#ifndef __EXC_DATA__
-#define __EXC_DATA__
+#pragma once
 
 #include "utils.h"
 
@@ -19,122 +18,6 @@ class cty_data
 {
 public:
 
-	// List of entities
-	struct entity_entry {
-		int adif_id;
-		string name;
-		string prefix;
-		int cq_zone;
-		string continent;
-		double longitude;
-		double latitude;
-		bool deleted;
-		time_t start;
-		time_t end;
-		bool whitelist;
-		time_t whitelist_start;
-
-		entity_entry() {
-			adif_id = 0;
-			name = "";
-			prefix = "";
-			cq_zone = 0;
-			continent = "";
-			longitude = nan("");
-			latitude = nan("");
-			deleted = false;
-			start = -1;
-			end = -1;
-			whitelist = false;
-			whitelist_start = -1;
-		}
-	};
-
-	// An exception entry - it will be mapped by callsign to a list of them
-	struct exc_entry {
-		string call;
-		int adif_id;
-		int cq_zone;
-		string continent;
-		double longitude;
-		double latitude;
-		time_t start;
-		time_t end;
-
-		exc_entry() {
-			call = "";
-			adif_id = 0;
-			cq_zone = 0;
-			continent = "";
-			longitude = nan("");
-			latitude = nan("");
-			start = -1;
-			end = -1;
-		}
-	};
-
-	// A prefix entry
-	struct prefix_entry {
-		string call;
-		string entity;
-		int adif_id;
-		int cq_zone;
-		string continent;
-		double longitude;
-		double latitude;
-		time_t start;
-		time_t end;
-
-		prefix_entry() {
-			call = "";
-			entity = "";
-			adif_id = 0;
-			cq_zone = 0;
-			continent = "";
-			longitude = nan("");
-			latitude = nan("");
-			start = -1;
-			end = -1;
-		}
-
-	};
-
-	// An invalid entry
-	struct invalid_entry {
-		string call;
-		time_t start;
-		time_t end;
-
-		invalid_entry() {
-			call = "";
-			start = -1;
-			end = -1;
-		}
-	};
-
-	// Zone exception
-	struct zone_entry {
-		string call;
-		int cq_zone;
-		time_t start;
-		time_t end;
-
-		zone_entry() {
-			call = "";
-			cq_zone = 0;
-			start = -1;
-			end = -1;
-		}
-	};
-
-	// Parse results
-	struct parse_result {
-		bool invalid;
-		exc_entry* exception;
-		zone_entry* zone_exception;
-		prefix_entry* prefix;
-	};
-
 	// Parse source
 	enum parse_source_t {
 		INVALID,
@@ -143,76 +26,29 @@ public:
 		DEFAULT
 	};
 
-	cty_data();
-	~cty_data();
+	cty_data() {};
+	virtual ~cty_data() {};
 
-	// Check timeliness of data
-	bool data_valid(string filename);
-	// Load data 
-	bool load_data(string filename);
 	// Return various fields of entity
-	string nickname(record* qso);
-	string name(record* qso);
-	string continent(record* qso);
-	int cq_zone(record* qso);
-	// Get entity for nickname and vice-versa
-	int entity(string nickname);
-	string nickname(int adif_id);
+	virtual string nickname(record* qso) = 0;
+	virtual string name(record* qso) = 0;
+	virtual string continent(record* qso) = 0;
+	virtual int cq_zone(record* qso) = 0;
 	// Get location
-	lat_long_t location(record* qso);
+	virtual lat_long_t location(record* qso) = 0;
 	// Update record based on parsing
-	bool update_qso(record* qso, bool my_call = false);
+	virtual bool update_qso(record* qso, bool my_call = false) = 0;
 	// Get location details
-	string get_tip(record* qso);
+	virtual string get_tip(record* qso) = 0;
 	// Parsing source
-	parse_source_t get_source(record* qso);
+	virtual parse_source_t get_source(record* qso) = 0;
 	// Return entity 
-	int entity(record* qso);
-	// Get default values for entity n
-	string name(int adif_id);
-	string continent(int adif_id);
-	int cq_zone(int adif_id);
-	
-	// Allow the reader to access the data directlt
-	friend class cty_reader;
-	friend class pfx_tree;
+	virtual int entity(record* qso) = 0;
 
-protected:
-	// Get the filename {REFERENCE DIR}/cty.xml
-	string get_filename();
-	// Delete contents
-	void delete_contents();
-	// Get parse results
-	void parse(record* qso);
-	// invalid
-	bool invalid(record* qso);
-	// Exception
-	exc_entry* except(record* qso);
-	// Zone exception
-	zone_entry* zone_except(record* qso);
-	// Get prefix
-	prefix_entry* prefix(record* qso);
+	// Get entity for nickname and vice-versa
+	virtual int entity(string nickname) = 0;
+	virtual string nickname(int adif_id) = 0;
 
-	// Entity data
-	map<int, entity_entry* > entities_;
-	// The cty_data data
-	map <string, list<exc_entry*> > entries_;
-	// Prefix data
-	map<string, list<prefix_entry*> > prefixes_;
-	// Invalid operations 
-	map<string, list<invalid_entry*> > invalids_;
-	// Zone exceptions
-	map < string, list<zone_entry*> > zones_;
-	// File created
-	string file_created_;
-
-	// Parse result
-	parse_result* parse_result_;
-	// Record for last parse result
-	record* qso_;
-	// Call sign for the previous parse result
-	string parse_call_;
 };
 
-#endif
 

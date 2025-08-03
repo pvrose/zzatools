@@ -21,7 +21,7 @@ main.cpp - application entry point
 #include "club_stn_dlg.h"
 #include "config.h"
 #include "contest_data.h"
-#include "cty_data.h"
+#include "cty1_data.h"
 #include "eqsl_handler.h"
 #include "extract_data.h"
 #include "fields.h"
@@ -670,7 +670,7 @@ void add_data() {
 	if (!closing_) {
 		if (!club_handler_) club_handler_ = new club_handler;
 		// Get pfx_data
-		cty_data_ = new cty_data;
+		cty_data_ = new cty1_data;
 	}
 	if (!closing_) {
 		// add ADIF specification data.

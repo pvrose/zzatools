@@ -188,8 +188,8 @@
     <ClCompile Include="src\contest_scorer.cpp" />
     <ClCompile Include="src\contest_writer.cpp" />
     <ClCompile Include="src\corr_dialog.cpp" />
-    <ClCompile Include="src\cty_data.cpp" />
-    <ClCompile Include="src\cty_reader.cpp" />
+    <ClCompile Include="src\cty1_data.cpp" />
+    <ClCompile Include="src\cty1_reader.cpp" />
     <ClCompile Include="src\dxcc_table.cpp" />
     <ClCompile Include="src\dxcc_view.cpp" />
     <ClCompile Include="src\eqsl_handler.cpp" />
@@ -309,8 +309,9 @@
     <ClInclude Include="include\contest_scorer.h" />
     <ClInclude Include="include\contest_writer.h" />
     <ClInclude Include="include\corr_dialog.h" />
+    <ClInclude Include="include\cty1_data.h" />
     <ClInclude Include="include\cty_data.h" />
-    <ClInclude Include="include\cty_reader.h" />
+    <ClInclude Include="include\cty1_reader.h" />
     <ClInclude Include="include\dxcc_table.h" />
     <ClInclude Include="include\dxcc_view.h" />
     <ClInclude Include="include\eqsl_handler.h" />

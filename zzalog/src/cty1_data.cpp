@@ -1,5 +1,5 @@
-#include "cty_data.h"
-#include "cty_reader.h"
+#include "cty1_data.h"
+#include "cty1_reader.h"
 #include "club_handler.h"
 #include "status.h"
 #include "callback.h"
@@ -31,7 +31,8 @@ extern string PROGRAM_ID;
 extern string default_user_directory_;
 
 // Constructor - Download new data and build database
-cty_data::cty_data() :
+cty1_data::cty1_data() :
+	cty_data(),
 	parse_result_(nullptr),
 	qso_(nullptr)
 {
@@ -48,12 +49,12 @@ cty_data::cty_data() :
 }
 
 // Destructor
-cty_data::~cty_data() {
+cty1_data::~cty1_data() {
 	delete_contents();
 }
 
 // Remove all the entries in the database
-void cty_data::delete_contents() {
+void cty1_data::delete_contents() {
 	// Delete all the exception entries
 	for (auto it1 = entries_.begin(); it1 != entries_.end(); it1++) {
 		list<exc_entry*>* list_entries = &(it1->second);
@@ -84,8 +85,8 @@ void cty_data::delete_contents() {
 	// Delete all the invalid entries
 }
 
-// Return the cty_data entry for the record (call and date) - nullptr if one doesn't exist
-cty_data::exc_entry* cty_data::except(record* qso) {
+// Return the cty1_data entry for the record (call and date) - nullptr if one doesn't exist
+cty1_data::exc_entry* cty1_data::except(record* qso) {
 	// Does the call exist in the list
 	string call = qso->item("CALL");
 	time_t timestamp = qso->timestamp();
@@ -115,7 +116,7 @@ cty_data::exc_entry* cty_data::except(record* qso) {
 }
 
 // Check timeliness of data
-bool cty_data::data_valid(string filename) {
+bool cty1_data::data_valid(string filename) {
 #ifdef _WIN32
 	int fd = _sopen(filename.c_str(), _O_RDONLY, _SH_DENYNO);
 #else
@@ -147,7 +148,7 @@ bool cty_data::data_valid(string filename) {
 }
 
 // Is the call in the list of invalid calls - unauthorised DXpeditions
-bool cty_data::invalid(record* qso) {
+bool cty1_data::invalid(record* qso) {
 	string call = qso->item("CALL");
 	time_t timestamp = qso->timestamp();
 	if (invalids_.find(call) == invalids_.end()) {
@@ -175,7 +176,7 @@ bool cty_data::invalid(record* qso) {
 }
 
 // Is the call  in the list of zone_exceptions - return 0 if not and the zone if it is
-cty_data::zone_entry* cty_data::zone_except(record* qso) {
+cty1_data::zone_entry* cty1_data::zone_except(record* qso) {
 	string call = qso->item("CALL");
 	time_t timestamp = qso->timestamp();
 	if (zones_.find(call) == zones_.end()) {
@@ -201,11 +202,11 @@ cty_data::zone_entry* cty_data::zone_except(record* qso) {
 }
 
 // Load data
-bool cty_data::load_data(string filename) {
+bool cty1_data::load_data(string filename) {
 	ifstream is(filename.c_str(), ios_base::in);
 	// File is either XML (a new download) or TSV (local copy to load faster)
 	if (filename.substr(filename.length() - 3) == "xml") {
-		cty_reader* reader = new cty_reader();
+		cty1_reader* reader = new cty1_reader();
 		char message[160];
 		snprintf(message, 160, "CTY DATA: Loading exception file %s", filename.c_str());
 		status_->misc_status(ST_NOTE, message);
@@ -233,12 +234,12 @@ bool cty_data::load_data(string filename) {
 }
 
 // Get the filename {REFERENCE DIR}/cty.xml
-string cty_data::get_filename() {
+string cty1_data::get_filename() {
 	return default_user_directory_ + "cty.xml";
 }
 
 // Parse the record
-void cty_data::parse(record* qso) {
+void cty1_data::parse(record* qso) {
 	if (qso != qso_ || qso->item("CALL") != parse_call_) {
 		qso_ = qso;
 		parse_call_ = qso->item("CALL");
@@ -252,7 +253,7 @@ void cty_data::parse(record* qso) {
 }
 
 // Get prefix
-cty_data::prefix_entry* cty_data::prefix(record* qso) {
+cty1_data::prefix_entry* cty1_data::prefix(record* qso) {
 	time_t timestamp = qso->timestamp();
 	string dxcc = qso->item("DXCC");
 	if (dxcc.length()) {
@@ -356,7 +357,7 @@ cty_data::prefix_entry* cty_data::prefix(record* qso) {
 }
 
 // Return entity 
-int cty_data::entity(record* qso) {
+int cty1_data::entity(record* qso) {
 	parse(qso);
 	if (parse_result_->invalid) return -1;
 	else if (parse_result_->exception) return parse_result_->exception->adif_id;
@@ -370,21 +371,21 @@ int cty_data::entity(record* qso) {
 }
 
 // Return entity prefix
-string cty_data::nickname(record* qso) {
+string cty1_data::nickname(record* qso) {
 	int adif_id = entity(qso);
 	if (adif_id <= 0) return "";
 	else return entities_.at(adif_id)->prefix;
 }
 
 /// Return entity name
-string cty_data::name(record* qso) {
+string cty1_data::name(record* qso) {
 	int adif_id = entity(qso);
 	if (adif_id <= 0) return "";
 	else return entities_.at(adif_id)->name;
 }
 
 // Return entity continent
-string cty_data::continent(record* qso) {
+string cty1_data::continent(record* qso) {
 	parse(qso);
 	if (parse_result_->invalid) return "";
 	else if (parse_result_->exception) return parse_result_->exception->continent;
@@ -398,7 +399,7 @@ string cty_data::continent(record* qso) {
 }
 
 // Return CQ zone
-int cty_data::cq_zone(record* qso) {
+int cty1_data::cq_zone(record* qso) {
 	parse(qso);
 	if (parse_result_->invalid) return -1;
 	else if (parse_result_->exception) return parse_result_->exception->cq_zone;
@@ -413,7 +414,7 @@ int cty_data::cq_zone(record* qso) {
 }
 
 // Return location (latitude and longitude)
-lat_long_t cty_data::location(record* qso) {
+lat_long_t cty1_data::location(record* qso) {
 	parse(qso);
 	lat_long_t result = { nan(""), nan("") };
 	if (parse_result_->invalid) return result;
@@ -430,7 +431,7 @@ lat_long_t cty_data::location(record* qso) {
 }
 
 // Parse source
-cty_data::parse_source_t cty_data::get_source(record* qso) {
+cty1_data::parse_source_t cty1_data::get_source(record* qso) {
 	parse(qso);
 	if (parse_result_->invalid) return INVALID;
 	if (parse_result_->exception) return EXCEPTION;
@@ -439,7 +440,7 @@ cty_data::parse_source_t cty_data::get_source(record* qso) {
 }
 
 // Update record based on parsing
-bool cty_data::update_qso(record* qso, bool my_call) {
+bool cty1_data::update_qso(record* qso, bool my_call) {
 	// Remove previous QSO as it falsely keeps previous parse result.
 	qso_ = nullptr;
 
@@ -463,7 +464,7 @@ bool cty_data::update_qso(record* qso, bool my_call) {
 }
 
 // Get location details
-string cty_data::get_tip(record* qso) {
+string cty1_data::get_tip(record* qso) {
 	parse(qso);
 	string message;
 	char text[160];
@@ -484,7 +485,7 @@ string cty_data::get_tip(record* qso) {
 }
 
 // Get default name for entity n
-string cty_data::name(int adif_id) {
+string cty1_data::name(int adif_id) {
 	if (adif_id == 0) {
 		return "";
 	}
@@ -504,7 +505,7 @@ string cty_data::name(int adif_id) {
 }
 
 // Get the continent for entity n
-string cty_data::continent(int adif_id) {
+string cty1_data::continent(int adif_id) {
 	if (adif_id == 0) {
 		return "";
 	}
@@ -524,7 +525,7 @@ string cty_data::continent(int adif_id) {
 }
 
 // Return the nickname for entity n
-string cty_data::nickname(int adif_id) {
+string cty1_data::nickname(int adif_id) {
 	if (adif_id == 0) {
 		return "";
 	} 
@@ -544,7 +545,7 @@ string cty_data::nickname(int adif_id) {
 }
 
 // Return the default CQ zone for entity n
-int cty_data::cq_zone(int adif_id) {
+int cty1_data::cq_zone(int adif_id) {
 	if (adif_id == 0) {
 		return 0;
 	}
@@ -564,7 +565,7 @@ int cty_data::cq_zone(int adif_id) {
 };
 
 // Return the entity number for the nickname
-int cty_data::entity(string nickname) {
+int cty1_data::entity(string nickname) {
 	for (auto it = entities_.begin(); it != entities_.end(); it++) {
 		if ((*it).second->prefix == nickname) {
 			return (*it).first;

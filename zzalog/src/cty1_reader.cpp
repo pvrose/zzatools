@@ -1,6 +1,6 @@
-#include "cty_reader.h"
+#include "cty1_reader.h"
 #include "status.h"
-#include "cty_data.h"
+#include "cty1_data.h"
 
 #include <list>
 
@@ -58,7 +58,7 @@ extern bool closing_;
 */
 
 // Constructor
-cty_reader::cty_reader() {
+cty1_reader::cty1_reader() {
 	ignore_processing_ = false;
 	current_exception_ = nullptr;
 	current_invalid_ = nullptr;
@@ -70,30 +70,30 @@ cty_reader::cty_reader() {
 }
 
 // Destructor
-cty_reader::~cty_reader() {
+cty1_reader::~cty1_reader() {
 }
 
 // Overloadable XML handlers
 // Start element
-bool cty_reader::start_element(string name, map<string, string>* attributes) {
+bool cty1_reader::start_element(string name, map<string, string>* attributes) {
 	if (!ignore_processing_) {
 		if (elements_.size()) {
 			string enclosure = elements_.back();
 			elements_.push_back(name);
 			if (enclosure == "entities" && name == "entity") {
-				current_entity_ = new cty_data::entity_entry;
+				current_entity_ = new cty1_data::entity_entry;
 			}
 			else if (enclosure == "prefixes" && name == "prefix") {
-				current_prefix_ = new cty_data::prefix_entry;
+				current_prefix_ = new cty1_data::prefix_entry;
 			}
 			else if (enclosure == "exceptions" && name == "exception") {
-				current_exception_ = new cty_data::exc_entry;
+				current_exception_ = new cty1_data::exc_entry;
 			}
 			else if (enclosure == "invalid_operations" && name == "invalid") {
-				current_invalid_ = new cty_data::invalid_entry;
+				current_invalid_ = new cty1_data::invalid_entry;
 			}
 			else if (enclosure == "zone_exceptions" && name == "zone_exception") {
-				current_zone_exc_ = new cty_data::zone_entry;
+				current_zone_exc_ = new cty1_data::zone_entry;
 			}
 		}
 		else {
@@ -104,7 +104,7 @@ bool cty_reader::start_element(string name, map<string, string>* attributes) {
 }
 
 // End element
-bool cty_reader::end_element(string name) {
+bool cty1_reader::end_element(string name) {
 	if (ignore_processing_) {
 		// We stop ignoring
 		if (name == elements_.back()) {
@@ -120,7 +120,7 @@ bool cty_reader::end_element(string name) {
 		if (enclosure == "exceptions" && element == "exception") {
 			// The records are stored as list of records mapped from the callsign
 			if (data_->entries_.find(current_exception_->call) == data_->entries_.end()) {
-				list<cty_data::exc_entry*>* entries = new list<cty_data::exc_entry*>;
+				list<cty1_data::exc_entry*>* entries = new list<cty1_data::exc_entry*>;
 				(data_->entries_)[current_exception_->call] = *entries;
 			}
 			data_->entries_.at(current_exception_->call).push_back(current_exception_);
@@ -129,7 +129,7 @@ bool cty_reader::end_element(string name) {
 		else if (enclosure == "invalid_operations" && element == "invalid") {
 			// The records are stored as list of records mapped from the callsign
 			if (data_->invalids_.find(current_invalid_->call) == data_->invalids_.end()) {
-				list<cty_data::invalid_entry*>* invalids = new list<cty_data::invalid_entry*>;
+				list<cty1_data::invalid_entry*>* invalids = new list<cty1_data::invalid_entry*>;
 				(data_->invalids_)[current_invalid_->call] = *invalids;
 			}
 			data_->invalids_.at(current_invalid_->call).push_back(current_invalid_);
@@ -138,7 +138,7 @@ bool cty_reader::end_element(string name) {
 		else if (enclosure == "zone_exceptions" && element == "zone_exception") {
 			// The records are stored as list of records mapped from the callsign
 			if (data_->zones_.find(current_zone_exc_->call) == data_->zones_.end()) {
-				list<cty_data::zone_entry*>* zones = new list<cty_data::zone_entry*>;
+				list<cty1_data::zone_entry*>* zones = new list<cty1_data::zone_entry*>;
 				(data_->zones_)[current_zone_exc_->call] = *zones;
 			}
 			data_->zones_.at(current_zone_exc_->call).push_back(current_zone_exc_);
@@ -147,7 +147,7 @@ bool cty_reader::end_element(string name) {
 		else if (enclosure == "entities" && element == "entity") {
 			// The records are stored as list of records mapped from the callsign
 			if (data_->entities_.find(current_entity_->adif_id) == data_->entities_.end()) {
-				cty_data::entity_entry* entity = new cty_data::entity_entry;
+				cty1_data::entity_entry* entity = new cty1_data::entity_entry;
 				(data_->entities_)[current_entity_->adif_id] = entity;
 			}
 			data_->entities_[current_entity_->adif_id] = current_entity_;
@@ -156,7 +156,7 @@ bool cty_reader::end_element(string name) {
 		else if (enclosure == "prefixes" && element == "prefix") {
 			// The records are stored as list of records mapped from the callsign
 			if (data_->prefixes_.find(current_prefix_->call) == data_->prefixes_.end()) {
-				list<cty_data::prefix_entry*>* prefixes = new list<cty_data::prefix_entry*>;
+				list<cty1_data::prefix_entry*>* prefixes = new list<cty1_data::prefix_entry*>;
 				(data_->prefixes_)[current_prefix_->call] = *prefixes;
 			}
 			data_->prefixes_.at(current_prefix_->call).push_back(current_prefix_);
@@ -225,23 +225,23 @@ bool cty_reader::end_element(string name) {
 }
 
 // Special element - not expected
-bool cty_reader::declaration(xml_element::element_t element_type, string name, string content) {
+bool cty1_reader::declaration(xml_element::element_t element_type, string name, string content) {
 	return false;
 }
 
 // Processing instruction - ignored
-bool cty_reader::process_instr(string name, string content) {
+bool cty1_reader::process_instr(string name, string content) {
 	return false;
 }
 
 // characters - set the element value
-bool cty_reader::characters(string content) {
+bool cty1_reader::characters(string content) {
 	value_ = content;
 	return true;
 }
 
 // Load data from specified file into and add each record to the map
-bool cty_reader::load_data(cty_data* data, istream& in, string& version) {
+bool cty1_reader::load_data(cty1_data* data, istream& in, string& version) {
 	fl_cursor(FL_CURSOR_WAIT);
 	data_ = data;
 	file_ = &in;
