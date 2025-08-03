@@ -22,6 +22,8 @@ main.cpp - application entry point
 #include "config.h"
 #include "contest_data.h"
 #include "cty1_data.h"
+#include "cty2_data.h"
+#include "cty_data.h"
 #include "eqsl_handler.h"
 #include "extract_data.h"
 #include "fields.h"

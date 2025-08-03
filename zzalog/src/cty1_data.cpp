@@ -1,4 +1,6 @@
 #include "cty1_data.h"
+
+#include "cty_data.h"
 #include "cty1_reader.h"
 #include "club_handler.h"
 #include "status.h"
@@ -36,6 +38,7 @@ cty1_data::cty1_data() :
 	parse_result_(nullptr),
 	qso_(nullptr)
 {
+	capabilities_ = HAS_HISTORY;
 	// Get the filename
 	string filename = get_filename();
 	if (!data_valid(filename)) {
@@ -412,6 +415,9 @@ int cty1_data::cq_zone(record* qso) {
 		return -1;
 	}
 }
+
+// Not supported
+int cty1_data::itu_zone(record* qso) { return 0; }
 
 // Return location (latitude and longitude)
 lat_long_t cty1_data::location(record* qso) {

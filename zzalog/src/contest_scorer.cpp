@@ -449,13 +449,15 @@ void contest_scorer::add_qso(record* qso, qso_num_t qso_number) {
 
 // Check record 
 void contest_scorer::check_qso(record* qso, qso_num_t qso_number) {
-	if (qso) {
-		cty_data_->update_qso(qso);
-		qso->update_band();
+	if (active_) {
+		if (qso) {
+			cty_data_->update_qso(qso);
+			qso->update_band();
+		}
+		qso_ = qso;
+		qso_number_ = qso_number;
+		score_qso(qso, true);
 	}
-	qso_ = qso;
-	qso_number_ = qso_number;
-	score_qso(qso, true);
 }
 
 // Load QSOs - after restarting zzalog

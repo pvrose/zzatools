@@ -369,6 +369,12 @@
     <ClCompile Include="..\widgets\src\filename_input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\cty2_data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cty2_reader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="packages\pthreads.2.9.1.4\build\native\include\pthread.h">
@@ -756,6 +762,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\cty1_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\cty2_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\cty2_reader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

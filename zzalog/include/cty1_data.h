@@ -148,6 +148,7 @@ public:
 	string name(record* qso);
 	string continent(record* qso);
 	int cq_zone(record* qso);
+	int itu_zone(record* qso);
 	// Get entity for nickname and vice-versa
 	int entity(string nickname);
 	string nickname(int adif_id);

@@ -162,6 +162,10 @@ void qso_dxcc::enable_widgets() {
 			op_source_->value("Invalid Operation");
 			op_source_->color(FL_RED);
 			break;
+		case cty_data::NO_DECODE:
+			op_source_->value("No decode");
+			op_source_->color(FL_BACKGROUND_COLOR);
+			break;
 		case cty_data::EXCEPTION:
 			op_source_->value("Entity Exception");
 			op_source_->color(FL_BACKGROUND_COLOR);
