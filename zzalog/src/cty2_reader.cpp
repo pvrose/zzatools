@@ -88,9 +88,6 @@ bool cty2_reader::load_entity(cty2_data::prefix_entry* entry, istream& in, int& 
 }
 
 void cty2_reader::load_pattern(string patt, string& match, cty2_data::pattern_entry* entry) {
-	bool cqz = false;
-	bool ituz = false;
-
 	size_t pos = 0;
 	size_t spos;
 	match = "";
@@ -101,14 +98,12 @@ void cty2_reader::load_pattern(string patt, string& match, cty2_data::pattern_en
 	while (pos < patt.length()) {
 		switch (patt[pos]) {
 		case '(':
-			cqz = true;
 			spos = pos + 1;
 			break;
 		case ')':
 			entry->cqzone = stoi(patt.substr(spos, pos - spos));
 			break;
 		case '[':
-			ituz = true;
 			spos = pos + 1;
 			break;
 		case ']':
