@@ -154,6 +154,9 @@ string cty_data::get_tip(record* qso) {
 	case INVALID:
 		message = "Unauthorised callsign";
 		break;
+	case PREVIOUS:
+		message = "Obtained from QSO record";
+		break;
 	case NO_DECODE:
 		message = "Unable to decode callsign";
 		break;
