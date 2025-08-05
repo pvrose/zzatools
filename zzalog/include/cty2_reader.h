@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cty2_data.h"
+#include "cty_data.h"
 
 #include <fstream>
 #include <string>
@@ -14,15 +14,15 @@ public:
 	~cty2_reader();
 
 	// Load data from specified file into and add each record to the map
-	bool load_data(cty2_data::data_t* data, istream& in, string& version);
+	bool load_data(cty_data::all_data* data, istream& in, string& version);
 
 protected:
 
-	bool load_entity(cty2_data::prefix_entry* , istream& in, int& dxcc);
+	bool load_entity(cty_data::ent_entry* , istream& in, int& dxcc);
 
-	void load_pattern(string value, string& match, cty2_data::pattern_entry*);
+	void load_pattern(string value, string& match, cty_data::patt_entry*);
 
-	cty2_data::data_t* data_;
+	cty_data::all_data* data_;
 
 	
 

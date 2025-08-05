@@ -173,6 +173,10 @@ void qso_dxcc::enable_widgets() {
 			op_source_->value("No decode");
 			op_source_->color(FL_BACKGROUND_COLOR);
 			break;
+		case cty_data::PREVIOUS:
+			op_source_->value("Logged in QSO");
+			op_source_->color(FL_BACKGROUND_COLOR);
+			break;
 		case cty_data::EXCEPTION:
 			op_source_->value("Entity Exception");
 			op_source_->color(FL_BACKGROUND_COLOR);

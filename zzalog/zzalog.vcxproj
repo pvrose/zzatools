@@ -188,10 +188,9 @@
     <ClCompile Include="src\contest_scorer.cpp" />
     <ClCompile Include="src\contest_writer.cpp" />
     <ClCompile Include="src\corr_dialog.cpp" />
-    <ClCompile Include="src\cty1_data.cpp" />
     <ClCompile Include="src\cty1_reader.cpp" />
-    <ClCompile Include="src\cty2_data.cpp" />
     <ClCompile Include="src\cty2_reader.cpp" />
+    <ClCompile Include="src\cty_data.cpp" />
     <ClCompile Include="src\dxcc_table.cpp" />
     <ClCompile Include="src\dxcc_view.cpp" />
     <ClCompile Include="src\eqsl_handler.cpp" />

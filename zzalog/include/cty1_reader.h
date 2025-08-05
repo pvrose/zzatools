@@ -1,7 +1,7 @@
 #pragma once
 
 #include "xml_reader.h"
-#include "cty1_data.h"
+#include "cty_data.h"
 
 #include <list>
 #include <string>
@@ -30,7 +30,7 @@ using namespace std;
 		virtual bool characters(string content);
 
 		// Load data from specified file into and add each record to the map
-		bool load_data(cty1_data* data, istream& in, string& version);
+		bool load_data(cty_data::all_data* data, istream& in, string& version);
 		// Protected methods
 	protected:
 
@@ -44,13 +44,16 @@ using namespace std;
 		// File timestamp
 		string timestamp_;
 		// Current elements
-		cty1_data::exc_entry* current_exception_;
-		cty1_data::invalid_entry* current_invalid_;
-		cty1_data::zone_entry* current_zone_exc_;
-		cty1_data::entity_entry* current_entity_;
-		cty1_data::prefix_entry* current_prefix_;
+		cty_data::ent_entry* current_entity_;
+		cty_data::patt_entry* current_pattern_;
+		string current_match_;
+		//cty1_data::exc_entry* current_exception_;
+		//cty1_data::invalid_entry* current_invalid_;
+		//cty1_data::zone_entry* current_zone_exc_;
+		//cty1_data::entity_entry* current_entity_;
+		//cty1_data::prefix_entry* current_prefix_;
 		// The data being read
-		cty1_data* data_;
+		cty_data::all_data* data_;
 		// Value of element
 		string value_;
 		// Pointer to file

@@ -96,9 +96,6 @@
     <ClCompile Include="src\corr_dialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\cty1_data.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\cty1_reader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -369,10 +366,10 @@
     <ClCompile Include="..\widgets\src\filename_input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\cty2_data.cpp">
+    <ClCompile Include="src\cty2_reader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\cty2_reader.cpp">
+    <ClCompile Include="src\cty_data.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,6 +1,6 @@
 #include "cty1_reader.h"
 #include "status.h"
-#include "cty1_data.h"
+#include "cty_data.h"
 
 #include <list>
 
@@ -60,11 +60,13 @@ extern bool closing_;
 // Constructor
 cty1_reader::cty1_reader() {
 	ignore_processing_ = false;
-	current_exception_ = nullptr;
-	current_invalid_ = nullptr;
-	current_zone_exc_ = nullptr;
 	current_entity_ = nullptr;
-	current_prefix_ = nullptr;
+	current_pattern_ = nullptr;
+	//current_exception_ = nullptr;
+	//current_invalid_ = nullptr;
+	//current_zone_exc_ = nullptr;
+	//current_entity_ = nullptr;
+	//current_prefix_ = nullptr;
 	data_ = nullptr;
 	file_ = nullptr;
 }
@@ -81,19 +83,24 @@ bool cty1_reader::start_element(string name, map<string, string>* attributes) {
 			string enclosure = elements_.back();
 			elements_.push_back(name);
 			if (enclosure == "entities" && name == "entity") {
-				current_entity_ = new cty1_data::entity_entry;
+				current_entity_ = new cty_data::ent_entry;
 			}
 			else if (enclosure == "prefixes" && name == "prefix") {
-				current_prefix_ = new cty1_data::prefix_entry;
+				current_pattern_ = new cty_data::patt_entry;
+				current_pattern_->type = 0;
 			}
 			else if (enclosure == "exceptions" && name == "exception") {
-				current_exception_ = new cty1_data::exc_entry;
+				current_pattern_ = new cty_data::patt_entry;
+				current_pattern_->type = cty_data::DXCC_EXCEPTION;
 			}
 			else if (enclosure == "invalid_operations" && name == "invalid") {
-				current_invalid_ = new cty1_data::invalid_entry;
+				current_pattern_ = new cty_data::patt_entry;
+				current_pattern_->type = cty_data::INVALID_CALL;
+				current_pattern_->dxcc_id = -1;
 			}
 			else if (enclosure == "zone_exceptions" && name == "zone_exception") {
-				current_zone_exc_ = new cty1_data::zone_entry;
+				current_pattern_ = new cty_data::patt_entry;
+				current_pattern_->type = cty_data::CQZ_EXCEPTION;
 			}
 		}
 		else {
@@ -117,102 +124,91 @@ bool cty1_reader::end_element(string name) {
 		string element = elements_.back();
 		elements_.pop_back();
 		string enclosure = elements_.size() ? elements_.back() : "";
-		if (enclosure == "exceptions" && element == "exception") {
-			// The records are stored as list of records mapped from the callsign
-			if (data_->entries_.find(current_exception_->call) == data_->entries_.end()) {
-				list<cty1_data::exc_entry*>* entries = new list<cty1_data::exc_entry*>;
-				(data_->entries_)[current_exception_->call] = *entries;
+		if ((enclosure == "exceptions" && element == "exception") ||
+			(enclosure == "invalid_operations" && element == "invalid") ||
+			(enclosure == "zone_exceptions" && element == "zone_exception") ||
+			(enclosure == "prefixes" && element == "prefix")) {
+			// Add it to the list, which if necessay create
+			if (data_->patterns.find(current_match_) == data_->patterns.end()) {
+				data_->patterns[current_match_] = { current_pattern_ };
 			}
-			data_->entries_.at(current_exception_->call).push_back(current_exception_);
-			current_exception_ = nullptr;
-		}
-		else if (enclosure == "invalid_operations" && element == "invalid") {
-			// The records are stored as list of records mapped from the callsign
-			if (data_->invalids_.find(current_invalid_->call) == data_->invalids_.end()) {
-				list<cty1_data::invalid_entry*>* invalids = new list<cty1_data::invalid_entry*>;
-				(data_->invalids_)[current_invalid_->call] = *invalids;
+			else {
+				data_->patterns[current_match_].push_back(current_pattern_);
 			}
-			data_->invalids_.at(current_invalid_->call).push_back(current_invalid_);
-			current_invalid_ = nullptr;
-		}
-		else if (enclosure == "zone_exceptions" && element == "zone_exception") {
-			// The records are stored as list of records mapped from the callsign
-			if (data_->zones_.find(current_zone_exc_->call) == data_->zones_.end()) {
-				list<cty1_data::zone_entry*>* zones = new list<cty1_data::zone_entry*>;
-				(data_->zones_)[current_zone_exc_->call] = *zones;
-			}
-			data_->zones_.at(current_zone_exc_->call).push_back(current_zone_exc_);
-			current_zone_exc_ = nullptr;
+			current_pattern_ = nullptr;
+			current_match_ = "";
 		}
 		else if (enclosure == "entities" && element == "entity") {
-			// The records are stored as list of records mapped from the callsign
-			if (data_->entities_.find(current_entity_->adif_id) == data_->entities_.end()) {
-				cty1_data::entity_entry* entity = new cty1_data::entity_entry;
-				(data_->entities_)[current_entity_->adif_id] = entity;
+			// Add it to the list, which if necessay create
+			if (data_->entities.find(current_entity_->dxcc_id) == data_->entities.end()) {
+				data_->entities[current_entity_->dxcc_id] = current_entity_;
 			}
-			data_->entities_[current_entity_->adif_id] = current_entity_;
+			else {
+				char msg[128];
+				snprintf(msg, sizeof(msg), "CTY DATA: Altready have record for entity %d - %s",
+					current_entity_->dxcc_id, current_entity_->name.c_str());
+				status_->misc_status(ST_ERROR, msg);
+			}
 			current_entity_ = nullptr;
-		}
-		else if (enclosure == "prefixes" && element == "prefix") {
-			// The records are stored as list of records mapped from the callsign
-			if (data_->prefixes_.find(current_prefix_->call) == data_->prefixes_.end()) {
-				list<cty1_data::prefix_entry*>* prefixes = new list<cty1_data::prefix_entry*>;
-				(data_->prefixes_)[current_prefix_->call] = *prefixes;
-			}
-			data_->prefixes_.at(current_prefix_->call).push_back(current_prefix_);
-			current_prefix_ = nullptr;
 		}
 		else if (elements_.size() && elements_.back() == "entity") {
 			// Build up the exception record from the various child elements
-			if (element == "adif") current_entity_->adif_id = stoi(value_);
+			if (element == "adif") current_entity_->dxcc_id = stoi(value_);
 			else if (element == "name") current_entity_->name = value_;
-			else if (element == "prefix") current_entity_->prefix = value_;
+			else if (element == "prefix") current_entity_->nickname = value_;
 			else if (element == "cqz") current_entity_->cq_zone = stoi(value_);
 			else if (element == "cont") current_entity_->continent = value_;
-			else if (element == "long") current_entity_->longitude = stod(value_);
-			else if (element == "lat") current_entity_->latitude = stod(value_);
-			else if (element == "start") current_entity_->start = convert_xml_datetime(value_);
-			else if (element == "end") current_entity_->end = convert_xml_datetime(value_);
-			else if (element == "deleted" && value_ == "TRUE") current_entity_->deleted = true;
-			else if (element == "whitelist" && value_ == "TRUE") current_entity_->whitelist = true;
-			else if (element == "whitelist_start") current_entity_->whitelist_start =
-				convert_xml_datetime(value_);
+			else if (element == "long") current_entity_->location.longitude = stod(value_);
+			else if (element == "lat") current_entity_->location.latitude = stod(value_);
+			else if (element == "start") current_entity_->validity.start = convert_xml_datetime(value_);
+			else if (element == "end") current_entity_->validity.end = convert_xml_datetime(value_);
 		}
 		else if (elements_.size() && elements_.back() == "prefix") {
 			// Build up the exception record from the various child elements
-			if (element == "call") current_prefix_->call = value_;
-			else if (element == "entity") current_prefix_->entity = value_;
-			else if (element == "adif") current_prefix_->adif_id = stoi(value_);
-			else if (element == "cqz") current_prefix_->cq_zone = stoi(value_);
-			else if (element == "cont") current_prefix_->continent = value_;
-			else if (element == "long") current_prefix_->longitude = stod(value_);
-			else if (element == "lat") current_prefix_->latitude = stod(value_);
-			else if (element == "start") current_prefix_->start = convert_xml_datetime(value_);
-			else if (element == "end") current_prefix_->end = convert_xml_datetime(value_);
+			if (element == "call") current_match_ = value_;
+			else if (element == "adif") current_pattern_->dxcc_id = stoi(value_);
+			else if (element == "cqz") current_pattern_->cq_zone = stoi(value_);
+			else if (element == "cont") current_pattern_->continent = value_;
+			else if (element == "long") current_pattern_->location.longitude = stod(value_);
+			else if (element == "lat") current_pattern_->location.latitude = stod(value_);
+			else if (element == "start") current_pattern_->validity.start = convert_xml_datetime(value_);
+			else if (element == "end") current_pattern_->validity.end = convert_xml_datetime(value_);
 		}
 		else if (elements_.size() && elements_.back() == "exception") {
 			// Build up the exception record from the various child elements
-			if (element == "call") current_exception_->call = value_;
-			else if (element == "adif") current_exception_->adif_id = stoi(value_);
-			else if (element == "cqz") current_exception_->cq_zone = stoi(value_);
-			else if (element == "cont") current_exception_->continent = value_;
-			else if (element == "long") current_exception_->longitude = stod(value_);
-			else if (element == "lat") current_exception_->latitude = stod(value_);
-			else if (element == "start") current_exception_->start = convert_xml_datetime(value_);
-			else if (element == "end") current_exception_->end = convert_xml_datetime(value_);
+			if (element == "call") current_match_ = value_;
+			else if (element == "adif") current_pattern_->dxcc_id = stoi(value_);
+			else if (element == "cqz") current_pattern_->cq_zone = stoi(value_);
+			else if (element == "cont") current_pattern_->continent = value_;
+			else if (element == "long") current_pattern_->location.longitude = stod(value_);
+			else if (element == "lat") current_pattern_->location.latitude = stod(value_);
+			else if (element == "start") current_pattern_->validity.start = convert_xml_datetime(value_);
+			else if (element == "end") current_pattern_->validity.end = convert_xml_datetime(value_);
 		}
 		else if (elements_.size() && elements_.back() == "invalid") {
 			// Build up the invalid record from the various child elements
-			if (element == "call") current_invalid_->call = value_;
-			else if (element == "start") current_invalid_->start = convert_xml_datetime(value_);
-			else if (element == "end") current_invalid_->end = convert_xml_datetime(value_);
+			if (element == "call") current_match_ = value_;
+			else if (element == "start") current_pattern_->validity.start = convert_xml_datetime(value_);
+			else if (element == "end") current_pattern_->validity.end = convert_xml_datetime(value_);
 		}
 		else if (elements_.size() && elements_.back() == "zone_exception") {
 			// Build up the exception record from the various child elements
-			if (element == "call") current_zone_exc_->call = value_;
-			else if (element == "cqz") current_zone_exc_->cq_zone = stoi(value_);
-			else if (element == "start") current_zone_exc_->start = convert_xml_datetime(value_);
-			else if (element == "end") current_zone_exc_->end = convert_xml_datetime(value_);
+			if (element == "call") current_match_ = value_;
+			else if (element == "cqz") current_pattern_->cq_zone = stoi(value_);
+			else if (element == "start") current_pattern_->validity.start = convert_xml_datetime(value_);
+			else if (element == "end") current_pattern_->validity.end = convert_xml_datetime(value_);
+		}
+		else if (elements_.size() && elements_.back() == "clublog") {
+			// Add all patterns to the entities
+			for (auto it : data_->patterns) {
+				string match = it.first;
+				for (auto ita : it.second) {
+					int dxcc_id = ita->dxcc_id;
+					if (data_->entities.find(dxcc_id) != data_->entities.end()) {
+						data_->entities[dxcc_id]->patterns[it.first].push_back(ita);
+					}
+				}
+			}
 		}
 	}
 	number_read_++;
@@ -241,7 +237,7 @@ bool cty1_reader::characters(string content) {
 }
 
 // Load data from specified file into and add each record to the map
-bool cty1_reader::load_data(cty1_data* data, istream& in, string& version) {
+bool cty1_reader::load_data(cty_data::all_data* data, istream& in, string& version) {
 	fl_cursor(FL_CURSOR_WAIT);
 	data_ = data;
 	file_ = &in;
