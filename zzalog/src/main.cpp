@@ -671,7 +671,7 @@ void add_data() {
 		if (!club_handler_) club_handler_ = new club_handler;
 		// Get pfx_data
 		cty_data_ = new cty_data;
-		cty_data_->type(cty_data::COUNTRY_FILES);
+		cty_data_->type(cty_data::CLUBLOG);
 	}
 	if (!closing_) {
 		// add ADIF specification data.

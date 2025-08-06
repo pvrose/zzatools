@@ -30,7 +30,7 @@ using namespace std;
 		virtual bool characters(string content);
 
 		// Load data from specified file into and add each record to the map
-		bool load_data(cty_data::all_data* data, istream& in, string& version);
+		bool load_data(cty_data* data, istream& in, string& version);
 		// Protected methods
 	protected:
 
@@ -53,7 +53,7 @@ using namespace std;
 		//cty1_data::entity_entry* current_entity_;
 		//cty1_data::prefix_entry* current_prefix_;
 		// The data being read
-		cty_data::all_data* data_;
+		cty_data* data_;
 		// Value of element
 		string value_;
 		// Pointer to file

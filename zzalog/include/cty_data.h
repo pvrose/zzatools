@@ -7,6 +7,8 @@
 #include <map>
 #include <list>
 #include <cmath>
+#include <ostream>
+#include <fstream>
 
 using namespace std;
 
@@ -49,6 +51,7 @@ protected:
 
 	// Pattern type
 	typedef uint16_t patt_type_t;
+	static const patt_type_t PTN_NORMAL = 0;
 	// Pattern represents a call that is unauthorised
 	static const patt_type_t INVALID_CALL = 1 << 0;
 	// Pattern represents that the CQ Zone is different from the prefix
@@ -66,18 +69,24 @@ protected:
 	// Pattern has time conditions
 	static const patt_type_t TIME_DEPENDENT = 1 << 7;
 	// Pattern is now deleted
-	static const patt_type_t PTN_DELECETED = 1 << 8;
+	static const patt_type_t PTN_DELETED = 1 << 8;
 
 	// Validity time period - where applicable
 	struct time_period {
-		time_t start = -1;
-		time_t end = -1;
+		time_t start = 0;
+		time_t end = LONG_MAX;
 	};
+
+	// Forward declaration for the below typedef
+	struct patt_entry;
+
+	// List of patterns that may match but differ by time validity
+	typedef list < patt_entry* > patt_matches;
 
 	// Pattern entry - indexed by string pattern
 	struct patt_entry {
 		// Pattern type
-		patt_type_t type = 0;
+		patt_type_t type = PTN_NORMAL;
 		// DXCC identifier - defined by ARRL DXCC - used as general entity identifier
 		int dxcc_id = -1;
 		// Pattern name
@@ -92,10 +101,11 @@ protected:
 		lat_long_t location = { nan(""), nan("") };
 		// pattern validity period
 		time_period validity;
+		// Parent
+		patt_entry* parent = nullptr;
+		// Children
+		patt_matches children = { };
 	};
-
-	// List of patterns that may match but differ by time validity
-	typedef list < patt_entry* > patt_matches;
 
 	// Entity entry - indexed by dxcc_id
 	struct ent_entry {
@@ -122,10 +132,7 @@ protected:
 		// Validity
 		time_period validity = { -1, -1 };
 		// the patterns - with time validity
-		map< string, patt_matches > patterns = {};
-		// sub-entry prefixes
-		map <string, patt_matches > sub_patterns = {};
-
+		map< string, patt_matches > patterns;
 	};
 
 	// Data structure
@@ -134,8 +141,6 @@ protected:
 		map < int, ent_entry* > entities;
 		// All the entity level prefixes - indexed by starting string
 		map < string, patt_matches > patterns;
-		// All the sub-entry level prefixes - indexed by starting string
-		map < string, patt_matches > sub_patterns;
 	};
 
 public:
@@ -180,6 +185,19 @@ public:
 
 	cty_caps_t capabilities() { return capabilities_; }
 
+	// Build list
+	// Add the entry to the list
+	void add_entity(int dxcc_id, ent_entry* entry);
+	// Add the pattern to an entity
+	void add_pattern(string pattern, int dxcc_id, patt_entry* entry);
+	// Add the sub-pattern to a pattern
+	void add_subpattern(string pattern, patt_entry* parent, patt_entry* entry);
+
+	// Merge patterns - returns true if merged
+	bool merge_pattern(string pattern, patt_type_t type, patt_entry* original, patt_entry* entry);
+	// Merge entry
+	void merge_entry(ent_entry* orig, ent_entry* entry);
+
 protected:
 
 	friend class cty1_reader;
@@ -214,6 +232,9 @@ protected:
 
 	// The country data
 	all_data* data_;
+
+	// Merge report
+	ofstream os_;
 
 
 };

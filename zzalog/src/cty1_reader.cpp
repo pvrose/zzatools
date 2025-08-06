@@ -129,26 +129,12 @@ bool cty1_reader::end_element(string name) {
 			(enclosure == "zone_exceptions" && element == "zone_exception") ||
 			(enclosure == "prefixes" && element == "prefix")) {
 			// Add it to the list, which if necessay create
-			if (data_->patterns.find(current_match_) == data_->patterns.end()) {
-				data_->patterns[current_match_] = { current_pattern_ };
-			}
-			else {
-				data_->patterns[current_match_].push_back(current_pattern_);
-			}
+			data_->add_pattern(current_match_, current_pattern_->dxcc_id, current_pattern_);
 			current_pattern_ = nullptr;
 			current_match_ = "";
 		}
 		else if (enclosure == "entities" && element == "entity") {
-			// Add it to the list, which if necessay create
-			if (data_->entities.find(current_entity_->dxcc_id) == data_->entities.end()) {
-				data_->entities[current_entity_->dxcc_id] = current_entity_;
-			}
-			else {
-				char msg[128];
-				snprintf(msg, sizeof(msg), "CTY DATA: Altready have record for entity %d - %s",
-					current_entity_->dxcc_id, current_entity_->name.c_str());
-				status_->misc_status(ST_ERROR, msg);
-			}
+			data_->add_entity(current_entity_->dxcc_id, current_entity_);
 			current_entity_ = nullptr;
 		}
 		else if (elements_.size() && elements_.back() == "entity") {
@@ -163,6 +149,9 @@ bool cty1_reader::end_element(string name) {
 			else if (element == "deleted" && value_ == "true") current_entity_->deleted = true;
 			else if (element == "start") {
 				current_entity_->validity.start = convert_xml_datetime(value_);
+#ifdef _WIN32
+				if (current_entity_->validity.start < 0LL) current_entity_->validity.start = 0;
+#endif
 				current_entity_->has_validity = true;
 			}
 			else if (element == "end") {
@@ -174,12 +163,16 @@ bool cty1_reader::end_element(string name) {
 			// Build up the exception record from the various child elements
 			if (element == "call") current_match_ = value_;
 			else if (element == "adif") current_pattern_->dxcc_id = stoi(value_);
+			else if (element == "entity") current_pattern_->name = value_;
 			else if (element == "cqz") current_pattern_->cq_zone = stoi(value_);
 			else if (element == "cont") current_pattern_->continent = value_;
 			else if (element == "long") current_pattern_->location.longitude = stod(value_);
 			else if (element == "lat") current_pattern_->location.latitude = stod(value_);
 			else if (element == "start") {
 				current_pattern_->validity.start = convert_xml_datetime(value_);
+#ifdef _WIN32
+				if (current_pattern_->validity.start < 0LL) current_pattern_->validity.start = 0;
+#endif
 				current_pattern_->type |= cty_data::TIME_DEPENDENT;
 			}
 			else if (element == "end") {
@@ -191,12 +184,16 @@ bool cty1_reader::end_element(string name) {
 			// Build up the exception record from the various child elements
 			if (element == "call") current_match_ = value_;
 			else if (element == "adif") current_pattern_->dxcc_id = stoi(value_);
+			else if (element == "entity") current_pattern_->name = value_;
 			else if (element == "cqz") current_pattern_->cq_zone = stoi(value_);
 			else if (element == "cont") current_pattern_->continent = value_;
 			else if (element == "long") current_pattern_->location.longitude = stod(value_);
 			else if (element == "lat") current_pattern_->location.latitude = stod(value_);
 			else if (element == "start") {
 				current_pattern_->validity.start = convert_xml_datetime(value_);
+#ifdef _WIN32
+				if (current_pattern_->validity.start < 0LL) current_pattern_->validity.start = 0;
+#endif
 				current_pattern_->type |= cty_data::TIME_DEPENDENT;
 			}
 			else if (element == "end") {
@@ -209,6 +206,9 @@ bool cty1_reader::end_element(string name) {
 			if (element == "call") current_match_ = value_;
 			else if (element == "start") {
 				current_pattern_->validity.start = convert_xml_datetime(value_);
+#ifdef _WIN32
+				if (current_pattern_->validity.start < 0LL) current_pattern_->validity.start = 0;
+#endif
 				current_pattern_->type |= cty_data::TIME_DEPENDENT;
 			}
 			else if (element == "end") {
@@ -222,23 +222,14 @@ bool cty1_reader::end_element(string name) {
 			else if (element == "cqz") current_pattern_->cq_zone = stoi(value_);
 			else if (element == "start") {
 				current_pattern_->validity.start = convert_xml_datetime(value_);
+#ifdef _WIN32
+				if (current_pattern_->validity.start < 0) current_pattern_->validity.start = 0;
+#endif
 				current_pattern_->type |= cty_data::TIME_DEPENDENT;
 			}
 			else if (element == "end") {
 				current_pattern_->validity.end = convert_xml_datetime(value_);
 				current_pattern_->type |= cty_data::TIME_DEPENDENT;
-			}
-		}
-		else if (elements_.size() && elements_.back() == "clublog") {
-			// Add all patterns to the entities
-			for (auto it : data_->patterns) {
-				string match = it.first;
-				for (auto ita : it.second) {
-					int dxcc_id = ita->dxcc_id;
-					if (data_->entities.find(dxcc_id) != data_->entities.end()) {
-						data_->entities[dxcc_id]->patterns[it.first].push_back(ita);
-					}
-				}
 			}
 		}
 	}
@@ -268,7 +259,7 @@ bool cty1_reader::characters(string content) {
 }
 
 // Load data from specified file into and add each record to the map
-bool cty1_reader::load_data(cty_data::all_data* data, istream& in, string& version) {
+bool cty1_reader::load_data(cty_data* data, istream& in, string& version) {
 	fl_cursor(FL_CURSOR_WAIT);
 	data_ = data;
 	file_ = &in;

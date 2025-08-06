@@ -24,11 +24,9 @@ void cty_data::delete_data() {
 		}
 		for (auto it : data_->patterns) {
 			for (auto ita : it.second) {
-				delete ita;
-			}
-		}
-		for (auto it : data_->sub_patterns) {
-			for (auto ita : it.second) {
+				for (auto itb : ita->children) {
+					delete itb;
+				}
 				delete ita;
 			}
 		}
@@ -51,8 +49,11 @@ void cty_data::type(cty_type_t t) {
 		capabilities_ = HAS_ITU_ZONE | HAS_TIMEZONE;
 		break;
 	}
+	string report_file = default_user_directory_ + "cty_merge.rpt";
+	os_ = ofstream(report_file.c_str());
 	string filename = get_filename();
 	load_data(filename);
+	os_.close();
 }
 
 // Return various fields of entity
@@ -235,14 +236,14 @@ bool cty_data::load_data(string filename) {
 		cty1_reader* reader = new cty1_reader;
 		data_ = new all_data;
 		status_->misc_status(ST_NOTE, "CTY DATA: Loading data supplied by clublog.org");
-		ok = reader->load_data(data_, in, version);
+		ok = reader->load_data(this, in, version);
 		break;
 	}
 	case COUNTRY_FILES: {
 		cty2_reader* reader = new cty2_reader;
 		data_ = new all_data;
 		status_->misc_status(ST_NOTE, "CTY DATA: Loading data supplied by www.country-files.com");
-		ok = reader->load_data(data_, in, version);
+		ok = reader->load_data(this, in, version);
 		break;
 	}
 	default:
@@ -303,7 +304,7 @@ void cty_data::parse(record* qso) {
 				parse_result_.pattern = matches->front();
 				ent_entry* entity = data_->entities.at(parse_result_.pattern->dxcc_id);
 				parse_result_.entity = entity;
-				parse_result_.sub_patterns = match_pattern(current_call_, entity->sub_patterns, when);
+				parse_result_.sub_patterns = match_pattern(current_call_, entity->patterns, when);
 			}
 			else {
 				parse_result_ = { nullptr, nullptr, nullptr };
@@ -427,3 +428,231 @@ bool cty_data::valid_entity(ent_entry* entry, time_t when) {
 	}
 	else return true;
 }
+
+// Adding pattern
+void cty_data::add_pattern(string pattern, int dxcc_id, patt_entry* entry) {
+	if (data_->patterns.find(pattern) == data_->patterns.end()) {
+		data_->patterns[pattern] = { entry };
+	}
+	else {
+		// Already have a rule for this pattern
+		patt_matches& patterns = data_->patterns.at(pattern);
+		bool merged = true;
+		if (entry->type == PTN_NORMAL) {
+			for (auto it : patterns) {
+				if (it->type == PTN_NORMAL) {
+					merged |= merge_pattern(pattern, PTN_NORMAL, it, entry);
+				}
+			}
+		}
+		else {
+			for (auto it : patterns) {
+				patt_type_t merge_type = it->type & entry->type;
+				if (merge_type) {
+					// We are trying to override the same thing
+					merged |= merge_pattern(pattern, merge_type, it, entry);
+				}
+			}
+		}
+		if (!merged) {
+			patterns.push_back(entry);
+			if (data_->entities.find(dxcc_id) == data_->entities.end()) {
+				char msg[128];
+				snprintf(msg, sizeof(msg), "CTY DATA: Adding prefix %s before entity %d", pattern.c_str(), dxcc_id);
+				status_->misc_status(ST_ERROR, msg);
+			}
+			else {
+				data_->entities[dxcc_id]->patterns[pattern].push_back(entry);
+			}
+		}
+	}
+}
+
+bool cty_data::merge_pattern(string pattern, patt_type_t type, patt_entry* original, patt_entry* entry) {
+	bool ignored = false;
+	if (type == PTN_NORMAL) {
+		if (original->name != "") {
+			if (original->name != entry->name) {
+				os_ << "Pattern: " << pattern << " - Existing name " << original->name <<
+					" ignoring " << entry->name << "\n";
+			}
+		}
+		else {
+			original->name = entry->name;
+		}
+		if (original->cq_zone > 0) {
+			if (original->cq_zone != entry->cq_zone) {
+				os_ << "Pattern: " << pattern << " - Existing CQ Zone " << original->cq_zone <<
+					" ignoring " << entry->cq_zone << "\n";
+			}
+		}
+		else {
+			original->cq_zone = entry->cq_zone;
+		}
+		if (original->itu_zone > 0) {
+			if (original->itu_zone != entry->itu_zone) {
+				os_ << "Pattern: " << pattern << " - Existing ITU Zone " << original->itu_zone <<
+					" ignoring " << entry->itu_zone << "\n";
+			}
+		}
+		else {
+			original->itu_zone = entry->itu_zone;
+		}
+		if (original->continent != "") {
+			if (original->continent != entry->continent) {
+				os_ << "Pattern: " << pattern << " - Existing Continent " << original->continent <<
+					" ignoring " << entry->continent << "\n";
+			}
+		}
+		else {
+			original->continent = entry->continent;
+		}
+		if (!isnan(original->location.latitude)) {
+			if (original->location.latitude != entry->location.latitude) {
+				os_ << "Pattern: " << pattern << " - Existing Latitude " << original->location.latitude <<
+					" ignoring " << entry->location.latitude << "\n";
+			}
+		}
+		else {
+			original->location.latitude = entry->location.latitude;
+		}
+		if (!isnan(original->location.longitude)) {
+			if (original->location.longitude != entry->location.longitude) {
+				os_ << "Pattern: " << pattern << " - Existing Longitude " << original->location.longitude <<
+					" ignoring " << entry->location.longitude << "\n";
+			}
+		}
+		else {
+			original->location.longitude = entry->location.longitude;
+		}
+	
+		ignored = true;
+	}
+	if (type & TIME_DEPENDENT) {
+		if ((entry->validity.start > original->validity.start && entry->validity.start < original->validity.end) ||
+			(entry->validity.end > original->validity.start && entry->validity.end < original->validity.end)) {
+			os_ << "Pattern: " << pattern << " - Overlap time ranges: (";
+			tm* temp_time = gmtime(&original->validity.start);
+			char temps[50];
+			strftime(temps, sizeof(temps), "%Y%m%d", temp_time);
+			os_ << temps << "-";
+			temp_time = gmtime(&original->validity.end);
+			strftime(temps, sizeof(temps), "%Y%m%d", temp_time);
+			os_ << temps << "), (";
+			temp_time = gmtime(&entry->validity.start);
+			strftime(temps, sizeof(temps), "%Y%m%d", temp_time);
+			os_ << temps << "-";
+			temp_time = gmtime(&entry->validity.end);
+			strftime(temps, sizeof(temps), "%Y%m%d", temp_time);
+			os_ << temps << ")\n";
+			ignored = true;
+		}
+	}
+	else {
+		if (type & CQZ_EXCEPTION) {
+			if (original->cq_zone > 0) {
+				if (original->cq_zone != entry->cq_zone) {
+					os_ << "Pattern: " << pattern << " - Existing CQ Zone " << original->cq_zone <<
+						" ignoring " << entry->cq_zone << "\n";
+				}
+			}
+			else {
+				original->cq_zone = entry->cq_zone;
+			}
+			ignored = true;
+		}
+		if (type & ITUZ_EXCEPTION) {
+			if (original->itu_zone > 0) {
+				if (original->itu_zone != entry->itu_zone) {
+					os_ << "Pattern: " << pattern << " - Existing ITU Zone " << original->itu_zone <<
+						" ignoring " << entry->itu_zone << "\n";
+				}
+			}
+			else {
+				original->itu_zone = entry->itu_zone;
+			}
+			ignored = true;
+		}
+		if (type & CONT_EXCEPTION) {
+			if (original->continent != "") {
+				if (original->continent != entry->continent) {
+					os_ << "Pattern: " << pattern << " - Existing Continent " << original->continent <<
+						" ignoring " << entry->continent << "\n";
+				}
+			}
+			else {
+				original->continent = entry->continent;
+			}
+			ignored = true;
+		}
+	}
+	return ignored;
+}
+
+void cty_data::add_entity(int dxcc_id, ent_entry* entry) {
+	if (data_->entities.find(dxcc_id) == data_->entities.end()) {
+		data_->entities[dxcc_id] = entry;
+	}
+	else {
+		merge_entry(data_->entities[dxcc_id], entry);
+	}
+}
+
+void cty_data::merge_entry(ent_entry* original, ent_entry* entry) {
+	if (original->name != "") {
+		if (original->name != entry->name) {
+			os_ << "Entity: " << original->dxcc_id << " - Existing name " << original->name <<
+				" ignoring " << entry->name << "\n";
+		}
+	}
+	else {
+		original->name = entry->name;
+	}
+	if (original->cq_zone > 0) {
+		if (original->cq_zone != entry->cq_zone) {
+			os_ << "Entity: " << original->dxcc_id << " - Existing CQ Zone " << original->cq_zone <<
+				" ignoring " << entry->cq_zone << "\n";
+		}
+	}
+	else {
+		original->cq_zone = entry->cq_zone;
+	}
+	if (original->itu_zone > 0) {
+		if (original->itu_zone != entry->itu_zone) {
+			os_ << "Entity: " << original->dxcc_id << " - Existing ITU Zone " << original->itu_zone <<
+				" ignoring " << entry->itu_zone << "\n";
+		}
+	}
+	else {
+		original->itu_zone = entry->itu_zone;
+	}
+	if (original->continent != "") {
+		if (original->continent != entry->continent) {
+			os_ << "Entity: " << original->dxcc_id << " - Existing Continent " << original->continent <<
+				" ignoring " << entry->continent << "\n";
+		}
+	}
+	else {
+		original->continent = entry->continent;
+	}
+	if (!isnan(original->location.latitude)) {
+		if (original->location.latitude != entry->location.latitude) {
+			os_ << "Entity: " << original->dxcc_id << " - Existing Latitude " << original->location.latitude <<
+				" ignoring " << entry->location.latitude << "\n";
+		}
+	}
+	else {
+		original->location.latitude = entry->location.latitude;
+	}
+	if (!isnan(original->location.longitude)) {
+		if (original->location.longitude != entry->location.longitude) {
+			os_ << "Entity: " << original->dxcc_id << " - Existing Longitude " << original->location.longitude <<
+				" ignoring " << entry->location.longitude << "\n";
+		}
+	}
+	else {
+		original->location.longitude = entry->location.longitude;
+	}
+
+}
+

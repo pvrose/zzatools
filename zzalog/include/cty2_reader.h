@@ -14,7 +14,7 @@ public:
 	~cty2_reader();
 
 	// Load data from specified file into and add each record to the map
-	bool load_data(cty_data::all_data* data, istream& in, string& version);
+	bool load_data(cty_data* data, istream& in, string& version);
 
 protected:
 
@@ -22,7 +22,7 @@ protected:
 
 	void load_pattern(string value, string& match, cty_data::patt_entry*);
 
-	cty_data::all_data* data_;
+	cty_data* data_;
 
 	
 

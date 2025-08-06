@@ -20,7 +20,7 @@ cty2_reader::~cty2_reader() {
 }
 
 // Load data from specified file into and add each record to the map
-bool cty2_reader::load_data(cty_data::all_data* data, istream& in, string& version) {
+bool cty2_reader::load_data(cty_data* data, istream& in, string& version) {
 	data_ = data;
 	// calculate the file size and initialise the progress bar
 	streampos startpos = in.tellg();
@@ -37,27 +37,13 @@ bool cty2_reader::load_data(cty_data::all_data* data, istream& in, string& versi
 		cty_data::ent_entry* entry = new cty_data::ent_entry;
 		int dxcc;
 		if (load_entity(entry, in, dxcc)) {
-			data_->entities[dxcc] = entry;
+			data_->add_entity(dxcc, entry);
 		}
 		else {
 			delete entry;
 		}
 	}
 	if (in.eof()) {
-		// Bring all patterns together
-		for (auto ita : data_->entities) {
-			for (auto itb : ita.second->patterns) {
-				if (data_->patterns.find(itb.first) == data_->patterns.end()) {
-					data_->patterns[itb.first] = itb.second;
-				}
-				else {
-					for (auto itc : itb.second) {
-						data_->patterns[itb.first].push_back(itc);
-					}
-				}
-				
-			}
-		}
 		return true;
 	}
 	else {
@@ -89,7 +75,7 @@ bool cty2_reader::load_entity(cty_data::ent_entry* entry, istream& in, int& dxcc
 			pantry->dxcc_id = dxcc;
 			string match;
 			load_pattern(it, match, pantry);
-			entry->patterns[match] = { pantry };
+			data_->add_pattern(match, dxcc, pantry);
 		}
 		// Report progress 
 		int bytes = (int)in.tellg();
