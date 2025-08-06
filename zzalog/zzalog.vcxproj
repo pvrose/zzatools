@@ -310,8 +310,6 @@
     <ClInclude Include="include\contest_scorer.h" />
     <ClInclude Include="include\contest_writer.h" />
     <ClInclude Include="include\corr_dialog.h" />
-    <ClInclude Include="include\cty1_data.h" />
-    <ClInclude Include="include\cty2_data.h" />
     <ClInclude Include="include\cty2_reader.h" />
     <ClInclude Include="include\cty_data.h" />
     <ClInclude Include="include\cty1_reader.h" />

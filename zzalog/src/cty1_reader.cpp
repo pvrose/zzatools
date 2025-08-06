@@ -160,8 +160,15 @@ bool cty1_reader::end_element(string name) {
 			else if (element == "cont") current_entity_->continent = value_;
 			else if (element == "long") current_entity_->location.longitude = stod(value_);
 			else if (element == "lat") current_entity_->location.latitude = stod(value_);
-			else if (element == "start") current_entity_->validity.start = convert_xml_datetime(value_);
-			else if (element == "end") current_entity_->validity.end = convert_xml_datetime(value_);
+			else if (element == "deleted" && value_ == "true") current_entity_->deleted = true;
+			else if (element == "start") {
+				current_entity_->validity.start = convert_xml_datetime(value_);
+				current_entity_->has_validity = true;
+			}
+			else if (element == "end") {
+				current_entity_->validity.end = convert_xml_datetime(value_);
+				current_entity_->has_validity = true;
+			}
 		}
 		else if (elements_.size() && elements_.back() == "prefix") {
 			// Build up the exception record from the various child elements
@@ -171,8 +178,14 @@ bool cty1_reader::end_element(string name) {
 			else if (element == "cont") current_pattern_->continent = value_;
 			else if (element == "long") current_pattern_->location.longitude = stod(value_);
 			else if (element == "lat") current_pattern_->location.latitude = stod(value_);
-			else if (element == "start") current_pattern_->validity.start = convert_xml_datetime(value_);
-			else if (element == "end") current_pattern_->validity.end = convert_xml_datetime(value_);
+			else if (element == "start") {
+				current_pattern_->validity.start = convert_xml_datetime(value_);
+				current_pattern_->type |= cty_data::TIME_DEPENDENT;
+			}
+			else if (element == "end") {
+				current_pattern_->validity.end = convert_xml_datetime(value_);
+				current_pattern_->type |= cty_data::TIME_DEPENDENT;
+			}
 		}
 		else if (elements_.size() && elements_.back() == "exception") {
 			// Build up the exception record from the various child elements
@@ -182,21 +195,39 @@ bool cty1_reader::end_element(string name) {
 			else if (element == "cont") current_pattern_->continent = value_;
 			else if (element == "long") current_pattern_->location.longitude = stod(value_);
 			else if (element == "lat") current_pattern_->location.latitude = stod(value_);
-			else if (element == "start") current_pattern_->validity.start = convert_xml_datetime(value_);
-			else if (element == "end") current_pattern_->validity.end = convert_xml_datetime(value_);
+			else if (element == "start") {
+				current_pattern_->validity.start = convert_xml_datetime(value_);
+				current_pattern_->type |= cty_data::TIME_DEPENDENT;
+			}
+			else if (element == "end") {
+				current_pattern_->validity.end = convert_xml_datetime(value_);
+				current_pattern_->type |= cty_data::TIME_DEPENDENT;
+			}
 		}
 		else if (elements_.size() && elements_.back() == "invalid") {
 			// Build up the invalid record from the various child elements
 			if (element == "call") current_match_ = value_;
-			else if (element == "start") current_pattern_->validity.start = convert_xml_datetime(value_);
-			else if (element == "end") current_pattern_->validity.end = convert_xml_datetime(value_);
+			else if (element == "start") {
+				current_pattern_->validity.start = convert_xml_datetime(value_);
+				current_pattern_->type |= cty_data::TIME_DEPENDENT;
+			}
+			else if (element == "end") {
+				current_pattern_->validity.end = convert_xml_datetime(value_);
+				current_pattern_->type |= cty_data::TIME_DEPENDENT;
+			}
 		}
 		else if (elements_.size() && elements_.back() == "zone_exception") {
 			// Build up the exception record from the various child elements
 			if (element == "call") current_match_ = value_;
 			else if (element == "cqz") current_pattern_->cq_zone = stoi(value_);
-			else if (element == "start") current_pattern_->validity.start = convert_xml_datetime(value_);
-			else if (element == "end") current_pattern_->validity.end = convert_xml_datetime(value_);
+			else if (element == "start") {
+				current_pattern_->validity.start = convert_xml_datetime(value_);
+				current_pattern_->type |= cty_data::TIME_DEPENDENT;
+			}
+			else if (element == "end") {
+				current_pattern_->validity.end = convert_xml_datetime(value_);
+				current_pattern_->type |= cty_data::TIME_DEPENDENT;
+			}
 		}
 		else if (elements_.size() && elements_.back() == "clublog") {
 			// Add all patterns to the entities

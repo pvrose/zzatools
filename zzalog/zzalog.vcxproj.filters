@@ -758,12 +758,6 @@
     <ClInclude Include="..\widgets\include\filename_input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\cty1_data.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\cty2_data.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\cty2_reader.h">
       <Filter>Header Files</Filter>
     </ClInclude>

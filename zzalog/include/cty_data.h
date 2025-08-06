@@ -31,16 +31,16 @@ public:
 	static const cty_caps_t HAS_CURRENCY = 1 << 3;
 
 	// Source of the data - set by type()
-	enum cty_type_t : uchar {
-		// No data
-		INVALID_CTY = 0,
-		// Data from www.clublog.org
-		CLUBLOG,
-		// Data from www.country-files.com
-		COUNTRY_FILES,
-		// Data from dxatlas.com
-		DXATLAS
-	};
+	// These can be orred in whcich case the various data are merged (TODO:)
+	typedef uchar cty_type_t;
+	// No data
+	static const cty_type_t INVALID_CTY = 0;
+	// Data from www.clublog.org
+	static const cty_type_t	CLUBLOG = 1;
+	// Data from www.country-files.com
+	static const cty_type_t COUNTRY_FILES = 1 << 1;
+	// Data from dxatlas.com
+	static const cty_type_t DXATLAS = 1 << 2;
 
 protected:
 
@@ -48,7 +48,7 @@ protected:
 	cty_type_t type_;
 
 	// Pattern type
-	typedef uchar patt_type_t;
+	typedef uint16_t patt_type_t;
 	// Pattern represents a call that is unauthorised
 	static const patt_type_t INVALID_CALL = 1 << 0;
 	// Pattern represents that the CQ Zone is different from the prefix
@@ -63,6 +63,10 @@ protected:
 	static const patt_type_t CLASS_SUBPATTERN = 1 << 5;
 	// Pattern represents a continent exception
 	static const patt_type_t CONT_EXCEPTION = 1 << 6;
+	// Pattern has time conditions
+	static const patt_type_t TIME_DEPENDENT = 1 << 7;
+	// Pattern is now deleted
+	static const patt_type_t PTN_DELECETED = 1 << 8;
 
 	// Validity time period - where applicable
 	struct time_period {
@@ -111,6 +115,10 @@ protected:
 		lat_long_t location = { nan(""), nan("") };
 		// Timezone (UTC + N hours)
 		double timezone = nan("");
+		// Deleted - may not necessarily have time vailidity
+		bool deleted = false;
+		// Time validity is valid
+		bool has_validity = false;
 		// Validity
 		time_period validity = { -1, -1 };
 		// the patterns - with time validity

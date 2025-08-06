@@ -234,12 +234,14 @@ bool cty_data::load_data(string filename) {
 	case CLUBLOG: {
 		cty1_reader* reader = new cty1_reader;
 		data_ = new all_data;
+		status_->misc_status(ST_NOTE, "CTY DATA: Loading data supplied by clublog.org");
 		ok = reader->load_data(data_, in, version);
 		break;
 	}
 	case COUNTRY_FILES: {
 		cty2_reader* reader = new cty2_reader;
 		data_ = new all_data;
+		status_->misc_status(ST_NOTE, "CTY DATA: Loading data supplied by www.country-files.com");
 		ok = reader->load_data(data_, in, version);
 		break;
 	}
@@ -410,7 +412,7 @@ cty_data::patt_matches* cty_data::match_pattern(string call, map<string, patt_ma
 
 // Is valid pattern
 bool cty_data::valid_pattern(patt_entry* entry, time_t when) {
-	if (capabilities_ == HAS_HISTORY) {
+	if (capabilities_ == HAS_HISTORY && (entry->type & TIME_DEPENDENT)) {
 		if (when >= entry->validity.start && when <= entry->validity.end) return true;
 		else return false;
 	}
@@ -419,9 +421,9 @@ bool cty_data::valid_pattern(patt_entry* entry, time_t when) {
 
 // Is valid entity
 bool cty_data::valid_entity(ent_entry* entry, time_t when) {
-	if (capabilities_ == HAS_HISTORY) {
+	if (capabilities_ == HAS_HISTORY && entry->has_validity) {
 		if (when >= entry->validity.start && when <= entry->validity.end) return true;
 		else return false;
 	}
-	else return false;
+	else return true;
 }
