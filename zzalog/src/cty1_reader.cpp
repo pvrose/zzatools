@@ -61,7 +61,7 @@ extern bool closing_;
 cty1_reader::cty1_reader() {
 	ignore_processing_ = false;
 	current_entity_ = nullptr;
-	current_pattern_ = nullptr;
+	current_prefix_ = nullptr;
 	//current_exception_ = nullptr;
 	//current_invalid_ = nullptr;
 	//current_zone_exc_ = nullptr;
@@ -83,24 +83,23 @@ bool cty1_reader::start_element(string name, map<string, string>* attributes) {
 			string enclosure = elements_.back();
 			elements_.push_back(name);
 			if (enclosure == "entities" && name == "entity") {
-				current_entity_ = new cty_data::ent_entry;
+				current_entity_ = new cty_entity;
 			}
 			else if (enclosure == "prefixes" && name == "prefix") {
-				current_pattern_ = new cty_data::patt_entry;
-				current_pattern_->type = 0;
+				current_prefix_ = new cty_prefix;
 			}
 			else if (enclosure == "exceptions" && name == "exception") {
-				current_pattern_ = new cty_data::patt_entry;
-				current_pattern_->type = cty_data::DXCC_EXCEPTION;
+				current_exception_ = new cty_exception;
+				current_exception_->exc_type_ = cty_exception::EXC_OVERRIDE;
 			}
 			else if (enclosure == "invalid_operations" && name == "invalid") {
-				current_pattern_ = new cty_data::patt_entry;
-				current_pattern_->type = cty_data::INVALID_CALL;
-				current_pattern_->dxcc_id = -1;
+				current_exception_ = new cty_exception;
+				current_exception_->exc_type_ = cty_exception::EXC_INVALID;
+				current_exception_->dxcc_id_ = -1;
 			}
 			else if (enclosure == "zone_exceptions" && name == "zone_exception") {
-				current_pattern_ = new cty_data::patt_entry;
-				current_pattern_->type = cty_data::CQZ_EXCEPTION;
+				current_exception_ = new cty_exception;
+				current_exception_->exc_type_ = cty_exception::EXC_OVERRIDE;
 			}
 		}
 		else {
@@ -125,111 +124,96 @@ bool cty1_reader::end_element(string name) {
 		elements_.pop_back();
 		string enclosure = elements_.size() ? elements_.back() : "";
 		if ((enclosure == "exceptions" && element == "exception") ||
-			(enclosure == "invalid_operations" && element == "invalid") ||
-			(enclosure == "zone_exceptions" && element == "zone_exception") ||
-			(enclosure == "prefixes" && element == "prefix")) {
+			(enclosure == "zone_exceptions" && element == "zone_exception") ) {
 			// Add it to the list, which if necessay create
-			data_->add_pattern(current_match_, current_pattern_->dxcc_id, current_pattern_);
-			current_pattern_ = nullptr;
+			data_->add_exception(current_match_, current_exception_);
+			current_exception_ = nullptr;
+			current_match_ = "";
+		}
+		else if ((enclosure == "invalid_operations" && element == "invalid")) {
+			// Add it to the list, which if necessay create
+			data_->add_exception(current_match_, current_exception_);
+			current_exception_ = nullptr;
+			current_match_ = "";
+		}
+		else if ((enclosure == "prefixes" && element == "prefix")) {
+			// Add it to the list, which if necessay create
+			data_->add_prefix(current_match_, current_prefix_);
+			current_prefix_ = nullptr;
 			current_match_ = "";
 		}
 		else if (enclosure == "entities" && element == "entity") {
-			data_->add_entity(current_entity_->dxcc_id, current_entity_);
+			data_->add_entity(current_entity_);
 			current_entity_ = nullptr;
 		}
 		else if (elements_.size() && elements_.back() == "entity") {
 			// Build up the exception record from the various child elements
-			if (element == "adif") current_entity_->dxcc_id = stoi(value_);
-			else if (element == "name") current_entity_->name = value_;
-			else if (element == "prefix") current_entity_->nickname = value_;
-			else if (element == "cqz") current_entity_->cq_zone = stoi(value_);
-			else if (element == "cont") current_entity_->continent = value_;
-			else if (element == "long") current_entity_->location.longitude = stod(value_);
-			else if (element == "lat") current_entity_->location.latitude = stod(value_);
-			else if (element == "deleted" && value_ == "true") current_entity_->deleted = true;
+			if (element == "adif") current_entity_->dxcc_id_ = stoi(value_);
+			else if (element == "name") current_entity_->name_ = value_;
+			else if (element == "prefix") current_entity_->nickname_ = value_;
+			else if (element == "cqz") current_entity_->cq_zone_ = stoi(value_);
+			else if (element == "cont") current_entity_->continent_ = value_;
+			else if (element == "long") current_entity_->coordinates_.longitude = stod(value_);
+			else if (element == "lat") current_entity_->coordinates_.latitude = stod(value_);
+			else if (element == "deleted" && value_ == "true") current_entity_->deleted_ = true;
 			else if (element == "start") {
-				current_entity_->validity.start = convert_xml_datetime(value_);
-#ifdef _WIN32
-				if (current_entity_->validity.start < 0LL) current_entity_->validity.start = 0;
-#endif
-				current_entity_->has_validity = true;
+				current_entity_->time_validity_.start = xmldt2date(value_);
 			}
 			else if (element == "end") {
-				current_entity_->validity.end = convert_xml_datetime(value_);
-				current_entity_->has_validity = true;
+				current_entity_->time_validity_.finish = xmldt2date(value_);
 			}
 		}
 		else if (elements_.size() && elements_.back() == "prefix") {
 			// Build up the exception record from the various child elements
 			if (element == "call") current_match_ = value_;
-			else if (element == "adif") current_pattern_->dxcc_id = stoi(value_);
-			else if (element == "entity") current_pattern_->name = value_;
-			else if (element == "cqz") current_pattern_->cq_zone = stoi(value_);
-			else if (element == "cont") current_pattern_->continent = value_;
-			else if (element == "long") current_pattern_->location.longitude = stod(value_);
-			else if (element == "lat") current_pattern_->location.latitude = stod(value_);
+			else if (element == "adif") current_prefix_->dxcc_id_ = stoi(value_);
+			else if (element == "entity") current_prefix_->name_ = value_;
+			else if (element == "cqz") current_prefix_->cq_zone_ = stoi(value_);
+			else if (element == "cont") current_prefix_->continent_ = value_;
+			else if (element == "long") current_prefix_->coordinates_.longitude = stod(value_);
+			else if (element == "lat") current_prefix_->coordinates_.latitude = stod(value_);
 			else if (element == "start") {
-				current_pattern_->validity.start = convert_xml_datetime(value_);
-#ifdef _WIN32
-				if (current_pattern_->validity.start < 0LL) current_pattern_->validity.start = 0;
-#endif
-				current_pattern_->type |= cty_data::TIME_DEPENDENT;
+				current_prefix_->time_validity_.start = xmldt2date(value_);
 			}
 			else if (element == "end") {
-				current_pattern_->validity.end = convert_xml_datetime(value_);
-				current_pattern_->type |= cty_data::TIME_DEPENDENT;
+				current_prefix_->time_validity_.finish = xmldt2date(value_);
 			}
 		}
 		else if (elements_.size() && elements_.back() == "exception") {
 			// Build up the exception record from the various child elements
 			if (element == "call") current_match_ = value_;
-			else if (element == "adif") current_pattern_->dxcc_id = stoi(value_);
-			else if (element == "entity") current_pattern_->name = value_;
-			else if (element == "cqz") current_pattern_->cq_zone = stoi(value_);
-			else if (element == "cont") current_pattern_->continent = value_;
-			else if (element == "long") current_pattern_->location.longitude = stod(value_);
-			else if (element == "lat") current_pattern_->location.latitude = stod(value_);
+			else if (element == "adif") current_exception_->dxcc_id_ = stoi(value_);
+			else if (element == "entity") current_exception_->name_ = value_;
+			else if (element == "cqz") current_exception_->cq_zone_ = stoi(value_);
+			else if (element == "cont") current_exception_->continent_ = value_;
+			else if (element == "long") current_exception_->coordinates_.longitude = stod(value_);
+			else if (element == "lat") current_exception_->coordinates_.latitude = stod(value_);
 			else if (element == "start") {
-				current_pattern_->validity.start = convert_xml_datetime(value_);
-#ifdef _WIN32
-				if (current_pattern_->validity.start < 0LL) current_pattern_->validity.start = 0;
-#endif
-				current_pattern_->type |= cty_data::TIME_DEPENDENT;
+				current_exception_->time_validity_.start = xmldt2date(value_);
 			}
 			else if (element == "end") {
-				current_pattern_->validity.end = convert_xml_datetime(value_);
-				current_pattern_->type |= cty_data::TIME_DEPENDENT;
+				current_exception_->time_validity_.finish = xmldt2date(value_);
 			}
 		}
 		else if (elements_.size() && elements_.back() == "invalid") {
 			// Build up the invalid record from the various child elements
 			if (element == "call") current_match_ = value_;
 			else if (element == "start") {
-				current_pattern_->validity.start = convert_xml_datetime(value_);
-#ifdef _WIN32
-				if (current_pattern_->validity.start < 0LL) current_pattern_->validity.start = 0;
-#endif
-				current_pattern_->type |= cty_data::TIME_DEPENDENT;
+				current_exception_->time_validity_.start = xmldt2date(value_);
 			}
 			else if (element == "end") {
-				current_pattern_->validity.end = convert_xml_datetime(value_);
-				current_pattern_->type |= cty_data::TIME_DEPENDENT;
+				current_exception_->time_validity_.finish = xmldt2date(value_);
 			}
 		}
 		else if (elements_.size() && elements_.back() == "zone_exception") {
 			// Build up the exception record from the various child elements
 			if (element == "call") current_match_ = value_;
-			else if (element == "cqz") current_pattern_->cq_zone = stoi(value_);
+			else if (element == "cqz") current_exception_->cq_zone_ = stoi(value_);
 			else if (element == "start") {
-				current_pattern_->validity.start = convert_xml_datetime(value_);
-#ifdef _WIN32
-				if (current_pattern_->validity.start < 0) current_pattern_->validity.start = 0;
-#endif
-				current_pattern_->type |= cty_data::TIME_DEPENDENT;
+				current_exception_->time_validity_.start = xmldt2date(value_);
 			}
 			else if (element == "end") {
-				current_pattern_->validity.end = convert_xml_datetime(value_);
-				current_pattern_->type |= cty_data::TIME_DEPENDENT;
+				current_exception_->time_validity_.finish = xmldt2date(value_);
 			}
 		}
 	}
@@ -295,4 +279,11 @@ bool cty1_reader::load_data(cty_data* data, istream& in, string& version) {
 		return false;
 	}
 
+}
+
+// Get date in format %Y%m%d from XML date time value.
+string cty1_reader::xmldt2date(string xml_date) {
+	string result = xml_date.substr(0, 4) + xml_date.substr(5, 2) + xml_date.substr(8, 2) +
+		xml_date.substr(11, 2) + xml_date.substr(14, 2);
+	return result;
 }

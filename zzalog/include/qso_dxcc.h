@@ -25,7 +25,6 @@ class Fl_Output;
 enum location_t : uchar;
 enum worked_t : uchar;
 
-
 // This class displays the "worked before" status for the DX - band and mode
 class qso_dxcc :
     public Fl_Group

@@ -668,12 +668,6 @@ void recent_files() {
 void add_data() {
 	// Note closing can get set during any of the below actions.
 	if (!closing_) {
-		if (!club_handler_) club_handler_ = new club_handler;
-		// Get pfx_data
-		cty_data_ = new cty_data;
-		cty_data_->type(cty_data::CLUBLOG);
-	}
-	if (!closing_) {
 		// add ADIF specification data.
 		spec_data_ = new spec_data;
 		// Check if loaded
@@ -688,6 +682,11 @@ void add_data() {
 			// Draw the specification view
 			((spec_tree*)tabbed_forms_->get_view(OT_ADIF))->populate_tree(false);
 		}
+	}
+	if (!closing_) {
+		if (!club_handler_) club_handler_ = new club_handler;
+		// Get pfx_data
+		cty_data_ = new cty_data;
 	}
 	// Add intl dialog
 	if (!closing_) {

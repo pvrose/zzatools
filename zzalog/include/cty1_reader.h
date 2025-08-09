@@ -2,6 +2,7 @@
 
 #include "xml_reader.h"
 #include "cty_data.h"
+#include "cty_element.h"
 
 #include <list>
 #include <string>
@@ -34,7 +35,8 @@ using namespace std;
 		// Protected methods
 	protected:
 
-
+		// Get date from XML format date & time
+		string xmldt2date(string xml_data);
 
 	protected:
 		// Ignore processing until end element
@@ -44,8 +46,9 @@ using namespace std;
 		// File timestamp
 		string timestamp_;
 		// Current elements
-		cty_data::ent_entry* current_entity_;
-		cty_data::patt_entry* current_pattern_;
+		cty_entity* current_entity_;
+		cty_prefix* current_prefix_;
+		cty_exception* current_exception_;
 		string current_match_;
 		//cty1_data::exc_entry* current_exception_;
 		//cty1_data::invalid_entry* current_invalid_;

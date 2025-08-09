@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cty_data.h"
+#include "cty_element.h"
 
 #include <fstream>
 #include <string>
@@ -18,9 +19,9 @@ public:
 
 protected:
 
-	bool load_entity(cty_data::ent_entry* , istream& in, int& dxcc);
+	bool load_entity(cty_entity* , istream& in, int& dxcc);
 
-	void load_pattern(string value, string& match, cty_data::patt_entry*);
+	cty_element* load_pattern(string value, string& match, bool& exception);
 
 	cty_data* data_;
 

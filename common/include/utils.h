@@ -27,6 +27,10 @@ using namespace std;
 		bool is_nan() {
 			return isnan(latitude) || isnan(longitude);
 		}
+
+		bool operator==(lat_long_t rhs) {
+			return (latitude == rhs.latitude && longitude == rhs.longitude);
+		}
 	};
 
 	// Tip display - 2 seconds

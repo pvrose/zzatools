@@ -600,6 +600,9 @@ string unescape_string(const string text) {
 
 // Convert a floating point degree value to � ' " N/E/S/W
 string degrees_to_dms(float value, bool is_latitude) {
+	if (isnan(value)) {
+		return "NAN";
+	}
 	int num_degrees;
 	int num_minutes;
 	int num_seconds;

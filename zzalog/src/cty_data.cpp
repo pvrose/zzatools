@@ -1,124 +1,155 @@
 #include "cty_data.h"
 
+#include "cty_element.h"
 #include "cty1_reader.h"
 #include "cty2_reader.h"
 #include "record.h"
+#include "spec_data.h"
 #include "status.h"
 
+#include <ostream>
+#include <fstream>
+#include <string>
+
+using namespace std;
+
+extern spec_data* spec_data_;
 extern status* status_;
 extern string default_user_directory_;
 
 cty_data::cty_data() {
-	capabilities_ = NO_DECODE;
-	data_ = nullptr;
+	data_ = new all_data;
+	import_ = new all_data;
+	string rep_fn = default_user_directory_ + "cty_load.rpt";
+	os_.open(rep_fn);
+	os_ << "Loading from ADIF\n";
+	// Load all the daat
+	type_ = ADIF;
+	load_data("");
+	merge_data();
+	dump_database();
+	delete_data(import_);
+	os_ << "Loading from Clublog.org\n";
+	type_ = CLUBLOG;
+	string filename = get_filename();
+	load_data(filename);
+	merge_data();
+	dump_database();
+	delete_data(import_);
+	os_ << "Loading from Country-files.com\n";
+	type_ = COUNTRY_FILES;
+	filename = get_filename();
+	load_data(filename);
+	merge_data();
+	dump_database();
+	delete_data(import_);
+	os_ << "Loading from DxAtlas\n";
+	type_ = DXATLAS;
+	filename = get_filename();
+	load_data(filename);
+	merge_data();
+	dump_database();
+	delete_data(import_);
+	os_.close();
+
 }
 
 cty_data::~cty_data() {
-	delete_data();
+	delete_data(data_);
+	delete_data(import_);
 }
 
-void cty_data::delete_data() {
-	if (data_) {
-		for (auto it : data_->entities) {
+void cty_data::delete_data(all_data* data) {
+	if (data) {
+		for (auto it : data->entities) {
 			delete it.second;
 		}
-		for (auto it : data_->patterns) {
+		data->entities.clear();
+		for (auto it : data->prefixes) {
 			for (auto ita : it.second) {
-				for (auto itb : ita->children) {
-					delete itb;
+				for (auto itb : ita->children_) {
+					for (auto itc : itb.second) {
+						delete itc;
+					}
 				}
 				delete ita;
 			}
 		}
+		data->prefixes.clear();
+		for (auto it : data->exceptions) {
+			for (auto ita : it.second) {
+				delete ita;
+			}
+		}
+		data->exceptions.clear();
 	}
 }
 
-void cty_data::type(cty_type_t t) {
-	type_ = t;
-	switch (type_) {
-	case INVALID_CTY:
-		capabilities_ = NO_DECODE;
-		break;
-	case CLUBLOG:
-		capabilities_ = HAS_HISTORY | HAS_CURRENCY;
-		break;
-	case COUNTRY_FILES:
-		capabilities_ = HAS_ITU_ZONE | HAS_TIMEZONE | HAS_CURRENCY;
-		break;
-	case DXATLAS:
-		capabilities_ = HAS_ITU_ZONE | HAS_TIMEZONE;
-		break;
+cty_exception* cty_data::exception() {
+	if (parse_result_.patterns.size() == 1 && parse_result_.patterns.front()->type_ == cty_element::CTY_EXCEPTION) {
+		return (cty_exception*)parse_result_.patterns.front();
 	}
-	string report_file = default_user_directory_ + "cty_merge.rpt";
-	os_ = ofstream(report_file.c_str());
-	string filename = get_filename();
-	load_data(filename);
-	os_.close();
+	else {
+		return nullptr;
+	}
 }
 
 // Return various fields of entity
 string cty_data::nickname(record* qso) {
 	parse(qso);
-	if (parse_result_.entity) return parse_result_.entity->nickname;
+	if (parse_result_.entity) return parse_result_.entity->nickname_;
 	return "";
 }
 
 string cty_data::name(record* qso) {
 	parse(qso);
-	if (parse_result_.entity) return parse_result_.entity->name;
+	if (parse_result_.entity) return parse_result_.entity->name_;
 	else return "";
 }
 
 string cty_data::continent(record* qso) {
 	parse(qso);
-	if (parse_result_.entity) return parse_result_.entity->continent;
+	if (parse_result_.entity) return parse_result_.entity->continent_;
 	else return "";
 }
 
 int cty_data::cq_zone(record* qso) {
 	parse(qso);
-	// Check if any geographic sub-entity has CQ Zone
-	if (parse_result_.sub_patterns) {
-		for (auto it : *parse_result_.sub_patterns) {
-			if (it->type & CQZ_EXCEPTION) return it->cq_zone;
-		}
+	// Check exception
+	cty_exception* except = exception();
+	if (except && except->cq_zone_ >= 0) return except->cq_zone_;
+	// Check if any geographic sub-entity has CQ Zone - start at lowest level
+	for (auto it = parse_result_.patterns.rbegin(); it != parse_result_.patterns.rend(); ++it) {
+		if ((*it)->cq_zone_ >= 0) return (*it)->cq_zone_;
 	}
-	// Check if any prefix overrides CQ Zone
-	if (parse_result_.pattern) {
-		if (parse_result_.pattern->type & CQZ_EXCEPTION) return parse_result_.pattern->cq_zone;
-	}
-	// return CQ Zone from entiity
-	if (parse_result_.entity) {
-		return parse_result_.entity->cq_zone;
-	}
-	// Otherwise invalid
+	// Not overridden
+	if (parse_result_.entity) return parse_result_.entity->cq_zone_;
+	// Default
 	return -1;
 }
 
 int cty_data::itu_zone(record* qso) {
 	parse(qso);
-	// Check if any geographic sub-entity has CQ Zone
-	if (parse_result_.sub_patterns) {
-		for (auto it : *parse_result_.sub_patterns) {
-			if (it->type & ITUZ_EXCEPTION) return it->itu_zone;
-		}
+	// Check exception
+	cty_exception* except = exception();
+	if (except && except->itu_zone_ >= 0) return except->itu_zone_;
+	// Check if any geographic sub-entity has CQ Zone - start at lowest level
+	for (auto it = parse_result_.patterns.rbegin(); it != parse_result_.patterns.rend(); ++it) {
+		if ((*it)->itu_zone_ >= 0) return (*it)->itu_zone_;
 	}
-	// Check if any prefix overrides CQ Zone
-	if (parse_result_.pattern) {
-		if (parse_result_.pattern->type & ITUZ_EXCEPTION) return parse_result_.pattern->itu_zone;
-	}
-	// return CQ Zone from entiity
-	if (parse_result_.entity) {
-		return parse_result_.entity->itu_zone;
-	}
-	// Otherwise invalid
+	// Use entity
+	if (parse_result_.entity) return parse_result_.entity->itu_zone_;
+	// Default
 	return -1;
 }
 
 // Get location
 lat_long_t cty_data::location(record* qso) {
 	parse(qso);
-	if (parse_result_.entity) return parse_result_.entity->location;
+	// Check exception
+	cty_exception* except = exception();
+	if (except && !(except->coordinates_.is_nan())) return except->coordinates_;
+	if (parse_result_.entity) return parse_result_.entity->coordinates_;
 	else return { nan(""), nan("") };
 }
 
@@ -177,28 +208,23 @@ cty_data::parse_source_t cty_data::get_source(record* qso) {
 	parse(qso);
 	// If no parse result
 	if (parse_result_.entity == nullptr) return NO_DECODE;
-	if (parse_result_.pattern == nullptr) return DEFAULT;
-	// Parse results has set DXCC excpetion (call outwith usual DXCC for pattern)
-	if (parse_result_.pattern->type & DXCC_EXCEPTION) return EXCEPTION;
-	// Either the pattern or sub-pattern has indicated a CQ or ITU Zone exception
-	if (parse_result_.pattern->type & (CQZ_EXCEPTION | ITUZ_EXCEPTION)) return ZONE_EXCEPTION;
-	if (parse_result_.sub_patterns) {
-		for (auto it : *parse_result_.sub_patterns) {
-			if (it->type & (CQZ_EXCEPTION | ITUZ_EXCEPTION)) return ZONE_EXCEPTION;
-		}
+	// If an exception
+	cty_exception* except = exception();
+	if (except && (except->cq_zone_ >= 0 || except->itu_zone_ >= 0)) return ZONE_EXCEPTION;
+	if (except) return EXCEPTION;
+	// If prefix changes CQ Zone or ITU zone
+	for (auto it = parse_result_.patterns.rbegin(); it != parse_result_.patterns.rend(); ++it) {
+		if ((*it)->cq_zone_ >= 0 || (*it)->itu_zone_ >= 0) return ZONE_EXCEPTION;
 	}
-	// Otherwise its the entity description
+	// Default from entity
 	return DEFAULT;
 }
 
 // Return entity 
 int cty_data::entity(record* qso) {
 	parse(qso);
-	// Pattern indicates different DXCC from entity decode
-	if (parse_result_.pattern && (parse_result_.pattern->type & DXCC_EXCEPTION))
-		return parse_result_.pattern->dxcc_id;
-	// Otherwise take from entity decode
-	if (parse_result_.entity) return parse_result_.entity->dxcc_id;
+	// We should have the entity descriptor but may not
+	if (parse_result_.entity) return parse_result_.entity->dxcc_id_;
 	// No decode
 	return -1;
 }
@@ -207,7 +233,7 @@ int cty_data::entity(record* qso) {
 int cty_data::entity(string nickname) {
 	if (data_) {
 		for (auto it : data_->entities) {
-			if (it.second->nickname == nickname) {
+			if (it.second->nickname_ == nickname) {
 				return it.first;
 			}
 		}
@@ -218,7 +244,7 @@ int cty_data::entity(string nickname) {
 string cty_data::nickname(int adif_id) {
 	if (data_) {
 		if (data_->entities.find(adif_id) == data_->entities.end()) {
-			return data_->entities.at(adif_id)->nickname;
+			return data_->entities.at(adif_id)->nickname_;
 		}
 	}
 	return "";
@@ -226,7 +252,11 @@ string cty_data::nickname(int adif_id) {
 
 // Load the data 
 bool cty_data::load_data(string filename) {
-	delete_data();
+	if (type_ == ADIF) {
+		load_adif_data();
+		return true;
+	}
+	// else
 	char msg[128];
 	ifstream in(filename.c_str(), ios_base::in);
 	string version;
@@ -285,73 +315,101 @@ void cty_data::parse(record* qso) {
 		// else 
 		current_qso_ = qso;
 		current_call_ = qso->item("CALL");
-		time_t when = qso->timestamp();
+		string when = qso->item("QSO_DATE") + qso->item("TIME_ON").substr(0,4);
 		int dxcc_id;
 		qso->item("DXCC", dxcc_id);
-		// If the DXCC has already been found
-		//if (data_->entities.find(dxcc_id) != data_->entities.end()) {
-		//	// Possible matching patterns
-		//	ent_entry* entity = data_->entities.at(dxcc_id);
-		//	parse_result_.entity = entity;
-		//	patt_matches* matches = match_pattern(current_call_, entity->patterns, when);
-		//	parse_result_.pattern = matches->size() ? matches->front() : nullptr;
-		//	parse_result_.sub_patterns = match_pattern(current_call_, entity->sub_patterns, when);
-		//	delete matches;
-		//}
-		//else {
-			patt_matches* matches = match_pattern(current_call_, data_->patterns, when);
-			if (matches && matches->size()) {
-				parse_result_.pattern = matches->front();
-				ent_entry* entity = data_->entities.at(parse_result_.pattern->dxcc_id);
-				parse_result_.entity = entity;
-				parse_result_.sub_patterns = match_pattern(current_call_, entity->patterns, when);
+		list<cty_element*> matches = match_patterns(current_call_, when);
+		parse_result_.patterns = matches;
+		if (matches.size()) {
+			int dxcc_id = matches.front()->dxcc_id_;
+			if (data_->entities.find(dxcc_id) != data_->entities.end()) {
+				parse_result_.entity = data_->entities[dxcc_id];
 			}
 			else {
-				parse_result_ = { nullptr, nullptr, nullptr };
+				parse_result_.entity = nullptr;
 			}
-			delete matches;
-		//}
+		}
+		else {
+			parse_result_.entity = nullptr;
+		}
 	}
 	else {
 		status_->misc_status(ST_WARNING, "No country data is loaded");
 	}
 }
 
-cty_data::patt_matches* cty_data::match_pattern(string call, map<string, patt_matches> patterns, time_t when) {
-	patt_matches* result = new patt_matches;
-	// First look for a match on the whole call
-	if (patterns.find(call) != patterns.end()) {
-		for (auto it : patterns.at(call)) {
-			if (valid_pattern(it, when)) {
-				result->push_back(it);
+list<cty_element*> cty_data::match_patterns(string call, string when) {
+	list<cty_element*> result;
+	// Look in exceptions
+	if (data_->exceptions.find(call) != data_->exceptions.end()) {
+		list<cty_exception*>& exceptions = data_->exceptions.at(call);
+		for (auto it : exceptions) {
+			if (it->time_contains(when)) result.push_back(it);
+		}
+	}
+	// Otherwise start looking in prefixes
+	else {
+		string alt;
+		string body;
+		// Split call accoridng to slashes in it. 
+		split_call(call, alt, body);
+		if (alt.length()) {
+			result = match_prefixes(data_->prefixes, alt, when);
+		}
+		if (result.size() == 0) {
+			result = match_prefixes(data_->prefixes, body, when);
+		}
+	}
+	return result;
+}
+
+list<cty_element*> cty_data::match_prefixes(map<string, list<cty_prefix*> > root, string call, string when) {
+	// Start matching prefixes - from full length of call down
+	string test = call;
+	bool found = false;
+	list<cty_element*> result;
+	while (test.length() > 0 && !found) {
+		if (root.find(test) != root.end()) {
+			list<cty_prefix*>& prefixes = root.at(test);
+			for (auto it = prefixes.begin(); it != prefixes.end() && !found; it++) {
+				if ((*it)->time_contains(when)) {
+					// Prefix has a match
+					found = true;
+					result.push_back(*it);
+					list<cty_element*> children = match_prefixes((*it)->children_, call, when);
+					result.insert(result.end(), children.begin(), children.end());
+				}
 			}
 		}
-		return result;
+		test = test.substr(0, test.length() - 1);
 	}
-	// else
+	return result;
+}
+
+void cty_data::split_call(string call, string& alt, string& body) {
 	// Split the callsign into its various components
 	vector<string> words;
 	split_line(call, words, '/');
 	string suffix = words.back();
-	string body = "";
-	string alt = "";
 	// Try and work out which bit of the call is which
 	switch (words.size()) {
 	case 1:
 		// Simple callsign
 		body = words[0];
+		alt = "";
 		suffix = "";
 		break;
 	case 2:
 		if (suffix == "MM") {
 			// /MM - not in a DXCC entity so no need to parse the callsign further
 			// TODO: Needs further work
-			return nullptr;
+			return;
 		}
 		else if (suffix.length() == 1 || suffix == "MM" || suffix == "AM") {
 			// Callsign has a roving style suffix - e.g. /M, /1 etc.
 			suffix = "";
 			body = words[0];
+			alt = "";
 		}
 		// Use the longer of the first two as callsign body, the shorter as the prefix of operation
 		else if (words[0].length() > words[1].length()) {
@@ -376,283 +434,211 @@ cty_data::patt_matches* cty_data::match_pattern(string call, map<string, patt_ma
 		}
 		break;
 	}
-	// Try alternate 
-	if (alt.length()) {
-		// Start comparing alt callsign and then reduce in length until found
-		for (int len = alt.length(); len > 0; len--) {
-			string test = alt.substr(0, len);
-			if (patterns.find(test) != patterns.end()) {
-				for (auto it : patterns.at(test)) {
-					if (valid_pattern(it, when)) {
-						result->push_back(it);
+
+}
+
+// Add an entity to import data
+void cty_data::add_entity(cty_entity* entry) {
+	int dxcc = entry->dxcc_id_;
+	if (import_->entities.find(dxcc) == import_->entities.end()) {
+		import_->entities[dxcc] = entry;
+	}
+	else {
+		os_ << "Multiple entity entry for DXCC " << dxcc << "\n";
+		os_ << "Original: " << *(import_->entities.at(dxcc)) << "\n";
+		os_ << "Duplicat: " << *entry << "\n";
+		report_errors_ = true;
+	}
+}
+
+// Add a prefix
+void cty_data::add_prefix(string pattern, cty_prefix* entry) {
+	if (import_->prefixes.find(pattern) == import_->prefixes.end()) {
+		import_->prefixes[pattern] = { entry };
+	}
+	else {
+		bool exists = false;
+		for (auto ita : import_->prefixes.at(pattern)) {
+			if (ita->time_overlap(entry)) {
+				os_ << "Overlapping prefix entry for " << pattern << "\n";
+				os_ << "Original: " << *ita << "\n";
+				os_ << "Overlap : " << *entry << "\n";
+				report_warnings_ = true;
+				exists = true;
+
+			} 
+		}
+		if (!exists) {
+			import_->prefixes[pattern].push_back(entry);
+		}
+	}
+}
+
+// Add an exception
+void cty_data::add_exception(string pattern, cty_exception* entry) {
+	if (import_->exceptions.find(pattern) == import_->exceptions.end()) {
+		import_->exceptions[pattern] = { entry };
+	}
+	else {
+		bool exists = false;
+		for (auto ita : import_->exceptions.at(pattern)) {
+			if (ita->time_overlap(entry)) {
+				os_ << "Overlapping exception entry for " << pattern << "\n";
+				os_ << "Original: " << *ita << "\n";
+				os_ << "Overlap : " << *entry << "\n";
+				report_warnings_ = true;
+				exists = true;
+			}
+		}
+		if (!exists) {
+			import_->exceptions[pattern].push_back(entry);
+		}
+	}
+}
+
+// Load entities as defined in the ADIF specification
+// TODO: move this to spec_data?
+void cty_data::load_adif_data() {
+	spec_dataset* dxccs = spec_data_->dataset("DXCC_Entity_Code");
+	for (auto it : dxccs->data) {
+		int dxcc = stod(it.first);
+		string name = it.second->at("Entity Name");
+		cty_entity* entry = new cty_entity;
+		entry->dxcc_id_ = dxcc;
+		entry->name_ = name;
+		add_entity(entry);
+	}
+}
+
+// Dump database
+void cty_data::dump_database() {
+	os_ << "Contents of data - entities\n";
+	for (auto it : data_->entities) {
+		os_ << "DXCC " << it.first << ":" << *it.second << "\n";
+	}
+	os_ << "Contents of data - prefixes\n";
+	for (auto ita : data_->prefixes) {
+		for (auto itb : ita.second) {
+			os_ << "PFX " << ita.first << ":" << *itb << "\n";
+		}
+	}
+	os_ << "Contents of data - exceptions\n";
+	for (auto ita : data_->exceptions) {
+		for (auto itb : ita.second) {
+			os_ << "EXCN " << ita.first << ":" << *itb << "\n";
+		}
+	}
+}
+
+// Merge import into data
+void cty_data::merge_data() {
+	// Merge entities
+	for (auto it : import_->entities) {
+		if (data_->entities.find(it.first) == data_->entities.end()) {
+			os_ << "DXCC " << it.first << " not in data: adding it\n";
+			os_ << *it.second << "\n";
+			// Need to copy contents rather than pointer
+			data_->entities[it.first] = new cty_entity;
+			*(data_->entities[it.first]) = *it.second;
+		} else {
+			cty_element::error_t error = data_->entities.at(it.first)->merge(it.second);
+			if (error != cty_element::CE_OK) {
+				os_ << "DXCC " << it.first << "clashes ";
+				if (error & cty_element::CE_NAME_CLASH) os_ << "Name; ";
+				if (error & cty_element::CE_CQ_CLASH) os_ << "CQZ; ";
+				if (error & cty_element::CE_ITU_CLASH) os_ << "ITUZ: ";
+				if (error & cty_element::CE_CONT_CLASH) os_ << "Cont; ";
+				if (error & cty_element::CE_COORD_CLASH) os_ << "Coords: ";
+				os_ << "\n";
+				os_ << "Original: " << *data_->entities.at(it.first) << "\n";
+				os_ << "Merging : " << *it.second << "\n";
+			}
+		}
+	}
+	// Merge prefixes
+	for (auto it : import_->prefixes) {
+		if (data_->prefixes.find(it.first) == data_->prefixes.end()) {
+			os_ << "PFX " << it.first << " not in data: adding it\n";
+			for (auto ita : it.second) {
+				os_ << ita << "\n";
+				// Copy the data not the pointer
+				cty_prefix* new_pfx = new cty_prefix;
+				*new_pfx = *ita;
+				data_->prefixes[it.first].push_back(new_pfx);
+			}
+		}
+		else {
+			// For each descriptor for imported prefix
+			for (auto ita : it.second) {
+				bool matches = false;
+				// Check against each prefix in data
+				for (auto itb : data_->prefixes.at(it.first)) {
+					if (itb->time_overlap(ita)) {
+						cty_element::error_t error = itb->merge(ita);
+						if (error != cty_element::CE_OK) {
+							os_ << "Prefix " << it.first << "clashes ";
+							if (error & cty_element::CE_NAME_CLASH) os_ << "Name; ";
+							if (error & cty_element::CE_CQ_CLASH) os_ << "CQZ; ";
+							if (error & cty_element::CE_ITU_CLASH) os_ << "ITUZ: ";
+							if (error & cty_element::CE_CONT_CLASH) os_ << "Cont; ";
+							if (error & cty_element::CE_COORD_CLASH) os_ << "Coords: ";
+							os_ << "\n";
+							os_ << "Original: " << *itb << "\n";
+							os_ << "Merging : " << *ita << "\n";
+						}
+						matches = true;
 					}
 				}
-				return result;
-			}
-		}
-	}
-	// Start comparing full callsign and then reduce in length until found
-	for (int len = body.length(); len > 0; len--) {
-		// Now try and match the callsign body
-		string test = body.substr(0, len);
-		if (patterns.find(test) != patterns.end()) {
-			for (auto it : patterns.at(test)) {
-				if (valid_pattern(it, when)) {
-					result->push_back(it);
-				}
-			}
-			return result;
-		}
-	}
-	char message[160];
-	snprintf(message, sizeof(message), "CTY DATA: Contact %s cannot be parsed",
-		call.c_str());
-	return nullptr;
-
-}
-
-// Is valid pattern
-bool cty_data::valid_pattern(patt_entry* entry, time_t when) {
-	if (capabilities_ == HAS_HISTORY && (entry->type & TIME_DEPENDENT)) {
-		if (when >= entry->validity.start && when <= entry->validity.end) return true;
-		else return false;
-	}
-	else return true;
-}
-
-// Is valid entity
-bool cty_data::valid_entity(ent_entry* entry, time_t when) {
-	if (capabilities_ == HAS_HISTORY && entry->has_validity) {
-		if (when >= entry->validity.start && when <= entry->validity.end) return true;
-		else return false;
-	}
-	else return true;
-}
-
-// Adding pattern
-void cty_data::add_pattern(string pattern, int dxcc_id, patt_entry* entry) {
-	if (data_->patterns.find(pattern) == data_->patterns.end()) {
-		data_->patterns[pattern] = { entry };
-	}
-	else {
-		// Already have a rule for this pattern
-		patt_matches& patterns = data_->patterns.at(pattern);
-		bool merged = true;
-		if (entry->type == PTN_NORMAL) {
-			for (auto it : patterns) {
-				if (it->type == PTN_NORMAL) {
-					merged |= merge_pattern(pattern, PTN_NORMAL, it, entry);
+				if (!matches) {
+					os_ << "PFX " << ita << " not in data: adding it\n";
+					os_ << ita << "\n";
+					cty_prefix* new_pfx = new cty_prefix(*ita);
+					data_->prefixes[it.first].push_back(new_pfx);
 				}
 			}
 		}
-		else {
-			for (auto it : patterns) {
-				patt_type_t merge_type = it->type & entry->type;
-				if (merge_type) {
-					// We are trying to override the same thing
-					merged |= merge_pattern(pattern, merge_type, it, entry);
-				}
+	}
+	// Merge exceptions
+	for (auto it : import_->exceptions) {
+		if (data_->exceptions.find(it.first) == data_->exceptions.end()) {
+			os_ << "EXCN " << it.first << " not in data: adding it\n";
+			for (auto ita : it.second) {
+				os_ << ita << "\n";
+				// Copy the data not the pointer
+				cty_exception* new_excn = new cty_exception;
+				*new_excn = *ita;
+				data_->exceptions[it.first].push_back(new_excn);
 			}
 		}
-		if (!merged) {
-			patterns.push_back(entry);
-			if (data_->entities.find(dxcc_id) == data_->entities.end()) {
-				char msg[128];
-				snprintf(msg, sizeof(msg), "CTY DATA: Adding prefix %s before entity %d", pattern.c_str(), dxcc_id);
-				status_->misc_status(ST_ERROR, msg);
-			}
-			else {
-				data_->entities[dxcc_id]->patterns[pattern].push_back(entry);
+		else {
+			// For each descriptor for imported prefix
+			for (auto ita : it.second) {
+				bool matches = false;
+				// Check against each prefix in data
+				for (auto itb : data_->exceptions.at(it.first)) {
+					if (itb->time_overlap(ita)) {
+						cty_element::error_t error = itb->merge(ita);
+						if (error != cty_element::CE_OK) {
+							os_ << "Prefix " << it.first << "clashes ";
+							if (error & cty_element::CE_NAME_CLASH) os_ << "Name; ";
+							if (error & cty_element::CE_CQ_CLASH) os_ << "CQZ; ";
+							if (error & cty_element::CE_ITU_CLASH) os_ << "ITUZ: ";
+							if (error & cty_element::CE_CONT_CLASH) os_ << "Cont; ";
+							if (error & cty_element::CE_COORD_CLASH) os_ << "Coords: ";
+							os_ << "\n";
+							os_ << "Original: " << *itb << "\n";
+							os_ << "Merging : " << *ita << "\n";
+						}
+						matches = true;
+					}
+				}
+				if (!matches) {
+					os_ << "PFX " << ita << " not in data: adding it\n";
+					os_ << ita << "\n";
+					cty_exception* new_excn = new cty_exception(*ita);
+					data_->exceptions[it.first].push_back(new_excn);
+				}
 			}
 		}
 	}
 }
-
-bool cty_data::merge_pattern(string pattern, patt_type_t type, patt_entry* original, patt_entry* entry) {
-	bool ignored = false;
-	if (type == PTN_NORMAL) {
-		if (original->name != "") {
-			if (original->name != entry->name) {
-				os_ << "Pattern: " << pattern << " - Existing name " << original->name <<
-					" ignoring " << entry->name << "\n";
-			}
-		}
-		else {
-			original->name = entry->name;
-		}
-		if (original->cq_zone > 0) {
-			if (original->cq_zone != entry->cq_zone) {
-				os_ << "Pattern: " << pattern << " - Existing CQ Zone " << original->cq_zone <<
-					" ignoring " << entry->cq_zone << "\n";
-			}
-		}
-		else {
-			original->cq_zone = entry->cq_zone;
-		}
-		if (original->itu_zone > 0) {
-			if (original->itu_zone != entry->itu_zone) {
-				os_ << "Pattern: " << pattern << " - Existing ITU Zone " << original->itu_zone <<
-					" ignoring " << entry->itu_zone << "\n";
-			}
-		}
-		else {
-			original->itu_zone = entry->itu_zone;
-		}
-		if (original->continent != "") {
-			if (original->continent != entry->continent) {
-				os_ << "Pattern: " << pattern << " - Existing Continent " << original->continent <<
-					" ignoring " << entry->continent << "\n";
-			}
-		}
-		else {
-			original->continent = entry->continent;
-		}
-		if (!isnan(original->location.latitude)) {
-			if (original->location.latitude != entry->location.latitude) {
-				os_ << "Pattern: " << pattern << " - Existing Latitude " << original->location.latitude <<
-					" ignoring " << entry->location.latitude << "\n";
-			}
-		}
-		else {
-			original->location.latitude = entry->location.latitude;
-		}
-		if (!isnan(original->location.longitude)) {
-			if (original->location.longitude != entry->location.longitude) {
-				os_ << "Pattern: " << pattern << " - Existing Longitude " << original->location.longitude <<
-					" ignoring " << entry->location.longitude << "\n";
-			}
-		}
-		else {
-			original->location.longitude = entry->location.longitude;
-		}
-	
-		ignored = true;
-	}
-	if (type & TIME_DEPENDENT) {
-		if ((entry->validity.start > original->validity.start && entry->validity.start < original->validity.end) ||
-			(entry->validity.end > original->validity.start && entry->validity.end < original->validity.end)) {
-			os_ << "Pattern: " << pattern << " - Overlap time ranges: (";
-			tm* temp_time = gmtime(&original->validity.start);
-			char temps[50];
-			strftime(temps, sizeof(temps), "%Y%m%d", temp_time);
-			os_ << temps << "-";
-			temp_time = gmtime(&original->validity.end);
-			strftime(temps, sizeof(temps), "%Y%m%d", temp_time);
-			os_ << temps << "), (";
-			temp_time = gmtime(&entry->validity.start);
-			strftime(temps, sizeof(temps), "%Y%m%d", temp_time);
-			os_ << temps << "-";
-			temp_time = gmtime(&entry->validity.end);
-			strftime(temps, sizeof(temps), "%Y%m%d", temp_time);
-			os_ << temps << ")\n";
-			ignored = true;
-		}
-	}
-	else {
-		if (type & CQZ_EXCEPTION) {
-			if (original->cq_zone > 0) {
-				if (original->cq_zone != entry->cq_zone) {
-					os_ << "Pattern: " << pattern << " - Existing CQ Zone " << original->cq_zone <<
-						" ignoring " << entry->cq_zone << "\n";
-				}
-			}
-			else {
-				original->cq_zone = entry->cq_zone;
-			}
-			ignored = true;
-		}
-		if (type & ITUZ_EXCEPTION) {
-			if (original->itu_zone > 0) {
-				if (original->itu_zone != entry->itu_zone) {
-					os_ << "Pattern: " << pattern << " - Existing ITU Zone " << original->itu_zone <<
-						" ignoring " << entry->itu_zone << "\n";
-				}
-			}
-			else {
-				original->itu_zone = entry->itu_zone;
-			}
-			ignored = true;
-		}
-		if (type & CONT_EXCEPTION) {
-			if (original->continent != "") {
-				if (original->continent != entry->continent) {
-					os_ << "Pattern: " << pattern << " - Existing Continent " << original->continent <<
-						" ignoring " << entry->continent << "\n";
-				}
-			}
-			else {
-				original->continent = entry->continent;
-			}
-			ignored = true;
-		}
-	}
-	return ignored;
-}
-
-void cty_data::add_entity(int dxcc_id, ent_entry* entry) {
-	if (data_->entities.find(dxcc_id) == data_->entities.end()) {
-		data_->entities[dxcc_id] = entry;
-	}
-	else {
-		merge_entry(data_->entities[dxcc_id], entry);
-	}
-}
-
-void cty_data::merge_entry(ent_entry* original, ent_entry* entry) {
-	if (original->name != "") {
-		if (original->name != entry->name) {
-			os_ << "Entity: " << original->dxcc_id << " - Existing name " << original->name <<
-				" ignoring " << entry->name << "\n";
-		}
-	}
-	else {
-		original->name = entry->name;
-	}
-	if (original->cq_zone > 0) {
-		if (original->cq_zone != entry->cq_zone) {
-			os_ << "Entity: " << original->dxcc_id << " - Existing CQ Zone " << original->cq_zone <<
-				" ignoring " << entry->cq_zone << "\n";
-		}
-	}
-	else {
-		original->cq_zone = entry->cq_zone;
-	}
-	if (original->itu_zone > 0) {
-		if (original->itu_zone != entry->itu_zone) {
-			os_ << "Entity: " << original->dxcc_id << " - Existing ITU Zone " << original->itu_zone <<
-				" ignoring " << entry->itu_zone << "\n";
-		}
-	}
-	else {
-		original->itu_zone = entry->itu_zone;
-	}
-	if (original->continent != "") {
-		if (original->continent != entry->continent) {
-			os_ << "Entity: " << original->dxcc_id << " - Existing Continent " << original->continent <<
-				" ignoring " << entry->continent << "\n";
-		}
-	}
-	else {
-		original->continent = entry->continent;
-	}
-	if (!isnan(original->location.latitude)) {
-		if (original->location.latitude != entry->location.latitude) {
-			os_ << "Entity: " << original->dxcc_id << " - Existing Latitude " << original->location.latitude <<
-				" ignoring " << entry->location.latitude << "\n";
-		}
-	}
-	else {
-		original->location.latitude = entry->location.latitude;
-	}
-	if (!isnan(original->location.longitude)) {
-		if (original->location.longitude != entry->location.longitude) {
-			os_ << "Entity: " << original->dxcc_id << " - Existing Longitude " << original->location.longitude <<
-				" ignoring " << entry->location.longitude << "\n";
-		}
-	}
-	else {
-		original->location.longitude = entry->location.longitude;
-	}
-
-}
-

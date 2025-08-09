@@ -26,6 +26,17 @@ extern spec_data* spec_data_;
 extern bool DARK;
 extern void open_html(const char*);
 
+map <string, string> CONTINENTS = {
+	{ "AF", "Africa" },
+	{ "AN", "Antarctica" },
+	{ "AS", "Asia" },
+	{ "EU", "Europe" },
+	{ "NA", "N.America" },
+	{ "OC", "Oceania" },
+	{ "SA", "S.America" },
+	{ "", "Not known"}
+};
+
 // Constructor
 qso_dxcc::qso_dxcc(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
@@ -190,10 +201,10 @@ void qso_dxcc::enable_widgets() {
 			op_source_->color(FL_BACKGROUND_COLOR);
 			break;
 		}
-		snprintf(text, sizeof(text), "%s: CQ Zone %d. ITU Zone %s.",
-			continent_.c_str(),
+		snprintf(text, sizeof(text), "%s: CQ Zone %d. ITU Zone %d.",
+			CONTINENTS[continent_].c_str(),
 			cq_zone_,
-			cty_data_->capabilities() & cty_data::HAS_ITU_ZONE ? to_string(itu_zone_).c_str() : "N/A");
+			itu_zone_);
 		op_zones_->value(text);
 		if (location_.is_nan()) {
 			op_coords_->value("");
