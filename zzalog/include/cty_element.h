@@ -41,6 +41,8 @@ public:
 	const static error_t CE_COORD_CLASH = 1 << 3;
 	// Name clash
 	const static error_t CE_NAME_CLASH = 1 << 4;
+	// Non element class
+	const static error_t CE_OTHER_CLASH = 1 << 5;
 
 	cty_element();
 	~cty_element();
@@ -83,6 +85,9 @@ public:
 
 	cty_entity();
 	~cty_entity();
+
+	// Merge a similar element into this one
+	virtual error_t merge(cty_element* elem);
 
 	// Additional fields
 	// entitiy has been deleted

@@ -264,14 +264,14 @@ bool cty_data::load_data(string filename) {
 	switch (type_) {
 	case CLUBLOG: {
 		cty1_reader* reader = new cty1_reader;
-		data_ = new all_data;
+		import_ = new all_data;
 		status_->misc_status(ST_NOTE, "CTY DATA: Loading data supplied by clublog.org");
 		ok = reader->load_data(this, in, version);
 		break;
 	}
 	case COUNTRY_FILES: {
 		cty2_reader* reader = new cty2_reader;
-		data_ = new all_data;
+		import_ = new all_data;
 		status_->misc_status(ST_NOTE, "CTY DATA: Loading data supplied by www.country-files.com");
 		ok = reader->load_data(this, in, version);
 		break;

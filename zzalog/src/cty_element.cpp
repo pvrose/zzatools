@@ -100,6 +100,20 @@ ostream& operator<<(ostream& os, const cty_element& rhs) {
 cty_entity::cty_entity() { type_ = CTY_ENTITY; }
 cty_entity::~cty_entity() {}
 
+cty_element::error_t cty_entity::merge(cty_element* elem) {
+	error_t result = cty_element::merge(elem);
+	cty_entity* entry = (cty_entity*)elem;
+	if (nickname_ == "") {
+		nickname_ = entry->nickname_;
+	}
+	else {
+		if (entry->nickname_ != "") {
+			result |= CE_OTHER_CLASH;
+		}
+	}
+	return result;
+}
+
 ostream& operator<<(ostream& os, const cty_entity& rhs) {
 	os << (cty_element)rhs << " Nickname=" << rhs.nickname_ << ", " << (rhs.deleted_ ? "(DELETED)" : "");
 	return os;
