@@ -210,11 +210,14 @@ cty_data::parse_source_t cty_data::get_source(record* qso) {
 	if (parse_result_.entity == nullptr) return NO_DECODE;
 	// If an exception
 	cty_exception* except = exception();
-	if (except && (except->cq_zone_ >= 0 || except->itu_zone_ >= 0)) return ZONE_EXCEPTION;
+	if (except && (
+		( except->cq_zone_ >= 0 && except->cq_zone_ != parse_result_.entity->cq_zone_) || 
+		( except->itu_zone_ >= 0 && except->itu_zone_ != parse_result_.entity->itu_zone_))) return ZONE_EXCEPTION;
 	if (except) return EXCEPTION;
 	// If prefix changes CQ Zone or ITU zone
 	for (auto it = parse_result_.patterns.rbegin(); it != parse_result_.patterns.rend(); ++it) {
-		if ((*it)->cq_zone_ >= 0 || (*it)->itu_zone_ >= 0) return ZONE_EXCEPTION;
+		if ((*it)->cq_zone_ >= 0 && (*it)->cq_zone_ != parse_result_.entity->cq_zone_ ||
+			(*it)->itu_zone_ >= 0 && (*it)->itu_zone_ != parse_result_.entity->itu_zone_) return ZONE_EXCEPTION;
 	}
 	// Default from entity
 	return DEFAULT;
