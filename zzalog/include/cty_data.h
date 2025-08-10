@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cty_element.h"
+
 #include "utils.h"
 
 #include <map>
@@ -12,10 +14,6 @@
 using namespace std;
 
 class record;
-class cty_element;
-class cty_entity;
-class cty_exception;
-class cty_prefix;
 
 // This class provides a wrapper for all  the callsign exception data in cty.xml
 class cty_data
@@ -146,6 +144,9 @@ protected:
 		map < string, list<cty_prefix*> > prefixes;
 		// All the exceptions
 		map < string, list<cty_exception*> > exceptions;
+		// All the filters 
+		list<cty_filter*> filters;
+
 	};
 
 public:
@@ -236,9 +237,12 @@ protected:
 
 	//patt_matches* match_pattern(string call, map<string, patt_matches> patterns, string when);
 	// Get all the elements that may match
-	list <cty_element*> match_patterns(string call, string when);
+	cty_element* match_pattern(string call, string when);
+	cty_element* match_prefix(string call, string when);
+	cty_filter* match_filter(cty_prefix* pfx, cty_filter::filter_t type, string call, string when);
+	//list <cty_element*> match_patterns(string call, string when);
 	// Get the prefixes that match
-	list <cty_element*> match_prefixes(map<string, list< cty_prefix*> > root, string call, string when);
+	//list <cty_element*> match_prefixes(map<string, list< cty_prefix*> > root, string call, string when);
 
 	// Split call into call body and alternate
 	void split_call(string call, string& alt, string& body);
@@ -252,6 +256,8 @@ protected:
 
 	// Parse result is exception - nullptr if not
 	cty_exception* exception();
+	// Parse result is prefix
+	cty_prefix* prefix();
 
 	//struct {
 	//	ent_entry* entity;
@@ -262,9 +268,12 @@ protected:
 	struct {
 		// The entity definition
 		cty_entity* entity = nullptr;
-		// Either an exception or prefix and its relevent children - 
-		// If prefixes, first is entity prefix, then children
-		list<cty_element*> patterns;
+		// Either an exception or prefix
+		cty_element* decode_element = nullptr;
+		// Seeecetd geographic filter
+		cty_geography* geography = nullptr;
+		// Usage filter
+		cty_filter* usage = nullptr;
 	} parse_result_;
 
 	// Current parse objects

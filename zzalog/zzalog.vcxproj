@@ -190,6 +190,7 @@
     <ClCompile Include="src\corr_dialog.cpp" />
     <ClCompile Include="src\cty1_reader.cpp" />
     <ClCompile Include="src\cty2_reader.cpp" />
+    <ClCompile Include="src\cty3_reader.cpp" />
     <ClCompile Include="src\cty_data.cpp" />
     <ClCompile Include="src\cty_element.cpp" />
     <ClCompile Include="src\dxcc_table.cpp" />
@@ -312,6 +313,7 @@
     <ClInclude Include="include\contest_writer.h" />
     <ClInclude Include="include\corr_dialog.h" />
     <ClInclude Include="include\cty2_reader.h" />
+    <ClInclude Include="include\cty3_reader.h" />
     <ClInclude Include="include\cty_data.h" />
     <ClInclude Include="include\cty1_reader.h" />
     <ClInclude Include="include\cty_element.h" />

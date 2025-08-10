@@ -7,6 +7,7 @@
 #include "spec_data.h"
 #include "status.h"
 
+#include <cctype>
 #include <ostream>
 #include <fstream>
 #include <string>
@@ -67,11 +68,6 @@ void cty_data::delete_data(all_data* data) {
 		data->entities.clear();
 		for (auto it : data->prefixes) {
 			for (auto ita : it.second) {
-				for (auto itb : ita->children_) {
-					for (auto itc : itb.second) {
-						delete itc;
-					}
-				}
 				delete ita;
 			}
 		}
@@ -82,12 +78,27 @@ void cty_data::delete_data(all_data* data) {
 			}
 		}
 		data->exceptions.clear();
+		for (auto it : data->filters) {
+			delete it;
+		}
+		data->filters.clear();
 	}
 }
 
 cty_exception* cty_data::exception() {
-	if (parse_result_.patterns.size() == 1 && parse_result_.patterns.front()->type_ == cty_element::CTY_EXCEPTION) {
-		return (cty_exception*)parse_result_.patterns.front();
+	if (parse_result_.decode_element == nullptr) return nullptr;
+	if (parse_result_.decode_element->type_ == cty_element::CTY_EXCEPTION) {
+		return (cty_exception*)parse_result_.decode_element;
+	}
+	else {
+		return nullptr;
+	}
+}
+
+cty_prefix* cty_data::prefix() {
+	if (parse_result_.decode_element == nullptr) return nullptr;
+	if (parse_result_.decode_element->type_ == cty_element::CTY_PREFIX) {
+		return (cty_prefix*)parse_result_.decode_element;
 	}
 	else {
 		return nullptr;
@@ -118,10 +129,13 @@ int cty_data::cq_zone(record* qso) {
 	// Check exception
 	cty_exception* except = exception();
 	if (except && except->cq_zone_ >= 0) return except->cq_zone_;
-	// Check if any geographic sub-entity has CQ Zone - start at lowest level
-	for (auto it = parse_result_.patterns.rbegin(); it != parse_result_.patterns.rend(); ++it) {
-		if ((*it)->cq_zone_ >= 0) return (*it)->cq_zone_;
+	// Check if any geographic sub-entity has CQ Zone 
+	cty_prefix* pfx = prefix();
+	string call = qso->item("CALL");
+	if (pfx && parse_result_.geography) {
+		if (parse_result_.geography->cq_zone_ >= 0) return parse_result_.geography->cq_zone_;
 	}
+	if (pfx && pfx->cq_zone_ >= 0) return pfx->cq_zone_;
 	// Not overridden
 	if (parse_result_.entity) return parse_result_.entity->cq_zone_;
 	// Default
@@ -133,13 +147,15 @@ int cty_data::itu_zone(record* qso) {
 	// Check exception
 	cty_exception* except = exception();
 	if (except && except->itu_zone_ >= 0) return except->itu_zone_;
-	// Check if any geographic sub-entity has CQ Zone - start at lowest level
-	for (auto it = parse_result_.patterns.rbegin(); it != parse_result_.patterns.rend(); ++it) {
-		if ((*it)->itu_zone_ >= 0) return (*it)->itu_zone_;
+	// Check if any geographic sub-entity has CQ Zone 
+	cty_prefix* pfx = prefix();
+	string call = qso->item("CALL");
+	if (pfx && parse_result_.geography) {
+		if (parse_result_.geography->itu_zone_ >= 0) return parse_result_.geography->itu_zone_;
 	}
-	// Use entity
+	if (pfx && pfx->itu_zone_ >= 0) return pfx->itu_zone_;
+	// Not overridden
 	if (parse_result_.entity) return parse_result_.entity->itu_zone_;
-	// Default
 	return -1;
 }
 
@@ -214,11 +230,16 @@ cty_data::parse_source_t cty_data::get_source(record* qso) {
 		( except->cq_zone_ >= 0 && except->cq_zone_ != parse_result_.entity->cq_zone_) || 
 		( except->itu_zone_ >= 0 && except->itu_zone_ != parse_result_.entity->itu_zone_))) return ZONE_EXCEPTION;
 	if (except) return EXCEPTION;
-	// If prefix changes CQ Zone or ITU zone
-	for (auto it = parse_result_.patterns.rbegin(); it != parse_result_.patterns.rend(); ++it) {
-		if ((*it)->cq_zone_ >= 0 && (*it)->cq_zone_ != parse_result_.entity->cq_zone_ ||
-			(*it)->itu_zone_ >= 0 && (*it)->itu_zone_ != parse_result_.entity->itu_zone_) return ZONE_EXCEPTION;
+	cty_prefix* pfx = prefix();
+	string call = qso->item("CALL");
+	if (pfx && parse_result_.geography) {
+		cty_geography* it = parse_result_.geography;
+		if ((it->cq_zone_ >= 0 && it->cq_zone_ != parse_result_.entity->cq_zone_) ||
+			(it->itu_zone_ >= 0 && it->itu_zone_ != parse_result_.entity->itu_zone_)) return ZONE_EXCEPTION;
 	}
+	if (pfx && (
+		(pfx->cq_zone_ >= 0 && pfx->cq_zone_ != parse_result_.entity->cq_zone_) ||
+		(pfx->itu_zone_ >= 0 && pfx->itu_zone_ != parse_result_.entity->itu_zone_))) return ZONE_EXCEPTION;
 	// Default from entity
 	return DEFAULT;
 }
@@ -321,15 +342,20 @@ void cty_data::parse(record* qso) {
 		string when = qso->item("QSO_DATE") + qso->item("TIME_ON").substr(0,4);
 		int dxcc_id;
 		qso->item("DXCC", dxcc_id);
-		list<cty_element*> matches = match_patterns(current_call_, when);
-		parse_result_.patterns = matches;
-		if (matches.size()) {
-			int dxcc_id = matches.front()->dxcc_id_;
+		parse_result_.decode_element = match_pattern(current_call_, when);
+		
+		if (parse_result_.decode_element) {
+			int dxcc_id = parse_result_.decode_element->dxcc_id_;
 			if (data_->entities.find(dxcc_id) != data_->entities.end()) {
 				parse_result_.entity = data_->entities[dxcc_id];
 			}
 			else {
 				parse_result_.entity = nullptr;
+			}
+			cty_prefix* pfx = prefix();
+			if (pfx) {
+				parse_result_.geography = (cty_geography*)match_filter(pfx, cty_filter::FT_GEOGRAPHY, current_call_, when);
+				parse_result_.usage = match_filter(pfx, cty_filter::FT_USAGE, current_call_, when);
 			}
 		}
 		else {
@@ -341,13 +367,12 @@ void cty_data::parse(record* qso) {
 	}
 }
 
-list<cty_element*> cty_data::match_patterns(string call, string when) {
-	list<cty_element*> result;
+cty_element* cty_data::match_pattern(string call, string when) {
 	// Look in exceptions
 	if (data_->exceptions.find(call) != data_->exceptions.end()) {
 		list<cty_exception*>& exceptions = data_->exceptions.at(call);
 		for (auto it : exceptions) {
-			if (it->time_contains(when)) result.push_back(it);
+			if (it->time_contains(when)) return it;
 		}
 	}
 	// Otherwise start looking in prefixes
@@ -357,36 +382,58 @@ list<cty_element*> cty_data::match_patterns(string call, string when) {
 		// Split call accoridng to slashes in it. 
 		split_call(call, alt, body);
 		if (alt.length()) {
-			result = match_prefixes(data_->prefixes, alt, when);
+			cty_element* pfx = match_prefix(alt, when);
+			if (pfx) return pfx;
 		}
-		if (result.size() == 0) {
-			result = match_prefixes(data_->prefixes, body, when);
-		}
+		return match_prefix(body, when);
 	}
-	return result;
+	return nullptr;
 }
 
-list<cty_element*> cty_data::match_prefixes(map<string, list<cty_prefix*> > root, string call, string when) {
+cty_element* cty_data::match_prefix(string call, string when) {
 	// Start matching prefixes - from full length of call down
 	string test = call;
-	bool found = false;
-	list<cty_element*> result;
-	while (test.length() > 0 && !found) {
-		if (root.find(test) != root.end()) {
-			list<cty_prefix*>& prefixes = root.at(test);
-			for (auto it = prefixes.begin(); it != prefixes.end() && !found; it++) {
-				if ((*it)->time_contains(when)) {
+	while (test.length() > 0) {
+		if (data_->prefixes.find(test) != data_->prefixes.end()) {
+			list<cty_prefix*>& prefixes = data_->prefixes.at(test);
+			for (auto it : prefixes) {
+				if (it->time_contains(when)) {
 					// Prefix has a match
-					found = true;
-					result.push_back(*it);
-					list<cty_element*> children = match_prefixes((*it)->children_, call, when);
-					result.insert(result.end(), children.begin(), children.end());
+					return it;
 				}
 			}
 		}
 		test = test.substr(0, test.length() - 1);
 	}
-	return result;
+	return nullptr;
+}
+
+cty_filter* cty_data::match_filter(cty_prefix* pfx, cty_filter::filter_t type, string call, string when) {
+	for (auto it : pfx->filters_) {
+		// Check filter type
+		if (it->filter_type_ == type) {
+			// Now match character by character
+			bool match = true;
+			for (int ix = 0; ix < it->pattern_.length() && match; ix++) {
+				switch (it->pattern_[ix]) {
+				case '?':
+					match = isalnum(call[ix]);
+					break;
+				case '#':
+					match = isdigit(call[ix]);
+					break;
+				case '@':
+					match = isalpha(call[ix]);
+					break;
+				default:
+					match = (it->pattern_[ix] == call[ix]);
+					break;
+				}
+			}
+			if (match) return it;
+		}
+	}
+	return nullptr;
 }
 
 void cty_data::split_call(string call, string& alt, string& body) {

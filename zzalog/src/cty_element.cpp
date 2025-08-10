@@ -48,6 +48,9 @@ cty_element::error_t cty_element::merge(cty_element* elem) {
 			result |= CE_NAME_CLASH;
 		}
 	}
+	if (deleted_ != elem->deleted_) {
+		result |= CE_DEL_CLASH;
+	}
 	return result;
 }
 
@@ -92,12 +95,13 @@ ostream& operator<<(ostream& os, const cty_element& rhs) {
 	os << "(" << rhs.time_validity_.start << "-" << rhs.time_validity_.finish << ") " <<
 		"Name=" << rhs.name_ << ", CQ=" << rhs.cq_zone_ << ", ITU=" << rhs.itu_zone_ <<
 		", Cont=" << rhs.continent_ << ", Coords=" << degrees_to_dms(rhs.coordinates_.latitude, true) <<
-		", " << degrees_to_dms(rhs.coordinates_.longitude, false);
+		", " << degrees_to_dms(rhs.coordinates_.longitude, false) <<
+		(rhs.deleted_ ? " (DELETED)" : "");
 	return os;
 }
 
 
-cty_entity::cty_entity() { type_ = CTY_ENTITY; }
+cty_entity::cty_entity() : cty_element() { type_ = CTY_ENTITY; }
 cty_entity::~cty_entity() {}
 
 cty_element::error_t cty_entity::merge(cty_element* elem) {
@@ -115,31 +119,40 @@ cty_element::error_t cty_entity::merge(cty_element* elem) {
 }
 
 ostream& operator<<(ostream& os, const cty_entity& rhs) {
-	os << (cty_element)rhs << " Nickname=" << rhs.nickname_ << ", " << (rhs.deleted_ ? "(DELETED)" : "");
+	os << (cty_element)rhs << " Nickname=" << rhs.nickname_;
 	return os;
 }
 
-cty_prefix::cty_prefix() { type_ = CTY_PREFIX; }
+cty_prefix::cty_prefix() : cty_element() { type_ = CTY_PREFIX; }
 // Ddstructor - delete children
-cty_prefix::~cty_prefix() {
-	for (auto it : children_) {
-		for (auto ita : it.second) {
-			delete ita;
-		}
-	}
-}
+cty_prefix::~cty_prefix() { }
 
 ostream& operator<<(ostream& os, const cty_prefix& rhs) {
-	os << (cty_element)rhs << ", Type=" << rhs.pfx_type_ << ", PAS=" << rhs.province_ <<
-		(rhs.parent_ ? "Child" : "") << ", " << rhs.children_.size() << " children";
+	os << (cty_element)rhs << ", " << rhs.filters_.size() << " filters";
 	return os;
 }
 
-cty_exception::cty_exception() { type_ = CTY_EXCEPTION; }
+cty_exception::cty_exception() : cty_element() { type_ = CTY_EXCEPTION; }
 cty_exception::~cty_exception() {}
 
 ostream& operator<<(ostream& os, const cty_exception& rhs) {
-	os << (cty_element)rhs << (rhs.exc_type_ == cty_exception::EXC_INVALID ? "INVALID" : "");
+	os << (cty_element)rhs << (rhs.exc_type_ == cty_exception::EXC_INVALID ? " (INVALID)" : "");
 	return os;
 }
 
+cty_filter::cty_filter() : cty_prefix() { type_ = CTY_FILTER; }
+cty_filter::~cty_filter() {}
+
+ostream& operator<<(ostream& os, const cty_filter& rhs) {
+	os << (cty_prefix)rhs << ", Filter=" << rhs.pattern_ << ", Reason=" << rhs.reason_ <<
+		", Nickname=" << rhs.nickname_;
+	return os;
+}
+
+cty_geography::cty_geography() : cty_filter() { type_ = CTY_GEOGRAPHY; }
+cty_geography::~cty_geography() { }
+
+ostream& operator<<(ostream& os, const cty_geography& rhs) {
+	os << (cty_filter)rhs << ", PAS=" << rhs.province_;
+	return os;
+}

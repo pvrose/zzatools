@@ -20,7 +20,9 @@ public:
 		CTY_UNSPECIFIED = 0,  
 		CTY_ENTITY,           // cty_entity
 		CTY_PREFIX,           // cty_prefix
-		CTY_EXCEPTION         // cty_exception
+		CTY_EXCEPTION,        // cty_exception
+		CTY_GEOGRAPHY,        // cty_geography
+		CTY_FILTER            // cty_filter
 	};
 	// Time range
 	struct time_scope {
@@ -41,8 +43,10 @@ public:
 	const static error_t CE_COORD_CLASH = 1 << 3;
 	// Name clash
 	const static error_t CE_NAME_CLASH = 1 << 4;
+	// Deleted clash
+	const static error_t CE_DEL_CLASH = 1 << 5;
 	// Non element class
-	const static error_t CE_OTHER_CLASH = 1 << 5;
+	const static error_t CE_OTHER_CLASH = 1 << 7;
 
 	cty_element();
 	~cty_element();
@@ -63,6 +67,8 @@ public:
 	string continent_ = "";
 	// Co-ordinates
 	lat_long_t coordinates_ = { nan(""), nan("") };
+	// Deltede
+	bool deleted_ = false;
 
 	// Merge a similar element into this one
 	error_t merge(cty_element* elem);
@@ -99,6 +105,7 @@ public:
 
 ostream& operator<<(ostream& os, const cty_entity& rhs);
 
+class cty_filter;
 // Vesrion to be used for prefixes
 class cty_prefix : public cty_element {
 
@@ -108,24 +115,8 @@ public:
 	// Ddstructor - delete children
 	~cty_prefix();
 
-	// Additional fields
-	typedef uint8_t pfx_type_t;
-	// Prefix specifies the entity
-	const static pfx_type_t PFX_ENTITY = 1;
-	// Prefix specifies a geographic subdivision
-	const static pfx_type_t PFX_GEOGRAPHY = 2;
-	// Prefix specifies a usage (eg license class)
-	const static pfx_type_t PFX_USAGE = 3;
-	// Prefix has been deleted - orred with above
-	const static pfx_type_t PFX_DELETED = 4;
-	
-	pfx_type_t pfx_type_ = 0;
-	// State/province
-	string province_ = "";
-	// Parent prefix
-	cty_prefix* parent_ = nullptr;
-	// Child prefixes
-	map<string, list <cty_prefix*> > children_;
+	// Filters
+	list<cty_filter*> filters_;
 
 };
 
@@ -149,3 +140,43 @@ public:
 };
 
 ostream& operator<<(ostream& os, const cty_exception& rhs);
+
+// Version to be used in prefix filter
+class cty_filter : public cty_prefix {
+
+public:
+
+	cty_filter();
+	~cty_filter();
+
+	// What the filter if for
+	enum filter_t : uint8_t {
+		FT_INVALID = 0,
+		FT_GEOGRAPHY,             // Filter to a geographic dub-division
+		FT_USAGE                  // Filter to a specific usag
+	} filter_type_ = FT_INVALID;
+
+	// Filetring patterns
+	string pattern_ = "";
+	// Nickname for filter 
+	string nickname_ = "";
+	// Reason for filter
+	string reason_ = "";
+
+};
+
+ostream& operator <<(ostream& os, const cty_filter& rhs);
+
+// Geographic filter
+class cty_geography : public cty_filter {
+
+public:
+
+	cty_geography();
+	~cty_geography();
+
+	string province_ = "";
+
+};
+
+ostream& operator <<(ostream& os, const cty_geography& rhs);
