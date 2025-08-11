@@ -45,13 +45,13 @@ cty_data::cty_data() {
 	merge_data();
 	dump_database();
 	delete_data(import_);
-	os_ << "Loading from DxAtlas\n";
-	type_ = DXATLAS;
-	filename = get_filename();
-	load_data(filename);
-	merge_data();
-	dump_database();
-	delete_data(import_);
+	//os_ << "Loading from DxAtlas\n";
+	//type_ = DXATLAS;
+	//filename = get_filename();
+	//load_data(filename);
+	//merge_data();
+	//dump_database();
+	//delete_data(import_);
 	os_.close();
 
 }
