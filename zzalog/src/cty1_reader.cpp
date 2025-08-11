@@ -256,7 +256,7 @@ bool cty1_reader::load_data(cty_data* data, istream& in, string& version) {
 	in.seekg(0, ios::beg);
 	// Initialsie the progress
 	status_->misc_status(ST_NOTE, "CTY DATA: Started importing data");
-	status_->progress(file_size, OT_PREFIX, "Importing Exception data from XML", "bytes");
+	status_->progress(file_size, OT_PREFIX, "Importing country data from clublog.org", "bytes");
 	// Call the XML parser - calls back to the overides herein
 	if (parse(in)) {
 		// Read successful - complete progress

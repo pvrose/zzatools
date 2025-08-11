@@ -128,7 +128,6 @@ ostream& operator<<(ostream& os, const cty_entity& rhs) {
 
 cty_prefix::cty_prefix() : cty_element() {
 	type_ = CTY_PREFIX;
-	filters_.clear();
 }
 // Ddstructor - delete children
 cty_prefix::~cty_prefix() { }

@@ -79,10 +79,10 @@ void cty_data::delete_data(all_data* data) {
 			}
 		}
 		data->exceptions.clear();
-		for (auto it : data->filters) {
-			delete it;
-		}
-		data->filters.clear();
+		//for (auto it : data->filters) {
+		//	delete it;
+		//}
+		//data->filters.clear();
 	}
 }
 
@@ -168,6 +168,32 @@ lat_long_t cty_data::location(record* qso) {
 	if (except && !(except->coordinates_.is_nan())) return except->coordinates_;
 	if (parse_result_.entity) return parse_result_.entity->coordinates_;
 	else return { nan(""), nan("") };
+}
+
+// Get geography
+string cty_data::geography(record* qso) {
+	string result;
+	parse(qso);
+	if (parse_result_.geography) {
+		result = parse_result_.geography->nickname_ + ": " + parse_result_.geography->name_;
+	}
+	else {
+		result = "Geography N/A";
+	}
+	return result;
+}
+
+// Get usage
+string cty_data::usage(record* qso) {
+	string result;
+	parse(qso);
+	if (parse_result_.usage) {
+		result = parse_result_.usage->nickname_ + ": " + parse_result_.usage->name_;
+	}
+	else {
+		result = "Usage N/A";
+	}
+	return result;
 }
 
 // Update record based on parsing
@@ -393,7 +419,7 @@ cty_element* cty_data::match_pattern(string call, string when) {
 		split_call(call, alt, body);
 		if (alt.length()) {
 			cty_element* pfx = match_prefix(alt, when);
-			if (pfx) return pfx;
+			if (pfx && pfx->dxcc_id_ > 0) return pfx;
 		}
 		return match_prefix(body, when);
 	}

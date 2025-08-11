@@ -49,8 +49,7 @@ list<string> cty3_reader::expand_mask(string patterns) {
 			}
 		}
 		if (num_multis > 1) {
-			snprintf(msg, sizeof(msg), "CTY DATA: Pattern %s ignored - too many individual prefixes", ptn.c_str());
-			status_->misc_status(ST_WARNING, msg);
+			data_->out() << "Pattern " << ptn << " ignored - too many individual prefixes\n";
 			continue;
 		}
 		// Preprocess removing #,@,? and -
@@ -188,6 +187,7 @@ void cty3_reader::load_geography(string line, list<cty_prefix*> parents, bool de
 	cty_geography* geo = new cty_geography;
 	cty_element* element = load_element(cty_element::CTY_GEOGRAPHY, line, nickname, pattern);
 	*(cty_element*)geo = *element;
+	geo->pattern_ = pattern;
 	geo->nickname_ = nickname;
 	geo->deleted_ = deleted;
 	data_->add_filter(geo);
@@ -203,6 +203,7 @@ void cty3_reader::load_usage(string line, list<cty_prefix*> parents) {
 	cty_filter* usage = new cty_filter;
 	cty_element* element = load_element(cty_element::CTY_FILTER, line, nickname, pattern);
 	*(cty_element*)usage = *element;
+	usage->pattern_ = pattern;
 	usage->nickname_ = nickname;
 	data_->add_filter(usage);
 	for (auto it : parents) {
@@ -224,7 +225,7 @@ bool cty3_reader::load_data(cty_data* data, istream& in, string& version) {
 	in.seekg(0, ios::beg);
 	// Initialsie the progress
 	status_->misc_status(ST_NOTE, "CTY DATA: Started importing data");
-	status_->progress(file_size, OT_PREFIX, "Importing Prefix data (prefix.csv)", "bytes");
+	status_->progress(file_size, OT_PREFIX, "Importing country data from DxAtlas", "bytes");
 
 	// Read and discard header lines
 	string line;
@@ -263,8 +264,7 @@ bool cty3_reader::load_data(cty_data* data, istream& in, string& version) {
 		char msg[128];
 		switch (type) {
 		case CTY_UNDEFINED:
-			snprintf(msg, sizeof(msg), "CTY DATA: Undefined record %s", line.c_str());
-			status_->misc_status(ST_WARNING, msg);
+			data_->out() << "Undefined record " << line << "\n";
 			break;
 		case CTY_ENTITY:
 			load_entity(line, false);
@@ -279,8 +279,7 @@ bool cty3_reader::load_data(cty_data* data, istream& in, string& version) {
 			load_entity(line, true);
 			break;
 		case CTY_OLD_PREFIX:
-			snprintf(msg, sizeof(msg), "CTY DATA: Old prefix %s", line.c_str());
-			status_->misc_status(ST_WARNING, msg);
+			data_->out() << "Old prefix " << line << "\n";
 		case CTY_UNRECOGNISED:
 			load_entity(line, false);
 			break;
@@ -303,6 +302,7 @@ bool cty3_reader::load_data(cty_data* data, istream& in, string& version) {
 	}
 	bytes = (int)in.tellg();
 	status_->progress(bytes, OT_PREFIX);
+	if (in.eof()) ok = true;
 	return ok;
 }
 

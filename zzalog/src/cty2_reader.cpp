@@ -31,7 +31,7 @@ bool cty2_reader::load_data(cty_data* data, istream& in, string& version) {
 	in.seekg(0, ios::beg);
 	// Initialsie the progress
 	status_->misc_status(ST_NOTE, "CTY DATA: Started importing data");
-	status_->progress(file_size, OT_PREFIX, "Importing Exception data (bigcty.csv)", "bytes");
+	status_->progress(file_size, OT_PREFIX, "Importing country data from country-files.com", "bytes");
 
 	while (in.good()) {
 		cty_entity* entry = new cty_entity;
