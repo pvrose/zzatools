@@ -30,7 +30,6 @@ cty_element* cty3_reader::load_element(cty_element::type_t type, string line, st
 
 // Convert prefix mask to list of prefixes
 list<string> cty3_reader::expand_mask(string patterns) {
-	char msg[128];
 	list<string> result;
 	// Separate int patterns
 	vector<string> indiv_patts;
@@ -261,7 +260,6 @@ bool cty3_reader::load_data(cty_data* data, istream& in, string& version) {
 			type = (rec_type_t)stoi(stype.substr(1, 2), 0, 10);
 			break;
 		}
-		char msg[128];
 		switch (type) {
 		case CTY_UNDEFINED:
 			data_->out() << "Undefined record " << line << "\n";
