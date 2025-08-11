@@ -3,6 +3,7 @@
 #include "cty_element.h"
 #include "cty1_reader.h"
 #include "cty2_reader.h"
+#include "cty3_reader.h"
 #include "record.h"
 #include "spec_data.h"
 #include "status.h"
@@ -300,6 +301,13 @@ bool cty_data::load_data(string filename) {
 		ok = reader->load_data(this, in, version);
 		break;
 	}
+	case DXATLAS: {
+		cty3_reader* reader = new cty3_reader;
+		import_ = new all_data;
+		status_->misc_status(ST_NOTE, "CTY DATA: Loading data supplied by dxatlas.com");
+		ok = reader->load_data(this, in, version);
+		break;
+	}
 	default:
 		status_->misc_status(ST_WARNING, "Attempting to load unsupported country file");
 		return false;
@@ -325,6 +333,8 @@ string cty_data::get_filename() {
 		return default_user_directory_ + "bigcty/cty.csv";
 	case CLUBLOG:
 		return default_user_directory_ + "cty.xml";
+	case DXATLAS:
+		return default_user_directory_ + "dxatlas/prefix.lst";
 	default:
 		return "";
 	}
@@ -546,6 +556,11 @@ void cty_data::add_exception(string pattern, cty_exception* entry) {
 	}
 }
 
+// Add a filter
+void cty_data::add_filter(cty_filter* entry) {
+	import_->filters.push_back(entry);
+}
+
 // Load entities as defined in the ADIF specification
 // TODO: move this to spec_data?
 void cty_data::load_adif_data() {
@@ -577,6 +592,10 @@ void cty_data::dump_database() {
 		for (auto itb : ita.second) {
 			os_ << "EXCN " << ita.first << ":" << *itb << "\n";
 		}
+	}
+	os_ << "Contents of data - filters\n";
+	for (auto it : data_->filters) {
+		os_ << "FLTR " << it << "\n";
 	}
 }
 
@@ -691,4 +710,6 @@ void cty_data::merge_data() {
 			}
 		}
 	}
+	// Add filters
+	data_->filters.insert(data_->filters.end(), import_->filters.begin(), import_->filters.end());
 }

@@ -205,6 +205,8 @@ public:
 	void add_prefix(string pattern, cty_prefix* entry);
 	// Add an exception
 	void add_exception(string pattern, cty_exception* entry);
+	// Add a filter
+	void add_filter(cty_filter* entry);
 
 	//// Merge patterns - returns true if merged
 	//bool merge_pattern(string pattern, patt_type_t type, patt_entry* original, patt_entry* entry);

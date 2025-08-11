@@ -96,8 +96,6 @@ public:
 	virtual error_t merge(cty_element* elem);
 
 	// Additional fields
-	// entitiy has been deleted
-	bool deleted_ = false;
 	// Entitiy nickname - primary prefix
 	string nickname_ = "";
 

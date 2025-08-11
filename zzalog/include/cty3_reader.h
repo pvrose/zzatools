@@ -42,13 +42,6 @@ class cty3_reader
 		FT_SOURCE = 14        // Ignored
 	};
 
-	struct raw_prefix_t {
-		string pattern;       // all the prefixes in regex-type format
-		cty_prefix* data;     // the raw data for these prefixes
-		list<raw_prefix_t*> children_;
-							  // raw data for the children
-	};
-
 public:
 
 	cty3_reader();
@@ -59,8 +52,20 @@ public:
 
 protected:
 
+	// Decode entity record
+	void load_entity(string line, bool deleted);
+	// Decode geography record
+	void load_geography(string line, list<cty_prefix*> parents, bool deleted);
+	// Decode usage record
+	void load_usage(string line, list<cty_prefix*> parents);
+	// Load element part of above
+	cty_element* load_element(cty_element::type_t type, string line, string& nickname, string& patterns);
+	// Convert prefix mask to list of prefixes
+	list<string> expand_mask(string patterns);
 
 	cty_data* data_ = nullptr;
+
+	list<cty_prefix*> current_prefixes_;
 
 
 };
