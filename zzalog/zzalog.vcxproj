@@ -454,6 +454,7 @@
     <None Include="userguide\qso_rig.dox" />
     <None Include="userguide\qso_wx.dox" />
     <None Include="userguide\quick_start.dox" />
+    <None Include="userguide\reference.dox" />
     <None Include="userguide\report_tree.dox" />
     <None Include="userguide\search_dialog.dox" />
     <None Include="userguide\stn_dialog.dox" />

@@ -1,0 +1,62 @@
+/** \page page_6 Reference Data
+
+ZZALOG uses reference data from a number of sources.
+
+\section cty_data Country Data
+
+Country Data is used to interpret (or parse) the callsign of the station of interest. 
+See \ref qso_dxcc.
+This is got from three sources as they each provide a subset of the overall data. 
+
+\subsection clublog Clublog.org
+
+The organisation Clublog (https://clublog.org) provides data that is regularly updated.
+It is provided in XML format and provides:
+- DXCC Entity.
+- CQ Zone.
+- Information about illegal use of callsigns and operations.
+- Exceptions from the standard callsign parsing (eg use of special prefixes).
+- Contains a complete history of such usage.
+
+\subsection countryfiles country-files.com
+
+The web-site https://www.country-files.com/big-cty/ provides similar data and is also regularly updated.
+It differs from Clublog:
+- Includes
+  - ITU Zone.
+- Exclude
+  - History, it contains only a snapshot of the callsign exceptions.
+
+\subsection dxatlas dxatlas.com
+
+The website https://dxatlas.com privides a more detailed breakdown 
+(https://dxatlas.com/DxAtlas/Files/DxAtlasTables.zip) 
+and includes:
+
+- Geographic subdivisions.
+- Special callsigns and license categories.
+
+It is not often updated.
+
+\section adif ADIF Specification
+
+The ADIF specification is provided in XML format. This is updated occasionally. It 
+contains the detailed description of the ADIF fields and types - 
+see \ref spec_tree. It is provided
+for reference, though some use is made of the data to validate that data has
+been input in the correct format.
+
+\section bandplan Band-plan data
+
+The IARU Region 1 band plan is included and is used to provide a graphic
+representation of the data - see \ref qso_bands.
+
+\section intl International Character sets
+
+This file contains all the characters that are available in the virtual keyboard (\ref
+intl_dialog).
+
+*/
+
+
+

@@ -822,6 +822,7 @@
     <None Include="userguide\config_tree.dox" />
     <None Include="userguide\cli.dox" />
     <None Include="userguide\installation.dox" />
+    <None Include="userguide\reference.dox" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="zzalog.ico">
