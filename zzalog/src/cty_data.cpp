@@ -379,15 +379,16 @@ void cty_data::parse(record* qso) {
 		string when = qso->item("QSO_DATE") + qso->item("TIME_ON").substr(0,4);
 		int dxcc_id;
 		qso->item("DXCC", dxcc_id);
-		parse_result_.decode_element = match_pattern(current_call_, when);
+		string matched_call;
+		parse_result_.decode_element = match_pattern(current_call_, when, matched_call);
 		
 		if (parse_result_.decode_element) {
 			int dxcc_id = parse_result_.decode_element->dxcc_id_;
 			if (data_->entities.find(dxcc_id) != data_->entities.end()) {
 				parse_result_.entity = data_->entities[dxcc_id];
 				if (parse_result_.entity) {
-					parse_result_.geography = (cty_geography*)match_filter(parse_result_.entity, cty_filter::FT_GEOGRAPHY, current_call_, when);
-					parse_result_.usage = match_filter(parse_result_.entity, cty_filter::FT_USAGE, current_call_, when);
+					parse_result_.geography = (cty_geography*)match_filter(parse_result_.entity, cty_filter::FT_GEOGRAPHY, matched_call, when);
+					parse_result_.usage = match_filter(parse_result_.entity, cty_filter::FT_USAGE, matched_call, when);
 				}
 			}
 			else {
@@ -403,7 +404,7 @@ void cty_data::parse(record* qso) {
 	}
 }
 
-cty_element* cty_data::match_pattern(string call, string when) {
+cty_element* cty_data::match_pattern(string call, string when, string& matched_call) {
 	// Look in exceptions
 	if (data_->exceptions.find(call) != data_->exceptions.end()) {
 		list<cty_exception*>& exceptions = data_->exceptions.at(call);
@@ -419,8 +420,10 @@ cty_element* cty_data::match_pattern(string call, string when) {
 		split_call(call, alt, body);
 		if (alt.length()) {
 			cty_element* pfx = match_prefix(alt, when);
+			matched_call = alt;
 			if (pfx && pfx->dxcc_id_ > 0) return pfx;
 		}
+		matched_call = body;
 		return match_prefix(body, when);
 	}
 	return nullptr;

@@ -113,11 +113,9 @@ protected:
 	void load_adif_data();
 	// Find the entity, pattern and sub-patterns for the supplied QSO
 	void parse(record* qso);
-	// Is a valid element (timeliness)
-	bool is_valid(cty_element* elem);
 
 	// Get all the elements that may match
-	cty_element* match_pattern(string call, string when);
+	cty_element* match_pattern(string call, string when, string& matched_call);
 	cty_element* match_prefix(string call, string when);
 	cty_filter* match_filter(cty_entity* entity, cty_filter::filter_t type, string call, string when);
 
