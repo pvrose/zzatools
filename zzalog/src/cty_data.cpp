@@ -356,11 +356,11 @@ bool cty_data::load_data(string filename) {
 string cty_data::get_filename() {
 	switch (type_) {
 	case COUNTRY_FILES:
-		return default_user_directory_ + "bigcty/cty.csv";
+		return default_user_directory_ + "cty.csv";
 	case CLUBLOG:
 		return default_user_directory_ + "cty.xml";
 	case DXATLAS:
-		return default_user_directory_ + "dxatlas/prefix.lst";
+		return default_user_directory_ + "prefix.lst";
 	default:
 		return "";
 	}
