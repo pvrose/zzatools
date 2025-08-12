@@ -41,6 +41,11 @@ DOXS := $(shell find $(UG_DIR) -name '*.dox')
 # tar file
 TARFILE = $(TARGET_EXEC:.exe=.tgz)
 
+# Refenerce files
+REFS := $(shell ls $(REF_DIR))
+# Target references
+TREFS := $(REFS:%=$(APPDATA_DIR)/%)
+
 # Every folder in ./src will need to be passed to GCC so that it can find header files
 INC_DIRS := ./include ../widgets/include ../common/include
 
@@ -149,7 +154,7 @@ touch_main:
 
 # install
 .PHONY: install
-install: touch_main $(APPDATA_DIR)/all.xml $(APPDATA_DIR)/band_plan.tsv $(APPDATA_DIR)/intl_chars.txt $(APPDATA_DIR)/html/index.html $(INSTALL_DIR)/$(TARGET_EXEC)
+install: touch_main $(TREFS) $(INSTALL_DIR)/$(TARGET_EXEC)
 
 $(INSTALL_DIR)/$(TARGET_EXEC): $(EXEC_DIR)/$(TARGET_EXEC)
 	@echo Installing $(INSTALL_DIR)/$(TARGET_EXEC)

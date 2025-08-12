@@ -17,6 +17,7 @@ using namespace std;
 
 extern spec_data* spec_data_;
 extern status* status_;
+extern string default_data_directory_;
 extern string default_user_directory_;
 
 cty_data::cty_data() {
@@ -356,11 +357,11 @@ bool cty_data::load_data(string filename) {
 string cty_data::get_filename() {
 	switch (type_) {
 	case COUNTRY_FILES:
-		return default_user_directory_ + "cty.csv";
+		return default_data_directory_ + "cty.csv";
 	case CLUBLOG:
-		return default_user_directory_ + "cty.xml";
+		return default_data_directory_ + "cty.xml";
 	case DXATLAS:
-		return default_user_directory_ + "prefix.lst";
+		return default_data_directory_ + "Prefix.lst";
 	default:
 		return "";
 	}

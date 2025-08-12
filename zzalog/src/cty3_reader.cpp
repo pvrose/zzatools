@@ -282,15 +282,13 @@ bool cty3_reader::load_data(cty_data* data, istream& in, string& version) {
 		}
 		getline(in, line);
 		// Report progress 
-		bytes = (int)in.tellg();
-		status_->progress(bytes, OT_PREFIX);
 		ok = in.good();
+		if (ok) {
+			bytes = (int)in.tellg();
+			status_->progress(bytes, OT_PREFIX);
+		}
 	}
-	if (in.eof()) {
-		bytes = (int)in.tellg();
-		status_->progress(bytes, OT_PREFIX);
-		if (in.eof()) ok = true;
-	}
+	if (in.eof()) ok = true;
 	return ok;
 }
 
