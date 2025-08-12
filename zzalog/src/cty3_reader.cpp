@@ -169,18 +169,11 @@ void cty3_reader::load_entity(string line, bool deleted) {
 	data_->add_entity(entity);
 	// Generate all prefix records
 	list<string> pfx_pattern = expand_mask(pattern);
-	current_prefixes_.clear();
-	element->type_ = cty_element::CTY_PREFIX;
-	for (auto it : pfx_pattern) {
-		cty_prefix* pfx = new cty_prefix;
-		*(cty_element*)pfx = *element;
-		current_prefixes_.push_back(pfx);
-		data_->add_prefix(it, pfx);
-	}
+	current_entity_ = entity;
 }
 
 // Decode geography record
-void cty3_reader::load_geography(string line, list<cty_prefix*> parents, bool deleted) {
+void cty3_reader::load_geography(string line, bool deleted) {
 	string nickname = "";
 	string pattern;
 	cty_geography* geo = new cty_geography;
@@ -189,14 +182,11 @@ void cty3_reader::load_geography(string line, list<cty_prefix*> parents, bool de
 	geo->pattern_ = pattern;
 	geo->nickname_ = nickname;
 	geo->deleted_ = deleted;
-	data_->add_filter(geo);
-	for (auto it : parents) {
-		it->filters_.push_back(geo);
-	}
+	data_->add_filter(current_entity_, geo);
 }
 
 // Decode usage record
-void cty3_reader::load_usage(string line, list<cty_prefix*> parents) {
+void cty3_reader::load_usage(string line) {
 	string nickname = "";
 	string pattern;
 	cty_filter* usage = new cty_filter;
@@ -204,10 +194,7 @@ void cty3_reader::load_usage(string line, list<cty_prefix*> parents) {
 	*(cty_element*)usage = *element;
 	usage->pattern_ = pattern;
 	usage->nickname_ = nickname;
-	data_->add_filter(usage);
-	for (auto it : parents) {
-		it->filters_.push_back(usage);
-	}
+	data_->add_filter(current_entity_, usage);
 }
 
 
@@ -268,16 +255,17 @@ bool cty3_reader::load_data(cty_data* data, istream& in, string& version) {
 			load_entity(line, false);
 			break;
 		case CTY_GEOGRAPHY:
-			load_geography(line, current_prefixes_, false);
+			load_geography(line, false);
 			break;
 		case CTY_SPECIAL:
-			load_usage(line, current_prefixes_);
+			load_usage(line);
 			break;
 		case CTY_OLD_ENTITY:
 			load_entity(line, true);
 			break;
 		case CTY_OLD_PREFIX:
 			data_->out() << "Old prefix " << line << "\n";
+			break;
 		case CTY_UNRECOGNISED:
 			load_entity(line, false);
 			break;
@@ -285,10 +273,10 @@ bool cty3_reader::load_data(cty_data* data, istream& in, string& version) {
 			load_entity(line, false);
 			break;
 		case CTY_OLD_GEOGRAPHY:
-			load_geography(line, current_prefixes_, true);
+			load_geography(line, true);
 			break;
 		case CTY_CITY:
-			load_geography(line, current_prefixes_, false);
+			load_geography(line, false);
 			break;
 
 		}

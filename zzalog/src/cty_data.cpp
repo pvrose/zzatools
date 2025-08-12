@@ -45,13 +45,13 @@ cty_data::cty_data() {
 	merge_data();
 	dump_database();
 	delete_data(import_);
-	//os_ << "Loading from DxAtlas\n";
-	//type_ = DXATLAS;
-	//filename = get_filename();
-	//load_data(filename);
-	//merge_data();
-	//dump_database();
-	//delete_data(import_);
+	os_ << "Loading from DxAtlas\n";
+	type_ = DXATLAS;
+	filename = get_filename();
+	load_data(filename);
+	merge_data();
+	dump_database();
+	delete_data(import_);
 	os_.close();
 
 }
@@ -384,14 +384,13 @@ void cty_data::parse(record* qso) {
 			int dxcc_id = parse_result_.decode_element->dxcc_id_;
 			if (data_->entities.find(dxcc_id) != data_->entities.end()) {
 				parse_result_.entity = data_->entities[dxcc_id];
+				if (parse_result_.entity) {
+					parse_result_.geography = (cty_geography*)match_filter(parse_result_.entity, cty_filter::FT_GEOGRAPHY, current_call_, when);
+					parse_result_.usage = match_filter(parse_result_.entity, cty_filter::FT_USAGE, current_call_, when);
+				}
 			}
 			else {
 				parse_result_.entity = nullptr;
-			}
-			cty_prefix* pfx = prefix();
-			if (pfx) {
-				parse_result_.geography = (cty_geography*)match_filter(pfx, cty_filter::FT_GEOGRAPHY, current_call_, when);
-				parse_result_.usage = match_filter(pfx, cty_filter::FT_USAGE, current_call_, when);
 			}
 		}
 		else {
@@ -444,25 +443,90 @@ cty_element* cty_data::match_prefix(string call, string when) {
 	return nullptr;
 }
 
-cty_filter* cty_data::match_filter(cty_prefix* pfx, cty_filter::filter_t type, string call, string when) {
-	for (auto it : pfx->filters_) {
+cty_filter* cty_data::match_filter(cty_entity* entity, cty_filter::filter_t type, string call, string when) {
+	for (auto it : entity->filters_) {
 		// Check filter type
 		if (it->filter_type_ == type) {
 			// Now match character by character
 			bool match = true;
-			for (int ix = 0; ix < it->pattern_.length() && match; ix++) {
+			bool found = false;
+			size_t pos_c = 0; // Position on call
+			bool seq = false;
+			bool braced = false;
+			bool brace_match = false;
+			char last_c = '\0';
+			for (int ix = 0; ix < it->pattern_.length() && !found; ix++) {
 				switch (it->pattern_[ix]) {
-				case '?':
-					match = isalnum(call[ix]);
+				case '[':
+					// Starting braced code
+					braced = true;
+					brace_match = false;
+					seq = false;
+					break;
+				case ']':
+					// Ending braced code
+					braced = false;
+					if (!brace_match) match = false;;
+					pos_c++;
+					break;
+				case '-':
+					// Staring a sequence of letters or numbers
+					if (braced) seq = true;
+					break;
+				case ',':
+					// Reached the end of a pattern - we match then look no further
+					if (match) found = true;
+					// Otherwise start again
+					else {
+						match = true;
+						pos_c = 0;
+					}
+					break;
+				case '.':
+					// Must match the call execatly
+					if (pos_c != call.length()) match = false;
 					break;
 				case '#':
-					match = isdigit(call[ix]);
+					// Numeric
+					if (braced) {
+						if (isdigit(call[pos_c])) brace_match = true;
+					}
+					else {
+						if (!isdigit(call[pos_c])) match = false;
+						pos_c++;
+					}
 					break;
 				case '@':
-					match = isalpha(call[ix]);
+					if (braced) {
+						if (isalpha(call[pos_c])) brace_match = true;
+					}
+					else {
+						if (!isalpha(call[pos_c])) match = false;
+						pos_c++;
+					}
+					break;
+				case '?':
+					if (braced) {
+						if (isalnum(call[pos_c])) brace_match = true;
+					}
+					else {
+						if (!isalnum(call[pos_c])) match = false;
+						pos_c++;
+					}
 					break;
 				default:
-					match = (it->pattern_[ix] == call[ix]);
+					if (braced) {
+						if (seq) {
+							brace_match |= (call[pos_c] > last_c && call[pos_c] <= it->pattern_[ix]);
+						}
+						else {
+							brace_match |= (call[pos_c] == it->pattern_[ix]);
+						}
+					}
+					else {
+						match &= (call[pos_c] == it->pattern_[ix]);
+						pos_c++;
+					}
 					break;
 				}
 			}
@@ -583,8 +647,8 @@ void cty_data::add_exception(string pattern, cty_exception* entry) {
 }
 
 // Add a filter
-void cty_data::add_filter(cty_filter* entry) {
-	import_->filters.push_back(entry);
+void cty_data::add_filter(cty_entity* entity, cty_filter* entry) {
+	entity->filters_.push_back(entry);
 }
 
 // Load entities as defined in the ADIF specification
@@ -606,6 +670,9 @@ void cty_data::dump_database() {
 	os_ << "Contents of data - entities\n";
 	for (auto it : data_->entities) {
 		os_ << "DXCC " << it.first << ":" << *it.second << "\n";
+		for (auto ita : it.second->filters_) {
+			os_ << "  FILT " << ita << "\n";
+		}
 	}
 	os_ << "Contents of data - prefixes\n";
 	for (auto ita : data_->prefixes) {
@@ -618,10 +685,6 @@ void cty_data::dump_database() {
 		for (auto itb : ita.second) {
 			os_ << "EXCN " << ita.first << ":" << *itb << "\n";
 		}
-	}
-	os_ << "Contents of data - filters\n";
-	for (auto it : data_->filters) {
-		os_ << "FLTR " << it << "\n";
 	}
 }
 
@@ -736,6 +799,4 @@ void cty_data::merge_data() {
 			}
 		}
 	}
-	// Add filters
-	data_->filters.insert(data_->filters.end(), import_->filters.begin(), import_->filters.end());
 }

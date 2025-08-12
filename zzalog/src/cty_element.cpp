@@ -118,11 +118,19 @@ cty_element::error_t cty_entity::merge(cty_element* elem) {
 			result |= CE_OTHER_CLASH;
 		}
 	}
+	if (filters_.size() == 0) {
+		filters_ = entry->filters_;
+	}
+	else {
+		if (entry->filters_.size()) {
+			result |= CE_OTHER_CLASH;
+		}
+	}
 	return result;
 }
 
 ostream& operator<<(ostream& os, const cty_entity& rhs) {
-	os << (cty_element)rhs << " Nickname=" << rhs.nickname_;
+	os << (cty_element)rhs << " Nickname=" << rhs.nickname_ << ", " << rhs.filters_.size() << " Filters";
 	return os;
 }
 
@@ -133,7 +141,7 @@ cty_prefix::cty_prefix() : cty_element() {
 cty_prefix::~cty_prefix() { }
 
 ostream& operator<<(ostream& os, const cty_prefix& rhs) {
-	os << (cty_element)rhs << ", " << rhs.filters_.size() << " filters";
+	os << (cty_element)rhs;
 	return os;
 }
 
@@ -148,7 +156,7 @@ ostream& operator<<(ostream& os, const cty_exception& rhs) {
 	return os;
 }
 
-cty_filter::cty_filter() : cty_prefix() { 
+cty_filter::cty_filter() : cty_element () { 
 	type_ = CTY_FILTER;
 	filter_type_ = FT_USAGE;
 	pattern_ = "";
@@ -158,7 +166,7 @@ cty_filter::cty_filter() : cty_prefix() {
 cty_filter::~cty_filter() {}
 
 ostream& operator<<(ostream& os, const cty_filter& rhs) {
-	os << (cty_prefix)rhs << ", Filter=" << rhs.pattern_ << ", Reason=" << rhs.reason_ <<
+	os << (cty_element)rhs << ", Filter=" << rhs.pattern_ << ", Reason=" << rhs.reason_ <<
 		", Nickname=" << rhs.nickname_;
 	return os;
 }

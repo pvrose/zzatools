@@ -55,9 +55,9 @@ protected:
 	// Decode entity record
 	void load_entity(string line, bool deleted);
 	// Decode geography record
-	void load_geography(string line, list<cty_prefix*> parents, bool deleted);
+	void load_geography(string line, bool deleted);
 	// Decode usage record
-	void load_usage(string line, list<cty_prefix*> parents);
+	void load_usage(string line);
 	// Load element part of above
 	cty_element* load_element(cty_element::type_t type, string line, string& nickname, string& patterns);
 	// Convert prefix mask to list of prefixes
@@ -65,7 +65,7 @@ protected:
 
 	cty_data* data_ = nullptr;
 
-	list<cty_prefix*> current_prefixes_;
+	cty_entity* current_entity_;
 
 
 };

@@ -81,6 +81,8 @@ protected:
     // Prefix data
     Fl_Output* op_source_;
     Fl_Output* op_prefix_;
+    Fl_Output* op_geography_;
+    Fl_Output* op_usage_;
     Fl_Output* op_zones_;
     Fl_Output* op_coords_;
     Fl_Output* op_dist_bear_;
@@ -108,6 +110,10 @@ protected:
     lat_long_t my_location_;
     // How has the callsign been parsed to get the DXCC - decoded or exception
     cty_data::parse_source_t source_;
+    // Current geography
+    string geography_;
+    // Current usage
+    string usage_;
     // Current record
     record* qso_;
     // The continent

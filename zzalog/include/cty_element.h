@@ -84,6 +84,7 @@ public:
 
 ostream& operator<<(ostream& os, const cty_element& elem);
 
+class cty_filter;
 // Version to be used for entities
 class cty_entity : public cty_element {
 
@@ -98,12 +99,13 @@ public:
 	// Additional fields
 	// Entitiy nickname - primary prefix
 	string nickname_ = "";
+	// Filters
+	list<cty_filter*> filters_;
 
 };
 
 ostream& operator<<(ostream& os, const cty_entity& rhs);
 
-class cty_filter;
 // Vesrion to be used for prefixes
 class cty_prefix : public cty_element {
 
@@ -112,9 +114,6 @@ public:
 	cty_prefix();
 	// Ddstructor - delete children
 	~cty_prefix();
-
-	// Filters
-	list<cty_filter*> filters_;
 
 };
 
@@ -140,7 +139,7 @@ public:
 ostream& operator<<(ostream& os, const cty_exception& rhs);
 
 // Version to be used in prefix filter
-class cty_filter : public cty_prefix {
+class cty_filter : public cty_element {
 
 public:
 

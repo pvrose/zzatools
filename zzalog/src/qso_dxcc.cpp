@@ -116,6 +116,22 @@ void qso_dxcc::create_form() {
 	op_prefix_->tooltip("Shows the DXCC of the call of interest");
 	curr_y += ROW_HEIGHT;
 
+	// Display the geographiic subdiviison
+	op_geography_ = new Fl_Output(curr_x + 10, curr_y, avail_width - 10, ROW_HEIGHT);
+	op_geography_->box(FL_FLAT_BOX);
+	op_geography_->color(FL_BACKGROUND_COLOR);
+	op_geography_->textfont(FL_ITALIC);
+	op_geography_->tooltip("Shows the geographic subdivision of the call of interest");
+	curr_y += ROW_HEIGHT;
+
+	// Display the DXCC prefix
+	op_usage_ = new Fl_Output(curr_x + 10, curr_y, avail_width - 10, ROW_HEIGHT);
+	op_usage_->box(FL_FLAT_BOX);
+	op_usage_->color(FL_BACKGROUND_COLOR);
+	op_usage_->textfont(FL_ITALIC);
+	op_usage_->tooltip("Shows the special usage of the call of interest");
+	curr_y += ROW_HEIGHT;
+
 	// Display how the DXCC was found (decoded or from exception file)
 	op_source_ = new Fl_Output(curr_x, curr_y, avail_width, ROW_HEIGHT);
 	op_source_->box(FL_FLAT_BOX);
@@ -175,6 +191,8 @@ void qso_dxcc::enable_widgets() {
 				break;
 		}
 		op_prefix_->value(text);
+		op_geography_->value(geography_.c_str());
+		op_usage_->value(usage_.c_str());
 		switch (source_) {
 		case cty_data::INVALID:
 			op_source_->value("Invalid Operation");
@@ -270,6 +288,8 @@ void qso_dxcc::set_data(record* qso) {
 		dxcc_ = cty_data_->entity(qso_);
 		my_location_ = qso_->location(true);
 		continent_ = cty_data_->continent(qso_);
+		geography_ = cty_data_->geography(qso_);
+		usage_ = cty_data_->usage(qso_);
 		g_wb4_->set_data();
 	}
 
