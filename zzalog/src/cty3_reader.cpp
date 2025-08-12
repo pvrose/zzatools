@@ -286,9 +286,11 @@ bool cty3_reader::load_data(cty_data* data, istream& in, string& version) {
 		status_->progress(bytes, OT_PREFIX);
 		ok = in.good();
 	}
-	bytes = (int)in.tellg();
-	status_->progress(bytes, OT_PREFIX);
-	if (in.eof()) ok = true;
+	if (in.eof()) {
+		bytes = (int)in.tellg();
+		status_->progress(bytes, OT_PREFIX);
+		if (in.eof()) ok = true;
+	}
 	return ok;
 }
 
