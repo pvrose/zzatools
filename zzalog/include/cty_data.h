@@ -6,6 +6,7 @@
 
 #include <map>
 #include <list>
+#include <ctime>
 #include <cmath>
 #include <ostream>
 #include <fstream>
@@ -128,6 +129,11 @@ protected:
 	cty_exception* exception();
 	// Parse result is prefix
 	cty_prefix* prefix();
+	
+	// Get the system timestamp for the named file
+	time_t get_timestamp(string filename);
+	// Get the recorded timestamp
+	time_t timestamp(cty_type_t type);
 
 	struct {
 		// The entity definition
@@ -156,6 +162,8 @@ protected:
 	// Merge report is there
 	bool report_warnings_ = false;
 	bool report_errors_ = false;
+
+	map<cty_type_t, time_t> timestamps_;
 
 };
 

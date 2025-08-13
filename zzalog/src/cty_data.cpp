@@ -12,6 +12,11 @@
 #include <ostream>
 #include <fstream>
 #include <string>
+#ifdef _WIN32
+#include <io.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#endif
 
 using namespace std;
 
@@ -23,6 +28,7 @@ extern string default_user_directory_;
 cty_data::cty_data() {
 	data_ = new all_data;
 	import_ = new all_data;
+	bool loaded;
 	string rep_fn = default_user_directory_ + "cty_load.rpt";
 	os_.open(rep_fn);
 	os_ << "Loading from ADIF\n";
@@ -35,24 +41,30 @@ cty_data::cty_data() {
 	os_ << "Loading from Clublog.org\n";
 	type_ = CLUBLOG;
 	string filename = get_filename();
-	load_data(filename);
+	loaded = load_data(filename);
 	merge_data();
 	dump_database();
 	delete_data(import_);
+	if (loaded) timestamps_[type_] = get_timestamp(filename);
+	else timestamps_[type_] = -1;
 	os_ << "Loading from Country-files.com\n";
 	type_ = COUNTRY_FILES;
 	filename = get_filename();
-	load_data(filename);
+	loaded = load_data(filename);
 	merge_data();
 	dump_database();
 	delete_data(import_);
+	if (loaded) timestamps_[type_] = get_timestamp(filename);
+	else timestamps_[type_] = -1;
 	os_ << "Loading from DxAtlas\n";
 	type_ = DXATLAS;
 	filename = get_filename();
-	load_data(filename);
+	loaded = load_data(filename);
 	merge_data();
 	dump_database();
 	delete_data(import_);
+	if (loaded) timestamps_[type_] = get_timestamp(filename);
+	else timestamps_[type_] = -1;
 	os_.close();
 
 }
@@ -802,5 +814,38 @@ void cty_data::merge_data() {
 				}
 			}
 		}
+	}
+}
+
+time_t cty_data::get_timestamp(string filename) {
+#ifdef _WIN32
+	int fd = _sopen(filename.c_str(), _O_RDONLY, _SH_DENYNO);
+#else
+	int fd = open(filename.c_str(), O_RDONLY);
+#endif
+	if (fd == -1) {
+		// File doesn't exist
+		return false;
+	}
+	// Get file status
+#ifdef _WIN32
+	struct _stat status;
+	_fstat(fd, &status);
+	_close(fd);
+#else
+	struct stat status;
+	fstat(fd, &status);
+	close(fd);
+#endif
+	return status.st_mtime;
+}
+
+// Return the recorded timestamp
+time_t cty_data::timestamp(cty_type_t type) {
+	if (timestamps_.find(type) != timestamps_.end()) {
+		return timestamps_[type];
+	}
+	else {
+		return -1;
 	}
 }
