@@ -14,9 +14,11 @@
 #include <string>
 #ifdef _WIN32
 #include <io.h>
+#else
+#include <unistd.h>
+#endif
 #include <sys/stat.h>
 #include <fcntl.h>
-#endif
 
 using namespace std;
 

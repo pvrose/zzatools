@@ -154,7 +154,7 @@ touch_main:
 
 # install
 .PHONY: install
-install: touch_main userguide $(TREFS) $(INSTALL_DIR)/$(TARGET_EXEC)
+install: touch_main userguide $(TREFS) $(APPDATA_DIR)/html/index.html $(INSTALL_DIR)/$(TARGET_EXEC)
 
 $(INSTALL_DIR)/$(TARGET_EXEC): $(EXEC_DIR)/$(TARGET_EXEC)
 	@echo Installing $(INSTALL_DIR)/$(TARGET_EXEC)
