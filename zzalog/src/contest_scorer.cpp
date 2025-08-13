@@ -323,7 +323,7 @@ void contest_scorer::enable_widgets() {
 // Copy points to display
 void contest_scorer::copy_points_to_display() {
 	char text[32];
-	snprintf(text, sizeof(text), "%zd", qsos_->size());
+	if (qsos_) snprintf(text, sizeof(text), "%zd", qsos_->size());
 	w_number_qsos_->value(text);
 	snprintf(text, sizeof(text), "%d", qso_points_);
 	w_qso_points_->value(text);

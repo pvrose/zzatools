@@ -13,6 +13,10 @@
 #include "spec_data.h"
 #include "callback.h"
 
+#include <chrono>
+#include <map>
+
+#include <FL/fl_ask.H>
 #include <FL/Fl_Toggle_Button.H>
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Scroll.H>
@@ -163,13 +167,20 @@ void qso_dxcc::create_form() {
 	avail_height -= (curr_y - y());
 
 	// Display worked before status (bands and modes)
-	g_wb4_ = new wb4_table(curr_x, curr_y, avail_width, avail_height, "Worked Before?");
+	g_wb4_ = new wb4_table(curr_x, curr_y, avail_width, avail_height - HBUTTON, "Worked Before?");
 	//g_wb4_ = new wb4_buttons(curr_x, curr_y, avail_width, avail_height);
 	g_wb4_->align(FL_ALIGN_TOP);
 	g_wb4_->box(FL_FLAT_BOX);
 	g_wb4_->tooltip("Shows the worked before status: any, specific band or mode");
 
+	curr_y += g_wb4_->h();
+	bn_check_age_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Check Data");
+	bn_check_age_->callback(cb_check_age, nullptr);
+	bn_check_age_->tooltip("Check the age of the country data");
+
+
 	end();
+	show();
 	enable_widgets();
 
 }
@@ -302,6 +313,42 @@ void qso_dxcc::cb_bn_qrz(Fl_Widget* w, void* v) {
 	data->action_qrz_com();
 }
 
+// Check age button clicked
+map< cty_data::cty_type_t, chrono::hours > OLD_AGE = {
+	{ cty_data::CLUBLOG, chrono::hours(7 * 24) },
+	{ cty_data::COUNTRY_FILES, chrono::hours(7 * 24) },
+	{ cty_data::DXATLAS, chrono::hours(365 * 24) } };
+
+void qso_dxcc::cb_check_age(Fl_Widget* w, void* v) {
+	chrono::system_clock::time_point now = chrono::system_clock::now();
+	set<cty_data::cty_type_t> old_data = {};
+	for (auto it : OLD_AGE) {
+		if ((now - cty_data_->timestamp(it.first)) > it.second) {
+			old_data.insert(it.first);
+		}
+	}
+	if (old_data.size()) {
+		switch (fl_choice("One or more of the country data files is old.", "Fetch?", "Fetch && Reload", "Ignore")) {
+		case 0:
+			// Fetch
+			// TODO: add fetch new data
+			break;
+		case 1:
+			// Fetch & reload
+			// TODO: add fetch new data
+			delete cty_data_;
+			cty_data_ = new cty_data;
+			break;
+		case 2:
+			// Ignore
+			break;
+		}
+	}
+	else {
+		fl_message("All the country data files are recent");
+	}
+}
+
 qso_dxcc::wb4_table::wb4_table(int X, int Y, int W, int H, const char* L) :
 	Fl_Table(X, Y, W, H, L) 
 {
@@ -314,6 +361,7 @@ qso_dxcc::wb4_table::wb4_table(int X, int Y, int W, int H, const char* L) :
 	col_width_all(w() / (cols() + 1));
 	row_header_width(col_width(0));
 	col_header_height(HBUTTON);
+	end();
 }
 
 qso_dxcc::wb4_table::~wb4_table() {

@@ -74,6 +74,8 @@ protected:
 
     // Button for QRZ.com
     static void cb_bn_qrz(Fl_Widget* w, void* v);
+    // Button for check age
+    static void cb_check_age(Fl_Widget * w, void* v);
  
     // Widgets:
     // Callsign label
@@ -91,6 +93,8 @@ protected:
     wb4_table* g_wb4_;
     // Call QRZ.com
     Fl_Button* bn_qrz_;
+    // Check cty_data age
+    Fl_Button* bn_check_age_;
 
     // Callsign
     string callsign_;

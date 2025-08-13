@@ -100,6 +100,8 @@ public:
 	void add_filter(cty_entity* entity, cty_filter* entry);
 
 	ostream& out() { return os_; };
+	// Get the recorded timestamp
+	chrono::system_clock::time_point timestamp(cty_type_t type);
 
 protected:
 
@@ -133,8 +135,6 @@ protected:
 	
 	// Get the system timestamp for the named file
 	chrono::system_clock::time_point get_timestamp(string filename, int old_age);
-	// Get the recorded timestamp
-	chrono::system_clock::time_point timestamp(cty_type_t type);
 
 	struct {
 		// The entity definition
