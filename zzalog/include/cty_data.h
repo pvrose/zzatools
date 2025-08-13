@@ -102,6 +102,8 @@ public:
 	ostream& out() { return os_; };
 	// Get the recorded timestamp
 	chrono::system_clock::time_point timestamp(cty_type_t type);
+	// get latest data for the type
+	void fetch_data(cty_type_t type);
 
 protected:
 

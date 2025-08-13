@@ -331,11 +331,15 @@ void qso_dxcc::cb_check_age(Fl_Widget* w, void* v) {
 		switch (fl_choice("One or more of the country data files is old.", "Fetch?", "Fetch && Reload", "Ignore")) {
 		case 0:
 			// Fetch
-			// TODO: add fetch new data
+			for (auto it : old_data) {
+				cty_data_->fetch_data(it);
+			}
 			break;
 		case 1:
 			// Fetch & reload
-			// TODO: add fetch new data
+			for (auto it : old_data) {
+				cty_data_->fetch_data(it);
+			}
 			delete cty_data_;
 			cty_data_ = new cty_data;
 			break;

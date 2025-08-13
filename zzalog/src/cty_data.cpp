@@ -1,5 +1,6 @@
 #include "cty_data.h"
 
+#include "club_handler.h"
 #include "cty_element.h"
 #include "cty1_reader.h"
 #include "cty2_reader.h"
@@ -23,6 +24,7 @@
 
 using namespace std;
 
+extern club_handler* club_handler_;
 extern spec_data* spec_data_;
 extern status* status_;
 extern string default_data_directory_;
@@ -857,5 +859,22 @@ chrono::system_clock::time_point cty_data::timestamp(cty_type_t type) {
 	}
 	else {
 		return chrono::system_clock::from_time_t(-1);
+	}
+}
+
+// Fetch the appropriate data
+void cty_data::fetch_data(cty_type_t type) {
+	type_ = type;
+	string filename = get_filename();
+	switch (type) {
+	case CLUBLOG:
+		club_handler_->download_exception(filename);
+		break;
+	case COUNTRY_FILES:
+		status_->misc_status(ST_WARNING, "CTY DATA: Downloading country-files.com not yet implemented");
+		break;
+	case DXATLAS:
+		status_->misc_status(ST_WARNING, "CTY DATA: Downloading DxAtlas data not yet implemented");
+		break;
 	}
 }
