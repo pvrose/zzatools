@@ -9,6 +9,7 @@
 #include "status.h"
 
 #include <cctype>
+#include <chrono>
 #include <ostream>
 #include <fstream>
 #include <string>
@@ -30,6 +31,7 @@ extern string default_user_directory_;
 cty_data::cty_data() {
 	data_ = new all_data;
 	import_ = new all_data;
+	now_ = chrono::system_clock::now();
 	bool loaded;
 	string rep_fn = default_user_directory_ + "cty_load.rpt";
 	os_.open(rep_fn);
@@ -47,8 +49,8 @@ cty_data::cty_data() {
 	merge_data();
 	dump_database();
 	delete_data(import_);
-	if (loaded) timestamps_[type_] = get_timestamp(filename);
-	else timestamps_[type_] = -1;
+	if (loaded) timestamps_[type_] = get_timestamp(filename, 7);
+	else timestamps_[type_] = chrono::system_clock::from_time_t(-1);
 	os_ << "Loading from Country-files.com\n";
 	type_ = COUNTRY_FILES;
 	filename = get_filename();
@@ -56,8 +58,8 @@ cty_data::cty_data() {
 	merge_data();
 	dump_database();
 	delete_data(import_);
-	if (loaded) timestamps_[type_] = get_timestamp(filename);
-	else timestamps_[type_] = -1;
+	if (loaded) timestamps_[type_] = get_timestamp(filename, 7);
+	else timestamps_[type_] = chrono::system_clock::from_time_t(-1);
 	os_ << "Loading from DxAtlas\n";
 	type_ = DXATLAS;
 	filename = get_filename();
@@ -65,8 +67,8 @@ cty_data::cty_data() {
 	merge_data();
 	dump_database();
 	delete_data(import_);
-	if (loaded) timestamps_[type_] = get_timestamp(filename);
-	else timestamps_[type_] = -1;
+	if (loaded) timestamps_[type_] = get_timestamp(filename, 365);
+	else timestamps_[type_] = chrono::system_clock::from_time_t(-1);
 	os_.close();
 
 }
@@ -819,7 +821,7 @@ void cty_data::merge_data() {
 	}
 }
 
-time_t cty_data::get_timestamp(string filename) {
+chrono::system_clock::time_point cty_data::get_timestamp(string filename, int old_age) {
 #ifdef _WIN32
 	int fd = _sopen(filename.c_str(), _O_RDONLY, _SH_DENYNO);
 #else
@@ -827,7 +829,7 @@ time_t cty_data::get_timestamp(string filename) {
 #endif
 	if (fd == -1) {
 		// File doesn't exist
-		return -1;
+		return chrono::system_clock::from_time_t(-1);
 	}
 	// Get file status
 #ifdef _WIN32
@@ -839,15 +841,21 @@ time_t cty_data::get_timestamp(string filename) {
 	fstat(fd, &status);
 	close(fd);
 #endif
-	return status.st_mtime;
+	chrono::system_clock::time_point ts = chrono::system_clock::from_time_t(status.st_mtime);
+	if ((now_ - ts) > chrono::hours(old_age * 24)) {
+		char msg[128];
+		snprintf(msg, sizeof(msg), "CTY DATA: Data file %s is > %d days old", filename.c_str(), old_age);
+		status_->misc_status(ST_WARNING, msg);
+	}
+	return ts;
 }
 
 // Return the recorded timestamp
-time_t cty_data::timestamp(cty_type_t type) {
+chrono::system_clock::time_point cty_data::timestamp(cty_type_t type) {
 	if (timestamps_.find(type) != timestamps_.end()) {
 		return timestamps_[type];
 	}
 	else {
-		return -1;
+		return chrono::system_clock::from_time_t(-1);
 	}
 }

@@ -4,12 +4,13 @@
 
 #include "utils.h"
 
-#include <map>
-#include <list>
-#include <ctime>
+#include <chrono>
 #include <cmath>
-#include <ostream>
+#include <ctime>
 #include <fstream>
+#include <list>
+#include <map>
+#include <ostream>
 #include <string>
 
 using namespace std;
@@ -131,9 +132,9 @@ protected:
 	cty_prefix* prefix();
 	
 	// Get the system timestamp for the named file
-	time_t get_timestamp(string filename);
+	chrono::system_clock::time_point get_timestamp(string filename, int old_age);
 	// Get the recorded timestamp
-	time_t timestamp(cty_type_t type);
+	chrono::system_clock::time_point timestamp(cty_type_t type);
 
 	struct {
 		// The entity definition
@@ -163,7 +164,9 @@ protected:
 	bool report_warnings_ = false;
 	bool report_errors_ = false;
 
-	map<cty_type_t, time_t> timestamps_;
+	map<cty_type_t, chrono::system_clock::time_point> timestamps_;
+	// Launch time
+	chrono::system_clock::time_point now_;
 
 };
 
