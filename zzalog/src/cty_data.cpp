@@ -827,7 +827,7 @@ time_t cty_data::get_timestamp(string filename) {
 #endif
 	if (fd == -1) {
 		// File doesn't exist
-		return false;
+		return -1;
 	}
 	// Get file status
 #ifdef _WIN32
