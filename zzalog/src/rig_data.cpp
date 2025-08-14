@@ -14,7 +14,7 @@ using namespace std;
 extern string VENDOR;
 extern string PROGRAM_ID;
 extern status* status_;
-extern string default_user_directory_;
+extern string default_data_directory_;
 extern Fl_Preferences::Root prefs_mode_;
 
 rig_data::rig_data() {
@@ -83,7 +83,7 @@ bool rig_data::store_data() {
 }
 
 bool rig_data::load_xml() {
-    string filename = default_user_directory_ + "rigs.xml";
+    string filename = default_data_directory_ + "rigs.xml";
     ifstream is;
     is.open(filename, ios_base::in);
     if (is.good()) {
@@ -98,7 +98,7 @@ bool rig_data::load_xml() {
 }
 
 bool rig_data::store_xml() {
-    string filename = default_user_directory_ + "rigs.xml";
+    string filename = default_data_directory_ + "rigs.xml";
     ofstream os;
     os.open(filename, ios_base::out);
     if (os.good()) {

@@ -188,7 +188,6 @@ string sticky_message_ = "";
 uint32_t seed_ = 0;
 // Defaults config files
 string default_data_directory_ = "";
-string default_user_directory_ = "";
 string default_html_directory_ = "";
 // Preferences root - system or use
 Fl_Preferences::Root prefs_mode_;
@@ -1066,9 +1065,8 @@ bool open_settings() {
 
 	char stemp[128];
 	if (sys_settings.getUserdataPath(stemp, sizeof(stemp))) {
-		default_data_directory_ = stemp;
+		default_html_directory_ = string(stemp) + "html/";;
 	}
-	default_html_directory_ = default_data_directory_ + "html/";
 
 	char* temp;
 	if (!sys_settings.get("Preferences Mode", temp, "")) {
@@ -1102,7 +1100,7 @@ bool open_settings() {
 	settings.filename(buffer, sizeof(buffer),
 		prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	if (settings.getUserdataPath(stemp, sizeof(stemp))) {
-		default_user_directory_ = stemp;
+		default_data_directory_ = stemp;
 	}
 
 	printf("ZZALOG: Opened settings %s\n", buffer);

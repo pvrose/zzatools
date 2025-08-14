@@ -10,7 +10,7 @@
 extern status* status_;
 extern string PROGRAM_ID;
 extern string VENDOR;
-extern string default_user_directory_;
+extern string default_data_directory_;
 extern Fl_Preferences::Root prefs_mode_;
 
 using namespace std;
@@ -111,7 +111,7 @@ void fields::load_data() {
 
 // Read - <Prefs path>.fields.tsv
 bool fields::load_collections() {
-    filename_ = default_user_directory_ + "fields.tsv";
+    filename_ = default_data_directory_ + "fields.tsv";
     fl_make_path_for_file(filename_.c_str());
     ifstream ip;
     ip.open(filename_.c_str(), ios_base::in);
@@ -152,7 +152,7 @@ bool fields::load_collections() {
 void fields::store_data() {
 	// Delete current settings
     if (filename_.length() == 0) {
-         filename_ = default_user_directory_ + "fields.tsv";
+         filename_ = default_data_directory_ + "fields.tsv";
         fl_make_path_for_file(filename_.c_str());
     }
     ofstream op;
