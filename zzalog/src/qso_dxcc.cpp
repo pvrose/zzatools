@@ -11,6 +11,7 @@
 #include "extract_data.h"
 #include "tabbed_forms.h"
 #include "spec_data.h"
+#include "status.h"
 #include "callback.h"
 
 #include <chrono>
@@ -25,6 +26,7 @@ extern cty_data* cty_data_;
 extern book* book_;
 extern extract_data* extract_records_;
 extern book* navigation_book_;
+extern status* status_;
 extern tabbed_forms* tabbed_forms_;
 extern spec_data* spec_data_;
 extern bool DARK;
@@ -328,20 +330,27 @@ void qso_dxcc::cb_check_age(Fl_Widget* w, void* v) {
 		}
 	}
 	if (old_data.size()) {
+		bool ok = true;
 		switch (fl_choice("One or more of the country data files is old.", "Fetch?", "Fetch && Reload", "Ignore")) {
 		case 0:
 			// Fetch
 			for (auto it : old_data) {
-				cty_data_->fetch_data(it);
+				ok &= cty_data_->fetch_data(it);
 			}
 			break;
 		case 1:
 			// Fetch & reload
 			for (auto it : old_data) {
-				cty_data_->fetch_data(it);
+				ok &= cty_data_->fetch_data(it);
 			}
-			delete cty_data_;
-			cty_data_ = new cty_data;
+			if (ok) {
+				delete cty_data_;
+				cty_data_ = new cty_data;
+			}
+			else {
+				status_->misc_status(ST_WARNING, "CTY DATA: Not reloaded as error in download - see user guide");
+				open_html("page_6.html");
+			}
 			break;
 		case 2:
 			// Ignore

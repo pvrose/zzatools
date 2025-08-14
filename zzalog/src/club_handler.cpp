@@ -30,8 +30,9 @@ extern qsl_dataset* qsl_dataset_;
 // extern uint32_t seed_;
 extern string VENDOR;
 extern string PROGRAM_ID;
-extern string default_user_directory_;
+extern string default_data_directory_;
 extern Fl_Preferences::Root prefs_mode_;
+extern void open_html(const char*);
 
 // Constructor 
 club_handler::club_handler() {
@@ -202,7 +203,7 @@ bool club_handler::unzip_exception(string filename) {
 
 // Get reference directory
 void club_handler::get_reference(string& dir_name) {
-	dir_name = default_user_directory_;
+	dir_name = default_data_directory_;
 }
 
 // Upload the single specified QSO in real time

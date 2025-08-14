@@ -863,18 +863,17 @@ chrono::system_clock::time_point cty_data::timestamp(cty_type_t type) {
 }
 
 // Fetch the appropriate data
-void cty_data::fetch_data(cty_type_t type) {
+bool cty_data::fetch_data(cty_type_t type) {
 	type_ = type;
 	string filename = get_filename();
 	switch (type) {
 	case CLUBLOG:
-		club_handler_->download_exception(filename);
-		break;
+		return club_handler_->download_exception(filename);
 	case COUNTRY_FILES:
 		status_->misc_status(ST_WARNING, "CTY DATA: Downloading country-files.com not yet implemented");
-		break;
+		return true;
 	case DXATLAS:
 		status_->misc_status(ST_WARNING, "CTY DATA: Downloading DxAtlas data not yet implemented");
-		break;
+		return true;
 	}
 }
