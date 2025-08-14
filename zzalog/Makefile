@@ -9,7 +9,8 @@ UG_DIR := ./userguide
 EXEC_DIR = $(BUILD_DIR)/$(BUILD_TYPE)
 INSTALL_DIR := /usr/local/bin
 LIBRARY_DIR := /usr/local/lib
-APPDATA_DIR := /etc/fltk/GM3ZZA/ZZALOG
+APPDATA_DIR := ${HOME}/.config/GM3ZZA/ZZALOG
+USERGUIDE_DIR := /etc/fltk/GM3ZZA/ZZALOG
 
 # Standard compilers and debuggers
 CC = gcc
@@ -108,7 +109,7 @@ endif
 	
 # Create a target to run the compiled code
 .PHONY: run
-run: $(EXEC_DIR)/$(TARGET_EXEC)
+run: $(EXEC_DIR)/$(TARGET_EXEC) $(TREFS)
 	@$(EXEC_DIR)/$(TARGET_EXEC) $(ARGS)
 
 # Create a target to run debugger
@@ -128,16 +129,16 @@ clean_ug:
 # Copy references
 $(APPDATA_DIR)/%: $(REF_DIR)/%
 	@echo $@
-	@sudo mkdir -p $(APPDATA_DIR)
-	@sudo cp $< $@
+	@mkdir -p $(APPDATA_DIR)
+	@cp $< $@
 
 # Copy User guide
 $(APPDATA_DIR)/html/index.html : $(UG_DIR)/html/index.html
 	@echo Copying HTML files
-	@sudo mkdir -p $(APPDATA_DIR)/html
-	@sudo cp -r $(UG_DIR)/html/* $(APPDATA_DIR)/html/
-	@sudo mkdir -p $(APPDATA_DIR)/images
-	@sudo cp $(UG_DIR)/images/* $(APPDATA_DIR)/images/
+	@sudo mkdir -p $(USERGUIDE_DIR)/html
+	@sudo cp -r $(UG_DIR)/html/* $(USERGUIDE_DIR)/html/
+	@sudo mkdir -p $(USERGUIDE_DIR)/images
+	@sudo cp $(UG_DIR)/images/* $(USERGUIDE_DIR)/images/
 
 
 $(UG_DIR)/html/index.html: ./Doxyfile $(DOXS)
@@ -154,7 +155,7 @@ touch_main:
 
 # install
 .PHONY: install
-install: touch_main userguide $(TREFS) $(APPDATA_DIR)/html/index.html $(INSTALL_DIR)/$(TARGET_EXEC)
+install: touch_main userguide $(TREFS) $(USERGUIDE_DIR)/html/index.html $(INSTALL_DIR)/$(TARGET_EXEC)
 
 $(INSTALL_DIR)/$(TARGET_EXEC): $(EXEC_DIR)/$(TARGET_EXEC)
 	@echo Installing $(INSTALL_DIR)/$(TARGET_EXEC)
