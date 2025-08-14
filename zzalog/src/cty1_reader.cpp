@@ -104,6 +104,11 @@ bool cty1_reader::start_element(string name, map<string, string>* attributes) {
 		}
 		else {
 			elements_.push_back(name);
+			if (name == "clublog") {
+				if (attributes && attributes->find("date") != attributes->end()) {
+					timestamp_ = xmldt2date(attributes->at("date"));
+				}
+			}
 		}
 	}
 	return true;

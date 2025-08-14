@@ -343,6 +343,9 @@ bool cty_data::load_data(string filename) {
 		import_ = new all_data;
 		status_->misc_status(ST_NOTE, "CTY DATA: Loading data supplied by www.country-files.com");
 		ok = reader->load_data(this, in, version);
+		// Get version from database
+		int vdxcc = import_->exceptions.at("VERSION").front()->dxcc_id_;
+		version = import_->entities.at(vdxcc)->name_;
 		break;
 	}
 	case DXATLAS: {
@@ -358,7 +361,7 @@ bool cty_data::load_data(string filename) {
 	}
 
 	if (ok) {
-		snprintf(msg, sizeof(msg), "CTY DATA: File %s read OK", filename.c_str());
+		snprintf(msg, sizeof(msg), "CTY DATA: File %s read OK - version: %s", filename.c_str(), version.c_str());
 		status_->misc_status(ST_OK, msg);
 
 		return true;
