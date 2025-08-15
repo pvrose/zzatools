@@ -1,18 +1,21 @@
 #include "qso_dxcc.h"
+
+#include "book.h"
+#include "cty_data.h"
+#include "cty_dialog.h"
+#include "extract_data.h"
+#include "menu.h"
 #include "qso_entry.h"
 #include "qso_data.h"
-#include "cty_data.h"
-#include "book.h"
 #include "record.h"
-#include "drawing.h"
-#include "utils.h"
-#include "menu.h"
 #include "search.h"
-#include "extract_data.h"
-#include "tabbed_forms.h"
 #include "spec_data.h"
 #include "status.h"
+#include "tabbed_forms.h"
+
 #include "callback.h"
+#include "drawing.h"
+#include "utils.h"
 
 #include <chrono>
 #include <map>
@@ -315,51 +318,11 @@ void qso_dxcc::cb_bn_qrz(Fl_Widget* w, void* v) {
 	data->action_qrz_com();
 }
 
-// Check age button clicked
-map< cty_data::cty_type_t, chrono::hours > OLD_AGE = {
-	{ cty_data::CLUBLOG, chrono::hours(7 * 24) },
-	{ cty_data::COUNTRY_FILES, chrono::hours(7 * 24) },
-	{ cty_data::DXATLAS, chrono::hours(365 * 24) } };
-
+// Display country data status/update dialog
 void qso_dxcc::cb_check_age(Fl_Widget* w, void* v) {
-	chrono::system_clock::time_point now = chrono::system_clock::now();
-	set<cty_data::cty_type_t> old_data = {};
-	for (auto it : OLD_AGE) {
-		if ((now - cty_data_->timestamp(it.first)) > it.second) {
-			old_data.insert(it.first);
-		}
-	}
-	if (old_data.size()) {
-		bool ok = true;
-		switch (fl_choice("One or more of the country data files is old.", "Fetch?", "Fetch && Reload", "Ignore")) {
-		case 0:
-			// Fetch
-			for (auto it : old_data) {
-				ok &= cty_data_->fetch_data(it);
-			}
-			break;
-		case 1:
-			// Fetch & reload
-			for (auto it : old_data) {
-				ok &= cty_data_->fetch_data(it);
-			}
-			if (ok) {
-				delete cty_data_;
-				cty_data_ = new cty_data;
-			}
-			else {
-				status_->misc_status(ST_WARNING, "CTY DATA: Not reloaded as error in download - see user guide");
-				open_html("page_6.html");
-			}
-			break;
-		case 2:
-			// Ignore
-			break;
-		}
-	}
-	else {
-		fl_message("All the country data files are recent");
-	}
+	cty_dialog* dlg = new cty_dialog(100, 100, "Country Data Status");
+	dlg->show();
+	while (dlg->visible()) Fl::check();
 }
 
 qso_dxcc::wb4_table::wb4_table(int X, int Y, int W, int H, const char* L) :

@@ -345,7 +345,8 @@ bool cty_data::load_data(string filename) {
 		ok = reader->load_data(this, in, version);
 		// Get version from database
 		int vdxcc = import_->exceptions.at("VERSION").front()->dxcc_id_;
-		version = import_->entities.at(vdxcc)->name_;
+		version = import_->entities.at(vdxcc)->name_ + ", " +
+			import_->entities.at(vdxcc)->nickname_;
 		break;
 	}
 	case DXATLAS: {
@@ -359,6 +360,7 @@ bool cty_data::load_data(string filename) {
 		status_->misc_status(ST_WARNING, "Attempting to load unsupported country file");
 		return false;
 	}
+	versions_[type_] = version;
 
 	if (ok) {
 		snprintf(msg, sizeof(msg), "CTY DATA: File %s read OK - version: %s", filename.c_str(), version.c_str());
@@ -878,4 +880,10 @@ bool cty_data::fetch_data(cty_type_t type) {
 		status_->misc_status(ST_WARNING, "CTY DATA: Downloading DxAtlas data not yet implemented");
 		return true;
 	}
+	return false;
+}
+
+// Return the version
+string cty_data::version(cty_type_t type) {
+	return versions_.at(type);
 }

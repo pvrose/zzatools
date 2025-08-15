@@ -192,6 +192,7 @@
     <ClCompile Include="src\cty2_reader.cpp" />
     <ClCompile Include="src\cty3_reader.cpp" />
     <ClCompile Include="src\cty_data.cpp" />
+    <ClCompile Include="src\cty_dialog.cpp" />
     <ClCompile Include="src\cty_element.cpp" />
     <ClCompile Include="src\dxcc_table.cpp" />
     <ClCompile Include="src\dxcc_view.cpp" />
@@ -316,6 +317,7 @@
     <ClInclude Include="include\cty3_reader.h" />
     <ClInclude Include="include\cty_data.h" />
     <ClInclude Include="include\cty1_reader.h" />
+    <ClInclude Include="include\cty_dialog.h" />
     <ClInclude Include="include\cty_element.h" />
     <ClInclude Include="include\dxcc_table.h" />
     <ClInclude Include="include\dxcc_view.h" />
@@ -424,6 +426,7 @@
     <None Include="userguide\config_tree.dox" />
     <None Include="userguide\contest_dialog.dox" />
     <None Include="userguide\contest_scorer.dox" />
+    <None Include="userguide\cty_dialog.dox" />
     <None Include="userguide\fields_dialog.dox" />
     <None Include="userguide\images\dxcc_view.dox" />
     <None Include="userguide\images\main_window.dox" />

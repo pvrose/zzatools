@@ -378,6 +378,9 @@
     <ClCompile Include="src\cty3_reader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\cty_dialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="packages\pthreads.2.9.1.4\build\native\include\pthread.h">
@@ -773,6 +776,9 @@
     <ClInclude Include="include\cty3_reader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\cty_dialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\reference\Prefix.lst" />
@@ -823,6 +829,7 @@
     <None Include="userguide\cli.dox" />
     <None Include="userguide\installation.dox" />
     <None Include="userguide\reference.dox" />
+    <None Include="userguide\cty_dialog.dox" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="zzalog.ico">

@@ -6,7 +6,8 @@ ZZALOG uses reference data from a number of sources.
 
 Country Data is used to interpret (or parse) the callsign of the station of interest. 
 See \ref qso_dxcc.
-This is got from three sources as they each provide a subset of the overall data. 
+This is got from three sources as they each provide a subset of the overall data. For
+download instructions see \subpage cty_dialog.
 
 \subsection clublog Clublog.org
 

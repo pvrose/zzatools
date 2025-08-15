@@ -104,6 +104,8 @@ public:
 	chrono::system_clock::time_point timestamp(cty_type_t type);
 	// get latest data for the type
 	bool fetch_data(cty_type_t type);
+	// Get type versiom
+	string version(cty_type_t type);
 
 protected:
 
@@ -169,6 +171,8 @@ protected:
 	map<cty_type_t, chrono::system_clock::time_point> timestamps_;
 	// Launch time
 	chrono::system_clock::time_point now_;
+	// Versions
+	map<cty_type_t, string> versions_;
 
 };
 

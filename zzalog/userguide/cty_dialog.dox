@@ -1,0 +1,36 @@
+/** \page cty_dialog Downloading Country Data
+
+Where possible ZZALOG can automatically download files for the Country Data reference. This
+dialog helps to manage the process.
+
+<IMG SRC="../images/cty_dialog_1.png">
+
+This dialog shows the current timestamp of each file and the version advertised by the file.
+
+\section dl_clublog Updating clublog.org
+
+Downloading data from Clublog.org is managed within ZZALOG. ZZALOG uses a private API key to
+access the data on behalf of the user. To download the latest data from clublog.org click the "Fetch"
+button. 
+
+\section dl_cfile Updating country-files.com
+
+The user must download the data from www.country-files.com themselves. Open a browser at 
+<A HREF="https://www.country-files.com">Country-files.com</A>. 
+
+<IMG SRC="../images/cty_dialog_2.png">
+
+Click on the "[download]" link (as indicated), this will initiaiate a download of a data
+package. Once the package is downloaded, open it and select the file "cty.xml" - indicated.
+
+<IMG SRC="../images/cty_dialog_3.png">
+
+Copy and paste this file into the application data directory. Click on the "Open Data" button to
+open a directory viewer at the correct location.
+
+\section dl_dxatlas Updating DxAtlas
+
+This data file is not updated frequenctly and requires some editing to enable it to 
+be used with ZZALOG. As such, updates will be included in each update of ZZALOG.
+
+*/
