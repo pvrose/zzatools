@@ -4,7 +4,7 @@
 
 #include <map>
 
-#include <FL\Fl_Double_Window.H>
+#include <FL/Fl_Double_Window.H>
 
 class Fl_Output;
 
