@@ -145,7 +145,7 @@ void qso_manager::create_form(int X, int Y) {
 	curr_x += rig_group_->w() + GAP;
 
 	// Clocks tabbed form
-	clock_group_ = new qso_clocks(curr_x, curr_y, 50, 50, nullptr);
+	clock_group_ = new qso_clocks(curr_x, curr_y, 50, 50);
 	curr_x += clock_group_->w() + GAP;
 
 	// Information tabbed form

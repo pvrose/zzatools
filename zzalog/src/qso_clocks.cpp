@@ -77,10 +77,6 @@ void qso_clocks::load_values() {
 // Create two tabs - one each for UTC and local timezone
 void qso_clocks::create_form() {
 
-	label("Clocks & Weather");
-	align(FL_ALIGN_TOP | FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-	labelfont(FL_BOLD);
-
 	int cx = x() + GAP;
 	int cy = y() + HTEXT;
 
@@ -109,7 +105,7 @@ void qso_clocks::create_form() {
 	int max_w = g1->x() + g1->w() - x();
 	int max_h = g1->y() + g1->h() - y();
 
-	cy += utc_clock_->h() + HTEXT;
+	cy += utc_clock_->h();
 	cx = x() + GAP;
 	int cw = max_w - GAP;
 

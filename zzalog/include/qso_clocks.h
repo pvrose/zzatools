@@ -10,7 +10,7 @@ class qso_clocks :
     public Fl_Group
 {
 public:
-    qso_clocks(int X, int Y, int W, int H, const char* L);
+    qso_clocks(int X, int Y, int W, int H, const char* L = nullptr);
     ~qso_clocks();
 
     virtual int handle(int event);
