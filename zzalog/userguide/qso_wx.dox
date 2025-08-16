@@ -17,7 +17,7 @@ kilometres per hour and knots.
 	- Atmospheric pressure - clicking cycles between hectopascals, millimetres of mercury, inches of mercury and
 millibars.
 	- Cloud coverage - clicking cycles between a chart symbol, percentage cloud cover and okta values.
-- Sun rise and sun set in local time.
-- Time of last update (local time).
+- Sun rise and sun set in the timezone selected in the system clock.
+- Time of last update in the timezone selected in the system clock.
 
 */

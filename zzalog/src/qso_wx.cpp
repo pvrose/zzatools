@@ -301,7 +301,7 @@ void qso_wx::enable_widgets() {
 		}
 		case DEGREES: {
 			if (wind_degree == -1) strcpy(label, "---"); 
-			else snprintf(label, sizeof(label), "%03d\302\260", wind_degree);
+			else snprintf(label, sizeof(label), "%3d\302\260", wind_degree);
 			bn_direction_->copy_label(label);
 			break;
 		}

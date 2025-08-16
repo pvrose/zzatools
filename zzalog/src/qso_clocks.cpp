@@ -84,6 +84,13 @@ void qso_clocks::create_form() {
 	int cx = x() + GAP;
 	int cy = y() + HTEXT;
 
+	utc_clock_ = new qso_clock(cx, cy, 50, 50, false);
+	utc_clock_->align(FL_ALIGN_TOP | FL_ALIGN_LEFT);
+	local_clock_ = new qso_clock(cx, cy, 50, 50, true);
+	local_clock_->align(FL_ALIGN_TOP | FL_ALIGN_LEFT);
+
+	cx += utc_clock_->w();
+
 	Fl_Group* g1 = new Fl_Group(cx, cy, HBUTTON, HBUTTON * 2);
 	Fl_Radio_Round_Button* r1 = new Fl_Radio_Round_Button(cx, cy, HBUTTON, HBUTTON);
 	r1->value(!local_);
@@ -98,17 +105,9 @@ void qso_clocks::create_form() {
 
 	g1->end();
 
-	cx += HBUTTON;
-	cy = y() + HTEXT;
 
-
-	utc_clock_ = new qso_clock(cx, cy, 50, 50, false);
-	utc_clock_->align(FL_ALIGN_TOP | FL_ALIGN_LEFT);
-	local_clock_ = new qso_clock(cx, cy, 50, 50, true);
-	local_clock_->align(FL_ALIGN_TOP | FL_ALIGN_LEFT);
-
-	int max_w = utc_clock_->x() + utc_clock_->w() - x();
-	int max_h = utc_clock_->y() + utc_clock_->h() - y();
+	int max_w = g1->x() + g1->w() - x();
+	int max_h = g1->y() + g1->h() - y();
 
 	cy += utc_clock_->h() + HTEXT;
 	cx = x() + GAP;
