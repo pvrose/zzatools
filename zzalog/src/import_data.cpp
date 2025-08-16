@@ -193,141 +193,143 @@ void import_data::update_book() {
 			// Any more than this is presented to the user to search for possible match
 			// Start at previous record or beginning of the book
 
-			// Start looking for an exact match only from 2 before until no longer overlap
+			if (datum_pos < book_->size()) {
+				// Start looking for an exact match only from 2 before until no longer overlap
 
-			// Start N minutes before the time 
-			const chrono::seconds MINUTES_30(1800);
-			chrono::system_clock::time_point datum = import_record->ctimestamp();
-			item_num_t start_pos = datum_pos;
-			chrono::system_clock::time_point start = book_->get_record(start_pos, false)->ctimestamp();
-			while (datum - start < MINUTES_30 && start_pos > 0) {
-				start_pos--;
-				start = book_->get_record(start_pos, false)->ctimestamp();
-			}
-			item_num_t end_pos = datum_pos;
-			datum = import_record->ctimestamp(true);
-			chrono::system_clock::time_point end_pt = book_->get_record(end_pos, false)->ctimestamp(true);
-			while (end_pt - datum < MINUTES_30 && end_pos < book_->size() - 1) {
-				end_pos++;
-				end_pt = book_->get_record(end_pos, false)->ctimestamp();
-			}
-			for (item_num_t test_record = start_pos; test_record <= end_pos && !found_match; test_record++) {
-				// If the test record is outwith the book skip the check
-				if (test_record < 0 || test_record >= book_->size()) continue;
-				// Get potential match QSO
-				record* test_qso = book_->get_record(test_record, false);
-				// Compare QSO records - Import record should have fewer fields
-				match_result_t match_result = import_record->match_records(test_qso);
-				switch(match_result) {
-				case MT_EXACT:
-				case MT_LOC_MISMATCH:
-					found_match = true;
-					had_swl_match = false;
-					// merge_records the matching record from the import record and delete the import record
-					if (test_qso->merge_records(import_record, match_flags)) {
-						snprintf(message, 256, "IMPORT: Updated record. %s %s %s %s %s",
-							test_qso->item("QSO_DATE").c_str(), test_qso->item("TIME_ON").c_str(),
-							test_qso->item("CALL").c_str(),
-							test_qso->item("BAND").c_str(), test_qso->item("MODE").c_str());
-						status_->misc_status(ST_LOG, message);
-						number_modified_++;
-						if (test_qso->item("CLUBLOG_QSO_UPLOAD_STATUS") == "M") {
-							number_clublog_++;
+				// Start N minutes before the time 
+				const chrono::seconds MINUTES_30(1800);
+				chrono::system_clock::time_point datum = import_record->ctimestamp();
+				item_num_t start_pos = datum_pos;
+				chrono::system_clock::time_point start = book_->get_record(start_pos, false)->ctimestamp();
+				while (datum - start < MINUTES_30 && start_pos > 0) {
+					start_pos--;
+					start = book_->get_record(start_pos, false)->ctimestamp();
+				}
+				item_num_t end_pos = datum_pos;
+				datum = import_record->ctimestamp(true);
+				chrono::system_clock::time_point end_pt = book_->get_record(end_pos, false)->ctimestamp(true);
+				while (end_pt - datum < MINUTES_30 && end_pos < book_->size() - 1) {
+					end_pos++;
+					end_pt = book_->get_record(end_pos, false)->ctimestamp();
+				}
+				for (item_num_t test_record = start_pos; test_record <= end_pos && !found_match; test_record++) {
+					// If the test record is outwith the book skip the check
+					if (test_record < 0 || test_record >= book_->size()) continue;
+					// Get potential match QSO
+					record* test_qso = book_->get_record(test_record, false);
+					// Compare QSO records - Import record should have fewer fields
+					match_result_t match_result = import_record->match_records(test_qso);
+					switch(match_result) {
+					case MT_EXACT:
+					case MT_LOC_MISMATCH:
+						found_match = true;
+						had_swl_match = false;
+						// merge_records the matching record from the import record and delete the import record
+						if (test_qso->merge_records(import_record, match_flags)) {
+							snprintf(message, 256, "IMPORT: Updated record. %s %s %s %s %s",
+								test_qso->item("QSO_DATE").c_str(), test_qso->item("TIME_ON").c_str(),
+								test_qso->item("CALL").c_str(),
+								test_qso->item("BAND").c_str(), test_qso->item("MODE").c_str());
+							status_->misc_status(ST_LOG, message);
+							number_modified_++;
+							if (test_qso->item("CLUBLOG_QSO_UPLOAD_STATUS") == "M") {
+								number_clublog_++;
+							}
 						}
-					}
-					number_matched_++;
-					// For eQSL.cc request the eQSL e-card. These are queued not to overwhelm eQSL.cc
-					if (update_mode_ == EQSL_UPDATE) {
-						eqsl_handler_->enqueue_request(test_record);
-					}
-					// Accepted - discard this record
-					discard_update(false);
-					break;
-				case MT_OVERLAP:
-					break;
-				default:
-					break;
-				}
-			}
-			// Now look for near misses.
-			for (item_num_t test_record = start_pos; test_record <= end_pos && !found_match; test_record++) {
-				// If the test record is outwith the book skip the check
-				if (test_record < 0 || test_record >= book_->size()) continue;
-				// Get potential match QSO
-				record* test_qso = book_->get_record(test_record, false);
-				// Compare QSO records - Import record should have fewer fields
-				match_result_t match_result = import_record->match_records(test_qso);
-				// LotW returns countries as listed in the ADIF spec,
-				// whereas parsing has used DxAtlas names so accept difference for LotW 
-				// but change to a possible match for any other source
-				if (match_result == MT_LOC_MISMATCH) {
-					if (update_mode_ != LOTW_UPDATE) {
-						match_result = MT_POSSIBLE;
-					}
-				}
-				// Select on result of match
-				switch (match_result) {
-					// Match exactly - may have additional fields in update so update log record from update record
-					// Location mismatch for LoTW and everything else OK
-					// 2-way SWL match - ignore it
-				case MT_2XSWL_MATCH:
-					found_match = true;
-					had_swl_match = false;
-					// Rejected - discard this record
-					discard_update(false);
-					break;
-					// No match found - do nothing
-				case MT_NOMATCH:
-				case MT_SWL_NOMATCH:
-					found_match = false;
-					break;
-					// SWL matches band and mode and time - wait until end of search to add it.
-				case MT_SWL_MATCH:
-					had_swl_match = true;
-					found_match = false;
-					break;
-					// All fields match (time within 30 minutes) - 
-					// can update without query and delete record
-				case MT_PROBABLE:
-					found_match = true;
-					if (test_qso->merge_records(import_record, match_flags)) {
-						number_modified_++;
-					}
-					number_matched_++;
-					// Fetch e-card from eQSL.cc
-					if (update_mode_ == EQSL_UPDATE) {
-						eqsl_handler_->enqueue_request(test_record);
-					}
-					discard_update(false);
-					break;
-					// Call, band and mode match (and time within 30 minutes) - update after query
-				case MT_POSSIBLE:
-					update_in_progress_ = true;
-					match_question_ = "Call, band and mode match - some fields differ. Please select correct values.";
-					snprintf(message, sizeof(message), "LOG: Possible match found with %s", import_record->item("CALL").c_str());
-					status_->misc_status(ST_LOG, message);
-					book_->selection(test_record, HT_IMPORT_QUERY);
-					found_match = true;
-					break;
-					// Call, band and mode match but time > 30 minutes 
-				case MT_UNLIKELY:
-					switch (update_mode_) {
-					case FILE_IMPORT:
-					case FILE_UPDATE:
-						// Matches are likely to be closer than 30 minutes so ignore those outwith this
+						number_matched_++;
+						// For eQSL.cc request the eQSL e-card. These are queued not to overwhelm eQSL.cc
+						if (update_mode_ == EQSL_UPDATE) {
+							eqsl_handler_->enqueue_request(test_record);
+						}
+						// Accepted - discard this record
+						discard_update(false);
+						break;
+					case MT_OVERLAP:
 						break;
 					default:
+						break;
+					}
+				}
+				// Now look for near misses.
+				for (item_num_t test_record = start_pos; test_record <= end_pos && !found_match; test_record++) {
+					// If the test record is outwith the book skip the check
+					if (test_record < 0 || test_record >= book_->size()) continue;
+					// Get potential match QSO
+					record* test_qso = book_->get_record(test_record, false);
+					// Compare QSO records - Import record should have fewer fields
+					match_result_t match_result = import_record->match_records(test_qso);
+					// LotW returns countries as listed in the ADIF spec,
+					// whereas parsing has used DxAtlas names so accept difference for LotW 
+					// but change to a possible match for any other source
+					if (match_result == MT_LOC_MISMATCH) {
+						if (update_mode_ != LOTW_UPDATE) {
+							match_result = MT_POSSIBLE;
+						}
+					}
+					// Select on result of match
+					switch (match_result) {
+						// Match exactly - may have additional fields in update so update log record from update record
+						// Location mismatch for LoTW and everything else OK
+						// 2-way SWL match - ignore it
+					case MT_2XSWL_MATCH:
+						found_match = true;
+						had_swl_match = false;
+						// Rejected - discard this record
+						discard_update(false);
+						break;
+						// No match found - do nothing
+					case MT_NOMATCH:
+					case MT_SWL_NOMATCH:
+						found_match = false;
+						break;
+						// SWL matches band and mode and time - wait until end of search to add it.
+					case MT_SWL_MATCH:
+						had_swl_match = true;
+						found_match = false;
+						break;
+						// All fields match (time within 30 minutes) - 
+						// can update without query and delete record
+					case MT_PROBABLE:
+						found_match = true;
+						if (test_qso->merge_records(import_record, match_flags)) {
+							number_modified_++;
+						}
+						number_matched_++;
+						// Fetch e-card from eQSL.cc
+						if (update_mode_ == EQSL_UPDATE) {
+							eqsl_handler_->enqueue_request(test_record);
+						}
+						discard_update(false);
+						break;
+						// Call, band and mode match (and time within 30 minutes) - update after query
+					case MT_POSSIBLE:
 						update_in_progress_ = true;
-						match_question_ = "Call, band and mode match - time differs > 30m. Please select correct values.";
+						match_question_ = "Call, band and mode match - some fields differ. Please select correct values.";
+						snprintf(message, sizeof(message), "LOG: Possible match found with %s", import_record->item("CALL").c_str());
+						status_->misc_status(ST_LOG, message);
 						book_->selection(test_record, HT_IMPORT_QUERY);
 						found_match = true;
 						break;
+						// Call, band and mode match but time > 30 minutes 
+					case MT_UNLIKELY:
+						switch (update_mode_) {
+						case FILE_IMPORT:
+						case FILE_UPDATE:
+							// Matches are likely to be closer than 30 minutes so ignore those outwith this
+							break;
+						default:
+							update_in_progress_ = true;
+							match_question_ = "Call, band and mode match - time differs > 30m. Please select correct values.";
+							book_->selection(test_record, HT_IMPORT_QUERY);
+							found_match = true;
+							break;
+						}
+						break;
+					case MT_OVERLAP:
+						break;
+					default:
+						break;
 					}
-					break;
-				case MT_OVERLAP:
-					break;
-				default:
-					break;
 				}
 			}
 			if (had_swl_match) {
