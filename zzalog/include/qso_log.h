@@ -5,7 +5,6 @@
 class qso_log_info;
 class qso_qsl;
 class qso_apps;
-class qso_wx;
 class qso_bands;
 
 // This calss collects the qso_log_info, qso_qsl, qso_server and qso_wx objects
@@ -41,7 +40,6 @@ protected:
 	qso_log_info* log_info_;
 	qso_qsl* qsl_ctrl_;
 	qso_apps* apps_ctrl_;
-	qso_wx* wx_ctrl_;
 	qso_bands* bands_;
 
 	// Default tab to open

@@ -1,6 +1,6 @@
 #include "qso_wx.h"
 
-#include "qso_wx.h"
+#include "qso_clocks.h"
 #include "qso_manager.h"
 #include "drawing.h"
 #include "wx_handler.h"
@@ -89,14 +89,12 @@ void qso_wx::create_form(int X, int Y) {
 	int curr_x = X + GAP;
 	int curr_y = Y + GAP;
 
-	const int WCLOCKS = 200;
-
 	const int WICON = 2 * HBUTTON;
-	const int WTEXT = WCLOCKS - WICON - GAP;
-	const int WWX = WCLOCKS - GAP;
+	const int WTEXT = w() - WICON - GAP - GAP - GAP;
+	const int WWX = w() - GAP - GAP;
     const int WT4 = WWX / 5;
     const int WT2 = WWX / 2;
-	const int WX_SIZE = FL_NORMAL_SIZE + 2;
+	const int WX_SIZE = FL_NORMAL_SIZE;
 
 	// Button that displays the received location
 	bn_location_ = new Fl_Button(curr_x, curr_y, WTEXT, WX_SIZE);
@@ -194,13 +192,12 @@ void qso_wx::create_form(int X, int Y) {
 	bn_updated_ = new Fl_Button(curr_x, curr_y, WTEXT, WX_SIZE);
 	bn_updated_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 	bn_updated_->box(FL_FLAT_BOX);
-	bn_updated_->labelsize(WX_SIZE);
+	bn_updated_->labelsize(FL_NORMAL_SIZE - 1);
 
-	curr_x = X + WCLOCKS + GAP + GAP;
 	curr_y += WX_SIZE + GAP;
 
 	resizable(nullptr);
-	size(curr_x - X, curr_y - Y);
+	size(w(), curr_y - Y);
 	end();
 }
 
@@ -223,13 +220,22 @@ void qso_wx::enable_widgets() {
 	string wx_location = wx_handler_ ? wx_handler_->location() : "";
 	string wx_latlong = wx_handler_ ? wx_handler_->latlong() : "";
 
+	bool local = ancestor_view<qso_clocks>(this)->is_local();
+
 	tm sunup_time;
 	tm sundown_time;
 	tm updated_time;
 	// Sunrise and sunset
-	sunup_time = *localtime(&sunrise);
-	sundown_time = *localtime(&sunset);
-	updated_time = *localtime(&updated);
+	if (local) {
+		sunup_time = *localtime(&sunrise);
+		sundown_time = *localtime(&sunset);
+		updated_time = *localtime(&updated);
+	}
+	else {
+		sunup_time = *gmtime(&sunrise);
+		sundown_time = *gmtime(&sunset);
+		updated_time = *gmtime(&updated);
+	}
 	// Latitude and Longitude 
 	bn_location_->copy_label(wx_location.c_str());
 	bn_latlong_->copy_label(wx_latlong.c_str());
@@ -358,9 +364,9 @@ void qso_wx::enable_widgets() {
 	// Set sunrise and sunset times and last updated time (local)
 	strftime(sunup, sizeof(sunup), "%H:%M", &sunup_time);
 	strftime(sundown, sizeof(sundown), "%H:%M", &sundown_time);
-	snprintf(label, sizeof(label), "\360\237\214\236Rise %s", sunup);
+	snprintf(label, sizeof(label), "Sunrise %s", sunup);
 	bn_sunrise_->copy_label(label);
-	snprintf(label, sizeof(label), "\360\237\214\236Set %s", sundown);
+	snprintf(label, sizeof(label), "Sunset %s", sundown);
 	bn_sunset_->copy_label(label);
 	strftime(label, sizeof(label), "Updated %H:%M:%S %Z", &updated_time);
 	bn_updated_->copy_label(label);

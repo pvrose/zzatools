@@ -42,12 +42,12 @@ void qso_clock::load_values() {
 // Create form
 void qso_clock::create_form(int X, int Y) {
 
-	int curr_x = X + GAP;
-	int curr_y = Y + GAP;
+	int curr_x = X;
+	int curr_y = Y;
 
-	const int WCLOCKS = 200;
+	const int WCLOCKS = 170;
 
-	const int TIME_SZ = 4 * FL_NORMAL_SIZE;
+	const int TIME_SZ = 3 * FL_NORMAL_SIZE;
 	const int DATE_SZ = 3 * FL_NORMAL_SIZE / 2;
 
 	// Button in which to display time
@@ -69,8 +69,8 @@ void qso_clock::create_form(int X, int Y) {
 	bn_date_->box(FL_FLAT_BOX);
 	bn_date_->when(FL_WHEN_RELEASE);
 
-	curr_x = X + WCLOCKS + GAP + GAP;
-	curr_y += bn_date_->h() + GAP;
+	curr_x = X + WCLOCKS;
+	curr_y += bn_date_->h();
 
 	resizable(nullptr);
 	size(curr_x - X, curr_y - Y);

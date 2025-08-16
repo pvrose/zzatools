@@ -1,12 +1,13 @@
 #pragma once
 
-#include <FL/Fl_Tabs.H>
+#include <FL/Fl_Group.H>
 
 class qso_clock;
+class qso_wx;
 
 // This class provides a tabbed group of instances of qso_clock (UTC and Local time)
 class qso_clocks :
-    public Fl_Tabs
+    public Fl_Group
 {
 public:
     qso_clocks(int X, int Y, int W, int H, const char* L);
@@ -20,15 +21,19 @@ public:
 
     void enable_widgets();
 
+    bool is_local();
+
 protected:
-    // Callback when the tab is changed
-    static void cb_tabs(Fl_Widget* w, void* v);
+    // Callback when the radio button is changed
+    static void cb_radio(Fl_Widget* w, void* v);
+
     // The two instances
     qso_clock* utc_clock_;
     qso_clock* local_clock_;
+    qso_wx* qso_weather_;
 
-    // Default tab
-    int default_tab_;
+
+    bool local_;
 
 };
 

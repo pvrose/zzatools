@@ -1,7 +1,6 @@
 #include "qso_log.h"
 #include "qso_log_info.h"
 #include "qso_apps.h"
-#include "qso_wx.h"
 #include "qso_qsl.h"
 #include "qso_bands.h"
 
@@ -70,12 +69,6 @@ void qso_log::create_form(int X, int Y) {
 	rw = max(rw, apps_ctrl_->w());
 	rh = max(rh, apps_ctrl_->h());
 
-	// Weather display tab
-	wx_ctrl_ = new qso_wx(rx, ry, rw, rh, "WX");
-	wx_ctrl_->labelsize(FL_NORMAL_SIZE + 2);
-	rw = max(rw, wx_ctrl_->w());
-	rh = max(rh, wx_ctrl_->h());
-
 	// Band-plan display tab
 	bands_ = new qso_bands(rx, ry, rw, rh, "Bandplan");
 	bands_->labelsize(FL_NORMAL_SIZE + 2);
@@ -112,7 +105,6 @@ void qso_log::enable_widgets() {
 	log_info_->enable_widgets();
 	qsl_ctrl_->enable_widgets();
 	apps_ctrl_->enable_widgets();
-	wx_ctrl_->enable_widgets();
 	bands_->enable_widgets();
 }
 
