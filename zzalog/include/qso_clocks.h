@@ -24,9 +24,6 @@ public:
     bool is_local();
 
 protected:
-    // Callback when the radio button is changed
-    static void cb_clock(Fl_Widget* w, void* v);
-
     // The two instances
     qso_clock* clock_;
     qso_wx* qso_weather_;

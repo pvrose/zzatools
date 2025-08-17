@@ -116,17 +116,12 @@ void qso_clocks::save_values() {
 
 // Enable the widgets
 void qso_clocks::enable_widgets() {
+	local_ = clock_->local();
 	// Enable the two qso_clock widgets
 	clock_->enable_widgets();
 	qso_weather_->enable_widgets();
+	redraw();
 }
 
-void qso_clocks::cb_clock(Fl_Widget* w, void* v) {
-	qso_clock* clock = (qso_clock*)w;
-	qso_clocks* that = ancestor_view<qso_clocks>(w);
-	that->local_ = !clock->local();
-	clock->local(that->local_);
-	that->enable_widgets();
-}
 
 bool qso_clocks::is_local() { return local_; }
