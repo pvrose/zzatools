@@ -25,11 +25,10 @@ public:
 
 protected:
     // Callback when the radio button is changed
-    static void cb_radio(Fl_Widget* w, void* v);
+    static void cb_clock(Fl_Widget* w, void* v);
 
     // The two instances
-    qso_clock* utc_clock_;
-    qso_clock* local_clock_;
+    qso_clock* clock_;
     qso_wx* qso_weather_;
 
 

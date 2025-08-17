@@ -80,32 +80,18 @@ void qso_clocks::create_form() {
 	int cx = x() + GAP;
 	int cy = y() + HTEXT;
 
-	utc_clock_ = new qso_clock(cx, cy, 50, 50, false);
-	utc_clock_->align(FL_ALIGN_TOP | FL_ALIGN_LEFT);
-	local_clock_ = new qso_clock(cx, cy, 50, 50, true);
-	local_clock_->align(FL_ALIGN_TOP | FL_ALIGN_LEFT);
+	clock_ = new qso_clock(cx, cy, 50, 50);
+	clock_->align(FL_ALIGN_TOP | FL_ALIGN_LEFT);
+	// clock_->callback(cb_clock, nullptr);
+	// clock_->when(FL_WHEN_RELEASE);
+	clock_->local(local_);
 
-	cx += utc_clock_->w();
+	cx += clock_->w();
 
-	Fl_Group* g1 = new Fl_Group(cx, cy, HBUTTON, HBUTTON * 2);
-	Fl_Radio_Round_Button* r1 = new Fl_Radio_Round_Button(cx, cy, HBUTTON, HBUTTON);
-	r1->value(!local_);
-	r1->callback(cb_radio, (void*)(intptr_t)false);
-	r1->tooltip("Click to select UTC time");
+	int max_w = clock_->x() + clock_->w() - x();
+	int max_h = clock_->y() + clock_->h() - y();
 
-	cy += HBUTTON;
-	Fl_Radio_Round_Button* r2 = new Fl_Radio_Round_Button(cx, cy, HBUTTON, HBUTTON);
-	r2->value(local_);
-	r2->callback(cb_radio, (void*)(intptr_t)true);
-	r2->tooltip("Click to select local time");
-
-	g1->end();
-
-
-	int max_w = g1->x() + g1->w() - x();
-	int max_h = g1->y() + g1->h() - y();
-
-	cy += utc_clock_->h();
+	cy += clock_->h() + HTEXT;
 	cx = x() + GAP;
 	int cw = max_w - GAP;
 
@@ -131,21 +117,15 @@ void qso_clocks::save_values() {
 // Enable the widgets
 void qso_clocks::enable_widgets() {
 	// Enable the two qso_clock widgets
-	utc_clock_->enable_widgets();
-	local_clock_->enable_widgets();	
-	if (local_) {
-		utc_clock_->hide();
-		local_clock_->show();
-	} else {
-		utc_clock_->show();
-		local_clock_->hide();
-	}
+	clock_->enable_widgets();
 	qso_weather_->enable_widgets();
 }
 
-void qso_clocks::cb_radio(Fl_Widget* w, void* v) {
+void qso_clocks::cb_clock(Fl_Widget* w, void* v) {
+	qso_clock* clock = (qso_clock*)w;
 	qso_clocks* that = ancestor_view<qso_clocks>(w);
-	that->local_ = (bool)(uintptr_t)v;
+	that->local_ = !clock->local();
+	clock->local(that->local_);
 	that->enable_widgets();
 }
 

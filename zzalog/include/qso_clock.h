@@ -9,7 +9,7 @@ class qso_clock :
     public Fl_Group
 {
 public:
-	qso_clock(int X, int Y, int W, int H, bool local);
+	qso_clock(int X, int Y, int W, int H, const char* L = nullptr);
 	~qso_clock();
 
 	// get settings
@@ -23,6 +23,12 @@ public:
 
 	// Clock callback
 	static void cb_ticker(void* v);
+	// Click clock
+	static void cb_clock(Fl_Widget* w, void* v);
+
+	// Set/get local
+	void local(bool value);
+	bool local();
 
 protected:
 

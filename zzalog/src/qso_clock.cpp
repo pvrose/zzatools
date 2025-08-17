@@ -1,7 +1,10 @@
 #include "qso_clock.h"
+
 #include "qso_manager.h"
-#include "drawing.h"
 #include "ticker.h"
+
+#include "utils.h"
+#include "drawing.h"
 
 #include<ctime>
 
@@ -12,9 +15,8 @@ extern ticker* ticker_;
 
 // Clock group - constructor
 qso_clock::qso_clock
-(int X, int Y, int W, int H, bool local) :
-	Fl_Group(X, Y, W, H)
-	, display_local_(local)
+(int X, int Y, int W, int H, const char* L) :
+	Fl_Group(X, Y, W, H, L)
 {
 	labelfont(FL_BOLD);
 	labelsize(FL_NORMAL_SIZE + 2);
@@ -45,7 +47,7 @@ void qso_clock::create_form(int X, int Y) {
 	int curr_x = X;
 	int curr_y = Y;
 
-	const int WCLOCKS = 170;
+	const int WCLOCKS = 200;
 
 	const int TIME_SZ = 3 * FL_NORMAL_SIZE;
 	const int DATE_SZ = 3 * FL_NORMAL_SIZE / 2;
@@ -57,7 +59,10 @@ void qso_clock::create_form(int X, int Y) {
 	//	bn_time_->labelfont(FL_BOLD);
 	bn_time_->labelsize(TIME_SZ);
 	bn_time_->box(FL_FLAT_BOX);
+	bn_time_->down_box(FL_FLAT_BOX);
+	bn_time_->callback(cb_clock, nullptr);
 	bn_time_->when(FL_WHEN_RELEASE);
+	bn_time_->clear_visible_focus();
 
 	curr_y += bn_time_->h();
 
@@ -67,7 +72,10 @@ void qso_clock::create_form(int X, int Y) {
 	bn_date_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
 	bn_date_->labelsize(DATE_SZ);
 	bn_date_->box(FL_FLAT_BOX);
+	bn_date_->down_box(FL_FLAT_BOX);
+	bn_date_->callback(cb_clock, nullptr);
 	bn_date_->when(FL_WHEN_RELEASE);
+	bn_date_->clear_visible_focus();
 
 	curr_x = X + WCLOCKS;
 	curr_y += bn_date_->h();
@@ -120,3 +128,21 @@ void qso_clock::cb_ticker(void* v) {
 	((qso_clock*)v)->enable_widgets();
 }
 
+// Click date or ime
+void qso_clock::cb_clock(Fl_Widget* w, void* v) {
+	qso_clock* that= ancestor_view<qso_clock>(w);
+	that->display_local_ = !that->display_local_;
+	qso_manager* mgr = ancestor_view<qso_manager>(that);
+	mgr->enable_widgets();
+}
+
+// Set local
+void qso_clock::local(bool value) {
+	display_local_ = value;
+	enable_widgets();
+}
+
+// Get local
+bool qso_clock::local() {
+	return display_local_;
+}
