@@ -132,6 +132,7 @@ void qso_qsl_vwr::create_form() {
 
 	int rx=0, ry=0, rw=0, rh=0;
 	tabs_->client_area(rx, ry, rw, rh);
+	int dh = h() - rh;
 
 	grp_viewer_ = new Fl_Group(rx, ry, rw, rh, "Display");
 	grp_viewer_->labelsize(FL_NORMAL_SIZE + 1);
@@ -156,7 +157,6 @@ void qso_qsl_vwr::create_form() {
 
 	// Group the following radio buttons
 	grp_card_type_ = new Fl_Group(curr_x, curr_y, w(), HBUTTON * 2);
-	grp_card_type_->box(FL_FLAT_BOX);
 
 	// Radio - Display eQSL.cc card image
 	radio_eqsl_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "eQSL");
@@ -207,20 +207,17 @@ void qso_qsl_vwr::create_form() {
 	radio_emails_->callback(cb_rad_card, (void*)QI_EMAILS);
 	radio_emails_->when(FL_WHEN_RELEASE_ALWAYS);
 	radio_emails_->tooltip("Select image to be sent by e-mail");
-	curr_y += HBUTTON + GAP;
-
+	curr_y += HBUTTON;
 
 	grp_card_type_->end();
 
-	rh = max(rh, curr_y - grp_viewer_->y());
 	grp_viewer_->resizable(nullptr);
-	grp_viewer_->size(grp_viewer_->w(), rh);
+	grp_viewer_->size(grp_viewer_->w(), curr_y - grp_viewer_->y());
 
 	grp_viewer_->end();
 
 	grp_status_ = new Fl_Group(rx, ry, rw, rh, "Status");
 	grp_status_->labelsize(FL_NORMAL_SIZE + 1);
-
 
 	curr_y = grp_status_->y() + GAP;
 	curr_x = grp_status_->x() + GAP;
@@ -338,9 +335,8 @@ void qso_qsl_vwr::create_form() {
 	curr_y += HBUTTON + GAP;
 	curr_x = x() + GAP;
 
-	rh = max(rh, curr_y - grp_status_->y());
 	grp_status_->resizable(nullptr);
-	grp_status_->size(grp_status_->w(), rh);
+	grp_status_->size(grp_status_->w(), curr_y - grp_status_->y());
 
 	grp_status_->end();
 
@@ -398,12 +394,17 @@ void qso_qsl_vwr::create_form() {
 	bn_card_decl_->when(FL_WHEN_RELEASE);
 	
 	curr_x += WBUTTON;
+	curr_y += HBUTTON + GAP;
 
-	rh = max(rh, curr_y - grp_editor_->y());
 	grp_editor_->resizable(nullptr);
-	grp_editor_->size(grp_status_->w(), rh);
+	grp_editor_->size(grp_status_->w(), curr_y - grp_editor_->y());
 
 	grp_editor_->end();
+
+	int th = max(grp_viewer_->h(), grp_status_->h());
+	th = max(th, grp_editor_->h()) + dh;
+	tabs_->resizable(nullptr);
+	tabs_->size(tabs_->w(), th);
 	tabs_->end();
 
 	end();
