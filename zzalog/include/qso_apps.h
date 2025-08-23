@@ -135,6 +135,8 @@ public:
 
     // Callback
     void static cb_bn_new(Fl_Widget* w, void* v);
+    // Input tab
+    void static cb_ip_new(Fl_Widget* w, void* v);
     // CAllback tabs
     void static cb_tabs(Fl_Widget* w, void* v);
 

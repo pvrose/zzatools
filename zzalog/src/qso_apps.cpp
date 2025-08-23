@@ -387,9 +387,11 @@ void app_grp::cb_show_script(Fl_Widget* w, void* v) {
     app_grp* that = ancestor_view<app_grp>(w);
     filename_input* ip = *(filename_input**)v;
     string fn = ip->value();
-    if (fn.length() > 0) {
-        qso_apps* qa = ancestor_view<qso_apps>(that);
-        file_viewer* fwin = qa->viewer();
+    qso_apps* qa = ancestor_view<qso_apps>(that);
+    file_viewer* fwin = qa->viewer();
+    if (fwin->file() == fn && fwin->visible() && !fwin->is_dirty()) {
+        fwin->hide();
+    } else if (fn.length() > 0) {
         fwin->load_file(fn);
     }
 }
@@ -567,7 +569,7 @@ void qso_apps::create_form() {
     curr_x += WBUTTON;
 
     ip_new_ = new Fl_Input(curr_x, curr_y, WSMEDIT, HBUTTON);
-    ip_new_->callback(cb_value<Fl_Input, string>, &new_name_);
+    ip_new_->callback(cb_ip_new, &new_name_);
     ip_new_->tooltip("Type in the name of the new app");
 
     curr_x = x();
@@ -643,6 +645,11 @@ void qso_apps::enable_widgets() {
             }
         }
     }
+    if (new_name_.length()) {
+        bn_new_->activate();
+    } else {
+        bn_new_->deactivate();
+    }
 }
 
 // Set new tab
@@ -669,6 +676,13 @@ void qso_apps::cb_bn_new(Fl_Widget* w, void* v) {
     that->adjust_size();
 
     that->redraw();
+}
+
+// Input new app nae
+void qso_apps::cb_ip_new(Fl_Widget* w, void* v) {
+    qso_apps* that = ancestor_view<qso_apps>(w);
+    cb_value<Fl_Input, string>(w, v);
+    that->enable_widgets(); 
 }
 
 // Switch tab

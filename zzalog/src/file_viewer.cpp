@@ -129,6 +129,10 @@ void file_viewer::load_file(string name) {
 	show();
 }
 
+string file_viewer::file() {
+	return filename_;
+}
+
 // Save file
 void file_viewer::save_file() {
 	char msg[128];

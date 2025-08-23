@@ -22,6 +22,9 @@ public:
 
     void load_file(string name);
 
+    // Return displayed file
+    string file();
+
     // File has been changed
     bool is_dirty();
 
