@@ -154,7 +154,7 @@ int intl_dialog::handle(int event) {
 	case FL_PUSH:
 		// Allow normal click behaviour before changing focus
 		result = win_dialog::handle(event);
-		take_focus();
+		if (!result) take_focus();
 		return result;
 	case FL_KEYBOARD:
 		switch (Fl::event_key()) {

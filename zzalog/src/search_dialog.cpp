@@ -402,7 +402,7 @@ int search_dialog::handle(int event) {
 		// Acknowledge focus events to get the keyboard event
 		return true;
 	case FL_PUSH:
-		take_focus();
+		if (!result) take_focus();
 		return true;
 	case FL_KEYBOARD:
 		switch (Fl::event_key()) {
