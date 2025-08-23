@@ -30,6 +30,7 @@ extern string COPYRIGHT;
 extern Fl_PNG_Image main_icon_;
 extern status* status_;
 extern ticker* ticker_;
+extern bool closing_;
 extern void open_html(const char*);
 
 const int NUMBER_STYLES = 10;
@@ -89,10 +90,18 @@ int banner::handle(int event) {
 	return result;
 }
 
+// Visualise or no the close overay
+void banner::draw() {
+	if (closing_) bx_closing_->show();
+	else bx_closing_->hide();
+	Fl_Double_Window::draw();
+}
+
 void banner::create_form() {
 	const int HMULT = 2 * HBUTTON;
 	const int HICON = HMULT * 2 + GAP;
 	const int WOP = WEDIT * 2;
+	const int WCL = HICON + GAP + WOP;
 	int curr_x = x() + GAP;
 	int curr_y = y() + GAP;
 
@@ -143,6 +152,12 @@ void banner::create_form() {
 
 	curr_y += HBUTTON;
 
+	bx_closing_ = new Fl_Box(bx_icon_->x(), bx_icon_->y(), WCL, HICON, "CLOSING!");
+	bx_closing_->labelsize(FL_NORMAL_SIZE * 5);
+	bx_closing_->labelcolor(FL_YELLOW);
+	bx_closing_->box(FL_BORDER_FRAME);
+	bx_closing_->hide();
+
 	int max_x = curr_x + WOP;
 	curr_x = x() + GAP;
 
@@ -179,7 +194,8 @@ void banner::create_form() {
 	show();
 }
 
-void banner::enable_widgets() {}
+void banner::enable_widgets() {
+}
 
 // Add a message to the banner
 void banner::add_message(status_t type, const char* msg) {

@@ -42,6 +42,9 @@ public:
     // Callback - close button - ignore
     static void cb_close(Fl_Widget* w, void* v);
 
+    // Override draw
+    virtual void draw();
+
 protected:
 
     // Add message to display (with colour)
@@ -56,6 +59,7 @@ protected:
     Fl_Output* op_prog_title_;
     Fl_Box* bx_prog_value_;
     Fl_Text_Display* display_;
+    Fl_Box* bx_closing_;
 
     // Overall heights - small banner
     int h_small_;
