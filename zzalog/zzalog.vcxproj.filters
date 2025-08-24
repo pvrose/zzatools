@@ -830,6 +830,14 @@
     <None Include="userguide\installation.dox" />
     <None Include="userguide\reference.dox" />
     <None Include="userguide\cty_dialog.dox" />
+    <None Include="userguide\basic1.dox" />
+    <None Include="userguide\basic2.dox" />
+    <None Include="userguide\adding.dox" />
+    <None Include="userguide\searching.dox" />
+    <None Include="userguide\analysis.dox" />
+    <None Include="userguide\new_rig.dox" />
+    <None Include="userguide\new_app.dox" />
+    <None Include="userguide\qsls.dox" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="zzalog.ico">

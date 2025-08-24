@@ -1,0 +1,60 @@
+/** \page basic1 Basic Operating - Analogue
+
+This page describes the basic use of ZZALOG to start operating and logging QSOs as the user makes the
+contacts.
+
+The use of a rig connection is not obligatory, but it does allow the automatic logging of items that can be 
+obtained from the rig: frequency, mode and transmit power. 
+
+\section b1_connect Connecting a rig
+
+This page assumes that ZZALOG has already has the rig connection defined and the means of 
+launching any CAT control application (the <I>script</I>) specified. See \ref new_rig.
+
+<IMG SRC="../images/basic1_1.png">
+
+ZZALOG will usually start with the previous rig selected, but not connected. 
+Select the tab for the rig you want to use,
+as shown by the red arrow. If the rig connection is made through an external app then 
+launch it using the <I>script</I> by clicking the "Start" button (blue arrow). 
+
+Depending on how the rig connection has configured ZZALOG may automatically connect to the
+external app after a period of time. If it doesn't, the clicking the "Connect" button (green arrow),
+will cause the rig to be connected. ZZALOG will then display information received from the 
+rig.
+
+<IMG SRC="../images/basic1_2.png">
+
+\section b1_prepare Before the QSO
+
+ZZALOG will usually start viewing the last QSO made. To prepare ZZALOG, the entry pane 
+must be activated, by clicking the "Activate" button. This then allows
+any callsigns to be reviewed before logging them. Type the call in the box beside that marked "CALL"
+(red arrow) and where the call is (blue) and whether it has beem worked before
+(green) is now shown.
+
+<IMG SRC="../images/basic1_3.png">
+
+In this case the call UR3AHF is shown to be a Ukrainian call and has been worked before,
+although not on this band or mode.
+
+To start logging a QSO with ths station click the "Start QSO". 
+
+\section b1_log_qso Logging the QSO
+
+<IMG SRC="../images/basic1_4.png">
+
+When the QSO is started the QSO date and time fields are frozen (yellow) and the frequency,
+mode and transmit power (red) are read from the rig. Note, that these latter are continually 
+updated from the rig. It is then up to the user to add details from the QSO. In this
+case the name, QTH and reports that were sent and received (blue). 
+
+When the QSO is ended then one of the "Save..." buttons (green) should be clicked.
+- "Save" will save the data entered so far, but not end the QSO.
+- "Save & View" will save the data and enter the end time. The QSO will remain in
+view mode.
+- "Save & New" will save the data and start a new QSO.
+- "Save & Edit" will save the data and enter the end time. The QSO can still be edited.
+- "Quit QSO" will abandon entering the QSO.
+
+*/

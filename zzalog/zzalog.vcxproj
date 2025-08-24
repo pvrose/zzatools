@@ -418,8 +418,12 @@
     <None Include="..\reference\Prefix.lst" />
     <None Include="Doxyfile" />
     <None Include="Makefile" />
+    <None Include="userguide\adding.dox" />
+    <None Include="userguide\analysis.dox" />
     <None Include="userguide\application.dox" />
     <None Include="userguide\banner.dox" />
+    <None Include="userguide\basic1.dox" />
+    <None Include="userguide\basic2.dox" />
     <None Include="userguide\change_dialog.dox" />
     <None Include="userguide\cli.dox" />
     <None Include="userguide\config.dox" />
@@ -438,7 +442,10 @@
     <None Include="userguide\log_table.dox" />
     <None Include="userguide\main_window.dox" />
     <None Include="userguide\menu.dox" />
+    <None Include="userguide\new_app.dox" />
+    <None Include="userguide\new_rig.dox" />
     <None Include="userguide\operating.dox" />
+    <None Include="userguide\qsls.dox" />
     <None Include="userguide\qsl_editor.dox" />
     <None Include="userguide\qso_apps.dox" />
     <None Include="userguide\qso_bands.dox" />
@@ -459,6 +466,7 @@
     <None Include="userguide\quick_start.dox" />
     <None Include="userguide\reference.dox" />
     <None Include="userguide\report_tree.dox" />
+    <None Include="userguide\searching.dox" />
     <None Include="userguide\search_dialog.dox" />
     <None Include="userguide\stn_dialog.dox" />
     <None Include="userguide\toolbar.dox" />
