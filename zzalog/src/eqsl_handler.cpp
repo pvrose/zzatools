@@ -926,11 +926,8 @@ map<string, string> eqsl_handler::parse_warning(string text) {
 
 // Upload single QSO to eQSL.cc
 bool eqsl_handler::upload_single_qso(qso_num_t record_num) {
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences qsl_settings(settings, "QSL");
-	Fl_Preferences eqsl_settings(qsl_settings, "eQSL");
-	int upload_qso;
-	eqsl_settings.get("Upload per QSO", upload_qso, false);
+	server_data_t* eqsl_data = qsl_dataset_->get_server_data("eQSL");
+	bool upload_qso = eqsl_data->upload_per_qso;
 	if (upload_qso == false) {
 		status_->misc_status(ST_WARNING, "EQSL: Uploading per QSO is disabled.");
 	}
