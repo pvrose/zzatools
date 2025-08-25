@@ -1,14 +1,16 @@
 #include "fllog_emul.h"
+
+#include "adi_reader.h"
+#include "adi_writer.h"
 #include "book.h"
 #include "extract_data.h"
-#include "status.h"
-#include "adi_writer.h"
-#include "adi_reader.h"
-#include "spec_data.h"
-#include "rpc_data_item.h"
-#include "qso_manager.h"
+#include "qso_apps.h"
 #include "qso_data.h"
+#include "qso_manager.h"
 #include "record.h"
+#include "rpc_data_item.h"
+#include "spec_data.h"
+#include "status.h"
 
 #include <sstream>
 
@@ -48,14 +50,14 @@ fllog_emul::~fllog_emul() {
 void fllog_emul::run_server() {
 	status_->misc_status(ST_NOTE, "FLLOG: Creating new socket");
 	if (!rpc_handler_) {
-		Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
-		Fl_Preferences nw_settings(settings, "Network");
-		Fl_Preferences fllog_settings(nw_settings, "Fllog");
-		int rpc_port = 8421;
-		fllog_settings.get("Port Number", rpc_port, rpc_port);
-		char* addr;
-		fllog_settings.get("Address", addr, "127.0.0.1");
-		rpc_handler_ = new rpc_handler(string(addr), rpc_port, "/RPC2");
+		string address = qso_manager_->apps()->network_address(FLDIGI);
+		int port_num = qso_manager_->apps()->network_port(FLDIGI);
+		if (address.length()) {
+			rpc_handler_ = new rpc_handler(address, port_num, "/RPC2");
+		}
+		else {
+			return;
+		}
 	}
 	// Set up callbacks to handle these
 	method_list_.push_back({ "log.add_record", "s:s", "adds new ADIF-RECORD" });

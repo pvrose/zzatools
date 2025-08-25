@@ -29,6 +29,8 @@ public:
 	qso_qsl* qsl_control();
 	// Returns a reference to the qso_log-info object
 	qso_log_info* log_info();
+	// Retunr pointer to qso_apps
+	qso_apps* apps();
 	
 
 protected:

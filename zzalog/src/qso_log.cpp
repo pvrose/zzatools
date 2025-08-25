@@ -138,3 +138,8 @@ qso_qsl* qso_log::qsl_control() {
 qso_log_info* qso_log::log_info() {
 	return log_info_;
 }
+
+// Return Apps widget
+qso_apps* qso_log::apps() {
+	return apps_ctrl_;
+}

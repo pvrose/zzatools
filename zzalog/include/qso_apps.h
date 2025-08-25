@@ -8,6 +8,7 @@
 using namespace std;
 class password_input;
 class Fl_Input;
+class Fl_Int_Input;
 class Fl_Light_Button;
 class Fl_Check_Button;
 class Fl_Radio_Light_Button;
@@ -15,6 +16,9 @@ class Fl_Button;
 class Fl_Tabs;
 class filename_input;
 class file_viewer;
+
+const string FLDIGI = "FLDigi";
+const string WSJTX = "WSJT-X";
 
 // App rig class
 enum app_rig_class_t {
@@ -34,6 +38,8 @@ struct app_data_t {
     bool can_disable{ false };       // The app can be disconnected (Rig = NONE)
     bool (*has_server)() { nullptr };   // Function to call to see if serever is active
     bool (*has_data)() { nullptr };     // Function to call to see if server has request
+    string address{ "" };        // Network address 
+    int port_num{ 0 };
 };
 
 // Displays and controls the status of a single modem apps using zzalog as a log server
@@ -102,6 +108,8 @@ class app_grp :
         filename_input* ip_disable_app_;
         Fl_Button* bn_show_script_;
         Fl_Button* bn_show_script2_;
+        Fl_Input* ip_nw_address_;
+        Fl_Int_Input* ip_nw_port_;
 
         app_data_t* app_data_;
 };
@@ -131,7 +139,10 @@ public:
     void delete_app(app_grp* w);
     // Get the viewer
     file_viewer* viewer();
-
+    // Get network address
+    string network_address(string app_name);
+    // Get network port number
+    int network_port(string app_name);
 
     // Callback
     void static cb_bn_new(Fl_Widget* w, void* v);

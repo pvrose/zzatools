@@ -3,6 +3,7 @@
 #include "menu.h"
 #include "utils.h"
 #include "toolbar.h"
+#include "qso_apps.h"
 #include "qso_manager.h"
 #include "qso_data.h"
 #include "adi_reader.h"
@@ -397,17 +398,13 @@ bool wsjtx_handler::has_server() {
 // Start the server
 void wsjtx_handler::run_server() {
 	if (!server_) {
-		Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
-		Fl_Preferences nw_settings(settings, "Network");
-		Fl_Preferences wsjtx_settings(nw_settings, "WSJT-X");
-		int udp_port = 2237;
-		wsjtx_settings.get("Port Number", udp_port, udp_port);
-		char* temp;
-		wsjtx_settings.get("Address", temp, "127.0.0.1");
-		status_->misc_status(ST_NOTE, "WSJT-X: Creating new socket");
-		server_ = new socket_server(socket_server::UDP, string(temp), udp_port);
-		server_->callback(rcv_request);
-		free(temp);
+		string address = qso_manager_->apps()->network_address(WSJTX);
+		int udp_port = qso_manager_->apps()->network_port(WSJTX);
+		if (address.length()) {
+			server_ = new socket_server(socket_server::UDP, address, udp_port);
+			server_->callback(rcv_request);
+		}
+		else return;
 	}
 	if (!server_->has_server()) {
 		status_->misc_status(ST_NOTE, "WSJT-X: Starting socket");

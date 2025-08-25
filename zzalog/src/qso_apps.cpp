@@ -11,6 +11,8 @@
 #include "file_viewer.h"
 #include "filename_input.h"
 
+#include <FL/Fl_Input.H>
+#include <FL/Fl_Int_Input.H>
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Tabs.H>
 #include <FL/Fl_Radio_Light_Button.H>
@@ -77,7 +79,7 @@ void app_grp::create_form() {
     
     curr_x = x() + GAP;
     curr_y += HBUTTON;
-
+ 
     // Button to act as a log server
     bn_server_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Server");
     bn_server_->callback(cb_bn_server, &(app_data_->server));
@@ -89,6 +91,19 @@ void app_grp::create_form() {
     bn_delete_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Delete");
     bn_delete_->callback(cb_bn_delete);
     bn_delete_->tooltip("Remove the application");
+
+    curr_x = x() + GAP + WBUTTON / 2;
+    curr_y += HBUTTON;
+
+     // Network address
+    ip_nw_address_ = new Fl_Input(curr_x, curr_y, 3 * WBUTTON / 2, HBUTTON, "Addr");
+    ip_nw_address_->callback(cb_value<Fl_Input, string>, &(app_data_->address));
+    ip_nw_address_->tooltip("Enter the network for ZZALOG as a server");
+
+    curr_x += WBUTTON * 2;
+    ip_nw_port_ = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON, "Port");
+    ip_nw_port_->callback(cb_value_int<Fl_Int_Input>, &(app_data_->port_num));
+    ip_nw_port_->tooltip("Enter the port number for ZZALOG as a server");
 
     curr_x = x() + GAP;
     curr_y += HBUTTON;
@@ -195,6 +210,18 @@ void app_grp::enable_widgets() {
     bn_rig_nocat_->value(app_data_->rig_class == RIG_NO_CAT);
     bn_rig_cat_->value(app_data_->rig_class == RIG_CAT);
     bn_server_->value(app_data_->server);
+    ip_nw_address_->value(app_data_->address.c_str());
+    char temp[32];
+    snprintf(temp, sizeof(temp), "%d", app_data_->port_num);
+    ip_nw_port_->value(temp);
+    if (app_data_->server) {
+        ip_nw_address_->activate();
+        ip_nw_port_->activate();
+    }
+    else {
+        ip_nw_address_->deactivate();
+        ip_nw_port_->deactivate();
+    }
     bn_rig_->copy_label(rig_name);
     if (app_data_->commands.find(rig_name) != app_data_->commands.end()) {
         ip_app_name_->value(app_data_->commands.at(string(rig_name)).c_str());
@@ -270,14 +297,14 @@ void app_grp::set_data(app_data_t* data) {
 void app_grp::cb_bn_listen(Fl_Widget* w, void* v) {
     app_grp* that = ancestor_view<app_grp>(w);
     string server = that->label();
-    if (server == "FLDigi") {
+    if (server == FLDIGI) {
         if (fllog_emul_->has_server()) {
             fllog_emul_->close_server();
         } else {
             fllog_emul_->run_server();
         }
     }
-    else if (server == "WSJT-X") {
+    else if (server == WSJTX) {
         if (wsjtx_handler_->has_server()) {
             wsjtx_handler_->close_server();
         } else {
@@ -479,10 +506,25 @@ void qso_apps::load_values() {
         app_data_t* data = new app_data_t;
         data->name = app;
         int tempi;
+        char* temps;
         app_settings.get("Common", tempi, (int)RIG_CAT);
         data->rig_class = (app_rig_class_t)tempi;
         app_settings.get("Server", tempi, (int)false);
         data->server = tempi;
+        if (string(app) == FLDIGI) {
+            app_settings.get("Address", temps, "127.0.0.1");
+            data->address = temps;
+            free(temps);
+            app_settings.get("Port Number", tempi, 8421);
+            data->port_num = tempi;
+        }
+        else if (string(app) == WSJTX) {
+            app_settings.get("Address", temps, "127.0.0.1");
+            data->address = temps;
+            free(temps);
+            app_settings.get("Port Number", tempi, 2237);
+            data->port_num = tempi;
+        }
         data->has_server = nullptr;
         data->has_data = nullptr;
         app_settings.get("Administrator", tempi, (int)false);
@@ -610,6 +652,10 @@ void qso_apps::save_values() {
         Fl_Preferences app_settings(apps_settings, (*it).first.c_str());
         app_settings.set("Common", (int)(*it).second->rig_class);
         app_settings.set("Server", (*it).second->server);
+        if ((*it).second->server) {
+            app_settings.set("Address", (*it).second->address);
+            app_settings.set("Port Number", (*it).second->port_num);
+        }
         app_settings.set("Administrator", (*it).second->admin);
         app_settings.set("Can Disconnect", (*it).second->can_disable);
         Fl_Preferences rigs_settings(app_settings, "Rigs");
@@ -693,13 +739,13 @@ void qso_apps::cb_tabs(Fl_Widget* w, void* v) {
 
 // Add the server links
 void qso_apps::add_servers(app_data_t* data) {
-    if (data->name == "FLDigi") {
+    if (data->name == FLDIGI) {
         if (fllog_emul_) {
             data->has_server = fllog_emul_->has_server;
             data->has_data = fllog_emul_->has_data;
         }
     } 
-    else if (data->name == "WSJT-X") {
+    else if (data->name == WSJTX) {
         if (wsjtx_handler_) {
             data->has_server = wsjtx_handler_->has_server;
             data->has_data = wsjtx_handler_->has_data;
@@ -724,4 +770,22 @@ void qso_apps::delete_app(app_grp* w) {
 
 file_viewer* qso_apps::viewer() { 
     return viewer_;
+}
+
+string qso_apps::network_address(string app) {
+    if (apps_data_.find(app) != apps_data_.end()) {
+        return apps_data_[app]->address;
+    }
+    else {
+        return "";
+    }
+}
+
+int qso_apps::network_port(string app) {
+    if (apps_data_.find(app) != apps_data_.end()) {
+        return apps_data_[app]->port_num;
+    }
+    else {
+        return 0;
+    }
 }

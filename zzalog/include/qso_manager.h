@@ -13,6 +13,7 @@
 using namespace std;
 
 // Forward declarations
+class qso_apps;
 class qso_clocks;
 class qso_data;
 class qso_tabbed_rigs;
@@ -112,6 +113,8 @@ enum hint_t : uchar;
 		qso_qsl* qsl_control();
 		// Log info
 		qso_log_info* log_info();
+		// Applications data
+		qso_apps* apps();
 
 		// Deactivate all QSOs and Rigs
 		void deactivate_all();

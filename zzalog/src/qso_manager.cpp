@@ -500,6 +500,10 @@ qso_log_info* qso_manager::log_info() {
 	return info_group_->log_info();
 }
 
+qso_apps* qso_manager::apps() {
+	return info_group_->apps();
+}
+
 // Deactivate any QSO entry and rigs to 
 void qso_manager::deactivate_all() {
 	data_group_->action_deactivate();
