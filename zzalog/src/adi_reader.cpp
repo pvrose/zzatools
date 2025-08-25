@@ -72,23 +72,28 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 
 	// now turn off header checking
 	expecting_header_ = false;
+	string field;
+	field.reserve(20);
+	string value;
+	value.reserve(50);
+	string old_value;
+	old_value.reserve(50);
 
 	// Until the end of record indicated by <EOR> or <EOH> - note in.good() is continually 
 	// checked to prevent running off the end
 	while (in.good() && !eor) {
 		// Each ADIF item is "<NAME:l[:T]>VALUE    " until <EOR> or <EOH>
-		string field = "";
-		string value = "";
-		string old_value = "";
+		field = "";
+		value = "";
+		old_value = "";
 		// Until : or > is read
 		in.get(c);
 		while (c != ':' && c != '>' && in.good()) {
-			field += c;
+			field += (char)toupper(c);
 			in.get(c);
 		}
 		if (!in.good()) result = LR_BAD;
 		// convert field name to upper-case
-		field = to_upper(field);
 		// If field is <EOH> or <EOR> we have reached the end of the record
 		if (field == "EOH" && in_record->is_header() || field == "EOR") {
 			eor = true;
