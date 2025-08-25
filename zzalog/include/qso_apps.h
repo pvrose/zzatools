@@ -84,6 +84,10 @@ class app_grp :
         static void cb_ip_passw(Fl_Widget* w, void* v);
         // callback to show script
         static void cb_show_script(Fl_Widget* w, void* v);
+        // Callback for network address
+        static void cb_ip_nwaddr(Fl_Widget* w, void* v);
+        // Callack for network port
+        static void cb_ip_nwport(Fl_Widget* w, void* v);
         
     protected:
 
