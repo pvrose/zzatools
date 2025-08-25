@@ -827,7 +827,7 @@ double band_widget::frequency(int x, int y) {
 	}
 	else if (x > x_kink2_) {
 		// Scan the list of markers
-		for (auto it : markers_) {
+		for (auto &it : markers_) {
 			if (y >= it.y_text && y < it.y_text + FL_NORMAL_SIZE) {
 				result = it.f;
 				break;
