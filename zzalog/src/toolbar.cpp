@@ -20,6 +20,7 @@
 
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Help_Dialog.H>
+#include <FL/Fl_PNG_Image.H>
 #include <FL/Fl_RGB_Image.H>
 #include <FL/Fl_Single_Window.H>
 #include <FL/Fl_Tooltip.H>
@@ -36,6 +37,7 @@ extern menu* menu_;
 extern qso_manager* qso_manager_;
 extern status* status_;
 extern tabbed_forms* tabbed_forms_;
+extern Fl_PNG_Image main_icon_;
 
 extern bool DARK;
 extern void open_html(const char*);
@@ -264,6 +266,16 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	bn->when(FL_WHEN_RELEASE);
 	bn->tooltip("Hide/Show International character set");
 	add(bn);
+	curr_x += H;
+	// Help->User Guide
+	bn = new Fl_Button(curr_x, Y, H, H, 0);
+	bn->callback(cb_bn_menu, (void*)"&Help/&User Guide");
+	bn->when(FL_WHEN_RELEASE);
+	Fl_Image* icon = main_icon_.copy(H, H);
+	bn->image(icon);
+	bn->tooltip("Open Userguide");
+	add(bn);
+
 	curr_x += H + TOOL_GAP;
 	// Input widget for entering search text to look for a call or to parse the call
 	search_text_ = "";
