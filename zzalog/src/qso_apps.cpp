@@ -653,7 +653,7 @@ void qso_apps::save_values() {
         app_settings.set("Common", (int)(*it).second->rig_class);
         app_settings.set("Server", (*it).second->server);
         if ((*it).second->server) {
-            app_settings.set("Address", (*it).second->address);
+            app_settings.set("Address", (*it).second->address.c_str());
             app_settings.set("Port Number", (*it).second->port_num);
         }
         app_settings.set("Administrator", (*it).second->admin);
