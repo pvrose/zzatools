@@ -1,5 +1,59 @@
 /** \page searching Searching the log
 
-Watch this space.
+It is possible to search through the log. When entering a QSO the common seraches are performed 
+automatically, see \ref b1_prepare. However there are still reasons for stand-alone searches.
+
+\section search_call Searching for a call.
+
+In the Main Window it is possible to search for a callsign.
+
+<IMG SRC="../images/searching_1.png">
+
+Enter the callsign in the circled box, and click the indicated button. All the QSOs with this callsign are now
+displayed in the "Extracted Records" tab.
+
+<IMG SRC="../images/searching_2.png">
+
+\section search_qso Searching for a specific QSO
+
+Sometimes it is necessary to search the log for a specific QSO. For example, when checking physical QSL cards.
+In this case at the inactive mode, click the "Query" button.
+
+<IMG SRC="../images/searching_3.png">
+
+On the query form enter the details of the QSO, in this case date, call and mode are sufficient. Then click "Check".
+
+<IMG SRC="../images/searching_4.png">
+
+The sought QSO then appears in edit view.
+
+<IMG SRC="../images/searching_5.png">
+
+\section search_dlg General queries
+
+It is possible to create general queries using the search dialog.
+It can be opened using the menu "Extract->Criteria".
+
+<IMG SRC="../images/searching_6.png">
+
+The dialog below is looking for all contacts with Africa.
+
+<IMG SRC="../images/searching_7.png">
+
+This displays all QSOs with stations in the DXCC continent Africa.
+
+<IMG SRC="../images/searching_8.png">
+
+\section search_custom Custom queries
+
+There are a number of customised queries available in the Main Window menu.
+
+<IMG SRC="../images/searching_9.png">
+
+- "No Name" - extracts all records without a NAME field.
+- "No QTH" - extracts all records without a QTH field.
+- "Small Locator" - extracts all records with no GRIDSQUARE field, or where the value has 4 or fewer characters.
+- "No Image" - extracts all records with eQSL received data but no QSO image. <B>NB</B> this search takes a 
+long time.
 
 */
