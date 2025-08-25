@@ -97,12 +97,12 @@ void app_grp::create_form() {
 
      // Network address
     ip_nw_address_ = new Fl_Input(curr_x, curr_y, 3 * WBUTTON / 2, HBUTTON, "Addr");
-    ip_nw_address_->callback(cb_value<Fl_Input, string>, &(app_data_->address));
+    ip_nw_address_->callback(cb_ip_nwaddr, &(app_data_->address));
     ip_nw_address_->tooltip("Enter the network for ZZALOG as a server");
 
     curr_x += WBUTTON * 2;
     ip_nw_port_ = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON, "Port");
-    ip_nw_port_->callback(cb_value_int<Fl_Int_Input>, &(app_data_->port_num));
+    ip_nw_port_->callback(cb_ip_nwport, &(app_data_->port_num));
     ip_nw_port_->tooltip("Enter the port number for ZZALOG as a server");
 
     curr_x = x() + GAP;
@@ -371,6 +371,20 @@ void app_grp::cb_bn_class(Fl_Widget* w, void* v) {
 void app_grp::cb_bn_server(Fl_Widget* w, void* v) {
     cb_value<Fl_Light_Button, bool>(w, v);
     app_grp* that = ancestor_view<app_grp>(w);
+    that->enable_widgets();
+}
+
+// Network address
+void app_grp::cb_ip_nwaddr(Fl_Widget* w, void* v) {
+    app_grp* that = ancestor_view<app_grp>(w);
+    cb_value<Fl_Input, string>(w, &that->app_data_->address);
+    that->enable_widgets();
+}
+
+// Network port
+void app_grp::cb_ip_nwport(Fl_Widget* w, void* v) {
+    app_grp* that = ancestor_view<app_grp>(w);
+    cb_value_int<Fl_Int_Input>(w, &that->app_data_->port_num);
     that->enable_widgets();
 }
 
