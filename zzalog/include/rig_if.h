@@ -181,6 +181,9 @@ using namespace std::chrono;
 		static void cb_rig_error(void* v);
 		// Callback if warning while accessing rig
 		static void cb_rig_warning(void* v);
+		// set frequency
+		bool set_frequency(double f);
+
 
 		// Protected attributes
 	protected:

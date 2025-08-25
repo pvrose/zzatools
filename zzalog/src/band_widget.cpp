@@ -816,3 +816,23 @@ void band_widget::default_mode() {
 		zoomable_ = false;
 	}
 }
+
+// Return the frequency under either the scal or the marker
+double band_widget::frequency(int x, int y) {
+	double result = nan("");
+	if (x < x_kink1_) {
+		// Calculate frequency as that between top and bottom of scale
+		double scale_pos = double(y - y_lower_) / double(y_upper_ - y_lower_);
+		result = scale_pos * (scale_range_.upper - scale_range_.lower) + scale_range_.lower;
+	}
+	else if (x > x_kink2_) {
+		// Scan the list of markers
+		for (auto it : markers_) {
+			if (y >= it.y_text && y < it.y_text + FL_NORMAL_SIZE) {
+				result = it.f;
+				break;
+			}
+		}
+	}
+	return result;
+}

@@ -39,6 +39,9 @@ public:
     // Value - frequency
     void value(double tx, double rx);
 
+    // Return frequency under position
+    double frequency(int x, int y);
+
     // Types
     static const uchar BAND_FULL = 0;     // Full display 
     static const uchar BAND_SUMMARY = 1;  // Summary display

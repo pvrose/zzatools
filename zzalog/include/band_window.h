@@ -16,6 +16,9 @@ public:
     // Set the frequency
     void set_frequency(double tx, double rx);
 
+    // Callback from widget
+    static void cb_widget(Fl_Widget* w, void* v);
+
 protected:
     band_widget* bw_;
 

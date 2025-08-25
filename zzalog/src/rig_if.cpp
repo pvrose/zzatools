@@ -795,3 +795,12 @@ bool rig_if::has_no_cat() {
 	return (hamlib_data_->port_type == RIG_PORT_NONE);
 }
 
+// Set frequency
+bool rig_if::set_frequency(double f) {
+	error_code_ = rig_set_freq(rig_, RIG_VFO_A, f * 1000000.0);
+	if (error_handler(error_code_, "Set frequency", nullptr, nullptr)) {
+		return false;
+	} else {
+		return true;
+	}
+}
