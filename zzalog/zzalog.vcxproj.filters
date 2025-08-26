@@ -838,6 +838,7 @@
     <None Include="userguide\new_rig.dox" />
     <None Include="userguide\new_app.dox" />
     <None Include="userguide\qsls.dox" />
+    <None Include="userguide\local_data.dox" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="zzalog.ico">

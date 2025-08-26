@@ -47,6 +47,15 @@ bool adi_writer::store_book(book* out_book, ostream& out, bool clean, field_list
 	// configure progress bar - progress is counted by number of records processed
 	status_->misc_status(ST_NOTE, "LOG: Started writing ADI");
 	status_->progress(out_book->size() + 1, out_book->book_type(), "Storing ADIF", "records");
+
+	unsigned char check = adif_compliance(out_book, fields);
+	if (check & non_latin) {
+		status_->misc_status(ST_WARNING, "Data cannot be represeneted in ASCII or ISO-8859-1");
+	}
+	else if (check & non_ascii) {
+		status_->misc_status(ST_WARNING, "Data cannot be represented as ASCII, but can as ISO-8859-1");
+	}
+
 	// For all records and while the output is successful
 	if (out_book->header()) {
 		store_record(out_book->header(), out, result, nullptr);
@@ -191,4 +200,60 @@ void adi_writer::to_adif(record* record, ostream& out, field_list* fields /* = n
 // Calculate the progress towards saving
 double adi_writer::progress() {
 	return (double)current_ / (double)out_book_->size();
+}
+
+// Check contents are ADIF compliant
+unsigned char adi_writer::adif_compliance(book* b, field_list* fields) {
+	unsigned char result = 0;
+	for (auto qso : *b) {
+		if (fields) {
+			for (auto field : *fields) {
+				string item = qso->item(field);
+				const char* pos = item.c_str();
+				const char* pend = pos + item.length();
+				int len;
+				while (pos < pend) {
+					unsigned int utf8 = fl_utf8decode(pos, pend, &len);
+					if (utf8 >= 0x20 && utf8 <= 0x7E) {
+						// Valid ASCII
+					}
+					else if (utf8 >= 0xA0 && utf8 <= 0xFF) {
+						// ISO-8859-1
+						result |= non_ascii;
+					}
+					else {
+						printf("Non-latin word %s=%s\n", field.c_str(), item.c_str());
+						result |= non_latin;
+					}
+					pos += len;
+				}
+			}
+		}
+		else {
+			for (auto field : *qso) {
+				const char* pos = field.second.c_str();
+				const char* pend = pos + field.second.length();
+				int len;
+				while (pos < pend) {
+					unsigned int utf8 = fl_utf8decode(pos, pend, &len);
+					if (utf8 < 0x20) {
+						result |= control;
+					}
+					else if (utf8 >= 0x20 && utf8 <= 0x7E) {
+						// Valid ASCII
+					}
+					else if (utf8 >= 0xA0 && utf8 <= 0xFF) {
+						// ISO-8859-1
+						result |= non_ascii;
+					}
+					else {
+						printf("Non-latin word %s=%s\n", field.first.c_str(), field.second.c_str());
+						result |= non_latin;
+					}
+					pos += len;
+				}
+			}
+		}
+	}
+	return result;
 }

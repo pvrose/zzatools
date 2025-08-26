@@ -2333,23 +2333,31 @@ string spec_data::summarise_enumaration(string name, string value) {
 		if (items != ds->data.end()) {
 			if (items->second->find("Primary Administrative Subdivision") != items->second->end()) {
 				return items->second->at("Primary Administrative Subdivision");
-			} else if (items->second->find("Section Name") != items->second->end()) {
+			}
+			else if (items->second->find("Section Name") != items->second->end()) {
 				return items->second->at("Section Name");
-			} else if (items->second->find("Continent") != items->second->end()) {
+			}
+			else if (items->second->find("Continent") != items->second->end()) {
 				return items->second->at("Continent");
-			} else if (items->second->find("Entity Name") != items->second->end()) {
+			}
+			else if (items->second->find("Entity Name") != items->second->end()) {
 				return items->second->at("Entity Name");
-			} else if (items->second->find("Meaning") != items->second->end()) {
+			}
+			else if (items->second->find("Meaning") != items->second->end()) {
 				return items->second->at("Meaning");
-			} else if (items->second->find("Description") != items->second->end()) {
+			}
+			else if (items->second->find("Description") != items->second->end()) {
 				return items->second->at("Description");
-			} else {
+			}
+			else {
 				return "";
 			}
-		} else {
+		}
+		else {
 			return "";
 		}
-	} else {
+	}
+	else {
 		return "";
 	}
 }
