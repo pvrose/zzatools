@@ -19,10 +19,17 @@ under special conditions from the licensing authority.
 
 This now provides more detail for each band segment. It now includes selected
 spot frequencies for recommended centres of activity and similar. More visible on this
-larer image are the coloured bars indicating the frequencies recommended for various
-modes.
+larger image are the coloured bars indicating the frequencies recommended for various
+modes. 
 
 This window is fully resizable. If it becomes too small, then information is removed 
 as necessary to fit the window.
+
+\section band_qsy Changing rig frequency
+
+Clicking on the frequency scale will cause the rig to move to that frequency. 
+Clicking on any of the text markers will cause the rig to move to the frequency at which the 
+marker is pointing.
+
 
 */

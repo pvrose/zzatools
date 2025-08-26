@@ -40,6 +40,16 @@ To install:
 make install
 </code>
 
+\subsection linux_reinstall Reinstalling after a library change
+
+To recompile and reinstall ZZALOG after a change to one of the external libraries:
+
+<code>
+cd [install directory]\n
+make clean\n
+make install
+</code>
+
 \section initial_run First-time Run
 
 The first time ZZALOG is run, a dialog opens asking whether the
