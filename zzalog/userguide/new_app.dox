@@ -15,6 +15,34 @@ a remote computer.
 - <B>Independent applications.</B> These do not access the rig directly and so do not necessarily need configuration.
 An example would be GridTracker that displays information from other applicatons.
 
+\section app_ex1 Example 1 - WSJT-X
 
+The following image shows the configuration for WSJT-X. This is a client application, so the "Server" button is lit.
+It also requires configuration for both audio and CAT, so the "Aud./CAT" button is lit.
+
+<IMG SRC="../images/new_apps_1.png">
+
+You will see that this choice is reflected in the label below this: "IC-705 FlRig". In the box below, a script is named. To
+view or edit the script click the "Show" button.
+
+<IMG SRC="../images/new_apps_2.png">
+
+As ZZALOG is acting as a server for WSJT-X, it needs to be initialised with the port that WSJT-X will use. 
+In this case, ZZALOG will listen on port 224.0.0.1:2237. ZZALOG is not the only server that WSJT-X uses, so
+the address supplied here is a Multicast address so that both ZZALOG and the other server will receive the
+packets. Otherwise it would be "first come, only serve". Note that the Windows version of ZZALOG does not yet
+support Multicast addresses.
+
+The script simply calls WSJT-X and tells it to use the configuration IC705, which the user sets up within WSJT-X. For
+information on this refer to the application's manual.
+
+\section app_ex2 Example 2 - GridTracker
+
+The second example shows the configuration for GridTracker2. This application has no interaction with the rigs. It
+listens for data packets sent out by WSJT-X: it is the other server refered to above.
+
+<IMG SRC="../images/new_apps_3.png">
+
+In this case, and this is particular to the Linux version of ZZALOG, the script is actually the terminal command.
 
 */
