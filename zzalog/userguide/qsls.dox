@@ -1,5 +1,164 @@
 /** \page qsls Handling QSLs
 
-Watch this space.
+Currently QSLs are managed in a number of ways. Amateur Radio is transitioning away from the 
+exchange of physical QSL cards to electronic cards. ZZALOG supports both these.
+
+<IMG SRC="../images/qsls_1.png">
+
+\section qsl_website Internet QSL agents
+
+There are a number of websites that support the exchange of QSL information:
+- <B>eQSL.cc</B> This accepts data in ADIF .adi format for the contacts the user uploads. The user can 
+download data in .adi format for contacts that others have claimed with this station.
+- <B>Logbook of the World</B> This is run by ARRL and matches logbooks uploaded by users
+world-wide. A user will only receive data that has been matched in ARRL's database.
+- <B>Clublog.org</B> This is another site that matches users' logbooks but does not 
+supply any data back to the user. It will instead correlate the data and display
+the user's status with respect to various awards.
+- <B>QRZ.com</B> User upload their logs to this website, and can receive data for
+records that match.
+
+ZZALOG has custom code to handle the interface with all the above websites. In all cases
+ZZALOG attempts to match data received with its own logbook. For sites which only send data
+that has already been matched, this usually results in the ZZALOG logbook being updated
+with flags indicating the match and sometimes location data is updated. For
+example a more accurate Maidenhead location is sometimes provided. 
+
+For eQSL.cc, ZZALOG sometimes detects a record that it cannot find a match for.
+
+\subsection qsl_upload Uploading QSLs 
+
+ZZALOG can be configured to upload QSLs to each of the above websites immediately after
+logging a QSO. This is the recommended method. 
+
+Sometimes, it would be more convenient to upload in batches at the end of a session.
+
+<IMG SRC="../images/qsls_5.png">
+
+In the above image, to extract all the records that have yet to be uploaded to a website,
+click the appropriate button boxed in red. Once the data has been extracted, the buttons
+boxed in blue will be enabled and click the appropriate button to upload the data to
+the website.
+
+\subsection qsl_download Downloading QSLs
+
+There is no automatic download feature from these websites. To download from a specific 
+website, click a button boxed in green in the image below.
+
+<IMG SRC="../images/qsls_6.png">
+
+Once downloaded, the data will be compared with the existing logbook, and any records
+that do not match, usually from eQSL.cc, are presented to the user for action.
+
+\subsection qsl_eqsl Matching QSLs from eQSL.cc
+
+When downloading data from eQSL.cc, ZZALOG will refer a record to the user if
+it cannot find a match.
+
+<IMG SRC="../images/qsls_2.png">
+
+In this example, the two search buttons are highlighted. The button with just a search
+icon, will allow the user to step backwards and forwards through the log around the 
+time of the reported QSO. This image shows the result of clicking this button. It shows
+a comparison with the reported QSO and the logged one immediately after the time of that
+QSO.
+
+<IMG SRC="../images/qsls_4.png">
+
+The button also labeled "ALL.TXT" will look at the 
+file produced by WSJT-X logging activity. This image shows that the callsign of the
+reported QSO was not found in the WSJT-X log around the time of the reported QSO.
+
+<IMG SRC="../images/qsls_3.png">
+
+For all QSls that match, ZZALOG then queries eQSL.cc for the  image that goes with the
+record. The image received will be stored in filestore if this has been set up. The image
+below shows the filstore structure used by ZZALOG in storing QSL images received from eQSL.cc.
+
+<IMG SRC="../images/qsls_8.png">
+
+<code>
+.../[Station Callsign]/[band]/[mode]/[call]__[timestamp].png\n
+
+.../GM3ZZA/10M/CW/AN44AND__202402281521.PNG\n
+</code>
+
+
+\section qsl_receive Receiving QSLs
+
+Other QSLs can be received as e-mail images or as physical cards, either direct or through
+the bureau. In both cases the reported QSO must be checked in the logbook. 
+To find the QSO in the logbook follow the procedure in \ref search_qso. The image below
+shows the result of searching for a QSO on a particular date with a particular callsign.
+
+<IMG SRC="../images/qsls_7.png">
+
+In the "QSL/Edit" tab on the right of the image, there are buttons marked "Bureau", "e-mail" and "Direct".
+Click the button that is appropriate for how the card was received, and the QSO record will be updated
+accordingly. In the "QSL/Display" tab it will be possible to view the image provided that it has been
+saved with the correct name. For eQSL.cc images, the image is automatically saved to the location
+described above. 
+
+For e-mail images save the image to:
+
+<code>
+.../[Station Callsign]/email/[call]__[qso_date]\n
+
+.../GM3ZZA/email/DL8MBF__20250630.jpg\n
+</code>
+
+For physical cards, you can scan the front and back of the card to:
+
+<code>
+.../[Station Callsign]/scans/[QSL rcvd date]/[call]__[qso_date]\n
+.../[Station Callsign]/scans/[QSL rcvd date]/[call]++[qso_date]\n
+
+.../GM3ZZA/scans/20161202/dg5mla__20150625.png\n
+.../GM3ZZA/scans/20161202/dg5mla++20150615.png\n
+</code>
+
+<B>NB</B> Replace forward slash characters '/' with and underscore '_' to avoid the slash being interpreted as a level of file hierarchy.
+
+\section qsl_sending Sending QSLs
+
+\subsection qsl_sendemail Sending QSLs by e-mail
+
+<IMG SRC="../images/qsls_9.png">
+
+ZZALOG provides the capability to create a design for an e-mail QSL card. See \ref qsl_editor. It is possible to 
+process more than one card. Clicking the "Search" button will extract all records, for which an e-mail card
+has been received. Alternatively an individual e-mail can be sent by clicking the check button
+"Only handle selected QSO".
+
+To send the e-mail or e-mails follow the steps from left to right:
+- Click the file icon: this generates a PNG image files with the completed e-mails.
+- Click the letter icon: this sends the e-mails.
+- Click the "Done" button: Once the e-mails have been sent this updates the QSO records. Only do this when you are 
+sure the e-mail has been sent.
+
+\subsection qsl_labels Sending physical QSLs
+
+<IMG SRC="../images/qsls_10.png">
+
+ZZALOG provides the capability to create a design for a print label. See \ref qsl_editor.
+It is expected to process a batch of cards at one time, to optimise the use of printer
+label sheets. 
+
+The "Search" button will extract all QSOs that have the ADIF field QSL_SENT set to "Q" (for queued) or "R"
+(for requested) or if not set and the QSL_RCVD field is set to "Y".
+
+The "Print" button will then print labels for all the extracted records. If enabled in the editor
+more than one record for the same recipient can be printed on one label. Alternatively, the user 
+can use the extracted list to hand-write the QSL cards.
+
+When the QSL cards have been sent, click the "Done" button while the extracted data is still present
+to update these QSO records.
+
+\subsection qsl_oqrs OQRS
+
+OQRS, or the On-line Qsl Request Service is run as part of the clublog.org website. It is a facility
+that allows other operators to request a physical QSL card. Clicking the "OQRS" button will 
+fetch a list of these requests. The records corresponding to this list will then
+be updated with QSL_SENT to "R" (for requested).
 
 */

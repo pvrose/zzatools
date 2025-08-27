@@ -1,0 +1,18 @@
+/** \page release_notes Revision History
+
+\section rev_366 Revision 3.6.6
+
+- Combine WX tab with Clock tab.
+- Change Clock tab to a single tab, switchable between UTC and local time.
+- Add "CLOSING" across progress banner.
+- Cosmetic changes
+- Bug fixes
+  - Exception when pasting data.
+  - Uploads to eQSL.cc cannot be enabled.
+  - Some input widgets not getting keyboard focus.
+
+\section rev_365 Revision 3.6.5
+
+- First documented release.
+
+*/
