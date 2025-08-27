@@ -37,15 +37,19 @@ using namespace std;
 		// write record to output stream
 		ostream & store_record(record* record, ostream& out, load_result_t& result, field_list* fields = nullptr);
 
-		// Data contains non-ASCII data
-		const unsigned char non_ascii = 1;
+		// Data is ASCII compliant
+		const unsigned char ASCII = 0;
+		// Data contains ISO-8859-1 compliant
+		const unsigned char LATIN_1 = 1;
 		// Data contains data that cannot be interpreted in ISO-8859-1 (Latin-1) 
-		const unsigned char non_latin = 2;
+		const unsigned char NON_LATIN = 2;
 		// Control character
-		const unsigned char control = 4;
+		const unsigned char CONTROL = 4;
 
 		// Check contents are ADIF compliant
 		unsigned char adif_compliance(book* b, field_list* fields);
+		// Check character
+		unsigned char adif_char(unsigned int utf8);
 
 
 	protected:

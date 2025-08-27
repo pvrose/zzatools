@@ -48,12 +48,15 @@ bool adi_writer::store_book(book* out_book, ostream& out, bool clean, field_list
 	status_->misc_status(ST_NOTE, "LOG: Started writing ADI");
 	status_->progress(out_book->size() + 1, out_book->book_type(), "Storing ADIF", "records");
 
-	unsigned char check = adif_compliance(out_book, fields);
-	if (check & non_latin) {
-		status_->misc_status(ST_WARNING, "Data cannot be represeneted in ASCII or ISO-8859-1");
-	}
-	else if (check & non_ascii) {
-		status_->misc_status(ST_WARNING, "Data cannot be represented as ASCII, but can as ISO-8859-1");
+	// If exported data check ADIF compliance
+	if (out_book->book_type() != OT_MAIN) {
+		unsigned char check = adif_compliance(out_book, fields);
+		if (check & NON_LATIN) {
+			status_->misc_status(ST_WARNING, "Exported data contains characters outwith ASCII or ISO-8859-1");
+		}
+		else if (check & LATIN_1) {
+			status_->misc_status(ST_WARNING, "Exported data contains non-ASCII but within ISO-8859-1");
+		}
 	}
 
 	// For all records and while the output is successful
@@ -202,6 +205,23 @@ double adi_writer::progress() {
 	return (double)current_ / (double)out_book_->size();
 }
 
+// Categorise UTF-8 character (ASCII, ISO-8859-1 or neither)
+unsigned char adi_writer::adif_char(unsigned int utf8) {
+	if (utf8 < 0x20) {
+		return CONTROL;
+	}
+	else if (utf8 >= 0x20 && utf8 <= 0x7E) {
+		return 0;
+	}
+	else if (utf8 >= 0xA0 && utf8 <= 0xFF) {
+		// ISO-8859-1
+		return LATIN_1;
+	}
+	else {
+		return NON_LATIN;
+	}
+}
+
 // Check contents are ADIF compliant
 unsigned char adi_writer::adif_compliance(book* b, field_list* fields) {
 	unsigned char result = 0;
@@ -214,17 +234,7 @@ unsigned char adi_writer::adif_compliance(book* b, field_list* fields) {
 				int len;
 				while (pos < pend) {
 					unsigned int utf8 = fl_utf8decode(pos, pend, &len);
-					if (utf8 >= 0x20 && utf8 <= 0x7E) {
-						// Valid ASCII
-					}
-					else if (utf8 >= 0xA0 && utf8 <= 0xFF) {
-						// ISO-8859-1
-						result |= non_ascii;
-					}
-					else {
-						printf("Non-latin word %s=%s\n", field.c_str(), item.c_str());
-						result |= non_latin;
-					}
+					result |= adif_char(utf8);
 					pos += len;
 				}
 			}
@@ -236,20 +246,7 @@ unsigned char adi_writer::adif_compliance(book* b, field_list* fields) {
 				int len;
 				while (pos < pend) {
 					unsigned int utf8 = fl_utf8decode(pos, pend, &len);
-					if (utf8 < 0x20) {
-						result |= control;
-					}
-					else if (utf8 >= 0x20 && utf8 <= 0x7E) {
-						// Valid ASCII
-					}
-					else if (utf8 >= 0xA0 && utf8 <= 0xFF) {
-						// ISO-8859-1
-						result |= non_ascii;
-					}
-					else {
-						printf("Non-latin word %s=%s\n", field.first.c_str(), field.second.c_str());
-						result |= non_latin;
-					}
+					result |= adif_char(utf8);
 					pos += len;
 				}
 			}
