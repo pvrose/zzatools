@@ -20,15 +20,6 @@ that provides the following functionality:
 - Interfaces with a number of
 	modem applications (WSJT-X, FLDIGI etc).
 
-ZZALOG maintains the QSO records
-in the ADIF .adi format. This allows manual editing, if done
-carefully. ZZALOG may not be tolerant of errors introduced by manual
-editing.
-Although ADIF .adi format does
-not support the use of non-ASCII character sets, ZZALOG provides
-support for all Unicode characters coded in UTF-8 format and
-may include such data in exported files. Exchange of
-such data with other applications may result in errors.
 This document can be opened at
 any time from the menu:
 
@@ -44,6 +35,7 @@ any time from the menu:
 - \subpage page_4
 - \subpage page_5
 - \subpage page_6
+- \subpage local_data
 
 For help on any specific window or panel, click on it and press F1.
 

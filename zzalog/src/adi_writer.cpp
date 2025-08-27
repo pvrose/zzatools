@@ -52,10 +52,10 @@ bool adi_writer::store_book(book* out_book, ostream& out, bool clean, field_list
 	if (out_book->book_type() != OT_MAIN) {
 		unsigned char check = adif_compliance(out_book, fields);
 		if (check & NON_LATIN) {
-			status_->misc_status(ST_WARNING, "Exported data contains characters outwith ASCII or ISO-8859-1");
+			status_->misc_status(ST_ERROR, "Exported data contains characters outwith ASCII or ISO-8859-1");
 		}
 		else if (check & LATIN_1) {
-			status_->misc_status(ST_WARNING, "Exported data contains non-ASCII but within ISO-8859-1");
+			status_->misc_status(ST_ERROR, "Exported data contains non-ASCII but within ISO-8859-1");
 		}
 	}
 
