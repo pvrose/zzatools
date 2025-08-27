@@ -49,31 +49,31 @@ void app_grp::save_values() {
 // Create fthe widgets
 void app_grp::create_form() {
     int curr_x = x() + GAP;
-    int curr_y = y() + GAP;
+    int curr_y = y() + HTEXT;
 
     box(FL_BORDER_BOX);
 
-    radio_class_ = new Fl_Group(curr_x, curr_y, WBUTTON * 3, HBUTTON);
+    radio_class_ = new Fl_Group(curr_x, curr_y, WBUTTON * 3, HBUTTON, "Rig connection");
     radio_class_->box(FL_FLAT_BOX);
 
     // Button to select common command for all rigs
-    bn_common_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "All rigs");
+    bn_common_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Common");
     bn_common_->callback(cb_bn_class, (void*)(intptr_t)ALL_RIGS);
-    bn_common_->tooltip("Select if the same command is used for all rigs");
+    bn_common_->tooltip("Select if no configuration per rig is required");
 
     curr_x += WBUTTON;
 
     // Button to select command for rig specific, CAT mnon-specific
-    bn_rig_nocat_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Rig");
+    bn_rig_nocat_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Audio");
     bn_rig_nocat_->callback(cb_bn_class, (void*)(intptr_t)RIG_NO_CAT);
-    bn_rig_nocat_->tooltip("Select if a separate command is required for the rig, but not CAT method");
+    bn_rig_nocat_->tooltip("Select if configuration is required only for audio");
 
     curr_x += WBUTTON;
 
     // Button to select command for rig and CAT specific
-    bn_rig_cat_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Rig+CAT");
+    bn_rig_cat_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Aud./CAT");
     bn_rig_cat_->callback(cb_bn_class, (void*)(intptr_t)RIG_CAT);
-    bn_rig_cat_->tooltip("Select if a separate command is required for the rig and the CAT method");
+    bn_rig_cat_->tooltip("Select if configuration is required for audio and CAT");
 
     radio_class_->end();
     

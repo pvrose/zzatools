@@ -1,5 +1,20 @@
-/** \page new_app Adding a new application
+/** \page new_app New applications
 
-Watch this space.
+ZZALOG provides the capability of launching other applications. There are several sorts of applications.
+- <B>Client applications.</B> These are typically modem applications that use ZZALOG as a server and access the logbook
+to check for any previous QSO with a potential contact and to log QSOs made by that application. Client applications
+require specific code within ZZALOG to handle its logging requirements.
+
+In addition any application whether it is a client of ZZALOG that may require configuration to connect to
+the same rig as ZZALOG.
+- <B>CAT & Audio applications.</B> These are applications that require access to the rig's audio and CAT ports,
+and so needs to be configured for both audio and CAT. n example would be a modem application like FlDigi.
+- <B>Audio applications.</B> These are applications that do not require access to the rig's CAT port, but does to its
+audio ports, so neeeds to be configured for audio. An example would be a helper application for routing audio to
+a remote computer.
+- <B>Independent applications.</B> These do not access the rig directly and so do not necessarily need configuration.
+An example would be GridTracker that displays information from other applicatons.
+
+
 
 */
