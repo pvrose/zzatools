@@ -3,17 +3,20 @@
 The logbook is kept as a text file, basically in ADIF 3 .adi format (see <A HREF="https://www.adif.org">ADIF specification</A>). Although ADIF specifically
 only allows the use of ASCII printable characters (codes 32 to 254 inclusive) and, with restrictions, codes 10 (LF) and 13 (CR), 
 ZZALOG will store non-ASCII characters as 
-UTF-8. The count of characters in the ADIF specification is implemented as a byte count. So, for example, the name J&uuml;rgen witll be stored as
+UTF-8. The count of characters in the ADIF specification is implemented as a byte count. So, for example,
+the name J&uuml;rgen will be stored as:
 
 <CODE>
-&lt;NAME:7&gt;J&uuml;rgen
+&lt;NAME:<B>7</B>&gt;J&uuml;rgen
 </CODE>
 
+\section data_export Exporting data
 When data is exported, it may contain non-ASCII characters. When this is the case an error is presented to the user. Most use cases are
 unlikely to contain such data. 
 
+\section data_edit Editing data
 The user may edit the text file with care and understanding of the ADIF specification.
-ZZALOG may not be tolerant to errors intoduced by manual edits.
+ZZALOG may not be tolerant to errors intoduced by manual edits. Typically, this will result in loss of data.
 
 
 */
