@@ -133,7 +133,7 @@ $(APPDATA_DIR)/%: $(REF_DIR)/%
 	@cp $< $@
 
 # Copy User guide
-$(USERGUIDE_DIR)/html/index.html : $(UG_DIR)/html/index.html
+$(USERGUIDE_DIR)/html/index.html : $(UG_DIR)/html/index.html ./Doxyfile
 	@echo Copying HTML files
 	@sudo mkdir -p $(USERGUIDE_DIR)/html
 	@sudo cp -r $(UG_DIR)/html/* $(USERGUIDE_DIR)/html/
