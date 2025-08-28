@@ -4,7 +4,7 @@ The logbook is kept as a text file, basically in ADIF 3 .adi format (see <A HREF
 only allows the use of ASCII printable characters (codes 32 to 254 inclusive) and, with restrictions, codes 10 (LF) and 13 (CR), 
 ZZALOG will store non-ASCII characters as 
 UTF-8. The count of characters in the ADIF specification is implemented as a byte count. So, for example,
-the name J&uuml;rgen will be stored as:
+the name <B>J&uuml;rgen</B> will be stored as:
 
 <CODE>
 &lt;NAME:<B>7</B>&gt;J&uuml;rgen

@@ -23,9 +23,9 @@ It is provided in XML format and provides:
 
 The web-site https://www.country-files.com/big-cty/ provides similar data and is also regularly updated.
 It differs from Clublog:
-- Includes
+- Includes:
   - ITU Zone.
-- Exclude
+- Excludes:
   - History, it contains only a snapshot of the callsign exceptions.
 
 \subsection dxatlas dxatlas.com

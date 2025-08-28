@@ -32,7 +32,7 @@ a page of the log-book showing the most recent entries is
 displayed. In this view the data that is presented can be configured
 by selecting different fields to be displayed. The data can be
 displayed either in chronological order or in reverse chronological
-order. More information about this window is provided in \ref page_5 "Application Details".
+order. More information about this window is provided in \ref main_window
 below.
 Secondly, a dashboard view is
 available: in the image below ZZALOG provides
@@ -67,8 +67,8 @@ provided in the links above.
 <IMG SRC="../images/qso_manager_1.png">
 
 Finally, if ZZALOG is so
-configured, a third window is displayed. This is used, for example,
-for a club operation where the information about individual operators
+configured, a third window is displayed. This is used
+for a club operation where individual log-in
 is required:
 
 <IMG SRC="../images/init_5.png">
@@ -80,7 +80,6 @@ themselves or if not listed type in their initials (or callsign
 suffix). The user can then enter their name and callsign if mandated
 by the station policy. 
 
-To start operating we shall need
-to connect to a rig.
+For further information about using ZZALOG see \ref page_4.
 
 */

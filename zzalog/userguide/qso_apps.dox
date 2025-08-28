@@ -7,7 +7,7 @@ applications.
 
 <IMG SRC="../images/qso_apps_1.png">
 
-\section apps_new Selecting a new application
+\section apps_new Selecting an application
 
 Enclosed in red below, the "New App" button allows an application to be
 declared to ZZALOG. The data to entered here shall be a "label" for the 
@@ -53,5 +53,7 @@ the button labeled "Adm" enables this. Enter the password into the input field. 
 labeled with a closed eye will show the password in clear.
 
 <IMG SRC="../images/qso_apps_8.png">
+
+To configure a new or existing application see \ref new_app.
 
 */

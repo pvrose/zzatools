@@ -21,14 +21,11 @@ that provides the following functionality:
 	modem applications (WSJT-X, FLDIGI etc).
 
 This document can be opened at
-any time from the menu:
+any time from the menu or the toolbar:
 
-<A ID="Frame15">
-	<IMG SRC="../images/UserGuide_html_m6467ee96.png" NAME="graphics16" ALIGN=LEFT WIDTH=528 BORDER=0><BR CLEAR=LEFT><I>Illustration
-	1: Opening this document from the menu</I>
-</A>
+<IMG SRC="../images/index_1.png">
 
-<H1>Contents:</H1>
+\section contents Contents
 
 - \subpage page_2
 - \subpage page_3

@@ -1,7 +1,7 @@
 /** \page qso_bands Bandplan viewer
 
 This pane displays a summary of the bandplan for the current band. This is either the
-connected rig's transmit frequency of, when no rig is connected, the frequency of the
+rig's transmit frequency of, when no rig is connected, the frequency of the
 selected QSO record.
 
 <IMG SRC="../images/qso_bands_1.png">

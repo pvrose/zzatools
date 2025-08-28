@@ -8,22 +8,22 @@ image shows the image recieved from eQSL.cc for that QSO.
 This sub-pane "Display" shows images of received QSLs as well as images to be sent. The six 
 buttons select:
 
-- eQSL: the image received from eQSL.cc for that QSO.
-- Front: the image on the front of a paper card received for that QSO.
-- Back: the image on the back of a paper card received for that QSO.
-- eMail(R): the image received in an e-mail QSL.
-- Label: the image to be printed on a label to be applied to an outgoing paper card.
-- eMail(S): the image that coule be sent as an e-mail QSL.
+- <B>eQSL</B> the image received from eQSL.cc for that QSO.
+- <B>Front</B> the image on the front of a physical card received for that QSO.
+- <B>Back</B> the image on the back of a physical card received for that QSO.
+- <B>eMail(R)</B> the image received in an e-mail QSL.
+- <B>Label</B> the image to be printed on a label to be applied to an outgoing physical card.
+- <B>eMail(S)</B> the image that coule be sent as an e-mail QSL.
 
 In the image below the "Label" button has been clicked and that image is now displayed.
-This image will be used when printing labels to apply to paper QSL cards.
+This image will be used when printing labels to apply to physical QSL cards.
 
 <IMG SRC="../images/qso_qsl_vwr_2.png">
 
 The second sub-pane "Status" shows the QSL status. It shows whether QSLs have been 
 received (column "R") or sent (column "S") through the various QSL mechanisms: the
 four internet QSL servers (eQSL.cc, Logbook of the World, QRZ.com and Clublog.org),
-and by paper card (Bureau or direct) or e-mail. The last cases 
+and by physical card (Bureau or direct) or e-mail. The last cases 
 are distinguished by the letter 'B' or 'E' next to the check boxes.
 
 <IMG SRC="../images/qso_qsl_vwr_3.png">
@@ -34,10 +34,10 @@ encased in red, allow the fact that a QSL card has been received via the Bureau,
 or direct to be recorded. The bottom three buttons, encased in blue, have the following
 actions:
 
-- Fetch: Fetch an image from eQSL.cc for the QSO. This is normally automatic, but this
+- <B>Fetch</B> Fetch an image from eQSL.cc for the QSO. This is normally automatic, but this
 feature is provided if a glitch has prevented the automatic download.
-- Requested: The operator of the other station has requested a paper QSL card.
-- Declined: The operator of the other station has specifically declined a paper
+- <B>Requested</B> The operator of the other station has requested a physical QSL card.
+- <B>Declined</B> The operator of the other station has specifically declined a physical
 QSL card. Typically this may be a special event station that sends cards out but does
 not want one in return.
 

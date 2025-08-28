@@ -1,4 +1,4 @@
-/** \page new_rig Connecting rigs
+/** \page new_rig Configuring the rig interface
 
 ZZALOG uses hamlib to access the CAT control port of any rig. Hamlib is a free library that provides a 
 common API for most rigs. It is available for both Windows and Linux OSs. Using hamlib, ZZALOG
@@ -50,14 +50,14 @@ click "Use" and ZZALOG will attempt to connect to the rig.
 
 <IMG SRC="../images/new_rig_5.png"> <IMG SRC="../images/new_rig_6.png">
 
-<B>NB</B> ZZALOG does not attempt to power-on the rig. Ensure that the rig is powered on before connecting.
+<B>NB</B> ZZALOG by itself does not attempt to power-on the rig. Ensure that the rig is powered on before connecting.
 
 \section rig_app Connecting using an application
 
 In the following case we are using the application FlRig to access the rig. We have created a new connection called 
 FlRig. We can select FlRig as a pseudo-rig. FlRig provides an interface known as XMLRPC (Remote Procedure Call
 using XML) and is accessed using HTTP. In the "Connection" tab there are now fields for a script (red below) and 
-a host port address (blue below). Let us ignore scripts for now, see \ref rig_script below.
+a host port address (blue below). Let us ignore scripts for now, but to use them see \ref rig_script below.
 
 <IMG SRC="../images/new_rig_7.png">
 
@@ -69,7 +69,8 @@ IC-7300 transceiver connected to machine "chinook" from the machine.
 <IMG SRC="../images/new_rig_8.png">
 
 It is possible to have an instance of FlRig on the local machine and configure it to connect to the 
-instance of FlRig on the remote machine.
+instance of FlRig on the remote machine. In that case the host name is "localhost" or its IP address 
+is "127.0.0.1".
 
 \section rig_script Automating application launch
 
@@ -95,7 +96,9 @@ to get ZZALOG to connect to the application.
 ZZALOG can, however, be configured to apply these steps automatically. In the "Auto" tab, it is possible to 
 configure ZZALOG to automatically launch the access application when it starts. It is also possible
 to configure ZZALOG to try an connect to the application after a defined period has elapsed. This period
-is configurable from immediately (0&nbsp;s) to a delay of 10&nbsp;s in steps of 0.5&nbsp;s.
+is configurable from immediately (0&nbsp;s) to a delay of 10&nbsp;s in steps of 0.5&nbsp;s. In the example
+below, ZZALOG waits a period of 10&nbsp;seconds before attempting to connect to FlRig and starting reading
+values from the rig.
 
 <IMG SRC="../images/new_rig_11.png">
 

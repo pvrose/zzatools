@@ -9,15 +9,15 @@ This pane allows the user to specify how to connect a rig to ZZALOG.
 \section features_rig Features
 \subsection rig_1 Selecting the Rig
 
-Most modern rigs have computer control (CAT - Computer Aided Transceiver). 
-Each major manufacturer has their proprietary protocols and each rig has a unique
+Most modern rigs have computer control (CAT <I>Computer Aided Transceiver</I>). 
+Each major manufacturer has its proprietary protocols and each rig has a unique
 set of features that require additional decodes within those protocols. Like 
-many other applications, ZZALOG uses a standard library 'hamlib'. This library
-provides a standard interface (API) to access all the common features of all
+many other applications, ZZALOG uses a standard library <B>hamlib</B>. This library
+provides a standard programming interface (API) to access the features of all
 but the most recent rigs. Rigs are grouped according to their manufacturer 
 with a couple of miscellaneous interfaces. There are number of other 
 applications that provide rig access - some of these can also be connected
-to using hamlib.
+using hamlib.
 
 Click the "Select" button. This will put the rig control into a 'select' mode
 which allows the user to select the rig directly or one of the other
@@ -41,8 +41,9 @@ and baud-rate menus have been opened.
 An example using the application FlRig is shown below. In this case communication 
 between ZZALIB and FlRig uses a protocol known as XML-RPC (Remote procedure call using
 XML) over an HTTP link. In the case below, this HTTP link is within the same computer
-(localhost - green pointer) but it can be over a network. Also ZZALOG can start the other application
-using scripts (blue pointer), but the other application can be started by invoking its command. In
+(localhost - green pointer) but it can be over a network. ZZALOG can start the other application
+using scripts (blue pointer), but the other application can have been started by invoking its command
+or clicking its icon. In
 the case below a script is available as indicated by the indicated "Use" button (red pointer).
 
 <IMG SRC="../images/qso_rig_5.png">
@@ -81,11 +82,11 @@ and its power output in W.
 \subsection rig_misc Miscellaneous features
 
 The "Timeout etc" pane allows the user to specify miscellaneous features.
-- Timeout: This specifies the time in seconds that ZZALOG waits before deciding that the rig
+- <B>Timeout</B> This specifies the time in seconds that ZZALOG waits before deciding that the rig
 will not honour a request that has been made.
-- S-meter stack: When ZZALOG displays the S-meter value, it displayes the maximum value
+- <B>S-meter stack</B> When ZZALOG displays the S-meter value, it displayes the maximum value
 in its stack of readings. This input allows the depth of the stack to be configured.
-- TO Count: This soecifies the number of timeouts allowed before ZZALOG decides that
+- <B>TO Count</B> This soecifies the number of timeouts allowed before ZZALOG decides that
 the rig does not support the function.
 
 <IMG SRC="../images/qso_rig_9.png">
@@ -97,7 +98,7 @@ state - here in receive indicated the green circle. For transmit the circle woul
 This is followed by a brief description of the band and band-plan allocation. In this case
 the frequency lies in the FM and Digital Voice section of the 2m band. 
 
-Encased in blue is the rig display. It shows frequency (in MHz), mode, power and S-meter
+Encased in blue is the rig display. It shows frequency (in MHz), mode, power (in W) and S-meter
 reading. The power reading is the highest read in the previous transmit period. The S-meter
 reading is the highest read over the last few readings in the previous receive period.
 

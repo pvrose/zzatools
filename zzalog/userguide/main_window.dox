@@ -3,8 +3,15 @@
 \section description_1 Description
 
 This contains the main menu, a toolbar and a set of views.
-These views offer log-book style views of the whole book and various other sets of QSOs;
-an ADIF reference; and analyses of the log-book.
+These views offer:
+- <B>Full Log View</B> A tabular view of the entire logbook. This may be ordered in chrnological or reverse chronological order 
+and the list of fields that are shown can be configured.
+- <B>Records for Import</B> A tabular view of any records that are waiting to be imported into the logbook. 
+- <B>Extracted Records</B> A tabular view of all records that match the last query ran.
+- <B>Specification</B> A tree view of the ADIF Specification. It provides details of the use of each field.
+- <B>Log Analysis</B> A tree view of the analysis per DXCC entity, band or mode of stations worked in the logbook. The tree 
+arrangment is configurable.
+- <B>DXCC Status</B> A tabular view of the number of stations worked per DXCC, band and mode. The view is configurable.
 
   <IMG SRC="../images/main_window_1.png">
 

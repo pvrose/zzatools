@@ -34,6 +34,6 @@ The operator attribute allows the addition of MY_NAME and OPERATOR fields to the
 <IMG SRC="../images/qso_operation_4.png">
 
 This allows the STATION_CALLSIGN field to be specified if the logbook is being used 
-for operations using different callsigns - eg different RSIs within the UK or /P operation."
+for operations using different callsigns - eg different RSIs within the UK or /P operation.
 
 */

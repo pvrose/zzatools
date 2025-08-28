@@ -20,7 +20,7 @@ logging activity.
 
 <IMG SRC="../images/qso_qsl_2.png">
 
-\subsection qsl_download Downloading data
+\subsection qq_download Downloading data
 
 The second column, shown below, contains buttons that start QSL data downloads.
 In the case of the three online servers that support it, clicking the button
@@ -36,7 +36,7 @@ server, or that a QSL request has been received for OQRS.
 
 <IMG SRC="../images/qso_qsl_3.png">
 
-\subsection qsl_extract Extracting QSL data
+\subsection qq_extract Extracting QSL data
 
 The third column, shown below, contains buttons that extract data for sending to the
 online servers or other processing. The bottom button, labeled with a backward looping
@@ -44,7 +44,7 @@ arrow, remoces the extract.
 
 <IMG SRC="../images/qso_qsl_4.png">
 
-\subsection qsl_processing Processing QSL data
+\subsection qq_processing Processing QSL data
 
 The fourth column, shown below, contains buttons that process data. 
 
@@ -57,7 +57,7 @@ Foe e-Mails, an QSL image is generated for each of the records in the extracted 
 
 <IMG SRC="../images/qso_qsl_5.png">
 
-\subsection qsl_upload Uploading QSL data
+\subsection qq_upload Uploading QSL data
 
 The fifth column, shown below, contains buttons that upload data.
 
@@ -71,7 +71,7 @@ for each record in the extracted data.
 
 <IMG SRC="../images/qso_qsl_6.png">
 
-\subsection qsl_done Updating records with "Done"
+\subsection qq_done Updating records with "Done"
 
 The last column, shown below, contains buttons, lebaled "Done". For those activities
 that require manual intervention: uploading data; posting cards and sending e-mails, 

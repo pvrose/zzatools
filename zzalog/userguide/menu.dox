@@ -9,125 +9,125 @@ top of the Main Window.
 \section features_2 Features
 \subsection Menu Items
 
-  - File - File-related actions.
+  - <B>File</B> - File-related actions.
   
-    - New - Create a new book.
-    - Open - Open an existing book.
-    - Read - Open an existing file as read-only.
-    - Save - Save the book and continue.
-    - Save As - Save the book with a new name.
-    - Close - Close the application.
-    - Print Log - Print the log as it looks.
-    - Recent - Opens a list of recent files that have opened.
-    - Backup - Save a copy of the current log in a known place.
-    - Restore - Open the saved backup.
+    - <B>New</B> - Create a new book.
+    - <B>Open</B> - Open an existing book.
+    - <B>Read</B> - Open an existing file as read-only.
+    - <B>Save</B> - Save the book and continue.
+    - <B>Save As</B> - Save the book with a new name.
+    - <B>Close</B> - Close the application.
+    - <B>Print Log</B> - Print the log as it looks.
+    - <B>Recent</B> - Opens a list of recent files that have opened.
+    - <B>Backup</B> - Save a copy of the current log in a known place.
+    - <B>Restore</B> - Open the saved backup.
 
-  - Settings - Access to configuration settings.
+  - <B>Settings</B> - Access to configuration settings.
   
-    - Files - Locations of pertinant files.
-    - Web/Network - Access to internet-connected features.
-    - Fields - Specification of which fields are used in the various features.
-    - Station - Define the various station locations, operators and callsigns used in the log.
-    - User Config - Allows limited user configuration of look and feel.
-    - QSL Design - Allows definition of QSL designs for card labels, and e-mails.
-    - Contests - Allows definition of contest algorithms.
-    - All - Displays all configuration data in a tree format.
+    - <B>Files</B> - Locations of pertinant files.
+    - <B>Web/Network</B> - Access to internet-connected features.
+    - <B>Fields</B> - Specification of which fields are used in the various features.
+    - <B>Station</B> - Define the various station locations, operators and callsigns used in the log.
+    - <B>User Config</B> - Allows limited user configuration of look and feel.
+    - <B>QSL Design</B> - Allows definition of QSL designs for card labels, and e-mails.
+    - <B>Contests</B> - Allows definition of contest algorithms.
+    - <B>All</B> - Displays all configuration data in a tree format.
 
-  - Windows - Control of visibility of windows.
+  - <B>Windows</B> - Control of visibility of windows.
   
-    - Show All - Make all active windows visible.
-    - Hide All - Minimise all windows.
-    - Main - Toggle vivibility of Main window.
-    - Dashboard - Toggle cisibility of Operating Dashboard.
-    - International Chars - Toggle visibility of the non-ASCII characater virtual keyboard.
+    - <B>Show All</B> - Make all active windows visible.
+    - <B>Hide All</B> - Minimise all windows.
+    - <B>Main</B> - Toggle visibility of Main window.
+    - <B>Dashboard</B> - Toggle visibility of Operating Dashboard.
+    - <B>International Chars</B> - Toggle visibility of the non-ASCII characater virtual keyboard.
     
-  - Navigate - Navigate through the log-book.
+  - <B>Navigate</B> - Navigate through the log-book.
   
-    - First - Select and display the first entry in the log.
-    - Previous - Select and display the entry immediately before the current selection.
-    - Next - Select and display the entry immediately after the current selection.
-    - Last - Select and display the most recent entry in the log.
-    - Date - Select and display the first entry on or after the entered date.
-    - Record No - Select and display the record numbered as entered.
-    - Find
-      - New - Select and display the first record matching entered callsign.
-      - Next - Select and display the next record matching the above callsign.
+    - <B>First</B> - Select and display the first entry in the log.
+    - <B>Previous</B> - Select and display the entry immediately before the current selection.
+    - <B>Next</B> - Select and display the entry immediately after the current selection.
+    - <B>Last</B> - Select and display the most recent entry in the log.
+    - <B>Date</B> - Select and display the first entry on or after the date entered in the pop-up dialog.
+    - <B>Record No</B> - Select and display the record numbered as entered in the pop-up dialog.
+    - <B>Find</B> 
+      - <B>New</B> - Select and display the first record matching entered callsign.
+      - <B>Next</B> - Select and display the next record matching the above callsign.
 
-  - Log - Activities affecting the log.
+  - <B>Log</B> - Activities affecting the log.
   
-    - New Record - Create a new QSO - deprecated use dashboard.
-    - Save Record - Save the QSO to the log - deprecated use dashboard.
-    - Retime Record - Update QSO_DATE_OFF and TIME_OFF to the current time.
-    - Cancel - Cancel the current QSO entry - deprecated use dashboard.
-    - Delete Record - Remove the selected record from the log - deprecated use dashboard.
-    - Parse Record - Decode the call in the selected record and add relevant data to record.
-    - Unparse Record - Remove fields added by parsing.
-    - Reparse Record - Combination of Unparse and Parse Record.
-    - Validate Record - Check all fields of the selected record are ADIF-compliant.
-    - Parse Log - Do "Parse Record" on all records in displayed log.
-    - Validate Log - Do "Validate Record" on all records in displayed log.
-    - Suspend Save - Toggle whether the log is automatically saved after each QSO.
-    - Bulk Changes - Opens a dialog to perform the same edit operation on each record in the displayed log.
-    - Check Duplicates - Scans the displayed log for any records that may be duplicates.
-    - Edit Header - Opens a dialog to edit the ADIF header record.
-    - Session - set the current operating session - highlighted as...
+    - <B>New Record</B> - Create a new QSO - deprecated use \ref qso_manager.
+    - <B>Save Record</B> - Save the QSO to the log - deprecated use \ref qso_manager.
+    - <B>Retime Record</B> - Update QSO_DATE_OFF and TIME_OFF to the current time.
+    - <B>Cancel</B> - Cancel the current QSO entry - deprecated use \ref qso_manager.
+    - <B>Delete Record</B> - Remove the selected record from the log - deprecated use \ref qso_manager.
+    - <B>Parse Record</B> - Decode the call in the selected record and add relevant data to record.
+    - <B>Unparse Record</B> - Remove fields added by parsing.
+    - <B>Reparse Record</B> - Combination of Unparse and Parse Record.
+    - <B>Validate Record</B> - Check all fields of the selected record are ADIF-compliant.
+    - <B>Parse Log</B> - Do "Parse Record" on all records in displayed log.
+    - <B>Validate Log</B> - Do "Validate Record" on all records in displayed log.
+    - <B>Suspend Save</B> - Toggle whether the log is automatically saved after each QSO.
+    - <B>Bulk Changes</B> - Opens a dialog to perform the same edit operation on each record in the displayed log.
+    - <B>Check Duplicates</B> - Scans the displayed log for any records that may be duplicates.
+    - <B>Edit Header</B> - Opens a dialog to edit the ADIF header record.
+    - <B>Session</B> - set the current operating session - highlighted as...
     
-      - Today - include all QSOs with the current date.
-      - Start Session - start the session from the selected record.
-      - Stop Session - 
-  - Extract - Extract records from the log, display them and undergo actions on them.
-    - Clear - clear extracted data.
-    - Criteria - Opens dialog to define selection criteria, and extract records accordingly.
-    - Redo - Repeat the previous extraction selection.
-    - Special - Special extraction criteria.
-      - No Name - Extract records with no name.
-      - No QTH - Extract records with no QTH.
-      - Small Locator - Extract records with 0, 2 or 4-character gridsquare locators.
-      - No Image - Extract records with no card image downloaded from eQSL.cc - takes a long time.
-    - Display - Displays a tooltip showing current extraction criteria.
-    - eQSL - Extract records that need uploading to eQSL.cc.
-    - LotW - Extract records that need uploading to Logbook of the World.
-    - Card - Extract records that need labels printing for QSL cards.
-    - e-Mail - Extract records that need response e-mailed QSLs.
-    - Clublog - Extract records that need uploading to Clublog.org.
-    - QRZ.com - Extract records that need uploading to QRZ.com.
-    - Save - Save the extracted records as a separate ADIF file.
-    - Upload - Upload records extracted for that purpose - target site set by previous extract.
-    - Print Cards - Print labels for records extracted for that purpose.
-    - Send e-Mail - send e-mails for records extracted for that purpose.
-    - Mark Sent - Mark records extracted for "Print Cards" and "Send e-Mail" as being done.
-    - Download Images - Download images from eQSL.cc for extracted records.
-  - Import - Import records from divers sources.
-    - File - Import (into separate data) new records from a file.
-    - File (Update QSOs) - Import new data for existing records from a file.
-    - File (QRZ.com) - Import data from QRZ.com for existing records.
-    - Download eQSL - Download an update file from eQSL.cc.
-    - Download LotW - Download an update file from Logbook of the World.
-    - Download QRZ.com - Download an update file from QRZ.com.
-    - Clipboard - Import records pastedto the clipboard (as ADIF text).
-    - WSJT-X UDP - Start importing records sent from WSJT-X.
-    - Merge (New QSOs) - Merge imported records into current log - new records.
-    - Merge (Update QSOs) - Merge imported records into current log - existing records.
-    - Cancel - Remove separate import data.
-  - Report - Configure the report view.
-    - Clear - Eemove data from analysis report.
-    - All - Add all data from the log to the analysis report.
-    - All Station - Add all data using the specified station callsign to the report.
-    - Extracted - Add the extracted data to the analysis report.
-    - Selected Record - Add only the selected record to the analysis report.
-    - Level N - Nth level of the analysis tree (For N=1, 2 and 3).
-      - Entities - DXCC Entities.
-      - Entities/States - DXCC Entities with primary administrative subdivisions.
-      - Bands - Bands.
-      - Modes - Modes used.
-      - Callsigns - Group records with the same callsign.
-      - Custom - Allow a custom selection.
-  - Information - Miscellaneous information sources.
-    - QRZ.com - Open the QRZ.com page for the callsign in the selected record.
-    - Google Maps - Open Google maps at the location indicated by the QTH or Gridsquare in the selected record.
-    - QSO Web-site - Open the web-page specified in the selected record.
-  - Help.
-    - About - Opens a dialog displaying the version information of ZZALOG and component libraries.
-    - User Guide - Opens the User Guide.
+      - <B>Today</B> - include all QSOs with the current date.
+      - <B>Start Session</B> - start the session from the selected record.
+      - <B>Stop Session</B> - exclude all current QSOs from the session and start a new one.
+  - <B>Extract</B> - Extract records from the log, display them and undergo actions on them.
+    - <B>Clear</B> - clear extracted data.
+    - <B>Criteria</B> - Opens dialog to define selection criteria, and extract records accordingly.
+    - <B>Redo</B> - Repeat the previous extraction selection.
+    - <B>Special</B> - Special extraction criteria.
+      - <B>No Name</B> - Extract records with no name.
+      - <B>No QTH</B> - Extract records with no QTH.
+      - <B>Small Locator</B> - Extract records with 0, 2 or 4-character gridsquare locators.
+      - <B>No Image</B> - Extract records with no card image downloaded from eQSL.cc - <B>NB</B> takes a long time.
+    - <B>Display</B> - Displays a tooltip showing current extraction criteria.
+    - <B>eQSL</B> - Extract records that need uploading to eQSL.cc.
+    - <B>LotW</B> - Extract records that need uploading to Logbook of the World.
+    - <B>Card</B> - Extract records that need labels printing for QSL cards.
+    - <B>e-Mail</B> - Extract records that need response e-mailed QSLs.
+    - <B>Clublog</B> - Extract records that need uploading to Clublog.org.
+    - <B>QRZ.com</B> - Extract records that need uploading to QRZ.com.
+    - <B>Save</B> - Save the extracted records as a separate ADIF file.
+    - <B>Upload</B> - Upload records extracted for that purpose - target site set by previous extract.
+    - <B>Print Cards</B> - Print labels for records extracted for that purpose.
+    - <B>Send e-Mail</B> - send e-mails for records extracted for that purpose.
+    - <B>Mark Sent</B> - Mark records extracted for "Print Cards" and "Send e-Mail" as being done.
+    - <B>Download Images</B> - Download images from eQSL.cc for extracted records.
+  - <B>Import</B> - Import records from divers sources.
+    - <B>File</B> - Read new records from a file in preparation for import.
+    - <B>File (Update QSOs)</B> - Read data records in preparation for merging with existing records.
+    - <B>File (QRZ.com)</B> - Read data from QRZ.com for existing records.
+    - <B>Download eQSL</B> - Download an update file from eQSL.cc.
+    - <B>Download LotW</B> - Download an update file from Logbook of the World.
+    - <B>Download QRZ.com</B> - Download an update file from QRZ.com.
+    - <B>Clipboard</B> - Import records pastedto the clipboard (as ADIF text).
+    - <B>WSJT-X UDP</B> - Start importing records sent from WSJT-X.
+    - <B>Merge (New QSOs)</B> - Merge imported records into current log - new records.
+    - <B>Merge (Update QSOs)</B> - Merge imported records into current log - existing records.
+    - <B>Cancel</B> - Remove separate import data.
+  - <B>Report</B> - Configure the report view.
+    - <B>Clear</B> - Remove data from analysis report.
+    - <B>All</B> - Add all data from the log to the analysis report.
+    - <B>All Station</B> - Add all data using the specified station callsign to the report.
+    - <B>Extracted</B> - Add the extracted data to the analysis report.
+    - <B>Selected Record</B> - Add only the selected record to the analysis report.
+    - <B>Level <I>N</I></B> - Nth level of the analysis tree (For N=1, 2 and 3).
+      - <B>Entities</B> - DXCC Entities.
+      - <B>Entities/States</B> - DXCC Entities with primary administrative subdivisions. The subdivisions form an extra branch to the tree.
+      - <B>Bands</B> - Bands.
+      - <B>Modes</B> - Modes used.
+      - <B>Callsigns</B> - Group records with the same callsign.
+      - <B>Custom</B> - Allow a custom selection.
+  - <B>Information</B> - Miscellaneous information sources.
+    - <B>QRZ.com</B> - Open the QRZ.com page for the callsign in the selected record.
+    - <B>Google Maps</B> - Open Google maps at the location indicated by the QTH or Gridsquare in the selected record.
+    - <B>QSO Web-site</B> - Open the web-page specified in the selected record.
+  - <B>Help</B>
+    - <B>About</B> - Opens a dialog displaying the version information of ZZALOG and component libraries.
+    - <B>User Guide</B> - Opens the User Guide.
 
 */

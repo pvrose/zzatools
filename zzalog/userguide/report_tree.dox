@@ -1,10 +1,10 @@
-/** \page report_tree Analysis of the log
+/** \page report_tree Log analysis
 
 \section description_6 Description
 
 This view shows an analysis of the log broken down into a hierarchy based on DXCC 
 entities bands and modes worked.
-The format is controlled by the "Report->" set of menu items in the main menu.
+The format is controlled by the "Report->" set of items in the main menu.
 
 <IMG SRC="../images/report_tree_1.png">
 

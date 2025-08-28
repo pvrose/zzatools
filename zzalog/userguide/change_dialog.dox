@@ -9,21 +9,21 @@ it will act on all records in the log-book.
 
 The various elements of this dialog are:
 
-- "Change field" - this specifies which field is to be operated on.
-- "Rename field" - selecting a field and clicking "OK" or "Action" will result in this
+- <B>Change field</B> This specifies which field is to be operated on.
+- <B>Rename field</B> Selecting a field and clicking "OK" or "Action" will result in this
 field being renamed in all the extracted records.
-- "Delete field" - clicking "OK" or "Action" will result in this field being removed from
+- <B>Delete field</B> Clicking "OK" or "Action" will result in this field being removed from
 all extracted records.
-- "Add field" - selecting this will enable either the "Value" or "Enum. Value"
+- <B>Add field</B> Selecting this will enable either the "Value" or "Enum. Value"
 inputs: clicking "OK" or "Action" will add the value entered to be added to all extracted
 records that currently do not have a value in this field.
-- "Change field" - selecting this will enable either the "Value" or "Enum. Value"
+- <B>Change field</B> Selecting this will enable either the "Value" or "Enum. Value"
 inputs: clicking "OK" or "Action" will add the value entered to be added to all extracted
 records whether they have an existing value or not.
 
 The buttons at the bottom:
-- "OK" - do the operation and close the dialog.
-- "Action" - do the operation, but leave the dialog open.
-- "Cancel" - clsoe the dialog withoiut doing the operation.
+- <B>OK</B> Do the operation and close the dialog.
+- <B>Action</B> Do the operation, but leave the dialog open.
+- <B>Cancel</B> Close the dialog withoiut doing the operation.
 
 */

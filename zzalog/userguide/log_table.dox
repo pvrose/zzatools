@@ -15,7 +15,7 @@ This will make this record the current record being worked on in all views.
 
 \subsection edit Editing an entry
 
-Double-clicking on an entry will open a edit box that allows for the 
+Double-clicking on an entry will open an edit box that allows for the 
 data within the field of the record to be edited.
 
 <IMG SRC="../images/log_table_2.png">
@@ -41,18 +41,18 @@ column will vary the width of a column.
 
 Double clicking on the header of a column containing QSO_DATE, TIME_ON, QSO_DATE_OFF or TIME_OFF will switch from chronological
 order to reverse-chronological order or vice-versa. Double clicking on the header of other columns is only enabled in the
-extracted-data instance of this widget.In that case the data will be displayed in alphabetical order of the entries in that
+"Extracted Records" tab. In that case the data will be displayed in alphabetical order of the entries in that
 column. Double-clicking it again will display in reverse alphabetical order. 
-<B>NB</B> Switching order like this will take a long time.
+<B>NB</B> Switching order like this on the same field will take a long time.
 
-\subsection import Import Data
+\subsection import Records for import
 
-The second nstance of the Log-book view is to present the contents of a file or data 
+The second instance of the Log-book view is to present the contents of a file or data 
 being imported. The image below shows the import of a log produced from WSJT-X.
 
 <IMG SRC="../images/log_table_5.png">
 
-\subsection extract Extracted 
+\subsection extract Extracted records
 
 The third instance of the log-book view shows a list of extracted records. 
 The image below shows an extraction of all records with stations in Denmark.

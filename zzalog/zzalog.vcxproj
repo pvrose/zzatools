@@ -432,7 +432,7 @@
     <None Include="userguide\contest_scorer.dox" />
     <None Include="userguide\cty_dialog.dox" />
     <None Include="userguide\fields_dialog.dox" />
-    <None Include="userguide\images\dxcc_view.dox" />
+    <None Include="userguide\dxcc_view.dox" />
     <None Include="userguide\images\main_window.dox" />
     <None Include="userguide\images\qso_buttons.dox" />
     <None Include="userguide\images\toolbar.dox" />

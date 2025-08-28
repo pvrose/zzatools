@@ -11,47 +11,48 @@ Displays a set of iconised buttons linked to main menu action. There are also a 
 The majority of buttons contain links to the Menu bar.
 
 <IMG SRC="../images/toolbar_set1.png">
--  Closed file icon - File->New.
--  Open file icon - File->Open.
--  Floppy disc icon - File->Save.
--  Floppy disc with pen icon - File->Save As.
+-  <B>Closed file icon</B> - File->New.
+-  <B>Open file icon</B> - File->Open.
+-  <B>Floppy disc icon</B> - File->Save.
+-  <B>Floppy disc with pen icon</B> - File->Save As.
 
 <IMG SRC="../images/toolbar_set2.png">
--  Left arrow with bar - Navigate->First.
--  Left arrow - Navigate->Previous.
--  Right arroe - Navigate->Next.
--  Right arrow with bar - Navigate->Last.
--  Blue Magnifying glass - Navigate->Find->New.
--  Blue double chevron - Navigate->Find->Next.
+-  <B>Left arrow with bar</B> - Navigate->First.
+-  <B>Left arrow</B> - Navigate->Previous.
+-  <B>Right arrow</B> - Navigate->Next.
+-  <B>Right arrow with bar</B> - Navigate->Last.
+-  <B>Blue Magnifying glass</B> - Navigate->Find->New.
+-  <B>Blue double chevron</B> - Navigate->Find->Next.
 
 <IMG SRC="../images/toolbar_set3.png">
--  White open square - Log->New Record.
--  White square with tick - Log->Save Record.
--  White square with red cross - Log->Cancel.
--  Large white square with black cross - Log->Delete Record.
--  White square containing blue image - Log->Retime Record.
+-  <B>White open square</B> - Log->New Record.
+-  <B>White square with tick</B> - Log->Save Record.
+-  <B>White square with red cross</B> - Log->Cancel.
+-  <B>Large white square with black cross</B> - Log->Delete Record.
+-  <B>White square containing blue image</B> - Log->Retime Record.
 
 <IMG SRC="../images/toolbar_set4.png">
--  Cyan downward arrow over "eQSL" - Import->Download eQSL.
--  Cyan downward arraow over "LotW" - Import->Download LotW.
--  Blue "?" over "eQSL" - Extract->eQSL.
--  Blue "?" over "LotW" - Extract->LotW.
--  Blue "?" over "CL" - Extract->ClubLog.
--  Upward arrow - Extract->Upload.
+-  <B>Cyan downward arrow over "eQSL"</B> - Import->Download eQSL.
+-  <B>Cyan downward arrow over "LotW"</B> - Import->Download LotW.
+-  <B>Blue "?" over "eQSL"</B> - Extract->eQSL.
+-  <B>Blue "?" over "LotW"</B> - Extract->LotW.
+-  <B>Blue "?" over "CL"</B> - Extract->ClubLog.
+-  <B>Upward arrow</B> - Extract->Upload.
 
 <IMG SRC="../images/toolbar_set5.png">
--  Box with three dots - Connect/Disconnect Rig.
--  Blue "?" - Extract->Criteria.
--  Blue "?" with red cross - Extract->Clear.
--  Blue "?" superimposed with horizontal lines - Extract->Display.
--  Image of world - Information->Google Maps.
--  "QRZ.com" - Information->QRZ.com.
--  &quot;&AElig;&quot; - Windows->International Chars.
+-  <B>Box with three dots</B> - Connect/Disconnect Rig.
+-  <B>Blue "?"</B> - Extract->Criteria.
+-  <B>Blue "?" with red cross</B> - Extract->Clear.
+-  <B>Blue "?" superimposed with horizontal lines</B> - Extract->Display.
+-  <B>Image of world</B> - Information->Google Maps.
+-  <B>"QRZ.com"</B> - Information->QRZ.com.
+-  <B>&quot;&AElig;&quot;</B> - Windows->International Chars.
+-  <B>Rose icon</B> - Help->User Guide.
 
 <IMG SRC="../images/toolbar_set6.png">
--  Text input - Enter callsign for search features.
--  Bold downward arrow - Find next occurence of callsign.
--  Downward chevron and bar - Extract all occurences of callsign.
--  "DX?" - Display parsing of the callsign.
+-  <B>Text input</B> - Enter callsign for search features.
+-  <B>Bold downward arrow</B> - Find next occurence of callsign.
+-  <B>Downward chevron and bar</B> - Extract all occurences of callsign.
+-  <B>"DX?"</B> - Display parsing of the callsign.
 
 */

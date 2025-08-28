@@ -85,7 +85,7 @@ string CONTACT2 = "gm3zza@btinternet.com";
 string DATA_COPYRIGHT = "\302\251 Philip Rose %s. This data may be copied for the purpose of correlation and analysis";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string PROGRAM_VERSION = "3.6.5";
+string PROGRAM_VERSION = "3.6.6";
 string VENDOR = "GM3ZZA";
 string TIMESTAMP = string(__DATE__) + " " + string(__TIME__) + " Local";
 // Target ADIF version number

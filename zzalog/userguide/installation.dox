@@ -18,7 +18,7 @@ the flow has not yet been tested on a clean machine.
 \section linux_install Linux Installation
 
 ZZALOG is available in source form. It may be cloned from 
-"https://github.com/pvrose/zzatools". It has dependencies on the 
+https://github.com/pvrose/zzatools. It has dependencies on the 
 external libraries: fltk, hamlib and libcurl.
 
 To compile:
@@ -54,13 +54,12 @@ make install
 
 The first time ZZALOG is run, a dialog opens asking whether the
 imstallation id for a club or individual.
-
-<IMG SRC="../images/init_1.png">
-
 Please select which version the installation is for. A dialog then opens 
 asking for a directory to store QSL card images. Cancel this if this
 feature is not required, otherwise navigate to where the images should be
 stored and select "OK". 
+
+<IMG SRC="../images/init_2.png">
 
 A dialog then opens asking for the name of the file to use to store 
 the log-book. Navigate to where the log-book is to be located and

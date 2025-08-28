@@ -213,6 +213,9 @@ void qso_data::enable_widgets() {
 		string call;
 		if (current_qso()) call = current_qso()->item("CALL");
 		else call = "N/A";
+		string query_call;
+		if (g_query_->query_qso()) query_call = g_query_->query_qso()->item("CALL");
+		else query_call = "N/A";
 		// Enable station details
 		g_station_->qso(current_qso());
 		char l[128];
@@ -323,7 +326,7 @@ void qso_data::enable_widgets() {
 		case QSO_BROWSE:
 			// Browsing - display using tabular view
 			g_entry_->hide();
-			snprintf(l, sizeof(l), "QSO Query - %s - %s", call.c_str(), g_query_->query_message().c_str());
+			snprintf(l, sizeof(l), "QSO Query - %s - %s", query_call.c_str(), g_query_->query_message().c_str());
 			g_query_->copy_label(l);
 			if (visible_r()) g_query_->show();
 			g_query_->enable_widgets();
@@ -341,7 +344,7 @@ void qso_data::enable_widgets() {
 		case QRZ_COPY:
 			// Show details downloaded from QRZ.com and check any matches
 			g_entry_->hide();
-			snprintf(l, sizeof(l), "QSO Query - %s - %s", call.c_str(), g_query_->query_message().c_str());
+			snprintf(l, sizeof(l), "QSO Query - %s - %s", query_call.c_str(), g_query_->query_message().c_str());
 			g_query_->copy_label(l);
 			if (visible_r()) g_query_->show();
 			g_query_->enable_widgets();
@@ -354,7 +357,7 @@ void qso_data::enable_widgets() {
 		case QUERY_NEW:
 			// Show an imported QSO (no match found) and check if real
 			g_entry_->hide();
-			snprintf(l, sizeof(l), "QSO Query - %s - %s", call.c_str(), g_query_->query_message().c_str());
+			snprintf(l, sizeof(l), "QSO Query - %s - %s", query_call.c_str(), g_query_->query_message().c_str());
 			g_query_->copy_label(l);
 			if (visible_r()) g_query_->show();
 			g_query_->enable_widgets();
@@ -367,7 +370,7 @@ void qso_data::enable_widgets() {
 		case QUERY_WSJTX:
 			// Show an imported QSO and possible match found in WSJTX All.TXT file
 			g_entry_->hide();
-			snprintf(l, sizeof(l), "QSO Query - %s - Possible match found in ALL.TXT", call.c_str());
+			snprintf(l, sizeof(l), "QSO Query - %s - Possible match found in ALL.TXT", query_call.c_str());
 			g_query_->copy_label(l);
 			if (visible_r()) g_query_->show();
 			g_query_->enable_widgets();

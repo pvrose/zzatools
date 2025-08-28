@@ -9,14 +9,14 @@ obtained from the rig: frequency, mode and transmit power.
 \section b1_connect Connecting a rig
 
 This page assumes that ZZALOG has already has the rig connection defined and the means of 
-launching any CAT control application (the <I>script</I>) specified. See \ref new_rig.
+launching any CAT control application (the script) specified. See \ref new_rig.
 
 <IMG SRC="../images/basic1_1.png">
 
-ZZALOG will usually start with the previous rig selected, but not connected. 
+ZZALOG will usually start with the previous rig selected, and if active will connect to it. 
 Select the tab for the rig you want to use,
 as shown by the red arrow. If the rig connection is made through an external app then 
-launch it using the <I>script</I> by clicking the "Start" button (blue arrow). 
+launch it using the script by clicking the "Start" button (blue arrow). 
 
 Depending on how the rig connection has configured ZZALOG may automatically connect to the
 external app after a period of time. If it doesn't, the clicking the "Connect" button (green arrow),
@@ -56,5 +56,7 @@ view mode.
 - "Save & New" will save the data and start a new QSO.
 - "Save & Edit" will save the data and enter the end time. The QSO can still be edited.
 - "Quit QSO" will abandon entering the QSO.
+
+You can then continue making more QSOs in the same way.
 
 */

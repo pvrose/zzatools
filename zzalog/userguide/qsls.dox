@@ -7,7 +7,8 @@ exchange of physical QSL cards to electronic cards. ZZALOG supports both these.
 
 \section qsl_website Internet QSL agents
 
-There are a number of websites that support the exchange of QSL information:
+There are a number of websites that support the exchange of QSL information, ZZALOG
+currently supports the following:
 - <B>eQSL.cc</B> This accepts data in ADIF .adi format for the contacts the user uploads. The user can 
 download data in .adi format for contacts that others have claimed with this station.
 - <B>Logbook of the World</B> This is run by ARRL and matches logbooks uploaded by users
@@ -24,7 +25,7 @@ that has already been matched, this usually results in the ZZALOG logbook being 
 with flags indicating the match and sometimes location data is updated. For
 example a more accurate Maidenhead location is sometimes provided. 
 
-For eQSL.cc, ZZALOG sometimes detects a record that it cannot find a match for.
+For eQSL.cc, ZZALOG sometimes detects a record that it cannot find a match for, see \ref qsl_eqsl.
 
 \subsection qsl_upload Uploading QSLs 
 
@@ -71,9 +72,10 @@ reported QSO was not found in the WSJT-X log around the time of the reported QSO
 
 <IMG SRC="../images/qsls_3.png">
 
-For all QSls that match, ZZALOG then queries eQSL.cc for the  image that goes with the
+For all QSLs that match, ZZALOG then sends a request to eQSL.cc for the  image that goes with the
 record. The image received will be stored in filestore if this has been set up. The image
 below shows the filstore structure used by ZZALOG in storing QSL images received from eQSL.cc.
+To view these images, refer to \ref qso_qsl_vwr.
 
 <IMG SRC="../images/qsls_8.png">
 
@@ -87,7 +89,7 @@ below shows the filstore structure used by ZZALOG in storing QSL images received
 \section qsl_receive Receiving QSLs
 
 Other QSLs can be received as e-mail images or as physical cards, either direct or through
-the bureau. In both cases the reported QSO must be checked in the logbook. 
+the bureau. In both cases the reported QSO may be checked in the logbook. 
 To find the QSO in the logbook follow the procedure in \ref search_qso. The image below
 shows the result of searching for a QSO on a particular date with a particular callsign.
 
@@ -127,7 +129,7 @@ For physical cards, you can scan the front and back of the card to:
 
 ZZALOG provides the capability to create a design for an e-mail QSL card. See \ref qsl_editor. It is possible to 
 process more than one card. Clicking the "Search" button will extract all records, for which an e-mail card
-has been received. Alternatively an individual e-mail can be sent by clicking the check button
+has been received and not replied to. Alternatively an individual e-mail can be sent by clicking the check button
 "Only handle selected QSO".
 
 To send the e-mail or e-mails follow the steps from left to right:
@@ -149,7 +151,7 @@ The "Search" button will extract all QSOs that have the ADIF field QSL_SENT set 
 
 The "Print" button will then print labels for all the extracted records. If enabled in the editor
 more than one record for the same recipient can be printed on one label. Alternatively, the user 
-can use the extracted list to hand-write the QSL cards.
+can use the extracted list to hand-write QSL cards.
 
 When the QSL cards have been sent, click the "Done" button while the extracted data is still present
 to update these QSO records.

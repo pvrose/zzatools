@@ -6,18 +6,17 @@ read when ZZALOG is launched and every 30 minutes thereafter.
 <IMG SRC="../images/qso_wx_1.png">
 
 The above image shows from top to bottom:
-- Location and latitude and longitude provided by the report server. This is in response to a 
-request providing the station's latitude and longitude.
-- Iconic and textual summaries of the current weather condition.
-- Weather statistics:
-	- Temperature - clicking on the value toggles between &deg;C and &deg;F.
-	- Wind speed - clicking cycles between miles per hour, metres per second, 
+- <B>Location</B> Place and latitude and longitude provided by the report server.
+- <B>Summary</B> Iconic and textual summaries of the current weather condition.
+- <B>Statistics:</B>
+	- <B>Temperature</B> clicking on the value toggles between &deg;C and &deg;F.
+	- <B>Wind speed</B> clicking cycles between miles per hour, metres per second, 
 kilometres per hour and knots.
-	- Wind direction - clicking cycles between an arrow indicating direction, compass point and compass degrees.
-	- Atmospheric pressure - clicking cycles between hectopascals, millimetres of mercury, inches of mercury and
+	- <B>Wind direction</B> clicking cycles between an arrow indicating direction, compass point and compass degrees.
+	- <B>Atmospheric pressure</B> clicking cycles between hectopascals, millimetres of mercury, inches of mercury and
 millibars.
-	- Cloud coverage - clicking cycles between a chart symbol, percentage cloud cover and okta values.
-- Sun rise and sun set in the timezone selected in the system clock.
-- Time of last update in the timezone selected in the system clock.
+	- <B>Cloud coverage</B> clicking cycles between a chart symbol, percentage cloud cover and okta values.
+- <B>Sun rise and sun set</B> Times in the timezone selected in the system clock.
+- <B>Last update</B> Time in the timezone selected in the system clock.
 
 */

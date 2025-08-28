@@ -1,6 +1,6 @@
 /** \page analysis Analysing the log
 
-There are a couple of features provided in ZZALOG to help analyse the log
+There are two features provided in ZZALOG to help analyse the log
 for numbers of DXCC entities worked. 
 
 \section anal_loga Using Log Analysis
@@ -16,7 +16,7 @@ the report is ordered
 <IMG SRC="../images/analysis_2.png"> 
 <IMG SRC="../images/analysis_3.png"> 
 
-This produces the listing as such.
+This produces the listing as such:
 
 <IMG SRC="../images/analysis_4.png">
 
@@ -26,7 +26,7 @@ Clicking on any line will open that QSO record in the view pane in the Dashboard
 
 The DXCC Status tab provides a tabular view. See \ref dxcc_view for details of the controls used
 to filter the view. This view is listing mode classes (as used in DXCC awards) worked for
-each entity and verified either on Logbook of the World or by paper card.
+each entity and verified either on Logbook of the World or by physical card.
 
 <IMG SRC="../images/analysis_5.png">
 */

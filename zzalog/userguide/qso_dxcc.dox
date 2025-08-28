@@ -20,7 +20,7 @@ but not on the current band (2m).
 There are a few cases where it is not possible to decode the DXCC entity from the callsign.
 One such example is the use of the GB prefix. By default this decodes to "G: England", but
 it is possible to temporarily override this by use of an exception applied in one
-of the on-line directories as shown below.
+of the on-line directories as shown in \ref page_6.
 
 <IMG SRC="../images/qso_dxcc_3.png">
 

@@ -8,16 +8,16 @@ port with ZZALOG. ZZALOG can launch the application configured for audio and CAT
 in a way compatible with ZZALOG. This requires the use of scripts. To configure the 
 modem application and generate the script, see \ref new_app.
 
-ZZALOG can act as a log server for two such modem applications: WSJT-X and FLDIGI. For 
-FLDIGI, ZZALOG can act as an emulation of the FLLOG application and provide details
+ZZALOG can act as a log server for two such modem applications: WSJT-X and FlDigi. For 
+FlDigi, ZZALOG can act as an emulation of the FlLog application and provide details
 of previous contacts as well as saving the QSO record to the log. For WSJT-X, ZZALOG interprets 
 data received from WSJT-X while the QSO is in progress and saves the QSO record to the log 
 on completion of the QSO.
 
-\section b2_fldigi Launching and Connecting FLDIGI
+\section b2_fldigi Launching and Connecting FlDigi
 
-FLDIGI is a modem application for modes such as RTTY, CW and PSK. To launch the application,
-select the FLDigi tab and click the "Connect" button. FLDIGI should have been configured
+FlDigi is a modem application for modes such as RTTY, CW and PSK. To launch the application,
+select the FlDigi tab and click the "Connect" button. FlDigi should have been configured
 for the specific transceiver type, and its CAT and audio port connections. 
 
 <IMG SRC="../images/basic2_1.png">
@@ -26,15 +26,15 @@ Once FLDIGI has been launched it needs to be told to use ZZALOG as its log serve
 
 <IMG SRC="../images/basic2_2.png">
 
-From the FLDIGI menu, select the "Logbook" drop-down menu and ensure "Connect to Server"
-is checked, as above. Once this is done, FLDIGI will access ZZALOG to query the
+From the FlDigi menu, select the "Logbook" drop-down menu and ensure "Connect to Server"
+is checked, as above. Once this is done, FlDigi will access ZZALOG to query the
 worked-before status of a call and tell ZZALOG to save the QSO record on completion 
 of the QSO.
 
 \section b2_wsjtx Launching and Connecting WSJT-X
 
 WSJT-X is a modem application for modes such as JT9 and FT8. To launch the application,
-select the WSJT tab and click the "Connect" button. FLDIGI should have been configured
+select the WSJT tab and click the "Connect" button. WSJT-X should have been configured
 for the specific transceiver type, and its CAT and audio port connections. 
 
 <IMG SRC="../images/basic2_3.png">

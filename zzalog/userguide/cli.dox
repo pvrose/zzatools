@@ -12,35 +12,34 @@ although some changes are aggregated by ZZALOG to prevent unnecessary updates (s
 - <B>-c|--club_mode</B> Launches ZZALOG in club mode. This requires the operator to log in to the application 
 whenever it is started (sticky).
 - <B>-d|--debug [mode...]</B> 
-  Applies a debug feature to be invoked for the run. 
-  - <B>-d c|curl</B>
+  Applies a debug feature to be invoked for the run. Mode has the values:
+  - <B>c|curl</B>
   Increases verbosity from the libcurl library used for network access.
-  - <B>-d noc|nocurl</B>
+  - <B>noc|nocurl</B>
   Restores normal verbosity from libcurl.
-  - <B>-d e|errors</B>
+  - <B>e|errors</B>
   Provides more details on errors.
-  - <B>-d noe|noerrors</B> Restores normal error reporting.
-  - <B>-d h=<I>N</I>|hamlib=<I>N</I></B>	  
-Sets the hamlib debug level (default ERRORS). This is set by the following 'C' enumerated type used
-in hamlib. <I>N</I> values as below:
-    - 0: No debug reporting
-    - 1: Report serious bugs
-    - 2: Report errors
-    - 3: Report warnings
-    - 4: Verbose
-    - 5: Tracing
-    - 6: Report cache behaviour
-  - <B>-d p|pretty</B>  
+  - <B>noe|noerrors</B> Restores normal error reporting.
+  - <B>h=<I>N</I>|hamlib=<I>N</I></B>	  
+Sets the hamlib debug level (default ERRORS). <I>N</I> values as below:
+    - <B>0</B> No debug reporting
+    - <B>1</B> Report serious bugs
+    - <B>2</B> Report errors
+    - <B>3</B> Report warnings
+    - <B>4</B> Verbose
+    - <B>5</B> Tracing
+    - <B>6</B> Report cache behaviour
+  - <B>p|pretty</B>  
 Sets the terminal to display formated status message (Needs terminal support).
-  - <B>-d nop|nopretty</B>
+  - <B>nop|nopretty</B>
 Sets the terminal to display unformatted status messages.
-  - <B>-d q|quick</B>  
+  - <B>q|quick</B>  
 Shortens long timeout and polling intervals.
-  - <B>-d r|rig</B>  
+  - <B>r|rig</B>  
 Prints rig diagnostics
-  - <B>-d t|threads</B>	
+  - <B>t|threads</B>	
 Provides debug tracing on thread use.
-  - <B>-d not|nothreads</B>
+  - <B>not|nothreads</B>
 Removes debug tracing on threads.
 - <B>-e|--new</B>
 Creates a new file

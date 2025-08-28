@@ -1,6 +1,6 @@
 /** \page stn_dialog Setting this station details
 
-This dialog allows the user to set various parameters about the current station. It has three tabs: #
+This dialog allows the user to set various parameters about the current station. It has three tabs:
 QTH, Operator and Station callsign.
 
 \section sd_qth Specifying QTH details
@@ -13,21 +13,21 @@ the control labeled "Id", or an existing location can be selected from the drop-
 
 The user can then enter as much or as little information about the location in the fields in the dialog:
 
-- "Street": the street name as part of the postal address of the station (QSO field MY_STREET).
-- "City": the town or city name as part of the postal address (QSO field MY_CITY).
-- "Postcode": the postal code (QSO field MY_POSTAL_CODE),
-- "Locator": the Maidenhead locator or grid square: this can be to any desired accuracy (QSO field MY_GRIDSQUARE).
-- "Country": the name of the DXCC entity (QSO field MY_COUNTRY).
-- "DXCC": the equivalent numeric index of the DXCC entity (QSO field MY_DXCC).
-- "Prim'y Sub": the primary administrative subdivision of the DXCC entity (e.g. US State or Canadian province -
+- <B>Street</B> The street name as part of the postal address of the station (QSO field MY_STREET).
+- <B>City</B> The town or city name as part of the postal address (QSO field MY_CITY).
+- <B>Postcode</B> The postal code (QSO field MY_POSTAL_CODE),
+- <B>Locator</B> The Maidenhead locator or grid square: this can be to any desired accuracy (QSO field MY_GRIDSQUARE).
+- <B>Country</B> The name of the DXCC entity (QSO field MY_COUNTRY).
+- <B>DXCC</B> The equivalent numeric index of the DXCC entity (QSO field MY_DXCC).
+- <B>Prim'y Sub</B> The primary administrative subdivision of the DXCC entity (e.g. US State or Canadian province -
 QSO field MY_STATE) - disabled if not relevant to the DXCC entity.
-- "Sec'y Sub": the secondary administrative subdivision of the DXCC entity (e.g. US county or Russian RDA -
+- <B>Sec'y Sub</B> The secondary administrative subdivision of the DXCC entity (e.g. US county or Russian RDA -
 QSO field MY_CNTY) - disabled if not relevant to the DXCC entity.
-- "CQ Zone" - the zone number for CQ Magazine awards and contests (QSO field MY_CQ_ZONE).
-- "ITU Zone" - the zone number alloacted by ITU and used for IARU awards and contests (QSO fiels MY_ITU_ZONE).
-- "Continent" - the abbtreviation of the continent (QSO field APP_ZZA_MY_CONT).
-- "IOTA" - the designation of the island group for Islands on the Air awards (QSO field MY_IOTA).
-- "WAB" - the Ordnance Survey location for Worked all Britain awards (QSO field APP_ZZA_MY_WAB).
+- <B>CQ Zone</B> The zone number for CQ Magazine awards and contests (QSO field MY_CQ_ZONE).
+- <B>TU Zone</B> The zone number alloacted by ITU and used for IARU awards and contests (QSO fiels MY_ITU_ZONE).
+- <B>Continent</B> The abbtreviation of the continent (QSO field APP_ZZA_MY_CONT).
+- <B>IOTA</B> The designation of the island group for Islands on the Air awards (QSO field MY_IOTA).
+- <B>WAB</B> The Ordnance Survey location for Worked all Britain awards (QSO field APP_ZZA_MY_WAB).
 
 It is possible to populate some of the fields by decoding the station callsign being used
 at this location. If the user clicks the check box "Update from call" a drop-down menu
@@ -45,8 +45,8 @@ the drop-down list.
 
 The user can then enter as much or as little information about the location in the fields in the dialog:
 
-- "Name": the name of the operator as can be exchanged in the QSO (QSO field MY_NAME).
-- "Callsign": the callsign of the operator (QSO field OPERATOR).
+- <B>Name</B> The name of the operator as can be exchanged in the QSO (QSO field MY_NAME).
+- <B>Callsign</B> The callsign of the operator (QSO field OPERATOR).
 
 <IMG SRC="../images/stn_dialog_2.png">
 

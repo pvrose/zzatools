@@ -13,32 +13,32 @@ custom criteria to be set in conjunction with the operators and search text.
 This selection may be refined - see \ref search_refine below.
 
 The criteria are:
-- "DXCC" - matches against the DXCC entered in the search text input. This may
+- <B>DXCC</B> Mmatches against the DXCC entered in the search text input. This may
 either be an integer representing the ARRL numeric identifier for the DXCC entity
 or its usual prefix.
-- "CQ Zone" - matches against the "CQZ" field in the ADIF record: a numeric value 
+- <B>CQ Zone</B> Matches against the "CQZ" field in the ADIF record: a numeric value 
 identifying the zone.
-- "ITU Zone" - matches against the "ITUZ" field of the ADIF record: a numeric value 
+- <B>ITU Zone</B> Matches against the "ITUZ" field of the ADIF record: a numeric value 
 identifying the zone.
-- "Continent" - matches against the "CONT" field of the ADIF record: a two-letter 
+- <B>Continent</B> Matches against the "CONT" field of the ADIF record: a two-letter 
 abbreviation of the continent.
-- "Square (2)" - matches against the first two characters of the record's GRIDSQUARE
+- <B>Square (2)</B> Matches against the first two characters of the record's GRIDSQUARE
 field.
-- "Square (4)" - matches against the first four characters of the record's GRIDSQUARE
+- <B>Square (4)</B> Matches against the first four characters of the record's GRIDSQUARE
 field.
-- "Callsign" - matches against the callsign.
-- "All" - extracts all records. This is useful for then sorting records other than
+- <B>Callsign</B> Matches against the callsign.
+- <B>All</B> Extracts all records. This is useful for then sorting records other than
 in chronological order.
-- "Field" - matches against the field selected in the adjacent drop-down list.
+- <B>Field</B> Matches against the field selected in the adjacent drop-down list.
 
 The next row of buttons selects the condition used:
-- "~" - regular expression matching - see https://cplusplus.com/ECMAScript for details.
-- "/=" - matches if the field selected does not equal the value specified.
-- "<" - matches if the field selected is less than the value specified.
-- "<=" - matches if the field selected is less than or equal to the value specified.
-- "=" - matches if the field selected is equal to the value specified.
-- ">=" - matches if the field selected is greater than or equal to the value specified.
-- ">" - matches if the field selected is greater than the value specified.
+- <B>~</B> Regular expression matching - see https://cplusplus.com/ECMAScript for details.
+- <B>/=</B> Matches if the field selected does not equal the value specified.
+- <B>&lt;</B> Matches if the field selected is less than the value specified.
+- <B>&lt;=</B> Matches if the field selected is less than or equal to the value specified.
+- <B>=</B> Matches if the field selected is equal to the value specified.
+- <B>&gt;=</B> Matches if the field selected is greater than or equal to the value specified.
+- <B>&gt;</B> Matches if the field selected is greater than the value specified.
 
 Except when "CQ Zone" or "ITU Zone" are selected, comparisons are based on string comparisons - 
 i.e. "11" is greater than "100". 
@@ -67,9 +67,9 @@ Note that all the refinements are accumulative.
 
 It is possible to specify muliple criteria. Clicking one of the buttons highlighted below will:
 
-- "New" - a new search is started: any previous search results are removed.
-- "And" - the existing search results are further matched against the new condition resulting in a reduced number
+- <B>New</B> A new search is started: any previous search results are removed.
+- <B>And</B> The existing search results are further matched against the new condition resulting in a reduced number
 of extracted records.
-- "Or" - a new search is started and the results are combined with the existing search results.
+- <B>Or</B> A new search is started and the results are combined with the existing search results.
 
 */

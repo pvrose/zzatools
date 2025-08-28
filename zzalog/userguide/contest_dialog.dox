@@ -11,9 +11,9 @@ the year for a contest which recurs every year.
 The user can then specify an algorithm by which to generate exchanges and score the contest. 
 Each algorithm is hard-coded into ZZALOG. The following algorithms are defined:
 
-- "Basic" - Exchange RS(T) plus serial, scoring 1 point per QSO outwith operator's own DXCC 
+- <B>Basic</B> Exchange RS(T) plus serial, scoring 1 point per QSO outwith operator's own DXCC 
 multiplied by the number of DXCC entities worked on each band.
-- "IARU-HF" - A custom algorithm developed for the IARU HF World Championship.
+- <B>IARU-HF</B> A custom algorithm developed for the IARU HF World Championship.
 
 The user should then specify the start and finish of the contest.
 
