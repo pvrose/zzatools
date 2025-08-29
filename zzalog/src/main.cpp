@@ -85,7 +85,7 @@ string CONTACT2 = "gm3zza@btinternet.com";
 string DATA_COPYRIGHT = "\302\251 Philip Rose %s. This data may be copied for the purpose of correlation and analysis";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string PROGRAM_VERSION = "3.6.6";
+string PROGRAM_VERSION = "3.6.6+";
 string VENDOR = "GM3ZZA";
 string TIMESTAMP = string(__DATE__) + " " + string(__TIME__) + " Local";
 // Target ADIF version number
@@ -98,6 +98,7 @@ bool DEBUG_THREADS = false;
 bool DEBUG_CURL = false;
 bool DEBUG_QUICK = false;
 bool DEBUG_RIGS = false;
+bool DEBUG_PARSE = false;
 rig_debug_level_e HAMLIB_DEBUG_LEVEL = RIG_DEBUG_ERR;
 // Operation switches - _S versions used to override sticky switch
 bool AUTO_UPLOAD = true;
@@ -525,6 +526,10 @@ int cb_args(int argc, char** argv, int& i) {
 				DEBUG_RIGS = true;
 				i += 1;
 			}
+			else if (strcmp("d", argv[i]) == 0 || strcmp("decode", argv[i]) == 0) {
+				DEBUG_PARSE = true;
+				i += 1;
+			}
 			// Not processed any parameter
 			if (i == save_i) debugs = false;
 		}
@@ -559,6 +564,7 @@ void show_help() {
   	"\t-d|--debug [mode...]\n"
 	"\t\tc|curl\tincrease verbosity from libcurl\n"
 	"\t\t\tnoc|nocurl\n"
+	"\t\td|decode\tShow callsign decoding\n"
 	"\t\te|errors\tprovide more details on errors\n"
 	"\t\t\tnoe|noerrors\n"
 	"\t\th=N|hamlib=N\tSet hamlib debug level (default ERRORS)\n"

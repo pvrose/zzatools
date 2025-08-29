@@ -28,6 +28,7 @@ extern club_handler* club_handler_;
 extern spec_data* spec_data_;
 extern status* status_;
 extern string default_data_directory_;
+extern bool DEBUG_PARSE;
 
 cty_data::cty_data() {
 	data_ = new all_data;
@@ -470,9 +471,15 @@ cty_element* cty_data::match_prefix(string call, string when) {
 }
 
 cty_filter* cty_data::match_filter(cty_entity* entity, cty_filter::filter_t type, string call, string when) {
+	if (DEBUG_PARSE) printf("DEBUG: Match call %s: \n", call.c_str());
 	for (auto it : entity->filters_) {
 		// Check filter type
-		if (it->filter_type_ == type) {
+		if (it->filter_type_ == type && it->pattern_.length()) {
+			if (DEBUG_PARSE) printf("DEBUG: Against pattern %s (%s:%s) for type %d\n", 
+				it->pattern_.c_str(), 
+				it->nickname_.c_str(),
+				it->name_.c_str(),
+				(int)type);
 			// Now match character by character
 			bool match = true;
 			bool found = false;
@@ -547,6 +554,7 @@ cty_filter* cty_data::match_filter(cty_entity* entity, cty_filter::filter_t type
 						}
 						else {
 							brace_match |= (call[pos_c] == it->pattern_[ix]);
+							last_c = it->pattern_[ix];
 						}
 					}
 					else {
@@ -555,8 +563,18 @@ cty_filter* cty_data::match_filter(cty_entity* entity, cty_filter::filter_t type
 					}
 					break;
 				}
+				if (DEBUG_PARSE) printf("%s vs %s - %s %s\n", 
+					it->pattern_.substr(0, ix).c_str(), 
+					call.substr(0, pos_c).c_str(),
+					brace_match ? "Brace match": "",
+					match ? "match": "no match");
 			}
-			if (match) return it;
+			if (match) {
+				if (DEBUG_PARSE) printf(" - matched\n");
+				return it;
+			} else {
+				if (DEBUG_PARSE) printf("\n");
+			}
 		}
 	}
 	return nullptr;

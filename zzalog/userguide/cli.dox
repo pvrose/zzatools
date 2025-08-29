@@ -17,6 +17,8 @@ whenever it is started (sticky).
   Increases verbosity from the libcurl library used for network access.
   - <B>noc|nocurl</B>
   Restores normal verbosity from libcurl.
+  - <B>d|decode</B>
+  Show callsign decoding
   - <B>e|errors</B>
   Provides more details on errors.
   - <B>noe|noerrors</B> Restores normal error reporting.
