@@ -651,7 +651,7 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 			}
 		}
 		else {
-			record* qso = match != nullptr ? match : qso_call(sender, true);
+			record* qso = match != nullptr ? match : qso_call(sender, false);
 			if (qso) {
 				qso->item("QSO_COMPLETE", string("N"));
 				switch (decode.type) {
@@ -698,6 +698,9 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 					return nullptr;
 				}
 			} else {
+				if (decode.type == TX1) {
+					grid_cache_[sender] = decode.exchange;
+				}
 				return qso;
 			}
 		}

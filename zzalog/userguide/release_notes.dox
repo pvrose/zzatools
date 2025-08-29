@@ -4,6 +4,7 @@
 
 - Bug fixes
   - Errors in callsign parsing algorithm against DxAtlas patterns
+  - Starting to log QSO in RX.TX1 results in confusion (revoking previous mod)
 
 \section rev_366 Revision 3.6.6
 
