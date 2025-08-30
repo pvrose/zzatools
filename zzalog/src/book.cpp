@@ -379,6 +379,16 @@ bool book::store_data(string filename, bool force, field_list* fields) {
 				sprintf(message, "LOG: %s", filename_.c_str());
 				status_->misc_status(ST_NOTE, message);
 				delete[] message;
+				// Rename the last 8 saves
+				for (char c = '8'; c > '0'; c--) {
+					// Rename will fail if file does not exist, so no need to test file exists
+					string oldfile = filename_ + c;
+					char c2 = c + 1;
+					string newfile = filename_ + c2;
+					fl_rename(oldfile.c_str(), newfile.c_str());
+				}
+				fl_rename(filename_.c_str(), (filename_ + '1').c_str());
+
 				// Output stream
 				ofstream file;
 				// Get file type suffix
