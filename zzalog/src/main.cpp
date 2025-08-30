@@ -1109,7 +1109,6 @@ bool open_settings() {
 		default_data_directory_ = stemp;
 	}
 
-	printf("ZZALOG: Opened settings %s\n", buffer);
 	for (char c = '8'; c > '0'; c--) {
 		// Rename will fail if file does not exist, so no need to test file exists
 		string oldfile = string(buffer) + c;
@@ -1143,9 +1142,6 @@ bool open_settings() {
 		in.close();
 		out.close();
 
-		if (ok) {
-			printf("ZZALOG: Settings saved as %s\n", backup);
-		}
 	}
 	return true;
 }
