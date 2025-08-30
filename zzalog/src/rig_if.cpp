@@ -419,11 +419,10 @@ bool rig_if::th_read_values() {
 	if (hamlib_data_->port_type == RIG_PORT_NONE) {
 		return false;
 	}
-	// TODO: This is a blunt instrument - WFVIEW seems to return powered off when it's not
-	if (hamlib_data_->model_id == 2) {
-		rig_data_.powered_on = true;
-	}
-	else {
+	// Assume powerd-on unless otherwise discover it
+	rig_data_.powered_on = true;
+	// WFView (accessed using rigctl_d doesn't have powered state)
+	if (hamlib_data_->model_id != 2) {
 		read_item_ = "powerstat";
 		// Check powered on
 		powerstat_t power_state;
