@@ -127,8 +127,10 @@ TX power of a transverter (in red) to be specified.
 Hamlib is under continual development as new rigs come onto the market and new features are added to hamlib itself.
 
 On Windows, a fixed version of hamlib is supplied with the ZZALOG installation package. This contains a DLL
-file containing the hamlib binary. It is located in "C:\Program Files\GM3ZZA\ZZALOG\libhamlib-4.dll". It is possible
-to overwrite this file with the latest version of hamlib. Care must be taken to follow the instructions in the
+file containing the hamlib binary. It is located in "C:\Program Files\GM3ZZA\ZZALOG\libhamlib-4.dll".
+It is intended that when a new official release of hamlib is made, then ZZALOG will be re-released.
+It is possible
+to overwrite this file with the latest unreleased version of hamlib. Care must be taken to follow the instructions in the
 hamlib installation notes to create a DLL for the MSVC flow.
 
 On Linux, hamlib is available for compiling from source. Download the latest and follow the instructions for 
