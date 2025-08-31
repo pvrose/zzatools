@@ -14,7 +14,7 @@ namespace contests {
         // Algorithm specific method to generate text from a number of fieds
         virtual string generate_exchange(record* qso);
         // Algorithm specific method to score an individual QSO
-        virtual score_result score_qso(record* qso, const set<string>& multipliers);
+        virtual score_result score_qso(record* qso, set<string>& multipliers);
         // Algorithmic specific method
         virtual bool uses_serno() { return true; }
 

@@ -51,12 +51,13 @@ string basic::generate_exchange(record* qso) {
 }
 
 // Algorithm specific method to score an individual QSO
-score_result basic::score_qso(record* qso, const set<string>& multipliers) {
+score_result basic::score_qso(record* qso, set<string>& multipliers) {
 	// Multiplier is number of DXCCs worked on each band
 	string multiplier = qso->item("DXCC") + " " + qso->item("BAND");
 	score_result result;
 	if (multipliers.find(multiplier) == multipliers.end()) {
 		result.multiplier = 1;
+		multipliers.insert(multiplier);
 	}
 	// QSO points - 1 per QSO in different DXCC
 	if (qso->item("DXCC") != my_info_->data.at(DXCC_ID)) {

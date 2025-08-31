@@ -400,6 +400,7 @@
     <ClInclude Include="include\symbols.h" />
     <ClInclude Include="include\tabbed_forms.h" />
     <ClInclude Include="include\ticker.h" />
+    <ClInclude Include="include\timestamp.h" />
     <ClInclude Include="include\toolbar.h" />
     <ClInclude Include="include\url_handler.h" />
     <ClInclude Include="include\user_dialog.h" />

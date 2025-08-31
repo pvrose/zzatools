@@ -55,7 +55,7 @@ string iaru_hf::generate_exchange(record* qso) {
 // Multiplier = count(ITUZ x BAND)
 // Total = QSO points * multiplier
 
-score_result iaru_hf::score_qso(record* qso, const set<string>& multipliers) {
+score_result iaru_hf::score_qso(record* qso, set<string>& multipliers) {
 	// ITU Zone or otherwise
 	string ituz = qso->item("ITUZ");
 	string cont = qso->item("CONT");
@@ -64,6 +64,7 @@ score_result iaru_hf::score_qso(record* qso, const set<string>& multipliers) {
 	string multiplier = ituz + " " + qso->item("BAND");
 	if (multipliers.find(multiplier) == multipliers.end()) {
 		res.multiplier = 1;
+		multipliers.insert(multiplier);
 	}
 	// QSO points
 	if (ituz == my_info_->data.at(ITU_ZONE)) res.qso_points = 1;
