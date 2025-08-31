@@ -80,7 +80,8 @@ using namespace std;
 
 // Program strings
 string COPYRIGHT = "\302\251 Philip Rose GM3ZZA 2018-2025. All rights reserved.";
-string PARTY3RD_COPYRIGHT = "Prefix data courtesy of clublog.org";
+string PARTY3RD_COPYRIGHT = "Prefix data courtesy of clublog.org\n"
+ 	"ZZALOG is based in part on the work of the FLTK project https://www.fltk.org.";
 string CONTACT = "gm3zza@@btinternet.com";
 string CONTACT2 = "gm3zza@btinternet.com";
 string DATA_COPYRIGHT = "\302\251 Philip Rose %s. This data may be copied for the purpose of correlation and analysis";
