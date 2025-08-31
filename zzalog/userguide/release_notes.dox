@@ -3,17 +3,18 @@
 \section rev_366plus Revision 3.6.6+
 
 - Save a copy of the latest data before each save. Upto 8 copies are saved.
-- Bug fixes
-  - Errors in callsign parsing algorithm against DxAtlas patterns
-  - Starting to log QSO in RX.TX1 results in confusion (revoking previous mod)
+- Bug fixes:
+  - Errors in callsign parsing algorithm against DxAtlas patterns.
+  - Starting to log QSO in RX.TX1 results in confusion (revoking previous mod).
+  - Code check uncovered bug in base contest algorithm code.
 
 \section rev_366 Revision 3.6.6
 
 - Combine WX tab with Clock tab.
 - Change Clock tab to a single tab, switchable between UTC and local time.
 - Add "CLOSING" across progress banner.
-- Cosmetic changes
-- Bug fixes
+- Cosmetic changes.
+- Bug fixes:
   - Exception when pasting data.
   - Uploads to eQSL.cc cannot be enabled.
   - Some input widgets not getting keyboard focus.
