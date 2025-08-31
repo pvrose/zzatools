@@ -3,6 +3,7 @@
 \section rev_366plus Revision 3.6.6+
 
 - Save a copy of the latest data before each save. Upto 8 copies are saved.
+- Add further acknowledgments of third-party data and libraries.
 - Bug fixes:
   - Errors in callsign parsing algorithm against DxAtlas patterns.
   - Starting to log QSO in RX.TX1 results in confusion (revoking previous mod).
