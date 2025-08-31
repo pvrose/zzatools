@@ -46,6 +46,7 @@ main.cpp - application entry point
 #include "symbols.h"
 #include "tabbed_forms.h"
 #include "ticker.h"
+#include "timestamp.h"
 #include "toolbar.h"
 #include "url_handler.h"
 #include "wsjtx_handler.h"
@@ -87,7 +88,6 @@ string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
 string PROGRAM_VERSION = "3.6.6+";
 string VENDOR = "GM3ZZA";
-string TIMESTAMP = string(__DATE__) + " " + string(__TIME__) + " Local";
 // Target ADIF version number
 string TARGET_ADIF_VN = "315";
 

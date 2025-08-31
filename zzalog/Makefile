@@ -107,6 +107,10 @@ endif
 	@echo Creating $@
 	@xxd -i $< > $@
 	
+# Touch main if any other source has changed
+./include/timestamp.h: $(SRCS)
+	touch ./include/timestamp.h
+
 # Create a target to run the compiled code
 .PHONY: run
 run: $(EXEC_DIR)/$(TARGET_EXEC) $(TREFS)
@@ -148,14 +152,14 @@ $(UG_DIR)/html/index.html: ./Doxyfile $(DOXS)
 .PHONY: userguide
 userguide: $(UG_DIR)/html/index.html
 
-# force recompile
-.PHONY: touch_main
-touch_main:
-	@touch ./src/main.cpp
+# # force recompile
+# .PHONY: touch_main
+# touch_main:
+# 	@touch ./src/main.cpp
 
 # install
 .PHONY: install
-install: touch_main userguide $(TREFS) $(USERGUIDE_DIR)/html/index.html $(INSTALL_DIR)/$(TARGET_EXEC)
+install: userguide $(TREFS) $(USERGUIDE_DIR)/html/index.html $(INSTALL_DIR)/$(TARGET_EXEC)
 
 $(INSTALL_DIR)/$(TARGET_EXEC): $(EXEC_DIR)/$(TARGET_EXEC)
 	@echo Installing $(INSTALL_DIR)/$(TARGET_EXEC)
