@@ -402,6 +402,7 @@ void cty_data::parse(record* qso) {
 		string when = qso->item("QSO_DATE") + qso->item("TIME_ON").substr(0,4);
 		int dxcc_id;
 		qso->item("DXCC", dxcc_id);
+		if (DEBUG_PARSE) printf("%s: QSO has DXCC %d\n", current_call_.c_str(), dxcc_id);
 		string matched_call;
 		parse_result_.decode_element = match_pattern(current_call_, when, matched_call);
 		
@@ -436,24 +437,26 @@ cty_element* cty_data::match_pattern(string call, string when, string& matched_c
 	if (data_->exceptions.find(call) != data_->exceptions.end()) {
 		list<cty_exception*>& exceptions = data_->exceptions.at(call);
 		for (auto it : exceptions) {
-			if (it->time_contains(when)) return it;
+			if (it->time_contains(when)) {
+				if (DEBUG_PARSE) {
+					printf("%s - Exception %s CQ%d ITU%d\n", call.c_str(), it->name_.c_str(), it->cq_zone_, it->itu_zone_);
+				}
+				return it;
+			}
 		}
 	}
 	// Otherwise start looking in prefixes
-	else {
-		string alt;
-		string body;
-		// Split call accoridng to slashes in it. 
-		split_call(call, alt, body);
-		if (alt.length()) {
-			cty_element* pfx = match_prefix(alt, when);
-			matched_call = alt;
-			if (pfx && pfx->dxcc_id_ > 0) return pfx;
-		}
-		matched_call = body;
-		return match_prefix(body, when);
+	string alt;
+	string body;
+	// Split call accoridng to slashes in it. 
+	split_call(call, alt, body);
+	if (alt.length()) {
+		cty_element* pfx = match_prefix(alt, when);
+		matched_call = alt;
+		if (pfx && pfx->dxcc_id_ > 0) return pfx;
 	}
-	return nullptr;
+	matched_call = body;
+	return match_prefix(body, when);
 }
 
 cty_element* cty_data::match_prefix(string call, string when) {
