@@ -902,8 +902,9 @@ bool cty_data::fetch_data(cty_type_t type) {
 	case DXATLAS:
 		status_->misc_status(ST_WARNING, "CTY DATA: Downloading DxAtlas data not yet implemented");
 		return true;
+	default:
+		return false;	
 	}
-	return false;
 }
 
 // Return the version
