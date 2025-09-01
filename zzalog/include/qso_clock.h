@@ -34,6 +34,8 @@ protected:
 
 	// Display local time rather than UTC
 	bool display_local_;
+	// Previous displayed time
+	time_t previous_time_;
 
 	// The date and time displays
 	Fl_Button* bn_time_;

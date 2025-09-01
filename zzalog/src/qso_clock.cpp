@@ -17,6 +17,7 @@ extern ticker* ticker_;
 qso_clock::qso_clock
 (int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
+	, previous_time_(0)
 {
 	labelfont(FL_BOLD);
 	labelsize(FL_NORMAL_SIZE + 2);
@@ -26,7 +27,7 @@ qso_clock::qso_clock
 	create_form(X, Y);
 
 	// Add 1s clock
-	ticker_->add_ticker(this, cb_ticker, 10);
+	ticker_->add_ticker(this, cb_ticker, 1);
 
 }
 
@@ -90,31 +91,35 @@ void qso_clock::enable_widgets() {
 	// Get the current time
 	time_t now = time(nullptr);
 
-	tm value;
-	char result[100];
-	if (display_local_) {
-		// Display in local timezone
-		value = *localtime(&now);
-		// Copy timezone to tab's label
-		strftime(result, 99, "Time: %Z", &value);
-		copy_label(result);
-		bn_time_->labelcolor(fl_lighter(FL_RED));
-		strftime(result, 99, "%H:%M:%S", &value);
-		bn_time_->copy_label(result);
-		bn_date_->labelcolor(fl_lighter(FL_RED));
-		strftime(result, 99, "%a %d %b %Y", &value);
-		bn_date_->copy_label(result);
-	}
-	else {
-		// Display in UTC (aka GMT)
-		value = *gmtime(&now);
-		label("Time: UTC");
-		bn_time_->labelcolor(FL_YELLOW);
-		strftime(result, 99, "%H:%M:%S", &value);
-		bn_time_->copy_label(result);
-		bn_date_->labelcolor(FL_YELLOW);
-		strftime(result, 99, "%a %d %b %Y", &value);
-		bn_date_->copy_label(result);
+	if (now != previous_time_) {
+		previous_time_ = now;
+
+		tm value;
+		char result[100];
+		if (display_local_) {
+			// Display in local timezone
+			value = *localtime(&now);
+			// Copy timezone to tab's label
+			strftime(result, 99, "Time: %Z", &value);
+			copy_label(result);
+			bn_time_->labelcolor(fl_lighter(FL_RED));
+			strftime(result, 99, "%H:%M:%S", &value);
+			bn_time_->copy_label(result);
+			bn_date_->labelcolor(fl_lighter(FL_RED));
+			strftime(result, 99, "%a %d %b %Y", &value);
+			bn_date_->copy_label(result);
+		}
+		else {
+			// Display in UTC (aka GMT)
+			value = *gmtime(&now);
+			label("Time: UTC");
+			bn_time_->labelcolor(FL_YELLOW);
+			strftime(result, 99, "%H:%M:%S", &value);
+			bn_time_->copy_label(result);
+			bn_date_->labelcolor(FL_YELLOW);
+			strftime(result, 99, "%a %d %b %Y", &value);
+			bn_date_->copy_label(result);
+		}
 	}
 }
 
