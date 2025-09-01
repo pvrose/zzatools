@@ -10,6 +10,8 @@
 
 using namespace std;
 
+class cty_filter;
+
 // This is the base class for all cty_data elements
 class cty_element
 {
@@ -69,6 +71,8 @@ public:
 	lat_long_t coordinates_ = { nan(""), nan("") };
 	// Deltede
 	bool deleted_ = false;
+	// Filters
+	list<cty_filter*> filters_ = {};
 
 	// Merge a similar element into this one
 	error_t merge(cty_element* elem);
@@ -84,7 +88,6 @@ public:
 
 ostream& operator<<(ostream& os, const cty_element& elem);
 
-class cty_filter;
 // Version to be used for entities
 class cty_entity : public cty_element {
 
@@ -99,8 +102,6 @@ public:
 	// Additional fields
 	// Entitiy nickname - primary prefix
 	string nickname_ = "";
-	// Filters
-	list<cty_filter*> filters_;
 
 };
 

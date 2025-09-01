@@ -53,11 +53,11 @@ public:
 protected:
 
 	// Decode entity record
-	void load_entity(string line, bool deleted);
+	cty_element* load_entity(string line, bool deleted);
 	// Decode geography record
-	void load_geography(string line, bool deleted);
+	cty_element* load_geography(string line, bool deleted);
 	// Decode usage record
-	void load_usage(string line);
+	cty_element* load_usage(string line);
 	// Load element part of above
 	cty_element* load_element(cty_element::type_t type, string line, string& nickname, string& patterns);
 	// Convert prefix mask to list of prefixes
@@ -65,7 +65,10 @@ protected:
 
 	cty_data* data_ = nullptr;
 
-	cty_entity* current_entity_;
+	// The most recent element at each level
+	// level 0 will be an entity
+	// other levels will be filters
+	vector<cty_element*> current_elements_;
 
 
 };

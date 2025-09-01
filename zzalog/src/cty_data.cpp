@@ -470,11 +470,11 @@ cty_element* cty_data::match_prefix(string call, string when) {
 	return nullptr;
 }
 
-cty_filter* cty_data::match_filter(cty_entity* entity, cty_filter::filter_t type, string call, string when) {
+cty_filter* cty_data::match_filter(cty_element* element, cty_filter::filter_t type, string call, string when) {
 	if (DEBUG_PARSE) printf("DEBUG: Match call %s: \n", call.c_str());
-	for (auto it : entity->filters_) {
+	for (auto it : element->filters_) {
 		// Check filter type
-		if (it->filter_type_ == type && it->pattern_.length()) {
+		if (it->pattern_.length()) {
 			if (DEBUG_PARSE) printf("DEBUG: Against pattern %s (%s:%s) for type %d\n", 
 				it->pattern_.c_str(), 
 				it->nickname_.c_str(),
@@ -489,89 +489,94 @@ cty_filter* cty_data::match_filter(cty_entity* entity, cty_filter::filter_t type
 			bool brace_match = false;
 			char last_c = '\0';
 			for (int ix = 0; ix < it->pattern_.length() && !found; ix++) {
-				switch (it->pattern_[ix]) {
-				case '[':
-					// Starting braced code
-					braced = true;
-					brace_match = false;
-					seq = false;
-					break;
-				case ']':
-					// Ending braced code
-					braced = false;
-					if (!brace_match) match = false;;
-					pos_c++;
-					break;
-				case '-':
-					// Staring a sequence of letters or numbers
-					if (braced) seq = true;
-					break;
-				case ',':
-					// Reached the end of a pattern - we match then look no further
-					if (match) found = true;
-					// Otherwise start again
-					else {
-						match = true;
-						pos_c = 0;
-					}
-					break;
-				case '.':
-					// Must match the call execatly
-					if (pos_c != call.length()) match = false;
-					break;
-				case '#':
-					// Numeric
-					if (braced) {
-						if (isdigit(call[pos_c])) brace_match = true;
-					}
-					else {
-						if (!isdigit(call[pos_c])) match = false;
+				if (match || it->pattern_[ix] == ',') {
+					switch (it->pattern_[ix]) {
+					case '[':
+						// Starting braced code
+						braced = true;
+						brace_match = false;
+						seq = false;
+						break;
+					case ']':
+						// Ending braced code
+						braced = false;
+						if (!brace_match) match = false;;
 						pos_c++;
-					}
-					break;
-				case '@':
-					if (braced) {
-						if (isalpha(call[pos_c])) brace_match = true;
-					}
-					else {
-						if (!isalpha(call[pos_c])) match = false;
-						pos_c++;
-					}
-					break;
-				case '?':
-					if (braced) {
-						if (isalnum(call[pos_c])) brace_match = true;
-					}
-					else {
-						if (!isalnum(call[pos_c])) match = false;
-						pos_c++;
-					}
-					break;
-				default:
-					if (braced) {
-						if (seq) {
-							brace_match |= (call[pos_c] > last_c && call[pos_c] <= it->pattern_[ix]);
+						break;
+					case '-':
+						// Staring a sequence of letters or numbers
+						if (braced) seq = true;
+						break;
+					case ',':
+						// Reached the end of a pattern - we match then look no further
+						if (match) found = true;
+						// Otherwise start again
+						else {
+							match = true;
+							pos_c = 0;
+						}
+						break;
+					case '.':
+						// Must match the call execatly
+						if (pos_c != call.length()) match = false;
+						break;
+					case '#':
+						// Numeric
+						if (braced) {
+							if (isdigit(call[pos_c])) brace_match = true;
 						}
 						else {
-							brace_match |= (call[pos_c] == it->pattern_[ix]);
-							last_c = it->pattern_[ix];
+							if (!isdigit(call[pos_c])) match = false;
+							pos_c++;
 						}
+						break;
+					case '@':
+						if (braced) {
+							if (isalpha(call[pos_c])) brace_match = true;
+						}
+						else {
+							if (!isalpha(call[pos_c])) match = false;
+							pos_c++;
+						}
+						break;
+					case '?':
+						if (braced) {
+							if (isalnum(call[pos_c])) brace_match = true;
+						}
+						else {
+							if (!isalnum(call[pos_c])) match = false;
+							pos_c++;
+						}
+						break;
+					default:
+						if (braced) {
+							if (seq) {
+								brace_match |= (call[pos_c] > last_c && call[pos_c] <= it->pattern_[ix]);
+							}
+							else {
+								brace_match |= (call[pos_c] == it->pattern_[ix]);
+								last_c = it->pattern_[ix];
+							}
+							seq = false;
+						}
+						else {
+							match &= (call[pos_c] == it->pattern_[ix]);
+							pos_c++;
+						}
+						break;
 					}
-					else {
-						match &= (call[pos_c] == it->pattern_[ix]);
-						pos_c++;
-					}
-					break;
+					if (DEBUG_PARSE) printf("%s vs %s - %s %s\n",
+						it->pattern_.substr(0, ix + 1).c_str(),
+						call.substr(0, pos_c).c_str(),
+						brace_match ? "Brace match" : "",
+						match ? "match" : "no match");
 				}
-				if (DEBUG_PARSE) printf("%s vs %s - %s %s\n", 
-					it->pattern_.substr(0, ix).c_str(), 
-					call.substr(0, pos_c).c_str(),
-					brace_match ? "Brace match": "",
-					match ? "match": "no match");
 			}
 			if (match) {
 				if (DEBUG_PARSE) printf(" - matched\n");
-				return it;
+				cty_filter* subfilter = match_filter(it, type, call, when);
+				if (subfilter) return subfilter;
+				else if (it->filter_type_ == type)	return it;
 			} else {
 				if (DEBUG_PARSE) printf("\n");
 			}
@@ -691,8 +696,8 @@ void cty_data::add_exception(string pattern, cty_exception* entry) {
 }
 
 // Add a filter
-void cty_data::add_filter(cty_entity* entity, cty_filter* entry) {
-	entity->filters_.push_back(entry);
+void cty_data::add_filter(cty_element* element, cty_filter* entry) {
+	if (element) element->filters_.push_back(entry);
 }
 
 // Load entities as defined in the ADIF specification

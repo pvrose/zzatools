@@ -97,7 +97,7 @@ public:
 	// Add an exception
 	void add_exception(string pattern, cty_exception* entry);
 	// Add a filter
-	void add_filter(cty_entity* entity, cty_filter* entry);
+	void add_filter(cty_element* element, cty_filter* entry);
 
 	ostream& out() { return os_; };
 	// Get the recorded timestamp
@@ -125,7 +125,7 @@ protected:
 	// Get all the elements that may match
 	cty_element* match_pattern(string call, string when, string& matched_call);
 	cty_element* match_prefix(string call, string when);
-	cty_filter* match_filter(cty_entity* entity, cty_filter::filter_t type, string call, string when);
+	cty_filter* match_filter(cty_element* element, cty_filter::filter_t type, string call, string when);
 
 	// Split call into call body and alternate
 	void split_call(string call, string& alt, string& body);

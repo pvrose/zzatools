@@ -156,7 +156,7 @@ list<string> cty3_reader::expand_mask(string patterns) {
 }
 
 // Decode entity record
-void cty3_reader::load_entity(string line, bool deleted) {
+cty_element* cty3_reader::load_entity(string line, bool deleted) {
 	string nickname = "";
 	string pattern;
 	// Get the basic data
@@ -169,11 +169,11 @@ void cty3_reader::load_entity(string line, bool deleted) {
 	data_->add_entity(entity);
 	// Generate all prefix records
 	list<string> pfx_pattern = expand_mask(pattern);
-	current_entity_ = entity;
+	return entity;
 }
 
 // Decode geography record
-void cty3_reader::load_geography(string line, bool deleted) {
+cty_element* cty3_reader::load_geography(string line, bool deleted) {
 	string nickname = "";
 	string pattern;
 	cty_geography* geo = new cty_geography;
@@ -182,11 +182,11 @@ void cty3_reader::load_geography(string line, bool deleted) {
 	geo->pattern_ = pattern;
 	geo->nickname_ = nickname;
 	geo->deleted_ = deleted;
-	data_->add_filter(current_entity_, geo);
+	return geo;
 }
 
 // Decode usage record
-void cty3_reader::load_usage(string line) {
+cty_element* cty3_reader::load_usage(string line) {
 	string nickname = "";
 	string pattern;
 	cty_filter* usage = new cty_filter;
@@ -194,7 +194,7 @@ void cty3_reader::load_usage(string line) {
 	*(cty_element*)usage = *element;
 	usage->pattern_ = pattern;
 	usage->nickname_ = nickname;
-	data_->add_filter(current_entity_, usage);
+	return usage;
 }
 
 
@@ -247,36 +247,42 @@ bool cty3_reader::load_data(cty_data* data, istream& in, string& version) {
 			type = (rec_type_t)stoi(stype.substr(1, 2), 0, 10);
 			break;
 		}
+		current_elements_.resize(depth + 1);
 		switch (type) {
 		case CTY_UNDEFINED:
 			data_->out() << "Undefined record " << line << "\n";
 			break;
 		case CTY_ENTITY:
-			load_entity(line, false);
+			// Add the element and remove the filters
+			current_elements_[depth] = load_entity(line, false);
 			break;
 		case CTY_GEOGRAPHY:
-			load_geography(line, false);
+			current_elements_[depth] = load_geography(line, false);
+			data_->add_filter(current_elements_[depth-1], (cty_filter*)current_elements_[depth]);
 			break;
 		case CTY_SPECIAL:
-			load_usage(line);
+			current_elements_[depth] = load_usage(line);
+			data_->add_filter(current_elements_[depth - 1], (cty_filter*)current_elements_[depth]);
 			break;
 		case CTY_OLD_ENTITY:
-			load_entity(line, true);
+			current_elements_[depth] = load_entity(line, true);
 			break;
 		case CTY_OLD_PREFIX:
 			data_->out() << "Old prefix " << line << "\n";
 			break;
 		case CTY_UNRECOGNISED:
-			load_entity(line, false);
+			current_elements_[depth] = load_entity(line, false);
 			break;
 		case CTY_UNASSIGNED:
-			load_entity(line, false);
+			current_elements_[depth] = load_entity(line, false);
 			break;
 		case CTY_OLD_GEOGRAPHY:
-			load_geography(line, true);
+			current_elements_[depth] = load_geography(line, true);
+			data_->add_filter(current_elements_[depth - 1], (cty_filter*)current_elements_[depth]);
 			break;
 		case CTY_CITY:
-			load_geography(line, false);
+			current_elements_[depth] = load_geography(line, false);
+			data_->add_filter(current_elements_[depth - 1], (cty_filter*)current_elements_[depth]);
 			break;
 
 		}
