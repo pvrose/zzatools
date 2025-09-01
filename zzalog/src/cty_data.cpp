@@ -416,10 +416,14 @@ void cty_data::parse(record* qso) {
 			}
 			else {
 				parse_result_.entity = nullptr;
+				parse_result_.geography = nullptr;
+				parse_result_.usage = nullptr;
 			}
 		}
 		else {
 			parse_result_.entity = nullptr;
+			parse_result_.geography = nullptr;
+			parse_result_.usage = nullptr;
 		}
 	}
 	else {
