@@ -413,6 +413,9 @@ void cty_data::parse(record* qso) {
 				if (parse_result_.entity) {
 					parse_result_.geography = (cty_geography*)match_filter(parse_result_.entity, cty_filter::FT_GEOGRAPHY, matched_call, when);
 					parse_result_.usage = match_filter(parse_result_.entity, cty_filter::FT_USAGE, matched_call, when);
+				} else {
+					parse_result_.geography = nullptr;
+					parse_result_.usage = nullptr;
 				}
 			}
 			else {
