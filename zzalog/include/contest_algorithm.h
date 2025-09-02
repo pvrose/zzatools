@@ -37,6 +37,8 @@ protected:
 
 public:
     //! Constructor.
+    //! This should initialise the attributes rx_fields and tx_fields.
+    //! This should add itself to the global attribute algorithms_.
     contest_algorithm();
     //! Destructor.
     ~contest_algorithm();
@@ -76,7 +78,7 @@ protected:
 
     //! Set the default RS(T) value required by the algorithm.
     //! The default RS(T) dependes on the mode - whether it is 59 or 599
-    //! \param QSO record to update with default RS(T)
+    //! \param qso the record to update with default RS(T)
     void set_default_rst(record* qso);
 
     //! List of field names to use in RX exchange and scoring
