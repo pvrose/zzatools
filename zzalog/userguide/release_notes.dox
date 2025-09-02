@@ -4,10 +4,9 @@
 
 - Save a copy of the latest data before each save. Upto 8 copies are saved.
 - Add further acknowledgments of third-party data and libraries.
-- When parsing a call follow the decode as far as possible, 
-eg to get Russian oblasts rather than just call area.
+- Refinements to callsign parsing algorithm.
 - Bug fixes:
-  - Errors in callsign parsing algorithm against DxAtlas patterns.
+  - Errors in callsign parsing algorithm.
   - Starting to log QSO in RX.TX1 results in confusion (revoking previous mod).
   - Code check uncovered bug in base contest algorithm code.
   - Displayed clock can be a noticeable fraction of a second out.

@@ -38,7 +38,42 @@ any callsigns to be reviewed before logging them. Type the call in the box besid
 In this case the call UR3AHF is shown to be a Ukrainian call and has been worked before,
 although not on this band or mode.
 
-To start logging a QSO with ths station click the "Start QSO". 
+To start logging a QSO with this station click the "Start QSO". 
+
+\subsection parsing Decoding callsigns
+
+ZZALOG makes use of publicly available databases to decode callsigns - see \ref page_6. ZZALOG
+follows the following algorithm:
+
+- Is the call registered as an exception? The database include a list of callsigns that
+do not follow the "rules". Examples are:
+  - In the UK and Crown Dependencies, Special Event Stations are given callsigns starting GB. This would
+  normally decode as <B>G: England</B>, but can be exceptionally decoded in another 
+  DXCC entity such as <B>GM: Scotland</B>.
+  - In the US and US administered territories, licensees do not need to obtain a new callsign when
+  moving to a new call area or administered territory. This a station originally from New York, say
+  WZ2XYZ which would normally decode as <B>K: United States of America</B>,
+  can use the same callsign operating from <B>KP4: Puerto Rico</B>.
+- Does the callsign contain one or more forward slash '/' characters? 
+  - If the callsign ends <B>/MM</B>, the station is treated as "Maritime Mobile" and classed as not being
+  within a DXCC entity.
+  - If the callsign ends <B>/AM</B>, the station is treated as "Aeronautical Mobile" and will be classed
+  as being within the DXCC indicated by the body of the call.
+  - If the callsign ends <B>/<I>n</I></B>, where <I>n</I> is a single-digit number, 
+  the station is treated as being in a different call area 
+  within the same DXCC.
+  - If the callsign ends <B>/<I>a</I></B>, where <I>a</I> is a single letter and typically used to 
+  indicate a special operation,
+  the first part of the callsign will be decoded to provide the
+  DXCC entity, but the final letter will be taken into consideration to decode a call area where 
+  the licensing authority requires it.
+  - If the callsign has one forward slash, then the shorter of the two parts is used first when decoding the 
+  DXCC entity. If this fails then the other is used. Examples are:
+    - GM9ABC/VP8 will be decoded using <B>/VP8</B> as <B>VP8: Falkland Islands</B>.
+    - MM/FF5ABC will be decoded using <B>MM/</B> as <B>GM: Scotland</B>.
+    - G1ABC/QRP will be decoded as <B>G: England</B> as <B>/QRP</B> will not decode into a DXCC entity.
+  - If two forward slashes are present, say MM/FF5ABC/M, then the first part <B>MM/</B> will be used to
+  decode the DXCC entity <B>GM: Scotland</B>. 
 
 \section b1_log_qso Logging the QSO
 

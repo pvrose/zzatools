@@ -121,6 +121,8 @@ protected:
 	void load_adif_data();
 	// Find the entity, pattern and sub-patterns for the supplied QSO
 	void parse(record* qso);
+	// Use the attached suffix to "mutate" the call
+	void mutate_call(string& call, char suffix);
 
 	// Get all the elements that may match
 	cty_element* match_pattern(string call, string when, string& matched_call);

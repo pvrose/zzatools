@@ -614,11 +614,20 @@ void cty_data::split_call(string call, string& alt, string& body) {
 			// TODO: Needs further work
 			return;
 		}
-		else if (suffix.length() == 1 || suffix == "MM" || suffix == "AM") {
+		else if (suffix.length() == 1 || suffix == "AM") {
 			// Callsign has a roving style suffix - e.g. /M, /1 etc.
+			if (suffix.length() == 1) {
+				alt = words[0];
+				mutate_call(alt, suffix[0]);
+				body = "";
+				if (DEBUG_PARSE) printf("""Mutated"" %s to %s\n", words[0].c_str(), alt.c_str());
+			}
+			else {
+				body = words[0];
+				alt = "";
+				if (DEBUG_PARSE) printf("Ignoring /%s", suffix.c_str());
+			}
 			suffix = "";
-			body = words[0];
-			alt = "";
 		}
 		// Use the longer of the first two as callsign body, the shorter as the prefix of operation
 		else if (words[0].length() > words[1].length()) {
@@ -644,6 +653,14 @@ void cty_data::split_call(string call, string& alt, string& body) {
 		break;
 	}
 
+}
+
+// Change the last number of the prefix (if suffix is numeric) or first letter of infix
+void cty_data::mutate_call(string& call, char suffix) {
+	auto pos = call.length();
+	while (isalpha(call[--pos]));
+	if (isalpha(suffix)) pos++;
+	call[pos] = suffix;
 }
 
 // Add an entity to import data
