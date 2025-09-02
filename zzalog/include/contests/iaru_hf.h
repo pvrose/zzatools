@@ -4,7 +4,8 @@
 
 namespace contests {
 
-    //! Implementation of \a contest_algorithm for the IARU HF Championship (IARU-HF).
+    //! Implementation of contest_algorithm for the IARU HF Championship (IARU-HF).
+
     //! Exchange is RS(T) and ITU Zone.
     //! 
     //! Scoring involves comparison of ITU Zone and continent.

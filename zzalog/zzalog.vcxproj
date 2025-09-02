@@ -337,6 +337,7 @@
     <ClInclude Include="include\logo.h" />
     <ClInclude Include="include\log_table.h" />
     <ClInclude Include="include\lotw_handler.h" />
+    <ClInclude Include="include\main.h" />
     <ClInclude Include="include\main_window.h" />
     <ClInclude Include="include\menu.h" />
     <ClInclude Include="include\page_dialog.h" />

@@ -3,7 +3,8 @@
 
 namespace contests {
 
-    //! Implementation of a basic context exchange.
+    //! Implementation of contest_algorithm for a basic context exchange.
+
     //! The receive and transmit exchanges are RS(T) and Serial Number.
     //! Scoring is 1 point per unique contact in a different DXCC entity with 
     //! a multiplier of 1 per DXCC entity per band
