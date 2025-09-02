@@ -6,6 +6,7 @@ BUILD_DIR := ./build
 SRC_DIRS := ./src ../widgets/src
 REF_DIR := ../reference
 UG_DIR := ./userguide
+CDX_DIR := ./docs
 EXEC_DIR = $(BUILD_DIR)/$(BUILD_TYPE)
 INSTALL_DIR := /usr/local/bin
 LIBRARY_DIR := /usr/local/lib
@@ -49,6 +50,9 @@ TREFS := $(REFS:%=$(APPDATA_DIR)/%)
 
 # Every folder in ./src will need to be passed to GCC so that it can find header files
 INC_DIRS := ./include ../widgets/include ../common/include
+
+# Include files for code documentation
+INCS := $(shell find $(INC_DIRS) -name '*.h' -or -name '*.hpp' -or -name '*.H')
 
 # Add a prefix to INC_DIRS. So moduleA would become -ImoduleA. GCC understands this -I flag
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
@@ -149,8 +153,12 @@ $(UG_DIR)/html/index.html: ./Doxyfile $(DOXS)
 	@echo Creating User Guide
 	@doxygen
 
-.PHONY: userguide
-userguide: $(UG_DIR)/html/index.html
+$(CDX_DIR)/html/index.html: ./Doxyfile_code $(INCS)
+	@echo Creating Code documentation
+	@doxygen ./Doxyfile_code
+
+.PHONY: documents
+documents: $(UG_DIR)/html/index.html $(CDX_DIR)/html/index.html
 
 # # force recompile
 # .PHONY: touch_main
@@ -159,7 +167,7 @@ userguide: $(UG_DIR)/html/index.html
 
 # install
 .PHONY: install
-install: userguide $(TREFS) $(USERGUIDE_DIR)/html/index.html $(INSTALL_DIR)/$(TARGET_EXEC)
+install: documents $(TREFS) $(USERGUIDE_DIR)/html/index.html $(INSTALL_DIR)/$(TARGET_EXEC)
 
 $(INSTALL_DIR)/$(TARGET_EXEC): $(EXEC_DIR)/$(TARGET_EXEC)
 	@echo Installing $(INSTALL_DIR)/$(TARGET_EXEC)
