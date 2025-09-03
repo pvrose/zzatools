@@ -11,9 +11,13 @@ using namespace std;
 
 extern spec_data* spec_data_;
 
-// Special comparison operator for bands allowing the bands to 
-// be sorted by frequency not namev
+//! Structure to provide a special means of sorting bands known by their
+//! wavelength to be sorted on their frequency.
 struct band_lt {
+    //! Special &lt; operator.
+    //! \param l LHS of operation. A string containing wavelength as eg. 10M (28~29.7 MHz).
+    //! \param r RHS of operation. A string containing wavelength.
+    //! \return frequency of LHS is less than frequency of RHS.
     bool operator() (string l, string r) const {
         // If the supploed string is not a real band name - return assume 0.0Hz
         double lv = spec_data_->freq_for_band(l);
@@ -24,10 +28,10 @@ struct band_lt {
     }
 };
 
-// The set container sorting on frequency
+//! A version of set<string> sorting on the frequency represented by the string value.
 class band_set : public set<string, band_lt>{};
 
-// The map container sorting on frequency
+//! A version of map<string, T> sorting on the frequency represented by the string value.
 template <class T>
 class band_map : public map<string, T, band_lt>{
 };

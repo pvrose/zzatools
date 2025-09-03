@@ -7,17 +7,26 @@
 
 using namespace std;
 
-	// Dialog to provide program information
+	//! Dialog to provide program information.
+	
+	//! This supplies details of the compilation status of ZZALOG. 
+	//! This acknowledges all third-party libraries and data used in ZZALOG.
 	class about_dialog :
 		public win_dialog
 	{
 	public:
+		//! Constructor.
 		about_dialog();
+		//! Destructor.
 		virtual ~about_dialog();
 
-		// callback - OK button
+		//! Callback when \p OK button is clicked.
+		//! \param w the clicked button
+		//! \param v not used.
 		static void cb_bn_ok(Fl_Widget* w, void* v);
-		// callback - cancel button (window close only)
+		//! Callback when \p CANCEL button clicked.
+		//! \param w the clicked button
+		//! \param v not used.
 		static void cb_bn_cancel(Fl_Widget* w, void * v);
 
 	protected:

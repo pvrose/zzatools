@@ -79,47 +79,75 @@ using namespace std;
 //! 
 //! 
 //! 
-// Program strings
+
+//! Program copyright - displayed in all windows.
 string COPYRIGHT = "\302\251 Philip Rose GM3ZZA 2018-2025. All rights reserved.";
+//! Third-party acknowledgments.
 string PARTY3RD_COPYRIGHT = "Prefix data courtesy of clublog.org, country-files.com and dxatlas.com\n"
 "ZZALOG is based in part on the work of the FLTK project https://www.fltk.org.";
+//! Contact address for use in FLTK widget labels.
 string CONTACT = "gm3zza@@btinternet.com";
+//! Contact address for use in general texts.
 string CONTACT2 = "gm3zza@btinternet.com";
+//! Copyright placed in exported data items.
 string DATA_COPYRIGHT = "\302\251 Philip Rose %s. This data may be copied for the purpose of correlation and analysis";
+//! Program identifier: used in ADIF PROGRAM_ID field and Fl_Preferences.
 string PROGRAM_ID = "ZZALOG";
+//! Short-form program identifier.
 string PROG_ID = "ZLG";
+//! Program version. 
 string PROGRAM_VERSION = "3.6.6+";
+//! Program vendor: used for Fl_Preferences.
 string VENDOR = "GM3ZZA";
-// Target ADIF version number
+//! Target ADIF version number
 string TARGET_ADIF_VN = "315";
 
-// switches
-// Debug levels
+// Debug switches
+//! Print errors - set by "-d e"
 bool DEBUG_ERRORS = true;
+//! Print thread debugging messages - set by "-d t"
 bool DEBUG_THREADS = false;
+//! Print libcurl debugging messages - set by "-d c"
 bool DEBUG_CURL = false;
+//! Reduce long duration tiemouts and waits - set by "-d q"
 bool DEBUG_QUICK = false;
+//! Print rig access debugging messages - set by "-d r"
 bool DEBUG_RIGS = false;
+//! Print callsign parsing messages - set by "-d d"
 bool DEBUG_PARSE = false;
+//! Set hamlib debugging verbosity level - set by "-d h=<level>"
 rig_debug_level_e HAMLIB_DEBUG_LEVEL = RIG_DEBUG_ERR;
-// Operation switches - _S versions used to override sticky switch
-bool AUTO_UPLOAD = true;
-bool AUTO_UPLOAD_S = false;
-bool AUTO_SAVE = true;
-bool AUTO_SAVE_S = false;
-bool DARK = false;
-bool DARK_S = false;
-bool DISPLAY_VERSION = false;
-bool HELP = false;
-bool NEW_BOOK = false;
-bool PRIVATE = false;
-bool READ_ONLY = false;
-bool RESUME_SESSION = false;
-bool VERBOSE = false;
 
-// FLTK externals
+// Operation switches - _S versions used to override sticky switch
+//! Automatically upload QSOs to QSL sites - set by "-n"
+bool AUTO_UPLOAD = true;
+//! Version of \p AUTO_UPLOAD read from settings
+bool AUTO_UPLOAD_S = false;
+//! Automatically save QSO record after each change - set by "-a"
+bool AUTO_SAVE = true;
+//! Version of \p AUTO_SAVE read from settings.
+bool AUTO_SAVE_S = false;
+//! Dark mode: Dark background, light forreground - set by "-k"
+bool DARK = false;
+//! Version of \p DARK read from settings.
+bool DARK_S = false;
+//! Print version details instead of running ZZALOG - set by "-v"
+bool DISPLAY_VERSION = false;
+//! Print command-line interface instead of running ZZALOG - set by "-h"
+bool HELP = false;
+//! Start with an empty logbook - set by "-e"
+bool NEW_BOOK = false;
+//! Do not add file to recent file list - set by "-p"
+bool PRIVATE = false;
+//! Open file in read-only mode - set by "-r"
+bool READ_ONLY = false;
+//! Resum logging including previous session - set by "-m"
+bool RESUME_SESSION = false;
+
+//! Access to FLTK global attribute to set default text size throughout ZZALOG.
 extern int FL_NORMAL_SIZE;
 
+//! \cond
 // Top level data items - these are declared as externals in each .cpp that uses them
 band_data* band_data_ = nullptr;
 band_window* band_window_ = nullptr;
@@ -153,48 +181,138 @@ url_handler* url_handler_ = nullptr;
 wsjtx_handler* wsjtx_handler_ = nullptr;
 wx_handler* wx_handler_ = nullptr;
 
-// Recent files opened
+//! List of files most recently opened. Maximum: 4 files. 
 list<string> recent_files_;
+//! \endcond
 
 // Forward declarations
-void backup_file();
+//! Get the backup filename.
+//! \return filename.
+string backup_filename(string source);
+//! Restores file from backup location.
 void restore_backup();
-void set_recent_file(string filename);
+//! Callback for main_window and qso_manager.
+//! \param w calling widget.
+//! \param v not used.
+static void cb_bn_close(Fl_Widget* w, void* v);
+//! Callback used by FLTK when parsing command-line arguments.
+//! \param argc count of arguments.
+//! \param argv array of arguments.
+//! \param i index of argument to decode.
+//! \return index of next argumant to decode.
+int cb_args(int argc, char** argv, int& i);
+//! Print the help message
+void show_help();
+//! Get the specified logbook filename
+//! \param arg_filename filename supplied by argument.
+//! \return selected filename: argument if specified otherwise most recently file opened.
+string get_file(char* arg_filename);
+//! Add some global properties
+void add_properties();
+//! Read the recent file list from the settings.
+void recent_files();
+//! Read the following data items:
+//! - ADIF specification.
+//! - Callsign parsing database.
+//! - International character set.
+//! - Bandplan data.
+//! - QSL Designs.
+//! - Configured rig data.
+//! - Contest specifications.
+void add_data();
+//! Read the logbook data.
+//! \param arg filename supplied as command-line argument.
+void add_book(char* arg);
+//! Instantiate the following external protocol handlers:
+//! - Generic HTTP and UDP handler.
+//! - eQSL.cc interface.
+//! - Logbook of the World interface.
+//! - QRZ.com interface.
+//! - Clublog.org interface.
+//! - WSJT-X interface.
+//! - FlDigi interface (FlLog emulator).
+//! - openweather.org interface.
+void add_qsl_handlers();
+//! Instantiate the QSO Manager (Dashboard)
+void add_dashboard();
+//! Label the main_window window as "[PROGRAM_ID] [PROGRAM_VERSION]: \a text". 
+//! \param text 
+void main_window_label(string text);
+//! Instantiate main_window.
+void create_window();
+//! Add the component widgets to the main_window.
+//! \param curr_y Y-coordinate of last widget added plus its height.
+void add_widgets(int& curr_y);
+//! Resize and reposition main_window to as it was when last opened or nearest
+//! position on current screem.
+void resize_window();
+//! Delete all created data items
+void tidy();
+//! Set the default icon for all windows.
+//! \param arg0 not used.
+void add_icon(const char* arg0);
+//! Display the arguments in the status log.
+//! \param argc number of arguments
+//! \param argv array of arguments.
+void print_args(int argc, char** argv);
+//! Checks the supplied argument \a this_record is within the current session.
+//! \param this_record QSO to check.
+//! \return true if the QSO is within the surrent session.
+bool in_current_session(record* this_record);
+//! Customises various aspects when using FLTK widgets
+//! TODO: Merge with add_properties?
+void customise_fltk();
+//! Read the sticky switches from the settings.
+void read_saved_switches();
+//! Save the sticky switches to the settings file.
 void save_switches();
+//! Open the settings file for saved configuration.
+//! \return true if file was opened successfully, otherwise false.
+bool open_settings();
+//! Initialise hamlib
+void load_rig_data();
+//! Open a dialog if a club installation to allow operator to login.
+void club_operator();
+//! Main program entry point.
+//! \param argc number of command-line arguments
+//! \param argv array of command-line arguments.
+int main(int argc, char** argv);
+//! Backs up file to separate location.
+void backup_file();
+//! Add the specified file to the recent files list.
+void set_recent_file(string filename);
+//! Open the user-guide at the specified page &lt;\a file&gt;.html.
 void open_html(const char* file);
 
-// Flag to prevent more than one closure process at the same time
+//! Flag to prevent more than one closure process at the same time.
 bool closing_ = false;
-// Flag to mark everything loaded
+//! Flag to mark everything loaded.
 bool initialised_ = false;
-// Time loaded
+//! Time loaded.
 time_t session_start_ = (time_t)0;
-// Previous frequency
+//! Previous frequency.
 double prev_freq_ = 0.0;
-// Sessions is a resumption
-bool resuming_ = false;
-// Ticker counter - max value = 0.1 * 2^64 seconds = a long time
-uint64_t ticks_ = 0;
-// Filename in arguments
+//! Filename in arguments.
 char* filename_ = nullptr;
-// File is new (neither in argument or settings
+//! File is new (neither in argument or settings.
 bool new_file_ = false;
-// Default station callsign
+//! Default station callsign.
 string default_station_ = "";
-// Main logo
+//! Main logo.
 Fl_PNG_Image main_icon_("ZZALOG_ICON", ___rose_png, ___rose_png_len);
-// Using backp
+//! Using backp.
 bool using_backup_ = false;
-// Sticky switches mesasge
+//! Sticky switches mesasge.
 string sticky_message_ = "";
-// Common seed to use in password encryption - maintaned with sessions
+//! Common seed to use in password encryption - maintaned with sessions.
 uint32_t seed_ = 0;
-// Defaults config files
+//! Default location for configuration files.
 string default_data_directory_ = "";
+//! Default location for userguide files.
 string default_html_directory_ = "";
-// Preferences root - system or use
+//! Preferences root - system-wide or per-user.
 Fl_Preferences::Root prefs_mode_;
-// Do not close banner
+//! Do not close banner. Kept \p false unless banner is not deleted at ZZALOG closure in error cases.
 bool keep_banner_ = false;
-// New installation
+//! This run is a new installation
 bool new_installation_ = false;
