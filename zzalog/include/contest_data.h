@@ -52,9 +52,9 @@ class contest_data
 	friend class contest_dialog;
 
 public:
-	// Constructor.
+	//! Constructor.
 	contest_data();
-	// Destructor.
+	//! Destructor.
 	~contest_data();
 
 	//! Get contest data structure for specific contest.
@@ -73,7 +73,7 @@ public:
 	//! \param number the index of the entry.
 	ct_entry_t* get_contest_info(int number);
 	//! Get all the instance identifiers for specific contest
-	//! 
+	
 	//! \param id identifier of the contest.
 	//! \return the set of instances of this contest.
 	set<string>* get_contest_indices(string id);
@@ -87,6 +87,7 @@ protected:
 
 	// The databases 
 	//! Individual contests mapped by ID and index (e.g. year)
+	
 	//! - <B>Outer map</B> Addressed by instance identifier.
 	//! - <B>Inner map</B> Addressed by contest identifier.
 	map<string, map<string, ct_data_t*> > contests_;
