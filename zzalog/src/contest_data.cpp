@@ -63,7 +63,7 @@ int contest_data::get_contest_count() {
 	return contest_infos_.size();
 }
 
-// Get the specified conets information
+// Get the specified contests information
 ct_entry_t* contest_data::get_contest_info(int number) {
 	return contest_infos_[number];
 }

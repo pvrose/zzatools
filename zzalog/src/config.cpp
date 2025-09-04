@@ -28,7 +28,6 @@ extern Fl_Preferences::Root prefs_mode_;
 config::config(int W, int H, const char* label) :
 	Fl_Window(W, H, label)
 	, settings_view_(nullptr)
-	, active_(true)
 	, tabs_(nullptr)
 {
 	updatable_views_.clear();
@@ -148,7 +147,6 @@ config::config(int W, int H, const char* label) :
 // Destructor
 config::~config()
 {
-	active_ = false;
 	// Rememeber window position
 	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences windows_settings(settings, "Windows");
@@ -259,15 +257,5 @@ void config::update() {
 	for (auto it = updatable_views_.begin(); it != updatable_views_.end(); it++) {
 		(*it)->update();
 	}
-}
-
-// Return active flag
-bool config::active() {
-	return active_;
-}
-
-// Clear active flag
-void config::inactive() {
-	active_ = false;
 }
 

@@ -331,7 +331,7 @@ string club_handler::to_adif(record* this_record, field_list &fields) {
 	return result;
 }
 
-// Specify the fields requested by eQSL.cc
+// Specify the fields requested by Clublog.org
 void club_handler::set_adif_fields() {
 	// Ser default values if necessary
 	(void)fields_->collection("Upload/ClubLog", CLUBLOG_FIELDS);
