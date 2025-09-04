@@ -83,13 +83,11 @@ book::book(object_t type)
 	, old_record_(nullptr)
 	, been_modified_(false)
 	, main_loading_(false)
-	, ignore_gridsquare_(false)
 	, save_level_(0)
 	, adi_reader_(nullptr)
 	, adx_reader_(nullptr)
 	, adi_writer_(nullptr)
 	, adx_writer_(nullptr)
-	, ignore_null_(false)
 	, upload_allowed_(true)
 	, deleted_record_(false)
 {
@@ -293,7 +291,6 @@ bool book::load_data(string filename)
 				set_session_start();
 
 				current_item_ = size() - 1;
-				newest_item_ = size() - 1;
 				tabbed_forms_->update_views(nullptr, HT_ALL, current_item_);
 				// TODO: Review how to update spec_data that is dependent on read in values 
 				// do the following for now
