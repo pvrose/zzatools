@@ -28,7 +28,7 @@ typedef size_t qso_num_t;
 	const double EQSL_THROTTLE = 10.0;
 	const char EQSL_TIMEFORMAT[] = "%Y%m%d";
 
-	// Default fiels to use in eqsl 
+	//! Default fields to use when sending QSOs to eQSL.cc
 	const field_list EQSL_FIELDS = {
 		"QSO_DATE",
 		"TIME_ON",
@@ -40,22 +40,23 @@ typedef size_t qso_num_t;
 		"QSL_MSG"
 	};
 
-	// This class manages the requirements for uploading data to and downloading data from eQSL.cc
+	//! This class manages the requirements for uploading data to and downloading data from eQSL.cc
 	class eqsl_handler
 	{
 	public:
-		// Response for an eQSL request
+		//! Response for an eQSL request
 		enum response_t {
-			ER_OK,         // OK
-			ER_SKIPPED,    // Request skipped
-			ER_THROTTLED,  // Request throttled by eQSL
-			ER_FAILED,     // Request failed
-			ER_HTML_ERR,   // HTML error
-			ER_DUPLICATE   // Duplicate request
+			ER_OK,         //!< Request successful
+			ER_SKIPPED,    //!< Request skipped
+			ER_THROTTLED,  //!< Request throttled by eQSL.cc
+			ER_FAILED,     //!< Request failed
+			ER_HTML_ERR,   //!< HTML error
+			ER_DUPLICATE   //!< Duplicate request
 		};
-		// Data required to repeat throttled requests
+		//! Data required to repeat throttled requests
 		struct request_t {
-			item_num_t record_num;
+			//! 
+			qso_num_t record_num;
 			bool force;
 			request_t()
 				: record_num(0)
