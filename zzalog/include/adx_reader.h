@@ -18,15 +18,15 @@ class record;
 	//! Set of XML element types used in ADX.
 	enum adx_element_t {
 		AET_NONE,        //! Not yet received an element
-		AET_ADX,         //! <ADX>...</ADX>
-		AET_HEADER,      //! <HEADER>...</HEADER>
-		AET_FIELD,       //! <[fieldname]>[data]</[fieldname]>
-		AET_APP,         //! <APP PROGRAMID="[id]" FIELDNAME="[fieldname]" TYPE="[datatype]">[data]</APP>
-		AET_USERDEFH,    //! <USERDEF FIELDID="[n]".....>[fieldname]</USERDEF>
-		AET_USERDEFR,    //! <USERDEF FIELDNAME="[fieldname]">[data]</USERDEF>
-		AET_RECORDS,     //! <RECORDS>...</RECORDS>
-		AET_RECORD,      //! <RECORD>...</RECORD>
-		AET_COMMENT      //! <--......-->
+		AET_ADX,         //! "<ADX>...</ADX>"
+		AET_HEADER,      //! "<HEADER>...</HEADER>"
+		AET_FIELD,       //! "<[fieldname]>[data]</[fieldname]>"
+		AET_APP,         //! "<APP PROGRAMID=[id] FIELDNAME=[fieldname] TYPE=[datatype]>[data]</APP>"
+		AET_USERDEFH,    //! "<USERDEF FIELDID=[n].....>[fieldname]</USERDEF>"
+		AET_USERDEFR,    //! "<USERDEF FIELDNAME=[fieldname]>[data]</USERDEF>"
+		AET_RECORDS,     //! "<RECORDS>...</RECORDS>"
+		AET_RECORD,      //! "<RECORD>...</RECORD>"
+		AET_COMMENT      //! "<--......-->"
 	};
 
 
@@ -46,28 +46,30 @@ class record;
 		bool load_book(book* book, istream& in);
 
 		// Overloadable XML handlers
-		//! Start XML element. The element name is used to call one of the specific start... methods.
-		//! See xml_reader::start_element for API details.
+		//! Start XML element: The element name is used to call one of the specific start... methods.
 		virtual bool start_element(string name, map<string, string>* attributes);
-		//! End XML element. The element name is used to call one of the specific end... methods.
-		//! See xml_reader::end_element for API details.
+		//! End XML element: The element name is used to call one of the specific end... methods.
 		virtual bool end_element(string name);
-		//! Special element. If the declaration is a comment within the header record, then
+		//! Special element: If the declaration is a comment within the header record, then
 		//! it is added to the header.
 		virtual bool declaration(xml_element::element_t element_type, string name, string content);
 		//! Processing instruction - ignored.
 		virtual bool process_instr(string name, string content);
-		//! characters - characters are stored for use in the end_element method. Any singleton
+		//! Characters - characters are stored for use in the end_element method. 
+		
+		//! Any singleton
 		//! \p CR or \p LF characters are translated into a \p CR/LF combination.
 		virtual bool characters(string content);
 
 		//! Used in showing progress.
+		
 		//! \return fraction of bytes processed. 
 		double progress();
 
 	protected:
 
-		//! start the <APP> element.
+		//! start the APP element.
+		
 		//! \code
 		//! <APP PROGRAMID="[id]" FIELDNAME="[fieldname]" TYPE="[datatype]">[data]</APP>
 		//! \endcode
@@ -75,34 +77,40 @@ class record;
 		//! \param attributes see above.
 		//! \return true if successful, false if not.
 		bool start_app(map<string, string>* attributes);
-		//! start the <RECORD> element
+		//! start the RECORD element.
+		
 		//! \code
 		//! <RECORD> field elements </RECORD>
 		//! \endcode
 		//! \return true if successful, false if not.
 		bool start_record();
-		//! start the <ADX> element
+		//! start the ADX element.
+		
 		//! \code
 		//! <ADX> header element, records element</ADX>
 		//! \endcode
 		//! \return true if successful, false if not.
 		bool start_adx();
-		//! start the <HEADER> element
+		//! start the HEADER element.
+		
 		//! \code
-		// <HEADER> field elements </HEADER>
+		//! <HEADER> field elements </HEADER>
 		//! \endcode
 		//! \return true if successful, false if not.
 		bool start_header();
-		//! start the <RECORDS> element
+		//! start the RECORDS element.
+		
 		//! \code
 		//! <RECORDS> record elements </RECORD>
 		//! \endcode
 		//! \return true if successful, false if not.
 		bool start_records();
-		//! start the <USERDEF> element
+		//! start the USERDEF element.
+		
 		//! \return true if successful, false if not.
 		bool start_userdef(map<string, string>* attributes);
-		//! start the <[field-name]> element
+		//! start the [field-name] element.
+		
 		//! in header element
 		//! \code
 		//! <USERDEF FIELDID="n" TYPE="DATATYPEINDICATOR" ENUM="{A,B, ... N}" RANGE="{LOWERBOUND:UPPERBOUND}">FIELDNAME</USERDEF>

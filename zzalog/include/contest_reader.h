@@ -8,15 +8,19 @@ struct ct_exch_t;
 
 class contest_data;
 
+//! XML element identifiers for contest.xml
 enum ct_element_t : char {
-    CT_NONE,                // Not yet reading an element
-    CT_CONTESTS,            // Outermost element
-    CT_CONTEST,             // Individual contest definition
-    CT_TIMEFRAME,           // Timeframe
-    CT_ALGORITHM,               // Individual fields
+    CT_NONE,                //!< Not yet reading an element.
+    CT_CONTESTS,            //!< Outermost element.
+    CT_CONTEST,             //!< Individual contest definition.
+    CT_TIMEFRAME,           //!< Timeframe.
+    CT_ALGORITHM,           //!< Individual fields.
 };
 
-/*
+//! Class to process the XML file contest.XML.
+
+/*! XML format:
+* \code
 *   <CONTESTS>
 *     <CONTEST id=[CONTEST_ID] index=[n]>
 *       <TIMEFRAME start=[start time] finish=[finish time] />
@@ -24,32 +28,35 @@ enum ct_element_t : char {
 *     </CONTEST>
 *     <CONTEST....
 *   </CONTESTS>
+* \endcode
 */
-
 class contest_reader :
     public xml_wreader
 {
 public:
+    //! Constructor.
     contest_reader();
+    //! Desctructor.
     ~contest_reader();
 
-    // Load data
+    //! Load data from input stream \p is to internal data \p d.
     bool load_data(contest_data* d, istream& is);
 
 protected:
-    // Start <CONTESTS>
+    //! Start "<CONTESTS>" element.
     static bool start_contests(xml_wreader* that, map<string, string>* attributes);
-    // Start <CONTEST id= index=>
+    //! Start "<CONTEST id= index=>" element.
     static bool start_contest(xml_wreader* that, map<string, string>* attributes);
-    // Start <TIMEFRAME start= finish=>
+    //! Start "<TIMEFRAME start= finish=>" elememnt.
     static bool start_timeframe(xml_wreader* that, map<string, string>* attributes);
-    // Start <ALGORITHM name=>
+    //! Start "<ALGORITHM name=>" element.
     static bool start_algorithm(xml_wreader* that, map<string, string>* attributes);
-     // End </CONTESTS>
+    //! End "</CONTESTS>" element.
     static bool end_contests(xml_wreader* that);
-    // End </CONTEST>
+    //! End "</CONTEST>" element.
     static bool end_contest(xml_wreader* that);
 
+    //! Maps the string to the element identifier for xml_wreader.
     const map<string, char> element_map_ = {
         { "CONTESTS", CT_CONTESTS },
         { "CONTEST", CT_CONTEST },
@@ -57,6 +64,7 @@ protected:
         { "ALGORITHM", CT_ALGORITHM },
     };
 
+    //! Map the element identifier to handler methods.
     const map<char, methods> method_map_ = {
         { CT_CONTESTS, { start_contests, end_contests, nullptr } },
         { CT_CONTEST, { start_contest, end_contest, nullptr } },
@@ -64,16 +72,16 @@ protected:
         { CT_ALGORITHM, { start_algorithm, nullptr, nullptr }},
     };
 
-    // date being read
+    //! The internal contest database
     contest_data* the_data_;
 
-    // Current contest
+    //! Contest data beiing loaded.
     ct_data_t* contest_data_;
-    // Current contest ID
+    //! Contest identifier being loaded.
     string contest_id_;
-    // Cureent contest index
+    //! Contest instance identifier being loaded.
     string contest_ix_;
-    // Input stream 
+    //! Data input stream.
     istream* in_file_;
 };
 

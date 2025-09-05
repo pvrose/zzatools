@@ -43,7 +43,7 @@ const int HCONFIG = 500;
 		//! \param W width. 
 		//! \param H height.
 		//! \param L label.
-		config(int W, int H, const char* label = nullptr);
+		config(int W, int H, const char* L = nullptr);
 		//! Destructor.
 		~config();
 

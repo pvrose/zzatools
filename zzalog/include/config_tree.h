@@ -23,7 +23,7 @@ class Fl_Preferences;
 		//! \param W width 
 		//! \param H height
 		//! \param L label
-		config_tree(int X, int Y, int W, int H, const char* label = nullptr);
+		config_tree(int X, int Y, int W, int H, const char* L = nullptr);
 		//! Destructor.
 		virtual ~config_tree();
 
