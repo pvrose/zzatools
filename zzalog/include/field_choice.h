@@ -12,91 +12,117 @@ struct spec_dataset;
 
 
 
-	// This class provides an extension to Fl_Choice to be used for an ADIF field selection choice.
+	//! This class provides an extension to Fl_Choice to be used for an ADIF field selection choice.
+	
+	//! If there are a large number of possible values, the list is broken into a hierarchy.
 	class field_choice : public Fl_Choice
 	{
 	public:
-		field_choice(int X, int Y, int W, int H, const char* label = nullptr);
+		//! Constructor.
+
+		//! \param X horizontal position within host window
+		//! \param Y vertical position with hosr window
+		//! \param W width 
+		//! \param H height
+		//! \param L label
+		field_choice(int X, int Y, int W, int H, const char* L = nullptr);
+		//! Destructor.
 		~field_choice();
 
-		// Set dataset
-		void set_dataset(string dataset_name, string field = "");
-		// Override value methods for fundamental string
+		//! Get the data for \p dataset_name from spec_data and set the \p default choice value.
+		void set_dataset(string dataset_name, string default = "");
+		//! Get the selected value, removing any hierarchy.
 		const char* value();
+		//! Set the value.
 		void value(const char* field);
-		// Set hierarchic
+		//! Set hierarchic list of values.
 		void hierarchic(bool h);
 
 	protected:
-		// Pointer to the dataet inside spec_data containing the list of fields 
+		//! Pointer to the dataet inside spec_data containing the list of fields 
 		spec_dataset* dataset_;
-		// Drop down list is hierarchic
+		//! Drop down list is hierarchic
 		bool hierarchic_;
 
 	};
 
 
-	// This class provides an extension to Fl_Input_Choice to add the menu
-	// if the field is an enumeration
+	//! This class provides an extension to Fl_Input_Choice to add the menu
+	//! if the field is an enumeration
 	class field_input : public Fl_Input_Choice
 	{
 	public:
-		field_input(int X, int Y, int W, int H, const char* label = nullptr);
+		//! Constructor
+		
+		//! \param X horizontal position within host window
+		//! \param Y vertical position with hosr window
+		//! \param W width 
+		//! \param H height
+		//! \param L label
+		field_input(int X, int Y, int W, int H, const char* L = nullptr);
+		//! Destructor.
 		~field_input();
 
-		// Overload handle to set this as a recipient of int'l pastes
+		//! Overload to handle selective mosue and keyboard events.
+		
+		//! - Left button push sets the input the focus of intl_dialog pastes.
+		//! - Right button release opens a tip window.
+		//! - Navigation keys have specific actions.
 		int handle(int event);
-		// The value() methods of Fl_Input_Choice are not virtual, so need to make them 
-		// all virtual here otherwise the compiler cannot find them
-		// Overload value
+		//! Get the input or selected value.
 		virtual const char* value();
-		// Make the others virtual as well
+		//! \cond
+		// The value() methods of Fl_Input_Choice are not virtual, so need to make them 
+		// all virtual here otherwise the compiler cannot find them.
 		virtual void value(const char* val);
 		virtual void value(int i);
-	
+		//! \endcond
 		void field_name(const char* field_name, record* qso = nullptr);
+		//! The field name used to populate the selection.
 		const char* field_name();
 
+		//! Set the QSO record to \p q.
 		void qso(record* q);
 
-		// Get reason for leaving 
+		//! Certain keystrokes can be passed to parent widget.
 		enum exit_reason_t {
-			IR_NULL,       // Normal behaviour - enter or lose focus
-			IR_RIGHT,      // Tab right
-			IR_LEFT,       // Tab left (Shift-tab)
-			IR_UP,         // Up key pressed
-			IR_DOWN,       // Down key pressed
-			IR_ENTER,    // Do not do anything
+			IR_NULL,       //!< Normal behaviour - enter or lose focus
+			IR_RIGHT,      //!< Tab right
+			IR_LEFT,       //!< Tab left (Shift-tab)
+			IR_UP,         //!< Up key pressed
+			IR_DOWN,       //!< Down key pressed
+			IR_ENTER,      //!< Do not do anything
 		};
+		//! Return reason for closing widget.
 		exit_reason_t reason();
 
-		// Reloas the choice values and possibly select that in the given QSO
+		//! Reloasds the choice values and possibly select that in the given \p QSO.
 		void reload_choice(record* qso = nullptr);
-		// Allow the Fl_Input component to be either INPUT or OUTPUT
+		//! Allow the Fl_Input component to be either INPUT or OUTPUT
 		virtual void type(uchar t);
-		// Overload draw - deactivates menubeutton accordingly
+		//! Overload draw - deactivates menubutton if type is OUTPUT.
 		virtual void draw();
 
-		// Overide the menu callback
+		//! Callback for menu changes.
 		static void cb_menu(Fl_Widget* w, void* v);
 
 	protected:
 
-		// Populate the choice
+		//! Populate the choice from field named \p name.
 		void populate_choice(string name);
-		// Populate a case choice
+		//! Populate a case choice - UPPER, lower and Mixed versions of the text value.
 		void populate_case_choice();
-		// Has a field that can have case changed
+		//! Is it a field that can have its value's case changed
 		bool is_string(string field);
-		// Name of field
+		//! Name of field
 		string field_name_;
-		// QSO
+		//! QSO
 		record* qso_;
-		// Get reason for leaving -1 - LEFT TAB, +1 - RIGHT TAB, 0 any other
+		//! Get reason for leaving
 		exit_reason_t reason_;
-		// activate the menubutton
+		//! activate the menubutton
 		bool use_menubutton_;
-		// Tip window
+		//! Tip window to be shown on right button click.
 		static Fl_Window* tip_window_;
 	};
 #endif
