@@ -12,169 +12,186 @@ using namespace std;
 
 class cty_filter;
 
-// This is the base class for all cty_data elements
+//! This is the base class for all cty_data elements
 class cty_element
 {
 public:
 
-	// Type of element
+	//! Type of element
 	enum type_t : uint8_t {
 		CTY_UNSPECIFIED = 0,  
-		CTY_ENTITY,           // cty_entity
-		CTY_PREFIX,           // cty_prefix
-		CTY_EXCEPTION,        // cty_exception
-		CTY_GEOGRAPHY,        // cty_geography
-		CTY_FILTER            // cty_filter
+		CTY_ENTITY,           //!< Entity element (cty_entity)
+		CTY_PREFIX,           //!< Prefix elemeent (cty_prefix)
+		CTY_EXCEPTION,        //!< Exception element (cty_exception)
+		CTY_GEOGRAPHY,        //!< Geographic subdivision of entity (cty_geography)
+		CTY_FILTER            //!< Usage element (cty_filter)
 	};
-	// Time range
+	//! Time range - in ADIF date format "YYYYMMDD".
 	struct time_scope {
-		string start = "*";
-		string finish = "*";
+		string start = "*";     //!< Start of validity of data.
+		string finish = "*";    //!< End of validity of data.
 	};
-	// Merge error response
+	//! Merge error response
 	typedef uint8_t error_t; 
-	// No issues
+	//! No issues
 	const static error_t CE_OK = 0;
-	// CQ Zones clash
+	//! CQ Zones clash
 	const static error_t CE_CQ_CLASH = 1 << 0;
-	// ITU Zones clash
+	//! ITU Zones clash
 	const static error_t CE_ITU_CLASH = 1 << 1;
-	// Continents clash
+	//! Continents clash
 	const static error_t CE_CONT_CLASH = 1 << 2;
-	// Latitude and/or longitude clash
+	//! Latitude and/or longitude clash
 	const static error_t CE_COORD_CLASH = 1 << 3;
-	// Name clash
+	//! Name clash
 	const static error_t CE_NAME_CLASH = 1 << 4;
-	// Deleted clash
+	//! Deleted clash
 	const static error_t CE_DEL_CLASH = 1 << 5;
-	// Non element class
+	//! Non element class
 	const static error_t CE_OTHER_CLASH = 1 << 7;
 
+	//! Constructor.
 	cty_element();
+	//! Destructor.
 	~cty_element();
 
+	//! Type of element.
 	type_t type_;
 
-	// DXCC identifier - -1=invalid, 0=valid, but not an entity
+	//! DXCC identifier - -1=invalid, 0=valid, but not an entity
 	int dxcc_id_ = -1;
-	// Element name
+	//! Element name
 	string name_ = "";
-	// Time validity
+	//! Time validity
 	time_scope time_validity_;
-	// CQ Zone - -1=invalid
+	//! CQ Zone - -1=invalid
 	int cq_zone_ = -1;
-	// ITU Zone
+	//! ITU Zone
 	int itu_zone_ = -1;
-	// Continent
+	//! Continent
 	string continent_ = "";
-	// Co-ordinates
+	//! Co-ordinates
 	lat_long_t coordinates_ = { nan(""), nan("") };
-	// Deltede
+	//! Item is no longer valid, but has been.
 	bool deleted_ = false;
-	// Filters
+	//! Filters that can be applied to this item.
 	list<cty_filter*> filters_ = {};
 
-	// Merge a similar element into this one
+	//! Merge a similar element \p elem into this one, returning error_t showing any clash.
 	error_t merge(cty_element* elem);
 
-	// Returns true if elem's valiidty overlaps this validity
+	//! Returns true if \p elem valiidty overlaps this validity, false if not.
 	bool time_overlap(cty_element* elem);
-	// Return true if this validity wholly contains elem's validity
+	//! Returns true if this validity wholly contains \p elem validity.
 	bool time_contains(cty_element* elem);
-	// Return true if supplied time is within this validity
+	//! Return true if supplied time (\p when) is within this validity.
 	bool time_contains(string when);
 
 };
 
+//! Output streaming operator "<<" for a cty_element.
 ostream& operator<<(ostream& os, const cty_element& elem);
 
-// Version to be used for entities
+//! Version of cty_element to be used for entities.
 class cty_entity : public cty_element {
 
 public:
 
+	//! Constructor.
 	cty_entity();
+	//! Destructor.
 	~cty_entity();
 
-	// Merge a similar element into this one
+	//! Merge a similar element \p elem into this one.
 	virtual error_t merge(cty_element* elem);
 
 	// Additional fields
-	// Entitiy nickname - primary prefix
+	//! Entitiy nickname - usually the primary prefix (eg GM for Scotland).
 	string nickname_ = "";
 
 };
 
+//! Output streaming operator "<<" for a cty_entity.
 ostream& operator<<(ostream& os, const cty_entity& rhs);
 
-// Vesrion to be used for prefixes
+//! Vesrion of cty_element to be used for prefixes
 class cty_prefix : public cty_element {
 
 public:
 
+	//! Constructor.
 	cty_prefix();
-	// Ddstructor - delete children
+	//! Destructor.
 	~cty_prefix();
 
 };
 
+//! Output streaming operator "<<" for a cty_prefix.
 ostream& operator<<(ostream& os, const cty_prefix& elem);
 
-// Version to be used for exceptions
+// Version of cty_exception to be used for exceptions
 class cty_exception : public cty_element {
 
 public:
 
+	//! Constructor.
 	cty_exception();
+	//! Destructor.
 	~cty_exception();
 
-	// Exception type
+	//! Exception type
 	enum exc_type_t : uint8_t {
-		EXC_INVALID,
-		EXC_OVERRIDE
+		EXC_INVALID,        //!< Callsign used has not been validly assigned to the station.
+		EXC_OVERRIDE        //!< The default parsing of callsign is overridden by this exception.
 	};
+	//! Exception type in this entry.
 	exc_type_t exc_type_ = EXC_INVALID;
 
 };
 
+//! Output streaming operator "<<" for a cty_exception.
 ostream& operator<<(ostream& os, const cty_exception& rhs);
 
-// Version to be used in prefix filter
+// Version of cty_element to be used in geographic or usage filter
 class cty_filter : public cty_element {
 
 public:
-
+	//! Constructor.
 	cty_filter();
+	//! Destructor.
 	~cty_filter();
 
-	// What the filter if for
+	//! Filter type
 	enum filter_t : uint8_t {
-		FT_INVALID = 0,
-		FT_GEOGRAPHY,             // Filter to a geographic dub-division
-		FT_USAGE                  // Filter to a specific usag
-	} filter_type_ = FT_INVALID;
+		FT_NOT_USED = 0,          
+		FT_GEOGRAPHY,             //!< Filter to a geographic dub-division
+		FT_USAGE                  //!< Filter to a specific usag
+	} filter_type_ = FT_NOT_USED;
 
-	// Filetring patterns
+	//! Filtering patterns.
 	string pattern_ = "";
-	// Nickname for filter 
+	//! Nickname used for filter. 
 	string nickname_ = "";
-	// Reason for filter
+	//! Reason for filter
 	string reason_ = "";
 
 };
 
+//! Output streaming operator "<<" for a cty_filter.
 ostream& operator <<(ostream& os, const cty_filter& rhs);
 
-// Geographic filter
+//! Version of cty_element used for geographic filters.
 class cty_geography : public cty_filter {
 
 public:
-
+	//! Constructor.
 	cty_geography();
+	//! Destructor.
 	~cty_geography();
-
+	//! Primary administrative sub-division where unique to this filter.
 	string province_ = "";
 
 };
 
+//! Output streaming operator "<<" for a cty_geography.
 ostream& operator <<(ostream& os, const cty_geography& rhs);

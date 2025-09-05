@@ -9,54 +9,6 @@
 extern status* status_;
 extern bool closing_;
 
-/* XML structure
-
-<clublog>
-:
-:
-<exceptions>
-	<exception record='6002'>
-		<call>VE1ST/NA14</call>
-		<entity>CANADA</entity>
-		<adif>1</adif>
-		<cqz>4</cqz>
-		<cont>NA</cont>
-		<long>-97.14</long>
-		<lat>49.90</lat>
-	</exception>
-	:
-	:
-</exceptions>
-:
-:
-<invalid_operations>
-	<invalid record='489'>
-		<call>T88A</call>
-		<start>1995-05-01T00:00:00+00:00</start>
-		<end>1995-12-31T23:59:59+00:00</end>
-	</invalid>
-	:
-	:
-</invalid_operations>
-:
-:
-<zone_exceptions>
-	<zone_exception record='59'>
-		<call>KD6WW/VY0</call>
-		<zone>1</zone>
-		<start>2003-07-30T00:00:00+00:00</start>
-		<end>2003-07-31T23:59:59+00:00</end>
-	</zone_exception>
-	:
-	:
-</zone_exceptions>
-:
-:
-</clublog>
-
-
-*/
-
 // Constructor
 cty1_reader::cty1_reader() {
 	ignore_processing_ = false;

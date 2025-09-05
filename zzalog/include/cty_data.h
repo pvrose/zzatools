@@ -17,163 +17,201 @@ using namespace std;
 
 class record;
 
-// This class provides a wrapper for all  the callsign exception data in cty.xml
+//! This class provides a wrapper for all the callsign exception data.
 class cty_data
 {
 
 public:
 
-	// Source of the data - set by type()
-	// These can be orred in whcich case the various data are merged (TODO:)
+	//! Source of the data - set by type()
 	enum cty_type_t : uint8_t {
-		ADIF = 0,
-		CLUBLOG,
-		COUNTRY_FILES,
-		DXATLAS,
+		ADIF = 0,          //!< Data from ADIF Specification.
+		CLUBLOG,           //!< Data from Clublog.org.
+		COUNTRY_FILES,     //!< Data from country-files.com.
+		DXATLAS,           //!< Data from dxatlas.com.
 		CTY_LIMIT
 	};
 
 protected:
 
-	//cty_caps_t capabilities_;
+	//! Data currently being loaded.
 	cty_type_t type_ = ADIF;
 
-	// Data structure
+	//! Database structure.
 	struct all_data {
-		// All the entities - indexed by dxcc_id
+		//! All the entities - indexed by dxcc_id.
 		map < int, cty_entity* > entities;
-		// All the entity level prefixes - indexed by starting string
+		//! All the entity level prefixes - indexed by starting string.
 		map < string, list<cty_prefix*> > prefixes;
-		// All the exceptions
+		//! All the exceptions - indexed by callsign.
 		map < string, list<cty_exception*> > exceptions;
 	};
 
 public:
 
-	// Parse source
+	//! Parse source
 	enum parse_source_t {
-		INVALID,
-		NO_DECODE,
-		EXCEPTION,
-		ZONE_EXCEPTION,
-		PREVIOUS,
-		DEFAULT
+		INVALID,            //!< Callsign marked invalid.
+		NO_DECODE,          //!< Not decoded.
+		EXCEPTION,          //!< Callsign in entity that is not its normal decode.
+		ZONE_EXCEPTION,     //!< Callsign in a zone other than the default for the entity.
+		PREVIOUS,           //!< Callsign previously decoded.
+		DEFAULT             //!< Parsing based on default for the callsign.
 	};
 
+	//! Constructor.
 	cty_data();
-
+	//! Destructor.
 	virtual ~cty_data();
 
 	// Return various fields of entity
-	string nickname(record* qso);
-	string name(record* qso);
-	string continent(record* qso);
-	int cq_zone(record* qso);
-	int itu_zone(record* qso);
+	string nickname(record* qso);  //!< Returns the nickname for the entity in the \p QSO. 
+	string name(record* qso);      //!< Returns the name of the entity in the \p QSO.
+	string continent(record* qso); //!< Returns the continent of the entity in the \p QSO.
+	int cq_zone(record* qso);      //!< Returns the CQ Zone of the callsign in the \p QSO.
+	int itu_zone(record* qso);     //!< Returns the ITU Zone of the callsign in the \p QSO.
 	// Get location
-	lat_long_t location(record* qso);
-	// Update record based on parsing
+	lat_long_t location(record* qso); //!< Returns the longitude and latitude of the station in the \p QSO.
+	//! Update record based on parsing
+	
+	//! \param qso QSO record to update.
+	//! \param my_call update the "MY_...." fields rather than the other station's information. 
+	//! \return true if successful, false if not.
 	bool update_qso(record* qso, bool my_call = false);
-	// Get location details
+	//! Get location details
+	
+	//! \param qso QSO record to parse.
+	//! \return text information about parsing for displaying in a tooltip.
 	string get_tip(record* qso);
-	// Parsing source
+	//! Parsing source
+	
+	//! \param qso QSO to parse.
+	//! \return indicates how the callsign was parsed. 
 	parse_source_t get_source(record* qso);
-	// Return entity 
+	//! Returns the DXCC identifier of the entity worked in \p qso. 
 	int entity(record* qso);
-	// Return geography info
+	//! Returns geography information relating to the callsign worked in \p qso.
 	string geography(record* qso);
-	// Return usage info
+	//! Returns usage information relating to the callsign worked in \p qso.
 	string usage(record* qso);
 
+	//! Returns the DXCC identifier for the entity with \p nickname.
+	int entity(string nickname);
+	//! Returns the entity nickname for the entity with DXCC identifier \p adif_id.
+	string nickname(int adif_id);
 
-	// Get entity for nickname and vice-versa
-	virtual int entity(string nickname);
-	virtual string nickname(int adif_id);
-
-	// Add an entity
+	//! Add the entity \p entry to the database.
 	void add_entity(cty_entity* entry);
-	// Add a prefix
+	//! Add the prefix \p entry mapped by \p pattern to the database.
 	void add_prefix(string pattern, cty_prefix* entry);
-	// Add an exception
+	//! Add the exception \p entry mapped by \p pattern to the database.
 	void add_exception(string pattern, cty_exception* entry);
-	// Add a filter
+	//! Add the filter \p entry to the specified \p element in the database. 
 	void add_filter(cty_element* element, cty_filter* entry);
 
+	//! Returns the current output stream
 	ostream& out() { return os_; };
-	// Get the recorded timestamp
+	//! Returns the recorded timestamp for the data source by \p type.
 	chrono::system_clock::time_point timestamp(cty_type_t type);
-	// get latest data for the type
+	//! Download the latest data from data source by \p type.
+	
+	//! Returns true if successful, false if not.
 	bool fetch_data(cty_type_t type);
-	// Get type versiom
+	//! Returns the version of the data source by \p type.
 	string version(cty_type_t type);
 
 protected:
 
-	// Load the data 
+	//! Load the data from the \p filename specified. 
 	bool load_data(string filename);
-	// Delete data
+	//! Delete data
 	void delete_data(all_data* data);
-	// Get the filename
+	//! Returns the filename for the current data type.
 	string get_filename();
-	// Merge imported data
+	//! Merge imported data from latest source.
 	void merge_data();
-	// Prepouplate from ADIF
+	//! Prepopulate from ADIF Specification.
 	void load_adif_data();
-	// Find the entity, pattern and sub-patterns for the supplied QSO
+	//! Find the entity, pattern and sub-patterns for the supplied QSO: updates internal attributes.
 	void parse(record* qso);
-	// Use the attached suffix to "mutate" the call
+	//! Use the attached \p suffix to "mutate" the \p call to parse eg W1ABC/2 type calls.
 	void mutate_call(string& call, char suffix);
 
-	// Get all the elements that may match
+	//! Find element that matches the call.
+	
+	//! \param call Callsign to match.
+	//! \param when Date of QSO.
+	//! \param matched_call Returns the part of the callsign that matches the element.
+	//! \return The matching element: either an exception record or an entity.
 	cty_element* match_pattern(string call, string when, string& matched_call);
+	//! Find specific prefix element that matches call.
+	
+	//! \param call Callsign to match.
+	//! \param when Date of QSO.
+	//! \return The matching prefix record.
 	cty_element* match_prefix(string call, string when);
+	//! Find specific secondary filter that matches the call and type.
+	
+	//! \param element The starting point of the match search - usually an entity element or
+	//! a previous filter for multi-layered filters.
+	//! \param type Either FT_GEOGRAPHY or FT_USAGE.
+	//! \param call The callsign to match.
+	//! \param when The date of the QSO.
 	cty_filter* match_filter(cty_element* element, cty_filter::filter_t type, string call, string when);
 
-	// Split call into call body and alternate
+	//! Split \p call into call \p body and \p alt (alternate).
 	void split_call(string call, string& alt, string& body);
-
+	//! Dump database into a file - for checking data loaded cotrrectly.
 	void dump_database();
 
-	// Parse result is exception - nullptr if not
+	//! Returns Exception record for current parse result, nullptr if not an exception
 	cty_exception* exception();
-	// Parse result is prefix
+	//! Returns Prefix record for current parse result, nullptr of no prefix.
 	cty_prefix* prefix();
 	
-	// Get the system timestamp for the named file
+	//! Get the system timestamp for the named \p filename.
+	
+	//! \param filename Filename.
+	//! \param old_age Age in days the filename is considered valid. A warning is raised if the file is older.
+	//! \return the system timestamp of the file.
 	chrono::system_clock::time_point get_timestamp(string filename, int old_age);
 
+	//! The result of a parse request.
 	struct {
-		// The entity definition
+		//! The entity definition
 		cty_entity* entity = nullptr;
-		// Either an exception or prefix
+		//! Either an exception or prefix
 		cty_element* decode_element = nullptr;
-		// Seeecetd geographic filter
+		//! Selecetd geographic filter
 		cty_geography* geography = nullptr;
-		// Usage filter
+		//! Usage filter
 		cty_filter* usage = nullptr;
 	} parse_result_;
 
-	// Current parse objects
+	//! Previous callsign that was parsed, to avoid unnecessary re-parsing.
 	string current_call_ = "";
+	//! Previous QSO that was parsed.
 	record* current_qso_ = nullptr;
 
-	// The country data
+	//! The country database.
 	all_data* data_ = nullptr;
 
-	// The data being imported
+	//! The data being imported
 	all_data* import_ = nullptr;
 
-	// Merge report
+	//! Output stream for the merge report.
 	ofstream os_;
 
-	// Merge report is there
+	//! Warnings have been reported during data merge.
 	bool report_warnings_ = false;
+	//! Errors have been reported during data merge.
 	bool report_errors_ = false;
 
+	//! Mapping of data timestamps by data source.
 	map<cty_type_t, chrono::system_clock::time_point> timestamps_;
-	// Launch time
+	//! Time at start of loading.
 	chrono::system_clock::time_point now_;
-	// Versions
+	//! Mapping of data versions by data source.
 	map<cty_type_t, string> versions_;
 
 };
