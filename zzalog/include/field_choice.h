@@ -29,8 +29,8 @@ struct spec_dataset;
 		//! Destructor.
 		~field_choice();
 
-		//! Get the data for \p dataset_name from spec_data and set the \p default choice value.
-		void set_dataset(string dataset_name, string default = "");
+		//! Get the data for \p dataset_name from spec_data and set the \p default_value choice value.
+		void set_dataset(string dataset_name, string default_value = "");
 		//! Get the selected value, removing any hierarchy.
 		const char* value();
 		//! Set the value.
