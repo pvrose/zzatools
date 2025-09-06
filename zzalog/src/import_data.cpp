@@ -47,8 +47,6 @@ import_data::import_data() :
 	book(OT_IMPORT)
 {
 	// Initialise
-	update_files_ = nullptr;
-	empty_files_ = nullptr;
 	close_pending_ = false;
 	update_in_progress_ = false;
 	update_is_new_ = false;
@@ -61,9 +59,6 @@ import_data::import_data() :
 	number_rejected_ = 0;
 	number_clublog_ = 0;
 	number_swl_ = 0;
-	num_update_files_ = 0;
-	update_files_ = nullptr;
-	empty_files_ = nullptr;
 	match_question_ = "";
 	close_pending_ = false;
 	last_added_number_ = 0;
@@ -72,8 +67,6 @@ import_data::import_data() :
 // Destructor
 import_data::~import_data()
 {
-	delete[] empty_files_;
-	delete[] update_files_;
 }
 
 // Delete the mismatch record in the update - delete it and erase 
@@ -473,14 +466,6 @@ void import_data::finish_update(bool merged /*= true*/) {
 			}
 		}
 	}
-	// We are waiting to finish the update
-	if (close_pending_) {
-		// Delete the update files
-		delete[] update_files_;
-		update_files_ = nullptr;
-		delete[] empty_files_;
-		empty_files_ = nullptr;
-	}
 	// If we are merging eQSL, release the card queue
 	if (update_mode_ == EQSL_UPDATE) {
 		eqsl_handler_->enable_fetch(eqsl_handler::EQ_START);
@@ -710,10 +695,6 @@ void import_data::load_stream(stringstream& adif, import_data::update_mode_t ser
 	adi_reader* reader = new adi_reader();
 	reader->load_book(this, adif);
 	delete reader;
-	if (server == LOTW_UPDATE) {
-		// Process the LotW header 
-		process_lotw_header();
-	}
 	last_record_loaded_ = get_record(size() - 1, false);
 	// Switch the view to the import view and select first record
 	tabbed_forms_->activate_pane(OT_IMPORT, true);
@@ -770,21 +751,6 @@ void import_data::load_record(record* qso, update_mode_t mode) {
 	update_mode_ = mode;
 	append_record(qso);
 	merge_data();
-}
-
-// Process LotW header - merges
-void import_data::process_lotw_header() {
-	if (header()->item("PROGRAMID") != "LoTW") {
-		status_->misc_status(ST_WARNING, "IMPORT: It does not appear the ADIF came from LoTW");
-	}
-	else {
-		status_->misc_status(ST_OK, "IMPORT: LotW download done.");
-	}
-}
-
-// Number of update files
-int import_data::number_update_files() {
-	return num_update_files_;
 }
 
 // Last record loaded

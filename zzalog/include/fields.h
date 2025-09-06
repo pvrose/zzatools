@@ -1,5 +1,6 @@
-/* Types and constants associated with field ordering in views and other classes
-*/
+/*! \file */
+//! Types and constants associated with field ordering in views and other classes.
+
 
 #ifndef __FIELDS__
 #define __FIELDS__
@@ -14,17 +15,18 @@ using namespace std;
 
 class Fl_Preferences;
 
-// Column info 
+//! Field data element. 
 struct field_info_t {
-	string field;			// Field name
-	string header;			// Text used for column headers in log table views
-	unsigned int width;		// Column width in log table views
-
+	string field;			//!< Field name
+	string header;			//!< Text used for column headers in log table views
+	unsigned int width;		//!< Column width in log table views
+	//! Default constructor.
 	field_info_t() :
 		field(""),
 		header(""),
 		width(0)
 	{}
+	//! Declaration constructor.
 	field_info_t(string f, string h, unsigned int w) :
 		field(f),
 		header(h),
@@ -32,18 +34,19 @@ struct field_info_t {
 	{}
 };
 
-
-// ADIF field ordering applications - order used for radio button and 
+//! ADIF field ordering applications - order 
 enum field_app_t : char {
-	FO_NONE,             // No application
-	FO_MAINLOG,          // Main log
-	FO_EXTRACTLOG,       // Extract log
-	FO_QSOVIEW,          // QSO View
-	FO_IMPORTLOG,        // Records for import
-	FO_LAST              // Keep at end to supply extent of enum
+	FO_NONE,             //!< No application
+	FO_MAINLOG,          //!< Main log
+	FO_EXTRACTLOG,       //!< Extract log
+	FO_QSOVIEW,          //!< QSO Manager views
+	FO_IMPORTLOG,        //!< Records for import
+	FO_LAST              //!< Keep at end to supply extent of enum
 };
 
-// Default columns to use in log_form 
+//! Default columns when no saved configuration and used for restore defaults.
+
+//! \todo Check that all usages have a restore default feature.
 const field_info_t DEFAULT_FIELDS[] = {
 	{ "QSO_DATE", "Date", 62 },
 	{ "TIME_ON", "Start", 50 },
@@ -61,7 +64,7 @@ const field_info_t DEFAULT_FIELDS[] = {
 	{ "", "", 0 }
 };
 
-// Anglicise collection names
+//! Convert usage type to text.
 const map<field_app_t, string> APPLICATION_LABELS = {
 	{ FO_NONE, "None" },
 	{ FO_MAINLOG, "Main Log" },
@@ -70,55 +73,57 @@ const map<field_app_t, string> APPLICATION_LABELS = {
 	{ FO_IMPORTLOG, "Imported data" }
 };
 
-// Field collection
+//! Field collection: a set of field descriptions.
 typedef vector<field_info_t> collection_t;
-// List of fields
+//! List of fields.
 typedef vector<string> field_list;
 
+//! Container class for the field descriptions.
 class fields {
 
 public:
 
-	// Constructor
+	//! Constructor.
 	fields(); 
-	// Destructor
+	//! Destructor.
 	~fields();
 
-	// Get the collection for the application
+	//! Returns the collection for the usage \p app.
 	collection_t* collection(field_app_t app);
-	// Get the collection named.. and if necessary copy the collection
+	//! Returns the collection named amd if necessary create it by copying from \p source.
 	collection_t* collection(string name, string source = "Default", bool* copied = nullptr);
-	// Get the collection named .. and if necessary pre-populate it
+	//! Returns the collection named and if necessary pre-populate it from the supplied \p values.
 	collection_t* collection(string name, field_list values);
-	// Get the field names in the collection
+	//! Returns the list of field names in the collection in the collection \p name.
 	field_list field_names(string name);
 
-	// Get the list of collection names
+	//! Returns the set of collection names.
 	set<string> coll_names();
-	// Get the collection name for the application
+	//! Returns the collection name for the usage \p app.
 	string coll_name(field_app_t app);
 
-	// Link app to collection
+	//! Link the usage \p app to collection \p coll.
 	void link_app(field_app_t app, string coll);
 
-	// Delete colelction - returns false if failed
+	//! Delete collection named \p coll, returns false if failed.
 	bool delete_coll(string coll);
 
+	//! Save any update made in the usage.
 	void save_update();
 
 protected:
-	// Read settings
+	//! Load database from fields.tsv.
 	void load_data();
-	// Store settings
+	//! Store databade to fields.tsv.
 	void store_data();
-	// Load collections
+	//! Load collections - called by load_data().
 	bool load_collections();
 
-	// The data - mapping app to collection name
+	//! Mapping usage to collection name.
 	map<field_app_t, string> app_map_;
-	// The data - mapping collection by name
+	//! The database, mapped by collection name.
 	map<string, collection_t*> coll_map_;
-	// Field settings filename
+	//! Field settings filename.
 	string filename_;
 
 };

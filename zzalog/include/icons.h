@@ -2,7 +2,9 @@
 #define __ICONS__
 
 
-	// This file provides all the icons used. These are all defined as 16*16 4-byte RGBA values.
+	//! This file provides all the icons used. 
+	//! These are all defined as 16*16 4-byte RGBA values.
+	//! \todo Replace these with drawn labels?
 
 // RGBA Red Opaque - =
 #define ZZRE "\xFF\0\0\xFF"
@@ -21,6 +23,7 @@
 // RGBA Transparent (no character)
 #define ZZBG "\0\0\0\0"
 
+//! Icon "Download eQSL.cc".
 	const unsigned char ICON_DL_EQSL[] =
 		/* Download eQSL | - dark blue, # - black
 		0           ###  ;
@@ -58,8 +61,9 @@
 		ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH
 		;
 
+	//! Icon "Download Logbook of the World"
 	const unsigned char ICON_DL_LOTW[] =
-		/* Download eQSL | - dark blue, # - black
+		/* Download LotW | - dark blue, # - black
 		0 #              ;
 		1 #     ||       ;
 		2 #     ||  ###  ;
@@ -95,6 +99,7 @@
 		ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH
 		;
 
+	//! Icon "New QSO"
 	const unsigned char ICON_NEW_QSO[] =
 		/* New Record @ = white
 		0 @@@@@@@@@@@@@@@@
@@ -132,6 +137,7 @@
 		ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH
 		;
 
+	//! Icon "Save QSO"
 	const unsigned char ICON_SAVE_QSO[] =
 		/* New Record @ = white, + = green
 		0 @@@@@@@@@@@@@@@@
@@ -169,6 +175,7 @@
 		ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH
 		;
 
+	//! Icon "Cancel QSO"
 	const unsigned char ICON_CNCL_QSO[] =
 		/* New Record @ = white, = = green
 		0 @@@@@@@@@@@@@@@@
@@ -206,6 +213,7 @@
 		ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH
 		;
 
+	//! Icon "Delete QSO"
 	const unsigned char ICON_DEL_QSO[] =
 		/* New Record @ = white, # = black
 		0 ##@@@@@@@@@@@@##
@@ -243,6 +251,7 @@
 		ZZBK ZZBK ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZBK ZZBK
 		;
 
+	//! Icon "Retime QSO"
 	const unsigned char ICON_RETIME_QSO[] =
 		/* New Record @ = white, + = blue
 		0 @@@@@@@@@@@@@@@@
@@ -280,42 +289,6 @@
 		ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH ZZWH
 		;
 
-	const unsigned char ICON_CALENDAR[] =
-		/* Calendar icon
-		0
-		1
-		2 ###############
-		3 #@#@#@#@#@#@#@#
-		4 #@#@#@#@#@#@#@#
-		5 ###############
-		6 #@#@#@#@#@#@#@#
-		7 ###############
-		8 #@#@#@#+#@#@#@#
-		9 ###############
-		0 #@#@#@#@#@#@#@#
-		1 ###############
-		2 #@#@#@#@#@#@#@#
-		3 ###############
-		4
-		5
-		*/
-		ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG
-		ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG
-		ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBG
-		ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZBG
-		ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZBG
-		ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBG
-		ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZBG
-		ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBG
-		ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZCY ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZBG
-		ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBG
-		ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZBG
-		ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBG
-		ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZWH ZZBK ZZBG
-		ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBK ZZBG
-		ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG
-		ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG ZZBG
-		;
 
 	const unsigned char ICON_EXTR_EQSL[] =
 		/* Upload eQSL | - dark blue, # - black

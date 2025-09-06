@@ -7,55 +7,83 @@
 class record;
 
 
-// This class provides an emulation for fllog software, the logging application
-// for the fldigi suite of applications. It allows the log to be updated 
-// directly from fldigi
+//! This class provides an emulation for fllog software, the logging application
+//! for the fldigi suite of applications. 
+
+//! It allows the log to be updated 
+//! directly from fldigi. Requests and Responses are in XML, Remote Procedure Call (XML-RPC) format.
 
 	class fllog_emul
 	{
 	public:
+		//! Constructor.
 		fllog_emul();
+		//! Destructoor.
 		~fllog_emul();
-		// Start the server
+		//! Start the server.
 		void run_server();
-		// Clsoe servefr
+		//! Close the server.
 		void close_server();
-		// Return server state
+		//! Returns the server state.
 		static bool has_server();
-		// Received a packet
+		//! Returns true if a request has been received.
 		static bool has_data();
 
 	protected:
-		// Get ADIF string for first record with callsign
+		//! Fetch the first record that matches callsign request.
+		
+		//! \param params Request.
+		//! \param response Returned response.
+		//! \return true if request fails, otherwise false.
 		static int get_record(rpc_data_item::rpc_list& params, rpc_data_item& response);
-		// Check duplicate - replies true (exact match), possible (callsign matches), false (not a match
+		//! Check duplicate - replies true (exact match), possible (callsign matches), false (not a match.
+
+		//! \param params Request.
+		//! \param response Returned response.
+		//! \return true if request fails, otherwise false.
 		static int check_dup(rpc_data_item::rpc_list& params, rpc_data_item& response);
-		// Add new record
+		//! Add new record
+
+		//! \param params Request.
+		//! \param response Returned response.
+		//! \return true if request fails, otherwise false.
 		static int add_record(rpc_data_item::rpc_list& params, rpc_data_item& response);
-		// Update fileds in current selection
+		//! Update fileds in current selection
+
+		//! \param params Request.
+		//! \param response Returned response.
+		//! \return true if request fails, otherwise false.
 		static int update_record(rpc_data_item::rpc_list& params, rpc_data_item& response);
-		// List methods - string returns list of methods suppported
+		//! List methods - string responds with a list of methods suppported
+
+		//! \param params Request.
+		//! \param response Returned response.
+		//! \return true if request fails, otherwise false.
 		static int list_methods(rpc_data_item::rpc_list& params, rpc_data_item& response);
 
-		// Generate error resposne
+		//! Generate error response
+		
+		//! \param code Error code.
+		//! \param message Error message
+		//! \param response Formatted response for sending to client.
 		void generate_error(int code, string message, rpc_data_item& response);
 
-		// Check connected
+		//! Check FlDigi isconnected
 		void check_connected();
 
-		// The currently selected record
+		//! The currently selected record.
 		record* current_qso_;
-		// The record possibly being created
+		//! The record possibly being created.
 		record* putative_qso_;
-		// RPC handler
+		//! XMK-RPC handler.
 		rpc_handler* rpc_handler_;
-		// The list of methods supported by the RPC interface
+		//! The list of methods supported by the RPC interface
 		list<rpc_handler::method_entry> method_list_;
 		
-		// The only instance
+		//! The only instance
 		static fllog_emul* that_;
 
-		// Connected
+		//! Connected
 		bool connected_;
 
 

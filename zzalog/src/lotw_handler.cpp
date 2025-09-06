@@ -252,7 +252,7 @@ bool lotw_handler::validate_adif(stringstream* adif) {
 }
 
 // Upload single QSO
-bool lotw_handler::upload_single_qso(item_num_t record_num) {
+bool lotw_handler::upload_single_qso(qso_num_t record_num) {
 	server_data_t* lotw_data = qsl_dataset_->get_server_data("LotW");
 	bool upload_qso = lotw_data->upload_per_qso;
 	if (upload_qso == false) {

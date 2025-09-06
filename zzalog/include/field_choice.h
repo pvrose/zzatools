@@ -77,6 +77,8 @@ struct spec_dataset;
 		virtual void value(const char* val);
 		virtual void value(int i);
 		//! \endcond
+		//! Set the field supported by the input to \p field_name, setting its
+		//! initial value to that in \p qso.
 		void field_name(const char* field_name, record* qso = nullptr);
 		//! The field name used to populate the selection.
 		const char* field_name();
