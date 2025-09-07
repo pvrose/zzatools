@@ -4,41 +4,49 @@
 #include <FL/Fl_Group.H>
 
 
-	// Standard settings dialog ahs OK, Save and Cancel buttons - each settings tab needs to implement them.
+	//! Standard settings dialog has OK, Save and Cancel buttons - each settings tab needs to implement them.
 	enum cfg_action_t {
-		CA_OK,                  // OK button pressed
-		CA_SAVE,                // Save button pressed
-		CA_CANCEL               // Cancel button pressed
+		CA_OK,                  //!< OK button pressed
+		CA_SAVE,                //!< Save button pressed
+		CA_CANCEL               //!< Cancel button pressed
 	};
 
-	// This class is a base class for the individual tabs within the settings dialog
+	//! This class is a base class for the individual tabs within the config dialog
 	class page_dialog : public Fl_Group
 
 	{
 	public:
+		//! Constructor.
+
+		//! \param X horizontal position within host window
+		//! \param Y vertical position with hosr window
+		//! \param W width 
+		//! \param H height
+		//! \param label label
 		page_dialog(int X, int Y, int W, int H, const char* label = nullptr);
+		//! Destructor.
 		virtual ~page_dialog();
 
-		// Update - implementation specific action, default do nothing.
+		//! Update - implementation specific action, default do nothing.
 		virtual void update() {};
 
 	protected:
-		// CB from external source - usually the controlling tabbed view OK/Cancel
+		//! Callback from external source - usually the controlling tabbed view OK/Cancel
 		static void cb_bn_ok(Fl_Widget* w, void* v);
-		// CB that also calls enable_widgets
+		//! Callback that also calls enable_widgets
 		static void cb_ch_enable(Fl_Widget* w, void* v);
 
 		// Standard methods - need to be written for each class that inherits from this
-		// Load values from settings
+		//! Load values from settings or specific file.
 		virtual void load_values() = 0;
-		// Used to create the form
+		//! Used to create the form
 		virtual void create_form(int X, int Y) = 0;
-		// Used to write settings back
+		//! Used to write back to settings or specific file.
 		virtual void save_values() = 0;
-		// Used to enable/disable specific widget - any widgets enabled must be attributes
+		//! Used to enable/disable specific widget - any widgets enabled must be attributes
 		virtual void enable_widgets() = 0;
 
-		// standard creation
+		//! standard creation
 		void do_creation(int X, int Y);
 	};
 #endif
