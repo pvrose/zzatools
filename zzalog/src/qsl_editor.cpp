@@ -799,10 +799,6 @@ void qsl_editor::create_iparams(int& curr_x, int& curr_y, qsl_data::image_def* i
 
 // After editing the item data, redraw the window
 void qsl_editor::redraw_display(bool dirty) {
-	// Mark data dirty if done as a result of edit
-	// if (dirty) {
-	// 	qsl_dataset_->dirty(data_);
-	// }
 	// Update qsl_display
 	if (data_->items.size()) {
 		load_tsv_ = false;
@@ -836,13 +832,6 @@ void qsl_editor::redraw_display(bool dirty) {
 			qsl_->set_qsos(nullptr, 0);
 		}
 	} else {
-		//if (qso_manager_) {
-		//	callsign_ = qso_manager_->get_default(qso_manager::CALLSIGN);
-		//	ip_callsign_->value(callsign_.c_str());
-		//	// Load the display settings for this callsign
-		//	data_ = qsl_dataset_->get_card(callsign_, qsl_type_, true);
-		//	ip_filename_->value(data_->filename.c_str());
-		//}
 		// Do not show an example QSO
 		if (data_->filename_valid || load_tsv_) {
 			ip_filename_->value(data_->filename.c_str());

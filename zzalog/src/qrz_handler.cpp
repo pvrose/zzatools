@@ -20,10 +20,7 @@
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl.H>
 #include <FL/fl_ask.H>
-#include <FL/Fl_Help_Dialog.H>
-
-
-
+#include <FL/filename.H>
 
 extern status* status_;
 extern tabbed_forms* tabbed_forms_;
@@ -59,7 +56,6 @@ qrz_handler::qrz_handler() :
 	if (!url_handler_) {
 		url_handler_ = new url_handler();
 	}
-	web_dialog_ = new Fl_Help_Dialog;
 	data_.clear();
 }
 
@@ -405,10 +401,6 @@ void qrz_handler::load_data() {
 	api_data_ = &qrz_data->call_data;
 }
 
-// Store the call_data to settings
-void qrz_handler::store_data() {
-}
-
 // Request download for callsign
 bool qrz_handler::download_qrzlog_log(stringstream* adif) {
 	char msg[128];
@@ -444,8 +436,6 @@ bool qrz_handler::download_qrzlog_log(stringstream* adif) {
 		*adif << sadif;
 	}
 	if (count > 0) {
-		// Write back the API data to settings
-		store_data();
 		return true;
 	} else {
 		return false;
