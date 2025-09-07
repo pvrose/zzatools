@@ -57,8 +57,6 @@ qso_data::qso_data(int X, int Y, int W, int H, const char* l) :
 	// Register default field names for qso_entry and qso_query
 	fields_->collection("QSO Manager", QSO_FIELDS);
 	fields_->link_app(FO_QSOVIEW, "QSO Manager");
-
-	load_values();
 }
 
 // Destructor
@@ -100,10 +98,6 @@ int qso_data::handle(int event) {
 	} else {
 		return Fl_Group::handle(event);
 	}
-}
-
-// Load values
-void qso_data::load_values() {
 }
 
 // Create qso_data
@@ -705,10 +699,6 @@ void qso_data::enter_modem_qso(record* qso) {
 		default:
 			break;
 	}
-}
-
-// Save the settings
-void qso_data::save_values() {
 }
 
 string qso_data::get_defined_fields() {

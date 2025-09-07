@@ -38,14 +38,6 @@ app_grp::app_grp(int X, int Y, int W, int H, const char* L) :
 app_grp::~app_grp() {
 }
 
-// Load settings
-void app_grp::load_values() {
-}
-
-// Save settings
-void app_grp::save_values() {
-}
-
 // Create fthe widgets
 void app_grp::create_form() {
     int curr_x = x() + GAP;

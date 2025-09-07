@@ -23,7 +23,6 @@ qso_clock::qso_clock
 	labelsize(FL_NORMAL_SIZE + 2);
 	box(FL_BORDER_BOX);
 	tooltip("Displays current clock value in the appropriate timezone");
-	load_values();
 	create_form(X, Y);
 
 	// Add 1s clock
@@ -34,12 +33,6 @@ qso_clock::qso_clock
 // Clock group destructor
 qso_clock::~qso_clock()
 {
-	save_values();
-}
-
-// get settings
-void qso_clock::load_values() {
-	// No code
 }
 
 // Create form
@@ -121,11 +114,6 @@ void qso_clock::enable_widgets() {
 			bn_date_->copy_label(result);
 		}
 	}
-}
-
-// save value
-void qso_clock::save_values() {
-	// No code
 }
 
 // Clock

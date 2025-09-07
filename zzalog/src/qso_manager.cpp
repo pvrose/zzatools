@@ -210,7 +210,6 @@ void qso_manager::save_values() {
 	dash_settings.set("Left", x_root());
 	dash_settings.set("Top", y_root());
 
-	data_group_->save_values();
 	rig_group_->save_values();
 	info_group_->save_values();
 }

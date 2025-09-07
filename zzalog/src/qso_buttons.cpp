@@ -135,14 +135,12 @@ qso_buttons::qso_buttons(int X, int Y, int W, int H, const char* L) :
 	qso_data_((qso_data*)parent())
 {
 	tooltip("Control buttons");
-	load_values();
 	create_form(X, Y);
 	enable_widgets();
 }
 
 // Destructor
 qso_buttons::~qso_buttons() {
-	save_values();
 }
 
 // Handle
@@ -167,13 +165,6 @@ int qso_buttons::handle(int event) {
 		break;
 	}
 	return result;
-}
-// Load settings - no actions
-void qso_buttons::load_values() {
-}
-
-// Save settings - no actions
-void qso_buttons::save_values() {
 }
 
 // Create all the buttons
