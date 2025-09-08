@@ -28,7 +28,6 @@ qso_log_info::qso_log_info(int X, int Y, int W, int H, const char* l) :
 	//align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	box(FL_BORDER_BOX);
 	tooltip("Displays the current status of the logbok data");
-	load_values();
 	create_form(X, Y);
 	enable_widgets();
 
@@ -63,11 +62,6 @@ int qso_log_info::handle(int event) {
 		break;
 	}
 	return result;
-}
-
-// get settings 
-void qso_log_info::load_values() {
-	// Nothing yet
 }
 
 // Create form
@@ -186,11 +180,6 @@ void qso_log_info::enable_widgets() {
 		bn_save_enable_->deactivate();
 	}
 	redraw();
-}
-
-// Save changes
-void qso_log_info::save_values() {
-	// No content yet
 }
 
 // On 1s ticker - reevaluate the widgets

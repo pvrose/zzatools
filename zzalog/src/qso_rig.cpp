@@ -1670,11 +1670,6 @@ rig_if* qso_rig::rig() {
 	return rig_;
 }
 
-// Return the colour used in the connect button as its alert
-Fl_Color qso_rig::alert_colour() {
-	return bn_connect_->color();
-}
-
 // Modify the values returned from the rig according to the modifier attributes
 void qso_rig::modify_hamlib_data() {
 	int cat_index = rig_info_->default_app;

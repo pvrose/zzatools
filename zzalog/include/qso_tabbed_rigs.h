@@ -9,41 +9,50 @@ using namespace std;
 
 class rig_if;
 
-// A tabbed display of qso_rig showing all the rigs recently refered to in QSOs
-// Initially only rigs actively connectable are shown, but if a QSO refers to another
-// that will get shown
+//! This class presents a set of tabs indicating the usable rigs.
+
+//! Initially only rigs actively connectable are shown, but if a QSO refers to another
+//! that will tehn get shown.
 class qso_tabbed_rigs :
     public Fl_Tabs
 {
 public:
-	qso_tabbed_rigs(int X, int Y, int W, int H, const char* l);
+	//! Constructor.
+
+	//! \param X horizontal position within host window
+	//! \param Y vertical position with hosr window
+	//! \param W width 
+	//! \param H height
+	//! \param L label
+	qso_tabbed_rigs(int X, int Y, int W, int H, const char* L);
+	//! Destructor.
 	~qso_tabbed_rigs();
 
-	// get settings 
+	//! Get active rigs and previous values from settings.
 	void load_values();
-	// Create form
+	//! Instatntiate component widgets. 
 	void create_form(int X, int Y);
-	// Enable widgets
+	//! Configure component widgets after data change.
 	void enable_widgets();
-	// Save changes
+	//! Save configuration back to settings.
 	void save_values();
-	// Switch the rig on or off
+	//! Connect/Disconnecy the active rig.
 	void switch_rig();
-	// Get the rig
+	//! Returns the active rig interface.
 	rig_if* rig();
 
-	// Deactivate all rigs
+	//! Deactivate all rigs
 	void deactivate_rigs();
 
 protected:
 
-	// Callback
+	//! Callback from switvhing tabs.
 	static void cb_tabs(Fl_Widget* w, void* v);
 
-	// Map the labels to the widgets
+	//! Map the labels to the widgets
 	map<string, Fl_Widget*> label_map_;
 
-	// Defauklt tab
+	//! Default tab
 	int default_tab_;
 };
 

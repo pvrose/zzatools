@@ -981,20 +981,8 @@ void qso_qsl_vwr::set_log_buttons() {
 	qso_data* data = ancestor_view<qso_data>(this);
 	if (current_qso_ && data->qso_editing(current_qso_num_)) {
 		grp_editor_->activate();
-		// bn_fetch_->activate();
-		// bn_log_bureau_->activate();
-		// bn_log_email_->activate();
-		// bn_log_direct_->activate();
-		// bn_card_reqd_->activate();
-		// bn_card_decl_->activate();
 	} else {
 		grp_editor_->deactivate();
-		// bn_fetch_->deactivate();
-		// bn_log_bureau_->deactivate();
-		// bn_log_email_->deactivate();
-		// bn_log_direct_->deactivate();
-		// bn_card_reqd_->deactivate();
-		// bn_card_decl_->deactivate();
 	}
 }
 

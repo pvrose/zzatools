@@ -19,8 +19,8 @@ public:
 	//! \param W width 
 	//! \param H height
 	//! \param L label
-	qso_log(int X, int Y, int W, int H, const char* l);
-	//! Destructot.
+	qso_log(int X, int Y, int W, int H, const char* L);
+	//! Destructor.
 	~qso_log();
 
 	//! Read default tab from settings.

@@ -11,57 +11,77 @@ class record;
 class record_table;
 typedef size_t qso_num_t;
 
-// Displays one record when importing from a QSL site) or two records
-// if they may possibly be the same record
+//! This class presents a query for the user to resolve.
+
+//! It will display 1, 2 or 3 records depending on query to enable the
+//! user to select one or the other or merge data from any.
 class qso_query :
     public Fl_Group
 {
 public:
-	qso_query(int X, int Y, int W, int H, const char* l = nullptr);
+	//! Constructor.
+
+	//! \param X horizontal position within host window
+	//! \param Y vertical position with hosr window
+	//! \param W width 
+	//! \param H height
+	//! \param L label
+	qso_query(int X, int Y, int W, int H, const char* L = nullptr);
+	//! Destructor.
 	~qso_query();
 
+	//! Inherited from Fl_Grou::handle to allow keyboard F1 to open userguide.
 	virtual int handle(int event);
 
-	// get settings
-	void load_values();
-	// Create form
+	//! Instantiate component widgets.
 	void create_form(int X, int Y);
-	// Enable/disab;e widgets
+	//! Configure component widgets after data change. 
 	void enable_widgets();
-	// save value
-	void save_values();
-	// Set QSOs
+	//! Set the query.
+	
+	//! \param message Instructions to user.
+	//! \param log_number Index of QSO record in full log to check against.
+	//! \param query_qso QSO record containing queried QSO.
+	//! \param save_original Keep a copy of the original record so that changes can be undone if necessary.
 	void set_query(string message, qso_num_t log_number, record* query_qso = nullptr, bool save_original = true);
-	// Set query to merge with new QSO
+	//! Set query to merge with new QSO. \see set_query.
+	
+	//! \param message Instructions to user.
+	//! \param new_qso New QSO to check against.
+	//! \param query_qso QSO record containing queried QSO.
+	//! \param save_original Keep a copy of the original record so that changes can be undone if necessary.
 	void set_query(string message, record* new_qso, record* query_qso = nullptr, bool save_original = true);
-	// Return QSO
+	//! Returns the logged QSO record.
 	record* qso();
-	// Return Query QSO
+	//! Returns the queried QSO record.
 	record* query_qso();
-	// Return record number
+	//! Returns the index of the logged qSO record.
 	qso_num_t qso_number();
-	// Clear query
+	//! Clear the query.
 	void clear_query();
-	// Get query message
+	//! Returns the messae to the user.
 	string query_message();
 
 protected:
-	// Record table
+	//! Callback from clicking the query table.
 	static void cb_tab_qso(Fl_Widget* w, void* v);
-	// Action handle d-click
+	//! Handle a double-click action in cb_tab_qso: usually updates logged record from query or original.
 	void action_handle_dclick(int col, string field);
 
-	// Query message
+	//! Query message
 	string query_message_;
 
-	// Record table
+	//! Record table
 	record_table* tab_query_;
-	// Parent
+	//! Parent
 	qso_data* qso_data_;
-	// QSOs
+	//! Logged QSO record.
 	record* log_qso_;
+	//! Index of logged QSO record.
 	qso_num_t log_number_;
+	//! Query record.
 	record* query_qso_;
+	//! Copy of original logged record.
 	record* original_qso_;
 
 };

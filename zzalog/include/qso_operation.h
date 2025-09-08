@@ -13,13 +13,16 @@ class qso_data;
 class record;
 
 
-// Special version of Fl_Input_Choice that allows annoated menu items - value is user_data
+//! This class is a special version of Fl_Input_Choice.
+
+//! It allows annoated menu items. The real value represented by a menu item
+//! is kept in that item's user data.
 class annotated_choice :
     public Fl_Input_Choice 
 {
 public:
 
-    // Copy user data rather than value to input
+    //! Callback when menu item is selected: copies userdata into the input widget.
     static void cb_menu(Fl_Widget* w, void* v) {
         annotated_choice* that = ancestor_view<annotated_choice>(w);
         const char* val = that->menubutton()->text();
@@ -36,12 +39,19 @@ public:
         that->do_callback(FL_REASON_ENTER_KEY);
     }
 
-    // Override input callback to pick up 
+    //! Callback when input widget is changed: emulates the enter ket being pressed.
     static void cb_inp(Fl_Widget* w, void* v) {
         annotated_choice* that = ancestor_view<annotated_choice>(w);
         that->do_callback(FL_REASON_ENTER_KEY);
     }
 
+    //! Constructor.
+
+    //! \param X horizontal position within host window
+    //! \param Y vertical position with hosr window
+    //! \param W width 
+    //! \param H height
+    //! \param L label
     annotated_choice(int X, int Y, int W, int H, const char* L = nullptr) :
     Fl_Input_Choice(X, Y, W, H, L) 
     {
@@ -51,59 +61,81 @@ public:
     }
 };
 
+//! This class provides the means of changing station credentials.
+//! 
+//! It allows the station location, station operator and station to be selected.
 class qso_operation :
     public Fl_Group
 {
 public:
+    //! Constructor.
+
+    //! \param X horizontal position within host window
+    //! \param Y vertical position with hosr window
+    //! \param W width 
+    //! \param H height
+    //! \param L label
     qso_operation(int X, int Y, int W, int H, const char* L = nullptr);
+    //! Destructor.
     ~qso_operation();
 
+    //! Inherited from Fl_Group::handle(): it allows F1 to open userguide.
     virtual int handle(int event);
 
+    //! Instantiate component widgets.
     void create_form();
+    //! Configure component widgets after data chaange.
     void enable_widgets();
+    //! Load previous session's values from settings.
     void load_data();
+    //! SAve current settings to settings.
     void store_data();
 
+    //! Callback from "QTH" input.
     static void cb_qth(Fl_Widget* w, void* v);
+    //! Callback from "Operator" input. 
     static void cb_oper(Fl_Widget* w, void* v);
+    //! Callback from "Station Callsign" input.
     static void cb_call(Fl_Widget* w, void* v);
 
+    //! Callback from the "Show" buttons: \p v specifes the specific button.
     static void cb_show(Fl_Widget*w, void* v);
 
-    // set the QSO
+    //! set the QSO record \p qso.
     void qso(record* qso);
 
-    // get the current QTH 
+    //! Returns the current QTH. 
     string current_qth();
+    //! Returns the current operator.
     string current_oper();
+    //! Returns the current station callsign.
     string current_call();
 
-    // Update QSO from current values
+    //! Update QSO record \p qso from current selected values.
     void update_qso(record* qso);
-    // Update station details
+    //! Reload data and configure widgets.
     void update_details();
-    // Populate the choices
+    //! Populate the choices
     void populate_choices();
 
 protected:
-    // Handle new QTH 
+    //! A new QTH has been entered, open edit dialog.
     void new_qth();
-    // handle new Operator
+    //! A new Operator has been entered, open edit dialog.
     void new_oper();
-    // Handle new call
+    //! A new station callsign has been entered, open edit dialog.
     void new_call();
 
     // Widgets
-    Fl_Input_Choice* ch_qth_;
-    Fl_Input_Choice* ch_oper_;
-    Fl_Input_Choice* ch_call_;
+    Fl_Input_Choice* ch_qth_;      //!< Input for specifyinh station location
+    Fl_Input_Choice* ch_oper_;     //!< Input for specifying station operator
+    Fl_Input_Choice* ch_call_;     //!< Input for specifying station callsign.
 
     // Attributes
-    string current_qth_;
-    string current_oper_;
-    string current_call_;
-    record* current_qso_;
+    string current_qth_;      //!< Current station location.
+    string current_oper_;     //!< Current station operator.
+    string current_call_;     //!< Current station callsign.
+    record* current_qso_;     //!< Current QSO record.
 
 
 };

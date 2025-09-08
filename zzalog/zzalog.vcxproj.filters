@@ -644,9 +644,6 @@
     <ClInclude Include="include\qso_wx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\qth_dialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\record.h">
       <Filter>Header Files</Filter>
     </ClInclude>

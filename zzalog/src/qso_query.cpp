@@ -21,13 +21,11 @@ qso_query::qso_query(int X, int Y, int W, int H, const char* L) :
 	query_qso_(nullptr)
 {
 	create_form(X, Y);
-	load_values();
 	enable_widgets();
 }
 
 // Destructor
 qso_query::~qso_query() {
-	save_values();
 }
 
 // Handle
@@ -52,14 +50,6 @@ int qso_query::handle(int event) {
 		break;
 	}
 	return result;
-}
-
-// Load Settings
-void qso_query::load_values() {
-}
-
-// Sabe settings
-void qso_query::save_values() {
 }
 
 // Create the widgets

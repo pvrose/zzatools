@@ -18,37 +18,37 @@ record.h - Individual record data item: header file
 
 using namespace std;
 
-	// When updating log - result of comparision between log and update
+	//! When updating log - result of comparision between log and update
 	enum match_result_t : char {
-		MT_NOMATCH = 0,      // No matching record found in log
-		MT_EXACT,            // An exact match found in log
-		MT_PROBABLE,         // A close match - same band/date/call but time out by upto 30 minutes
-		MT_POSSIBLE,         // call found but something important differs
-		MT_UNLIKELY,         // A close match - same band/date/call but time out by > 30 mins
-		MT_LOC_MISMATCH,     // A close match but a location field differs
-		MT_SWL_MATCH,        // An SWL report that is a close match to existing activity
-		MT_SWL_NOMATCH,      // An SWL report that is no match for any activity
-		MT_2XSWL_MATCH,      // An SWL report matches an existing SWL report
-		MT_OVERLAP,          // The two records have same freq/mode and times overlap
+		MT_NOMATCH = 0,      //!< No matching record found in log
+		MT_EXACT,            //!< An exact match found in log
+		MT_PROBABLE,         //!< A close match - same band/date/call but time out by upto 30 minutes
+		MT_POSSIBLE,         //!< Call found but something important differs
+		MT_UNLIKELY,         //!< A close match - same band/date/call but time out by > 30 mins
+		MT_LOC_MISMATCH,     //!< A close match but a location field differs
+		MT_SWL_MATCH,        //!< An SWL report that is a close match to existing activity
+		MT_SWL_NOMATCH,      //!< An SWL report that is no match for any activity
+		MT_2XSWL_MATCH,      //!< An SWL report matches an existing SWL report
+		MT_OVERLAP,          //!< The two records have same freq/mode and times overlap
 	};
 
-	// Flags used in match_records
+	//! Flags used in match_records
 	enum match_flags_t : uchar {
-		MR_NONE,             // No special match instructions - default
-		MR_ALLOW_LOC = 1,    // ALlow limited location mismatch (used for LOTW)
-		MR_ALLOW_QSLS = 2,   // Allow processing of QSL_SENT* (used for OQRS)
+		MR_NONE,             //!< No special match instructions - default
+		MR_ALLOW_LOC = 1,    //!< ALlow limited location mismatch (used for LOTW)
+		MR_ALLOW_QSLS = 2,   //!< Allow processing of QSL_SENT* (used for OQRS)
 	};
 
 
-	// Location source
+	//! Location source
 	enum location_t : uchar {
-		LOC_NONE,        // not derived
-		LOC_PREFIX,      // Obtained from prefix data
-		LOC_LATLONG,     // LAT/LON pair
-		LOC_GRID2,       // 2-letter gridsquare
-		LOC_GRID4,       // 4-character gridsquare
-		LOC_GRID6,       // 6-character 
-		LOC_GRID8        // 8-character
+		LOC_NONE,        //!< not derived
+		LOC_PREFIX,      //!< Obtained from prefix data
+		LOC_LATLONG,     //!< LAT/LON pair
+		LOC_GRID2,       //!< 2-letter gridsquare
+		LOC_GRID4,       //!< 4-character gridsquare
+		LOC_GRID6,       //!< 6-character 
+		LOC_GRID8        //!< 8-character
 	};
 
 	// forward declaration
@@ -56,90 +56,122 @@ using namespace std;
 
 	typedef size_t qso_num_t;    // QSO number
 
-	// This class represents a single record as a container of field items NAME=>VALUE
+	//! This class represents a single QSO record as a container of field items NAME=>VALUE
 	class record : public map<string, string> {
 	public:
 
 		// Constructors and Destructors
 	public:
-		// Default constructor
+		//! Default constructor
 		record();
-		// Copy constructor
+		//! Copy constructor
 		record(const record& rhs);
-		// Assignment operator
+		//! Assignment operator
 		record& operator= (const record& rhs);
-		// Destructor
+		//! Destructor
 		virtual ~record();
 
 		// Public methods
 	public:
-		// Set an item pair returns true if succeeded
+		//! Set an item.
+		
+		//! \param field Field name.
+		//! \param value Field value.
+		//! \param formatted if true the displayed format is converted to ADIF format.
+		//! \param dirty if true ther record is marked dirty if the contents change.
 		void item(string field, string value, bool formatted = false, bool dirty = true);
-		// Get an item - as string
+		//! Returns the item
+		
+		//! \param field Field name.
+		//! \param formatted if true converts data to the displayed format.
+		//! \param indirect \todo is this still required as no longer use macros.
+		//! \return Field value.
 		string item(string field, bool formatted = false, bool indirect = false);
-		// get an item - as an integer
+		//! Gets an integer item
+		
+		//! \param field Field name
+		//! \param value Receives field value converted to an integer, 0 if it cannot be.
 		void item(string field, int& value);
-		// get an item - as a double
+		//! Gets a double-precision value
+		
+		//! \param field Field name
+		//! \param value Receives field value converted to a double-precision, NAN if it cannot be.
 		void item(string field, double& value);
-		// Get an item as an unsigned long long
+		//! Gets a long long item
+		
+		//! \param field Field name
+		//! \param value Receives field value converted to an unsigned 64-bit integer, 0 if it cannot be.
 		void item(string field, unsigned long long& value);
-		// is the QSO valid - has a minimum subset of fields
+		//! Returns true if the QSO is valid - has a minimum subset of fields
 		bool is_valid();
-		// does the item exist - in the map and not an empty string
+		//! Returns true if the item named \p field exists and is not an empty string.
 		bool item_exists(string field);
-		// set the header information
+		//! Set the header information
 		void header(string comment);
-		// get the header information
+		//! Returns the header information
 		string header();
-		// is a header record
+		//! Returns true if the record is a header record.
 		bool is_header();
-		// is the record more recent
+		//! Comparison operator. One record is greater than another if the start date and time is later.
 		bool operator > (record& rhs);
-		// delete all the derived fields
+		//! delete all the derived fields
 		void unparse();
-		// get the latitude and longitude of the contacted station (ignotre less than 6 character gridsquares)
+		//! Returns the latitude and longitude.
+		
+		//! \param my_station if true returns the user's coordinates, otherwise of the contacted station.
+		//! \param source Receives an indication of how the coordinates were calculated.
 		lat_long_t location(bool my_station, location_t& source);
-		// Get the latitude and longuitude without specifying a source
+		//! Get the latitude and longuitude without specifying a source.
+		
+		//! \param my_station if true returns the user's coordinates, otherwise of the contacted station.
 		lat_long_t location(bool my_station);
-		// update BAND from FREQ
+		//! update BAND from FREQ. If \p force is false do not overwrite an existing BAND field.
 		bool update_band(bool force = false);
-		// combine records - update result with hint to use in subsequent update
+		//! combine records - update result with hint to use in subsequent update.
+		
+		//! \param record QSO record to be merged into this one.
+		//! \param flags match_flags_t to use to control the match.
+		//! \param result Receives a hint that describes the merge.
 		bool merge_records(record* record, match_flags_t flags = MR_NONE, hint_t* result = nullptr);
-		// records are duplicates
+		//! Returns match_result_t between QSO \p record and this QSO record.
 		match_result_t match_records(record* record);
-		// Add timeoff if its isn't set
+		//! Add timeoff if its isn't set
 		void update_timeoff();
-		// Update DISTANCE and ANT_AZ fields 
+		//! Update DISTANCE and ANT_AZ fields. 
 		void update_bearing();
-		// change the field name
+		//! change the field name from value in \p from to value in \p to.
 		void change_field_name(string from, string to);
-		// Write to an item merging data from other items
+		//! Returns a string where field names in angle brackets in \p data are replaced by their values.
 		string item_merge(string data, bool indirect = false);
-		// get the timestamp
+		//! Returns the timestamp as time_t of the record.
+		
+		//! \param time_off if true use QSO_DATE_OFF + TIME_OFF rather than QS_DATE + TIME_ON for the QSO time.
 		time_t timestamp(bool time_off = false);
-		// And similar in chrono form
+		//! Returns the timestamp as time_point of the record.
+		
+		//! \param time_off if true use QSO_DATE_OFF + TIME_OFF rather than QS_DATE + TIME_ON for the QSO time.
 		chrono::system_clock::time_point ctimestamp(bool time_off = false);
-		// items match between records
+		//! Itema \p field_name match between \p record and this record.
 		bool items_match(record* record, string field_name);
-		// Delete all contents
+		//! Delete all contents
 		void delete_contents();
-		// Invalidate QSL statuses
+		//! Delete QSL statuses.
 		void invalidate_qsl_status();
 
 		// protected attributes
 	protected:
-		// record is a header
+		//! record is a header
 		bool is_header_;
-		// header comment
+		//! header comment
 		string header_comment_;
-		// incomplete record read
+		//! incomplete record read
 		bool is_incomplete_;
 
-		// Expecting a header record
+		//! Expecting a header record
 		static bool expecting_header_;
 
 	public:
-		// Avoid reporting errors too many times
+		//! Avoid reporting errors too many times
 		static bool inhibit_error_reporting_;
 
 	};

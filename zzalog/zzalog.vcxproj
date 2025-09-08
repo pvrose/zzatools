@@ -375,7 +375,6 @@
     <ClInclude Include="include\qso_rig.h" />
     <ClInclude Include="include\qso_tabbed_rigs.h" />
     <ClInclude Include="include\qso_wx.h" />
-    <ClInclude Include="include\qth_dialog.h" />
     <ClInclude Include="include\record.h" />
     <ClInclude Include="include\record_table.h" />
     <ClInclude Include="include\regices.h" />

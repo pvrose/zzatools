@@ -15,18 +15,11 @@ extern void open_html(const char*);
 qso_net_entry::qso_net_entry(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
 {
-	load_values();
 	create_form(X, Y);
 }
 
 // Destructor
 qso_net_entry::~qso_net_entry() {
-	save_values();
-}
-
-// get settings
-void qso_net_entry::load_values() {
-	// Nothing yet
 }
 
 // Create form
@@ -104,9 +97,6 @@ void qso_net_entry::enable_widgets() {
 		qe->enable_widgets();
 	}
 }
-
-// save value - nothing as yet
-void qso_net_entry::save_values() {}
 
 // Return QSO - return open tab's QSO
 record* qso_net_entry::qso() {

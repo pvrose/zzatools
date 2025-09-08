@@ -9,46 +9,56 @@ class Fl_Fill_Dial;
 class Fl_Button;
 class Fl_Check_Button;
 
-// Displays the current state of the log, whether it is "dirty"
-// and controls around this
+//! This class displays the current state of the log.
+//! 
+//! It indicates whether it is dirty and provides basic controls.
 class qso_log_info :
 	public Fl_Group
 {
 
 
 public:
+	//! Constructor.
 
-	qso_log_info(int X, int Y, int W, int H, const char* l = nullptr);
+	//! \param X horizontal position within host window
+	//! \param Y vertical position with hosr window
+	//! \param W width 
+	//! \param H height
+	//! \param L label
+	qso_log_info(int X, int Y, int W, int H, const char* L = nullptr);
+	//! Destructor.
 	~qso_log_info();
 
+	//! Inherited from Fl_Group::handle() to accept forecase so that keyboard F1 opens the userguide.
 	virtual int handle(int event);
 
-	// get settings 
-	void load_values();
-	// Create form
+	//! Instantiate component widgets.
 	void create_form(int X, int Y);
-	// Enable widgets
+	//! Configure component widgets after data change.
 	void enable_widgets();
-	// Save changes
-	void save_values();
-	// Enable timer -dependent widgets
+	//! Configer component widgets after a ticker callback.
 	void enable_timer_widgets();
 
+	//! Callback every 100 ms.
+	
+	//! \todo does this need to be this frequent?
 	static void cb_ticker(void* v);
 
-	// Call back for enable check box
+	//! Callback from "Save/QSO" button. 
+	
+	//! If value of button is true, then allows each change to a QSO record to be saved.
 	static void cb_bn_enable(Fl_Widget* w, void* v);
-	// Callback to force save
+	//! Callback from "Save!" button: forces the book_ to be saved.
 	static void cb_bn_save(Fl_Widget* w, void* v);
 
 protected:
-	// Log status
+	//! Output: textual description of status.
 	Fl_Output* op_status_;
-	// Load/Save progress bar
+	//! Dial: indicates status through colour and indicates progress changing from one status to another.
 	Fl_Fill_Dial* pr_loadsave_;
-	// Saved after every QSO?
+	//! Check button: indicates and controls whether to save every QSO record cahnge.
 	Fl_Check_Button* bn_save_enable_;
-	// Save it!
+	//! Button: Force save.
 	Fl_Button* bn_save_;
 
 };
