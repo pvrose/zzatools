@@ -57,7 +57,6 @@ qso_entry::qso_entry(int X, int Y, int W, int H, const char* L) :
 	// Initialise field input map
 	field_ip_map_.clear();
 	tooltip("Allows the display and editing of QSO record fields");
-	load_values();
 	create_form(X, Y);
 	enable_widgets();
 
@@ -67,7 +66,6 @@ qso_entry::qso_entry(int X, int Y, int W, int H, const char* L) :
 
 // Destructor
 qso_entry::~qso_entry() {
-	save_values();
 	ticker_->remove_ticker(this);
 }
 
@@ -100,14 +98,6 @@ int qso_entry::handle(int event) {
 		break;
 	}
 	return result;
-}
-
-// Nothing so far
-void qso_entry::load_values() {
-}
-
-// Nothing so far
-void qso_entry::save_values() {
 }
 
 // Create the widgets

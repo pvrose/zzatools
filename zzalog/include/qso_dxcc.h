@@ -25,112 +25,129 @@ class Fl_Output;
 enum location_t : uchar;
 enum worked_t : uchar;
 
-// This class displays the "worked before" status for the DX - band and mode
+//! This class displays the "worked before" status for the DX - band and mode
 class qso_dxcc :
     public Fl_Group
 {
 
-    // A table 
+    // This class displays the "worked before" status in tabular form.
     class wb4_table : public Fl_Table {
 
     public:
 
+        //! Constructor.
+
+        //! \param X horizontal position within host window
+        //! \param Y vertical position with hosr window
+        //! \param W width 
+        //! \param H height
+        //! \param L label
         wb4_table(int X, int Y, int W, int H, const char* L = nullptr);
+        //! Destructor.
         ~wb4_table();
-        // inherited from Fl_Table
+        //! Inherited from Fl_Table to draw the contents of each cell.
         virtual void draw_cell(TableContext context, int R = 0, int C = 0, int X = 0, int Y = 0,
             int W = 0, int H = 0);
 
+        //! Gathers the data required for the table from the current QSO and date held in book_.
         void set_data();
 
     protected:
 
-        // Worked data
+        //! The data for one line of the "worked before" table.
         struct wkd_line {
-            string text;
-            bool any;
-            bool band;
-            bool mode;
+            string text;     //!< The name of the tested item.
+            bool any;        //!< true: worked on any band or mode.
+            bool band;       //!< true: worked on the same band as current QSO.
+            bool mode;       //!< true: worked on the same mode as current QSO.
         };
-        // worked matrix
+        //! The data for the table mapped by "worked before" item against status.
         map < worked_t, wkd_line > wkd_matrix_;
      };
 
 public:
+    //! Constructor.
+
+    //! \param X horizontal position within host window
+    //! \param Y vertical position with hosr window
+    //! \param W width 
+    //! \param H height
+    //! \param L label
     qso_dxcc(int X, int Y, int W, int H, const char* L = nullptr);
+    //! Destructor.
     ~qso_dxcc();
 
+    //! Inherited from Fl_Group::handle() - accepts focus to let keyboard F1 open userguide.
     virtual int handle(int event);
 
-    // Create the widgets
+    //! Instantiate component widgets.
     void create_form();
-    // Configure them
+    //! Configure component widgets after data change.
     void enable_widgets();
 
-    // Set the data - parse the callsign in the current qso
+    //! Set the data - parse the callsign in the current \p qso.
     void set_data(record* qso);
 
 protected:
 
-    // Button for QRZ.com
+    //! Callback from "QRZ.com" button: opens QRZ.com page for this callsign.
     static void cb_bn_qrz(Fl_Widget* w, void* v);
-    // Button for check age
+    //! Callback from "Check Data" button.
+    
+    //! Opens a dialog showing the status of the files used
+    //! and buttons to guide the user through updating them.
     static void cb_check_age(Fl_Widget * w, void* v);
  
     // Widgets:
     // Callsign label
-    Fl_Output* op_call_;
+    Fl_Output* op_call_;         //!< Output displaying callsign.
     // Prefix data
-    Fl_Output* op_source_;
-    Fl_Output* op_prefix_;
-    Fl_Output* op_geography_;
-    Fl_Output* op_usage_;
-    Fl_Output* op_zones_;
-    Fl_Output* op_coords_;
-    Fl_Output* op_dist_bear_;
-    // 
-    // Buttons showing worked before
-    wb4_table* g_wb4_;
-    // Call QRZ.com
-    Fl_Button* bn_qrz_;
-    // Check cty_data age
-    Fl_Button* bn_check_age_;
+    Fl_Output* op_source_;       //!< Output showing how the callsign was parsed.
+    Fl_Output* op_prefix_;       //!< Output showing parsed prefix and name.
+    Fl_Output* op_geography_;    //!< Output showing secondary geography.
+    Fl_Output* op_usage_;        //!< Output showing special usage.
+    Fl_Output* op_zones_;        //!< Output showing CQ and ITU zones.
+    Fl_Output* op_coords_;       //!< Output showing latitude and longitude.
+    Fl_Output* op_dist_bear_;    //!< Output showing distance and bearing from user's station.
+    wb4_table* g_wb4_;           //!< Table showing "Worked before" status. 
+    Fl_Button* bn_qrz_;          //!< Button "QRZ.com".
+    Fl_Button* bn_check_age_;    //!< Button "Check Data".
 
-    // Callsign
+    //! Current callsign.
     string callsign_;
-    // DXCC nickname - eg GM for Scotland
+    //! DXCC nickname - eg GM for Scotland.
     string nickname_;
-    // DXCC full name
+    //! DXCC full name.
     string name_;
-    // The CQ zone
+    //! The CQ zone.
     int cq_zone_;
+    //! The ITU Zone.
     int itu_zone_;
-    // The DXCC number per ADIF
+    //! The DXCC number per ADIF.
     int dxcc_;
-    // The latitude and longitude of the DXCC centre
+    //! The latitude and longitude of the DXCC centre
     lat_long_t location_;
+    //! The source of geographic coordinates.
     location_t loc_source_;
-    // The latitude and longitude of the user station
+    //! The latitude and longitude of the user station
     lat_long_t my_location_;
-    // How has the callsign been parsed to get the DXCC - decoded or exception
+    //! How has the callsign been parsed to get the DXCC - decoded or exception
     cty_data::parse_source_t source_;
-    // Current geography
+    //! Current geographic subdivision.
     string geography_;
-    // Current usage
+    //! Current usage
     string usage_;
-    // Current record
+    //! Current record
     record* qso_;
-    // The continent
+    //! Current continent
     string continent_;
-    // Station callsign
+    //! Station callsign
     string station_;
 
-    // BAnd worked
+    //! The set of bands worked.
     band_set* bands_worked_;
-    // Modes worked
+    //! The set of modes worked.
     set<string>* modes_worked_;
-    // Source of prefix parsing
-    
 
 };
 
