@@ -11,49 +11,68 @@ using namespace std;
 struct rig_data_t;
 struct cat_data_t;
 
-// XML element types used in rigs.xml
+//! XML element types used in rigs.xml
 enum rigs_element_t : char {
-    RIG_NONE,          // Not yet processing an elemaent
-    RIG_RIGS,          // Top-level element <rigs version=".."
-    RIG_RIG,           // Start of individual rig <rig name="..">
-    RIG_VALUE,         // common rig data item <value name="..">,,,</Vvalue>
-    RIG_APP,           // Start of individual app-specific data
+    RIG_NONE,          //!< Not yet processing an elemaent
+    RIG_RIGS,          //!< Top-level element rigs version=".."
+    RIG_RIG,           //!< Start of individual rig rig name=".."
+    RIG_VALUE,         //!< common rig data item value name="..">
+    RIG_APP,           //!< Start of individual app-specific data
 };
 
+//! This class reads the rigs.xml file into the internal database.
+//! 
+//! \code
+//! <RIGS version="3.6.6">
+//!   <RIG name="IC-705">
+//!     <value name="Default App">0</value>
+//!     <value name="Instantaneous Values">0 </value >
+//!     <app name="WFView WAN">
+//!       <value name="Rig Model">NET rigctl</value>
+//!       <value name="Manufacturer">Hamlib</value>
+//!       :
+//!     </app>
+//!     :
+//!   </RIG>
+//!   :
+//! </RIGS>
+//! \endcode
 class rig_reader :
     public xml_wreader
 {
 public:
+    //! Constructor.
     rig_reader();
+    //! Destructor.
     ~rig_reader();
 
-    // Load data
+    //! Load \p data from input stream \p in.
     bool load_data(map<string, rig_data_t*>* data, istream& in);
 
 protected:
-    // Start <rigs version = .....
+    //! Start "rigs version=....."
     static bool start_rigs(xml_wreader* that, map<string, string>* attributes);
-    // Start <rig name=
+    //! Start "rig name="
     static bool start_rig(xml_wreader* that, map<string, string>* attributes);
-    // Start <value name=
+    //! Start "value name="
     static bool start_value(xml_wreader* that, map<string, string>* attributes);
-    // Start <app name=...
+    //! Start "app name=..."
     static bool start_app(xml_wreader* that, map<string, string>* attributes);
-    // End </rigs>
+    //! End RIGS
     static bool end_rigs(xml_wreader* that);
-    // End </rig>
+    //! End RIG
     static bool end_rig(xml_wreader* that);
-    // End </app>
+    //! End APP
     static bool end_app(xml_wreader* that);
-    // End </value>
+    //! End VALUE
     static bool end_value(xml_wreader* that);
-    // Characters <value ..>..<\value>
+    //! Characters VALUE
     static bool chars_value(xml_wreader* that, string content);
-    // Check version
+    //! Check ZZALOG version against \p v
     bool check_version(string v);
 
  
-    // Name to element map
+    //! Name to element map
     const map<string, char> element_map_ = {
         { "RIGS", RIG_RIGS },
         { "RIG", RIG_RIG },
@@ -61,7 +80,7 @@ protected:
         { "APP", RIG_APP }
     };
 
-    // Element to start method map
+    //! Element to start method map
     const map<char, methods> method_map_ = {
         { RIG_RIGS, { start_rigs, end_rigs, nullptr }},
         { RIG_RIG, { start_rig, end_rig, nullptr }},
@@ -69,21 +88,21 @@ protected:
         { RIG_APP, { start_app, end_app, nullptr }}
     };
 
-    // The data being loaded
+    //! The data being loaded
     map<string, rig_data_t*>* data_;
-   // Current rig data
+    //! Current rig data
     rig_data_t* rig_data_;
-    // string current rig name
+    //! string current rig name
     string rig_name_;
-    // Current app_name
+    //! Current app_name
     string app_name_;
-    // Current app data
+    //! Current app data
     cat_data_t* app_data_;
-    // Input stream 
+    //! Input stream 
     istream* in_file_;
-    // Current value name
+    //! Current value name
     string value_name_;
-    // Current value data
+    //! Current value data
     string value_data_;
 };
 

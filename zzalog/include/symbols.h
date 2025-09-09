@@ -2,20 +2,12 @@
 
 #include <FL/Enumerations.H>
 
-// Class to initialise and draw custom label symbols 
-// 
-// @eyeopen 
-//		An open eye with lashes on upper lid
-// @eyeshut
-//      A shut eye with upper lid lashes pointing down
-
-
-// Draw the eye open symbol
+//! Draw an open eye (eyeopen) - for password inputs indicating plain text 
 void draw_eyeopen(Fl_Color c);
-// Draw the eye shut sybol
+//! Draw a shut eye (eyeshut) - for password inputs indicating hidden text
 void draw_eyeshut(Fl_Color c);
-// Draw the calendar symbol
+//! Draw a calendar (calendar) - for calendar input widget
 void draw_calendar(Fl_Color c);
-// Draw a mail icon
+//! Draw a letter image (mail) - as a label image for e-Mail.
 void draw_mail(Fl_Color c);
 

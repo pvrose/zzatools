@@ -11,50 +11,55 @@ using namespace std;
 
 struct hamlib_data_t;
 
+//! This structure provides the configuration data for the rig interface.
+
+//! \todo Remove level of indirection in load_data and store_data.
 struct cat_data_t {
-    hamlib_data_t* hamlib = nullptr;
-    bool use_cat_app = false;
-    bool override_hamlib = false;
-    string app = "";
-    string nickname = "";
-    bool auto_start = false;
-    bool auto_connect = false;
-    double connect_delay = 1.0;
+    hamlib_data_t* hamlib = nullptr;   //!< Hamlib API configuration  
+    bool use_cat_app = false;          //!< Use another app for accessing CAT interface.
+    bool override_hamlib = false;      //!< Override values obtained from CAT interface
+    string app = "";                   //!< Name of the command to launch app
+    string nickname = "";              //!< Short form of the name used in CAT menu.
+    bool auto_start = false;           //!< Automatically start app when ZZALOG starts.
+    bool auto_connect = false;         //!< Automatically connect to app after starting it.
+    double connect_delay = 1.0;        //!< Delay between starting app and connecting (in seconds).
 };
 
-struct rig_data_t {
-    int default_app = -1;
-    string antenna = "";
-    bool use_instant_values = false;
-    vector<cat_data_t*> cat_data;
+//! This structure configures the use of the rig interface.
+struct rig_data_t {          
+    int default_app = -1;              //!< Index into cat_data for the default CAT method.
+    string antenna = "";               //!< Preferred antenna when using this rig.
+    bool use_instant_values = false;   //!< Use values just radfrom rig rather than smoothed ones.
+    vector<cat_data_t*> cat_data;      //!< Methods of accessing this particular rig.
 };
 
+//! This class provides the data required for configuring, accessing and using each rig.
 class rig_data {
 
 public:
-    // Constructor
+    //! Constructor
     rig_data();
-    // Destructor
+    //! Destructor
     ~rig_data();
-    // Get CAT data for rig and app. - Pointer so that it can be written to.
+    //! Returns reference to the CAT for the \p rig with index \ app. 
     cat_data_t* cat_data(string rig, int app = -1);
-    //Get list of supported rigs
+    //! Returns all the rigs currently supported by this database.
     vector<string> rigs();
-    // Get rig data for rig
+    //! Returns the rig_data_t structure for the specified \p rig.
     rig_data_t* get_rig(string rig); 
     
 
 protected:
-    // Load data from preferences directory
+    //! Load data from rigs.xml
     void load_data();
-    // Load data from XML 
+    //! Load data from rigs.xml.
     bool load_xml();
-    // Store data to preferences directory
+    //! Store data  to rigs,xml.
     bool store_data();
-    // Store data to XML
+    //! Store data to rigs.xml.
     bool store_xml();
-    // The rig data
+    //! Configuration data for all rigs.
     map<string, rig_data_t*> data_;
-    // Load faields
+    //! Load failed.
     bool load_failed_;
 };

@@ -9,49 +9,52 @@
 
 using namespace std;
 
-	// Labels for the comparison mode labels
+	//! Labels for the comparison mode labels : order matches enumeration search_comp_t.
 	static const string comparator_labels_[7] = {
 		"~", "/=", "<", "<=", "=", ">=", ">"
 	};
 
-	// This class provides a dialog to generate a search or extract condition
+	//! This class provides a dialog to generate a search or extract condition
 	class search_dialog :
 		public win_dialog
 	{
 	public:
+		//! Constrcutor.
 		search_dialog();
+		//! Destructor.
 		virtual ~search_dialog();
 
+		//! Inherited from win_dialog to accept keyboard F1 to open userguide.
 		virtual int handle(int event);
 
-		// get the extract criteria
+		//! Returns the extract criteria
 		search_criteria_t* criteria();
-		// set extract fail message
+		//! set extract fail message
 		void fail(string message);
 
 		// callbacks 
-		// OK button clicked
+		//! Callback from "OK" button.
 		static void cb_bn_ok(Fl_Widget* w, void* v);
-		// Cancel button clicked
+		//! Callback from "Cancel" button
 		static void cb_bn_cancel(Fl_Widget* w, void* v);
-		// One of the condition buttons
+		//! Callback from a condition button: \p v is search_comp_t indicating which button.
 		static void cb_bn_condx(Fl_Widget* w, void* v);
-		// The field name choice
+		//! Callback from field name choice button.
 		static void cb_ch_field(Fl_Widget* w, void* v);
 
 
 	protected:
-		// Load previous criteria from settings
+		//! Load previous criteria from settings
 		void load_values();
-		// Save criteria in settings
+		//! Save criteria in settings
 		void save_values();
-		// Enable widgets
+		//! Configure component widgets after data chane.
 		void enable_widgets();
 
-		// The current criteria
+		//! The current criteria
 		search_criteria_t* criteria_;
 
-		// Radio button callback parameters - basic condition
+		//! Radio button callback parameters - basic condition
 		radio_param_t condition_params_[XC_MAXIMUM] =
 		{
 			{ XC_DXCC, nullptr },
@@ -64,14 +67,14 @@ using namespace std;
 			{ XC_UNFILTERED, nullptr },
 			{ XC_FIELD, nullptr }
 		};
-		// Radio button callback parameters - combination mode
+		//! Radio button callback parameters - combination mode
 		radio_param_t combination_params_[3] =
 		{
 			{ XM_NEW, nullptr },
 			{ XM_AND, nullptr },
 			{ XM_OR, nullptr }
 		};
-		// Radio button callback parameters - comparison mode
+		//! Radio button callback parameters - comparison mode
 		radio_param_t comparator_params_[7] =
 		{
 			{XP_REGEX, nullptr},
@@ -82,18 +85,19 @@ using namespace std;
 			{XP_GE, nullptr},
 			{XP_GT, nullptr},
 		};
-		// Labels for the condition radio buttons 
+		//! Labels for the condition radio buttons 
 		const string condition_labels_[XC_MAXIMUM] =
 		{ "DXCC", "CQ Zone", "ITU Zone", "Continent", "Square (2)", "Square (4)", "Callsign",
 			"All", "Field" };
-		// Labels for the combination mode radio buttons
+		//! Labels for the combination mode radio buttons
 		const string combination_labels_[3] = {
 			"New", "And", "Or"
 		};
-		// Fail display widget
+		//! Output: Displays error message.
 		Fl_Widget* fail_box_;
-		// Field definitions widget
+		//! Choice: Field name menu for "Field" condition.
 		Fl_Widget* field_name_;
+		//! Input: Field value - can be a menu of enumeration values or input for direct entry.
 		Fl_Widget* search_text_;
 	};
 #endif

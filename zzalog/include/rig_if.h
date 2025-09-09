@@ -18,102 +18,116 @@
 using namespace std;
 using namespace std::chrono;
 
-	// Encoding of result from reading the mode from the rig
+	//! Internal representation of the mode read from the rig.
 	enum rig_mode_t {
-		GM_INVALID = 0,
-		GM_LSB = '1',
-		GM_USB = '2',
-		GM_CWU = '3',
-		GM_FM = '4',
-		GM_AM = '5',
-		GM_DIGL = '6',
-		GM_CWL = '7',
-		GM_DIGU = '9',
-		GM_DSTAR = 'A'
+		GM_INVALID = 0,   //!< Invalid or unsupported mode
+		GM_LSB = '1',     //!< LSB
+		GM_USB = '2',     //!< USB
+		GM_CWU = '3',     //!< CW - VFO frequency below signal frequency
+		GM_FM = '4',      //!< FM
+		GM_AM = '5',      //!< AM
+		GM_DIGL = '6',    //!< Digital mode: Modulated as LSB
+		GM_CWL = '7',     //!< CW - VFO frequency above signal frequency
+		GM_DIGU = '9',    //!< Digital mode: Modulated as USB
+		GM_DSTAR = 'A'    //!< Digital voice: Icom DSTAR.
 	};
 
-	// slow rig polling - 1s -> 10min (default 1 min)
+	//! slow rig polling - 1s -> 10min (default 1 min)
 	const int SLOW_RIG_TIMER = 60;
-	// fast rig polling - 20ms -> 2s (default 1s);
+	//! fast rig polling - 20ms -> 2s (default 1s);
 	const int FAST_RIG_TIMER = 1;
 
+	//! Method by which power level read from rig is converted to a power reading.
 	enum power_mode_t : uchar {
-		NO_POWER,        // No power returnable
-		RF_METER,        // Can read the RF power out meter
-		DRIVE_LEVEL,     // else, can read the power drive level
-		MAX_POWER        // else supply a default value 
+		NO_POWER,        //!< No power returnable
+		RF_METER,        //!< Read the RF power out meter directly.
+		DRIVE_LEVEL,     //!< Read the drive level meter and multiply by maximum poer.
+		MAX_POWER        //!< Use the specified maximum power.
 	};
 
+	//! Method by which frequency is provided.
 	enum freq_mode_t : uchar {
-		NO_FREQ,         // No frequency available
-		VFO,             // Can read a VFO
-		XTAL             // else supply a specified (crystal) value
+		NO_FREQ,         //!< No frequency available
+		VFO,             //!< Read a VFO
+		XTAL             //!< Fixed freqency
 	};
 
+	//! Used to add accessories.
 	enum accessory_t : uchar {
-		BAREBACK,        // No accessory
-		AMPLIFIER = 1,   // Amplifer attached
-		TRANSVERTER = 2, // Transverter attached
-		BOTH = AMPLIFIER | TRANSVERTER
+		BAREBACK,        //!< No accessory
+		AMPLIFIER = 1,   //!< Amplifer attached
+		TRANSVERTER = 2, //!< Transverter attached
+		BOTH = AMPLIFIER | TRANSVERTER  //!< Both amplifier and transverter attached.
 	};
 
-	// Hamlib parameters 
+	//! Interface configuration data:
 	struct hamlib_data_t {
-		// Manufacturer
+		//! Manufacturer as known by hamlib.
 		string mfr = "";
-		// Model
+		//! Model as known by hamlib.
 		string model = "";
-		// Portname
+		//! Port name used by hamlib.
 		string port_name = "";
-		// Baud rate
+		//! Baud rate used by hamlib.
 		int baud_rate = 9600;
-		// Model ID - as known by hamlib
+		//! Model ID - index into hamlib capabilities table.
 		rig_model_t model_id = -1;
-		// Port type
+		//! Port type used by hamlib.
 		rig_port_t port_type = RIG_PORT_NONE;
-		// MAximum number of timeouts allowed before ignore meter
+		//! Maximum number of timeouts allowed before ignore meter
 		int max_to_count = 5;
 		// additional features required by rig_if to return data
-		// Timeout value (not a hamlib item
+		//! Timeout value (not a hamlib item
 		double timeout = 1.0;
-		// S-meter reading queue length
+		//! S-meter reading queue length
 		int num_smeters = 5;
-		// Power defaults
+		//! Default power mode.
 		power_mode_t power_mode = RF_METER;
+		//! Maximum power level (in watts)
 		double max_power = 0.0;
-		// Frequency defaults
+		//! Default frequency mode
 		freq_mode_t freq_mode = VFO;
+		//! Fixed frequency (in megahertz)
 		double frequency = 0.0;
-		// Amplifer and transverter defaults
+		//! Amplifer and transverter defaults
 		accessory_t accessory = BAREBACK;
+		//! Spcified amplifier gain (in decibels)
 		int gain = 0;
+		//! Specified transverter power (in watts)
 		double tvtr_power = 0.0;
+		//! Specified transverter local oscillator frequency (in megawatts) 
 		double freq_offset = 0.0;
 	};
 
-	// This class is the base class for rig handlers. 
+	//! This class is the base class for rig handlers. 
 	class rig_if
 	{
 	public:
 
+		//! Constructor.
+		
+		//! \param name Name as known to the user.
+		//! \param data interface configuration data.
 		rig_if(const char* name, hamlib_data_t* data);
+		//! Destructor.
 		~rig_if();
 
-		// Values read from rig
+		//! Values read from rig
 		struct rig_values {
-			atomic<double> tx_frequency;
-			atomic<double> rx_frequency;
-			atomic<rig_mode_t> mode;
-			atomic<double> drive ;
-			atomic<bool> split;
-			atomic<int> s_value;
-			atomic<int> s_meter;
-			atomic<double> pwr_value;
-			atomic<double> pwr_meter;
-			atomic<bool> ptt;
-			atomic<bool> slow;
-			atomic<bool> powered_on;
+			atomic<double> tx_frequency;  //!< Transmit Frequency (in megahertz)
+			atomic<double> rx_frequency;  //!< Receive Frequency (in megahertz)
+			atomic<rig_mode_t> mode;      //!< Transmit mode
+			atomic<double> drive ;        //!< Drive level (fraction)
+			atomic<bool> split;           //!< Split mode.
+			atomic<int> s_value;          //!< Smoothed S-meter reading (in decibels)
+			atomic<int> s_meter;          //!< Immediate S-meter reading (in decibels)
+			atomic<double> pwr_value;     //!< Smoothed RF power meter reading (in watts)
+			atomic<double> pwr_meter;     //!< Immediate power meter reading (in watts)
+			atomic<bool> ptt;             //!< If true indicates transmitting otherwise receiving.
+			atomic<bool> slow;            //!< Rig is not responding 
+			atomic<bool> powered_on;      //!< Rig appears powered on.
 			
+			//! Constrctor.
 			rig_values() {
 				tx_frequency = 0.0;
 				rx_frequency = 0.0;
@@ -130,117 +144,119 @@ using namespace std::chrono;
 			}
 		};
 
-		// Opens the COM port associated with the rig
+		//! Opens the connection to the rig
 		bool open();
-		// Return rig name
+		//! Returns rig name
 		string& rig_name();
-		// Return the most recent error message
+		//! Returns the most recent error message and adds \p func_name.
 		string error_message(const char* func_name);
 
-		// Error Code is not OK.
+		//! Returns that the rig connection is not in an error state.
 		bool is_good();
-		// close rig - may be null for some 
+		//! close rig - may be null for some 
 		void close();
 
 		// Types of error
+		//! Returns true if the last error was a network error.
 		bool is_network_error();
+		//! Returns true if the last error was reported by the rig.
 		bool is_rig_error();
 
-		// Port was successfully opened
+		//! Returns true if the port was successfully opened
 		bool is_open();
-		// Port is being opened
+		//! Returns true if the port is being opened.
 		bool is_opening();
-		// Port has no CAT
+		//! Returns true if the port has no CAT
 		bool has_no_cat();
 
-		// return mode/submode  
+		//! Receives \p mode and \p submode.  
 		void get_string_mode(string& mode, string& submode);
-		// return frequency
+		//! Returns frequency as string (in megahertz to 1 hertz resolution)
 		string get_frequency(bool tx);
-		// Return frequency as double
+		//! Returns frequency as double (in megahertz)
 		double get_dfrequency(bool tx);
-		// return power
+		//! Returns power (in watts): \p max maximum value over the transmit period.
 		string get_tx_power(bool max = true);
-		// return max power as double
+		//! Returns power (in watts): \p max maximum value over the transmit period.
 		double get_dpower(bool max = true);
-		// return S-meter reading - max - maximum over receive perion, false = instatntaneous
+		//! Returns S-meter reading - \p max - maximum over receive perion, false = instatntaneous
 		string get_smeter(bool max = true);
-		// Return PTT value
+		//! Returns PTT value: true indicates transmit.
 		bool get_ptt();
-		// Return Splt value
+		//! Returns Split value
 		bool get_split();
-		// Run in thread to get the data from the rig
+		//! Run in thread to get the data from the rig
 		static void th_run_rig(rig_if* that);
-		// Get slow - rig taking over 1 s to access
+		//! Returns true if the rig is taking over 1 second to access
 		bool get_slow();
-		// Power on-off
+		//! Returns true if thr rig appears powered.
 		bool get_powered();
-		// Separate run in thread to open rig
+		//! Open rig in rig access thread.
 		static void th_sopen_rig(rig_if* that);
-		// Callback if error while accessing rig
+		//! Callback from rig thread if an error is detected.
 		static void cb_rig_error(void* v);
-		// Callback if warning while accessing rig
+		//! Callback from rig thread if a warning is detected.
 		static void cb_rig_warning(void* v);
-		// set frequency
+		//! set frequency (in megahertz)
 		bool set_frequency(double f);
 
 
 		// Protected attributes
 	protected:
+		//! Runs in rig thread to poll values every 1 second.
 		bool th_read_values();
-		// Open rig - run in thread
+		//! Open rig - run in thread
 		void th_open_rig(rig_if* that);
-		// Handle errors
+		//! Handle errors.
+		
+		//! \param code Error code
+		//! \param meter Name of meter value being accessed.
+		//! \param flag Pointer to a Boolean value that if set inhibits further attempts to acccess.
+		//! \param to_count Number of accesses allowed befor further ones are inhibited.
+		//! \return true indicates error prevents further access.
 		bool error_handler(int code, const char* meter, bool* flag, int* to_count);
-		// Rig opened OK
+		//! Rig opened OK
 		atomic<bool> opened_ok_;
-		// SEmaphore to use around opening
+		//! Semaphore to use around opening
 		atomic<bool> opening_;
-		// bool
-		bool have_freq_to_band_;
-		// last band read
-		string previous_band_;
-		// Stop incessane errors
-		bool inhibit_repeated_errors;
-		// Full rig name
+		//! Full rig name
 		string full_rig_name_;
 
-		// Re-implement error message
+		//! Returns error message for error \p code.
 		const char* error_text(rig_errcode_e code);
 
-		// MY_RIG name
+		//! Name to log as MY_RIG
 		string my_rig_name_;
-		// Hamlib specific attributes
+		//! Interface specific attributes
 		hamlib_data_t* hamlib_data_;
-		// Rig interface
+		//! Hamlib rig interface
 		RIG* rig_;
-		// Numeric error code
+		//! Numeric error code
 		int error_code_;
-		// Reported error code
-		bool unsupported_function_;
-		// Rig values
+		//! Values polled from rig.
 		rig_values rig_data_;
-		// Timer count down
+		//! Timer count down
 		int count_down_;
-		// Read rig thread
+		//! Thread in whcih to run rig access.
 		thread* thread_;
-		// Stop thread
+		//! Keep rig thread running.
 		atomic<bool> run_read_;
 
-		// The time of the last PTT off - to decide if it's a new over
+		//! The time of the last PTT off - to decide if it's a new transmission.
 		system_clock::time_point last_ptt_off_;
 
-		// Queue of s-meter readings
+		//! The most recent S-meter readings: used for smoothing the value read.
 		vector<int> smeters_;
-		// Cumulated value of smeter readings
+		//! Cumulated value of smeter readings
 		int sum_smeters_;
 		// Flags to avoid unsupported meters
-		bool has_smeter_;
-		bool has_drive_;
-		bool has_rf_meter_;
-		// Timeout counts
+		bool has_smeter_;     //!< S-meter appears to be supported.
+		bool has_drive_;      //!< Drive meter appears to be supported.
+		bool has_rf_meter_;   //!< RF Power meter appears to be supported.
+
+		//! Timeout counts
 		int toc_split_;
-		// Phase - for debug mostly
+		//! Function being performed - for error debug mostly
 		string read_item_;
 
 

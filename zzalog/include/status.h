@@ -15,26 +15,27 @@ using namespace std;
 
 class banner;
 
-	// Default colours for status bars
+	//! The colours used for a particular status_t value.
 	struct colours_t {
 		Fl_Color fg;
 		Fl_Color bg;
 	};
 
-	// The status of the various messages
+	//! The status of the various messages
 	enum status_t : char {
-		ST_NONE,             // Uninitialised
-		ST_LOG,              // Only log the message, do not display it in status
-		ST_DEBUG,            // Debug message
-		ST_NOTE,             // An information message
-		ST_PROGRESS,         // A progress note
-		ST_OK,               // Task successful
-		ST_WARNING,          // A warning message
-		ST_ERROR,            // An error has been signaled
-		ST_SEVERE,           // A sever error that will result in reduced capability
-		ST_FATAL             // A fatal (non-recoverable) error has been signaled
+		ST_NONE,             //!< Uninitialised
+		ST_LOG,              //!< Only log the message, do not display it in status
+		ST_DEBUG,            //!< Debug message
+		ST_NOTE,             //!< An information message
+		ST_PROGRESS,         //!< A progress note
+		ST_OK,               //!< Task successful
+		ST_WARNING,          //!< A warning message
+		ST_ERROR,            //!, An error has been signaled
+		ST_SEVERE,           //!< A sever error that will result in reduced capability
+		ST_FATAL             //!< A fatal (non-recoverable) error has been signaled
 	};
 
+	//! MAp the values of status_t to the colours used to display them.
 	const map<status_t, colours_t> STATUS_COLOURS = {
 		{ ST_NONE, { FL_BLUE, FL_BLACK } },
 		{ ST_LOG, { fl_lighter(FL_BLUE), FL_BLACK } },
@@ -48,7 +49,7 @@ class banner;
 		{ ST_FATAL, { FL_BLACK, FL_RED } },
 	};
 
-	// Code - letters witten to log file to indicate severity of the logged status
+	//! Code - letters witten to log file to indicate severity of the logged status
 	const map<status_t, char> STATUS_CODES = {
 		{ ST_NONE, ' '},
 		{ ST_LOG, 'L'},
@@ -62,50 +63,50 @@ class banner;
 		{ ST_FATAL, 'F'}
 	};
 
-	// Abbreviations
-	const map < status_t, const char* > STATUS_ABBREV = {
-		{ ST_NONE, "    "},
-		{ ST_LOG, " LOG "},
-		{ ST_DEBUG, " DBUG"},
-		{ ST_NOTE, " NOTE"},
-		{ ST_PROGRESS, " PROG"},
-		{ ST_OK, " OK  "},
-		{ ST_WARNING, "?WARN"},
-		{ ST_ERROR, "*ERR*"},
-		{ ST_SEVERE, "!SVR!"},
-		{ ST_FATAL, "!FTL!"}
-	};
-
 	// 
 	enum object_t : char;
 
-	// This class provides the status bar and manages access to the various status information
+	//! This class provides the means of managing status and progress for ZZALOG.
 	class status 
 	{
 	public:
 
+		//! Constructor.
 		status();
+		//! Destructor.
 		~status();
 
-		// Initialise progress
+		//! Initialise progress
+		
+		//! \param max_value Maximum value of items being used to monitor progress.
+		//! \param object An identifier for the what is being measured
+		//! \param description Textual description of what is being measured.
+		//! \param suffix Indicates units of items being measured.
 		void progress(uint64_t max_value, object_t object, const char* description, const char* suffix);
-		// UPdate progress
+		//! Update progress
+		
+		//! \param value Current number of items being measured.
+		//! \param object Identifier.
 		void progress(uint64_t value, object_t object);
-		// Update progress with a text message and mark 100%
+		//! Update progress with a text message and mark complete.
+		
+		//! \param message Message indicating why it is complete.
+		//! \param object Identifier.
 		void progress(const char* message, object_t object);
-		// Update miscellaneous status
+		//! Output message \p label with \p status.
 		void misc_status(status_t status, const char* label);
 
 	protected:
-		// Colour code
+		//! Returns the terminal characters used for the specific \p fg or bg colour for \p status.
 		string colour_code(status_t status, bool fg); 
 
 
 	protected:
-		// Status report file
+		//! Status report file
 		string report_filename_;
+		//! Output stream for report file.
 		ofstream* report_file_;
-		// Report file unusable
+		//! Report file unusable
 		bool file_unusable_;
 	};
 #endif

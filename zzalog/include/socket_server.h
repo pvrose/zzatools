@@ -22,88 +22,93 @@
 
 using namespace std;
 
-// This class provides an interface to use a generic socket as a server.
-
-
-
-
+//! This class provides an interface to use a generic socket as a server.
 	class socket_server
 	{
 
 	public:
+
+		//! Supported protocols
 		enum protocol_t {
 			HTTP,
 			UDP
 		};
+		//! Constructor
+		 
+		//! \param protocol Create serverfor this protocol.
+		//! \param address Network address for other end of socket.
+		//! \param port_num Port number for other end of socket.
 		socket_server(protocol_t protocol, string address, int port_num);
+		//! Destructor.
 		~socket_server();
 
-		// Close the socket
+		//! Close the socket
+		
+		//! \param external Waits for interface to quiesce.
 		void close_server(bool external);
-		// Start listening
+		//! Start running the server
 		void run_server();
-		// Is this listening
+		//! Returns true if this server is listening
 		bool has_server();
-		// Set handler 
+		//! Set callback to handle requests. 
 		void callback(int(*do_request)(stringstream&));
-		// Send response
+		//! Send response
 		int send_response(istream& response);
 
 	protected:
 
+		//! Response from client.
 		enum client_status {
-			OK = 0,
-			NG = 1,
-			BLOCK = 2
+			OK = 0,           //!< Response OK
+			NG = 1,           //!< No good.
+			BLOCK = 2         //!< Response would block.
 		};
 
-		// Receive a datagram from WSJT-X
+		//! Receive a datagram from UDP client
 		int rcv_packet();
-		// Accept the client
+		//! Accept the client - returns client status.
 		client_status accept_client();
-		// Error handler
+		//! Error handler - \p phase indicates the peocess that errored.
 		void handle_error(const char* phase);
-		// Send request - set by call-back
+		//! Send request - set by call-back
 		int (*do_request)(stringstream& request);
 
-		// Open socket and create server
+		//! Open socket and create server
 		int create_server();
-		// // Timer to wait before testing receive
-		// static void cb_timer_rcv(void* v);
-		// // Timer to wait before trying to accept again
-		// static void cb_timer_acc(void* v);
-		// Diagnostic data
+		//! Print diagnostic data
 		void dump(string line);
-		// Call back to handle packets - pass pointer to socket serevr
+		//! Callback from server thread to handle packet.
 		static void cb_th_packet(void* v);
-		// Thread runner
+		//! Start the server thread.
 		static void thread_run(socket_server* that);
 
-		// Server socket
+		//! Server socket
 		SOCKET server_;
-		// HTTP Client
+		//! HTTP Client
 		SOCKET client_;
-		// Current client address
+		//! Current client address
 		SOCKADDR_IN client_addr_;
-		// Previous client address
+		//! Previous client address
 		string prev_addr_;
+		//! Previous client port number
 		int prev_port_;
-		// Host IP address e.g. 127.0.0.1
+		//! Host IP address e.g. 127.0.0.1
 		string host_id_;
-		// port number
+		//! port number
 		int port_num_;
-		// Server address
+		//! Server address
 		string address_;
-		// protocol
+		//! protocol
 		protocol_t protocol_;
-		// Closure in progress
+		//! Socket is closing
 		atomic<bool> closing_;
+		//! Socket has closed.
 		atomic<bool> closed_;
-		// Thread handling
+		//! Separate thread to handle socket transfers.
 		thread* th_socket_;
-		// Packet queue
+		//! Packet queue
 		queue<string> q_packet_;
-		// Packet queue lock
+		//! Lock to avoid pushing into the packet queue and pulling from it at the same time.
 		mutex mu_packet_;
 
 	};

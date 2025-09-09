@@ -181,11 +181,8 @@ rig_if::rig_if(const char* name, hamlib_data_t* data)
 	opening_.store( false);
 	opened_ok_.store(false);
 	// Default action
-	have_freq_to_band_ = false;
-	inhibit_repeated_errors = false;
 	rig_ = nullptr;
 	error_code_ = 0;
-	unsupported_function_ = false;
 	my_rig_name_ = name;
 	hamlib_data_ = data;
 	run_read_ = false;

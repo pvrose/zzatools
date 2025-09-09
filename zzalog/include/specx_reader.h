@@ -11,112 +11,175 @@ using namespace std;
 	class spec_data;
 	struct spec_dataset;
 
-	// XML element types used in ADIF specification
+	//! XML element types used in ADIF specification
 	enum specx_element_t {
-		SXE_NONE,        // Not yet processing an element
-		SXE_ADIF,        // Top-level element <adif version=".." status="Released" created = "ISO date"> datatypes enumerations fields</adif>
-		SXE_DATATYPES,   // Start of datatypes dataset <dataType>header record+</dataTypes>
-		SXE_HEADER,      // Start of dataset header <header>value+</header>
-		SXE_VALUEH,      // column name <value>Column</value>
-		SXE_RECORD,      // Start of dataset record <record>value+<record>
-		SXE_VALUER,      // record data item <value name="<Column>">Item value</value>
-		SXE_ENUMS,       // Enumerations: <enumerations>enumeration+</enumerations>
-		SXE_ENUM,        // Enumeration dataset <enumeration name="name">header record+</enumeration>
-		SXE_FIELDS       // Fields dataset <fields>header record+</field>
+		SXE_NONE,        //!< Not yet processing an element
+		SXE_ADIF,        //!< Top-level element 
+		SXE_DATATYPES,   //!< Start of datatypes dataset 
+		SXE_HEADER,      //!< Start of dataset header 
+		SXE_VALUEH,      //!< column name
+		SXE_RECORD,      //!< Start of dataset record
+		SXE_VALUER,      //!< record data item
+		SXE_ENUMS,       //!< Enumerations: 
+		SXE_ENUM,        //!< Enumeration dataset 
+		SXE_FIELDS       //!< Fields dataset 
 
 	};
 
-	// This class reads the XML specification and loads it into the specification database
+	//! This class reads the XML specification from ADIF and loads it into the specification database.
+	//! 
+	/*! \code
+  <adif version="3.1.5" status="Released" date="2024-11-28T00:00:00Z" created="2024-11-28T09:18:56Z">
+	<dataTypes>
+	  <header>
+		<value>Data Type Name</value>
+		<value>Data Type Indicator</value>
+		<value>Description</value>
+		<value>Minimum Value</value>
+		<value>Maximum Value</value>
+		<value>Import-only</value>
+		<value>Comments</value>
+	  </header>
+	  <record>
+		<value name="Data Type Name">AwardList</value>
+		<value name="Description">a comma-delimited list of members of the Award enumeration</value>
+		<value name="Import-only">true</value>
+	  </record>
+	  :
+	</dataTypes>
+	<enumerations>
+	  <enumeration name="Ant_Path">
+		<header>
+	      <value>Enumeration Name</value>
+          <value>Abbreviation</value>
+		  <value>Meaning</value>
+		  <value>Import-only</value>
+	      <value>Comments</value>
+		</header>
+		<record>
+		  <value name="Enumeration Name">Ant_Path</value>
+		  <value name="Abbreviation">G</value>
+		  <value name="Meaning">grayline</value>
+		</record>
+		:
+	  </enumeration>
+      :
+	</enumerations>
+	<fields>
+	  <header>
+		<value>Field Name</value>
+	    <value>Data Type</value>
+		<value>Enumeration</value>
+		<value>Description</value>
+		<value>Header Field</value>
+		<value>Minimum Value</value>
+		<value>Maximum Value</value>
+		<value>Import-only</value>
+		<value>Comments</value>
+      </header>
+	  <record>
+		<value name="Field Name">ADIF_VER</value>
+		<value name="Data Type">String</value>
+	    <value name="Description">identifies the version of ADIF used in this file in the format X.Y.Z where X is an integer designating the ADIF epoch Y is an integer between 0 and 9 designating the major version Z is an integer between 0 and 9 designating the minor version</value>
+		<value name="Header Field">true</value>
+	  </record>
+	  :
+    </fields>
+</adif>
+\endcode
+*/
 	class specx_reader :
 		public xml_reader
 	{
 	public:
+		//! Constructor.
 		specx_reader();
+		//! Destructor.
 		~specx_reader();
 
 		// Public methods
 	public:
 
 		// Overloadable XML handlers
-		// Start 
+		//! Start element 
 		virtual bool start_element(string name, map<string, string>* attributes);
-		// End
+		//! End element
 		virtual bool end_element(string name);
-		// Special element
+		//! Special element
 		virtual bool declaration(xml_element::element_t element_type, string name, string content);
-		// Processing instruction
+		//! Processing instruction
 		virtual bool processing_instr(string name, string content);
-		// characters
+		//! characters
 		virtual bool characters(string content);
 
-		// Load data from specified file into and add each record to the map
+		// Load \p data from input stream /p in: /p version receives version from file.
 		bool load_data(spec_data* data, istream& in, string& version);
 		// Protected methods
 
 	protected:
-		// Start <adif verstion= status= created=
+		//! Start: adif verstion= status= created=
 		bool start_adif(map<string, string>* attributes);
-		// Start <dataTypes>
+		//! Start: dataTypes
 		bool start_datatypes();
-		// Start header
+		//! Start: header
 		bool start_header();
-		// Start header value
+		//! Start header value
 		bool start_value(map<string, string>* attributes);
-		// Start record
+		//! Start record
 		bool start_record();
-		// Start enumerations
+		//! Start enumerations
 		bool start_enumerations();
-		// Start enumeration
+		//! Start enumeration
 		bool start_enumeration(map<string, string>* attributes);
-		// Start fields
+		//! Start fields
 		bool start_fields();
-		// End ADIF
+		//! End ADIF
 		bool end_adif();
-		// End Datatypes
+		//! End Datatypes
 		bool end_datatypes();
-		// End header
+		//! End header
 		bool end_header();
-		// End header value
+		//! End header value
 		bool end_header_value();
-		// End Record
+		//! End Record
 		bool end_record();
-		// End record value
+		//! End record value
 		bool end_record_value();
-		// End enumerations
+		//! End enumerations
 		bool end_enumerations();
-		// End enumeration
+		//! End enumeration
 		bool end_enumeration();
-		// End fields
+		//! End fields
 		bool end_fields();
 
 	protected:
-		// The data
+		//! The data
 		spec_data * data_;
-		// List of elments
+		//! Stack of elments being processed
 		list<specx_element_t> elements_;
-		// Current column headers
+		//! Current column headers
 		vector<string> column_headers_;
-		// Version
+		//! Version
 		string adif_version_;
-		// Status
+		//! Status
 		string file_status_;
-		// Created date
+		//! Created date
 		string created_;
-		// Current dataset name - Datatypes, specific enumeration or fields
+		//! Current dataset name - Datatypes, specific enumeration or fields
 		string dataset_name_;
-		// Current item name
+		//! Current item name
 		string item_name_;
-		// Current record
+		//! Current record
 		map<string, string>* record_data_;
-		// Element data
+		//! Element data
 		string element_data_;
-		// Number of ignored XML elements
+		//! Number of ignored XML elements
 		int num_ignored_;
-		// Name of the record item
+		//! Name of the record item
 		string record_name_;
-		// Is an enumeration
+		//! Is this an enumeration
 		bool dataset_enumeration_;
-		// Remember the stream so that we can display progress
+		//! Remember the stream so that we can display progress
 		istream* in_file_;
 
 	};
