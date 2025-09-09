@@ -12,70 +12,70 @@ using namespace std;
 
 class Fl_Image;
 
-// WX XML elements
+//! WX XML elements
 enum wxe_element_t {
-    WXE_NONE,                   // No element yste
-    WXE_CURRENT,                // Current weather report
-    WXE_CITY,                   // City definition
-    WXE_COORD,                  // City coordinates
-    WXE_COUNTRY,                // ISO Country ID (eg GB)
-    WXE_TIMEZONE,               // Timezone difference
-    WXE_SUN,                    // City sunrise/sunset
-    WXE_TEMPERATURE,            // Temperature values 
-    WXE_FEELS_LIKE,             // Subjective temperature
-    WXE_HUMIDITY,               // Humidity value
-    WXE_PRESSURE,               // Pressure value
-    WXE_WIND,                   // Wind value/description
-    WXE_SPEED,                  // Wind speed value and beaufort description
-    WXE_GUSTS,                  // Gusting wind speed
-    WXE_DIRECTION,              // Direction
-    WXE_CLOUDS,                 // Cloud cover value, description
-    WXE_VISIBILITY,             // Visibility (metres - max 10 km)
-    WXE_PRECIPITATION,          // Rain/snow levels
-    WXE_WEATHER,                // Weather summary
-    WXE_LASTUPDATE,             // Last update time
-    WXE_CLIENTERROR,            // Error message
-    WXE_COD,                    // Error code
-    WXE_MESSAGE,                // ERror message
+    WXE_NONE,                   //!< No element yste
+    WXE_CURRENT,                //!< Current weather report
+    WXE_CITY,                   //!< City definition
+    WXE_COORD,                  //!< City coordinates
+    WXE_COUNTRY,                //!< ISO Country ID (eg GB)
+    WXE_TIMEZONE,               //!< Timezone difference
+    WXE_SUN,                    //!< City sunrise/sunset
+    WXE_TEMPERATURE,            //!< Temperature values 
+    WXE_FEELS_LIKE,             //!< Subjective temperature
+    WXE_HUMIDITY,               //!< Humidity value
+    WXE_PRESSURE,               //!< Pressure value
+    WXE_WIND,                   //!< Wind value/description
+    WXE_SPEED,                  //!< Wind speed value and beaufort description
+    WXE_GUSTS,                  //!< Gusting wind speed
+    WXE_DIRECTION,              //!< Direction
+    WXE_CLOUDS,                 //!< Cloud cover value, description
+    WXE_VISIBILITY,             //!< Visibility (metres - max 10 km)
+    WXE_PRECIPITATION,          //!< Rain/snow levels
+    WXE_WEATHER,                //!< Weather summary
+    WXE_LASTUPDATE,             //!< Last update time
+    WXE_CLIENTERROR,            //!< Error message
+    WXE_COD,                    //!< Error code
+    WXE_MESSAGE,                //!< Error message
 };
 
-// The data received in a weather reports
+//! The data received in a weather reports
 struct wx_report {
 
-    unsigned int city_id{ 0 };       // City ID number
-    string city_name;                // Location name
-    lat_long_t city_location;        // Latitude and longitude
-    string iso_country;              // ISO country code (eg GB)
-    float timezone_hr{ 0.0F };       // Timezone difference (hours)
-    time_t sunrise{ 0 };             // Sunrise (UTC)
-    time_t sunset{ 0 };              // Sunset (UTC)
-    float temperature_K{ 0.0F };     // Temperature (kelvin) 
-    float subjective_K{ 0.0F };      // Subjective temperature
-    unsigned int humidity_pc{ 0 };   // Relative humidity
-    unsigned int pressure_hPa{ 0 };  // Air pressure (hPa - aka mbar)
-    float wind_speed_ms{ 0.0F };     // Wind speed (m/s)
-    string wind_name;                // Wind name (Beaufort scale?)
-    unsigned int wind_dirn{ 0 };     // Wind direction (degrees);
-    string wind_cardinal;            // Cardinal (sixteenth) whence the wind
-    float gusting_ms{ 0.0F };        // Gusting up to ... (m/s)
-    unsigned int cloud_cover{ 0 };   // Percentage cloud cover
-    string cloud_name;               // Cloud cover description
-    unsigned int visibility_m{ 0 };  // Visibility (m - max 10 km)
-    string precipitation;            // Precipitation "no", "rain", "snow"
-    float precip_mm{ 0 };            // Precipitation in last hour (mm)
-    string description;              // Overall weather description
-    Fl_Image* icon{ nullptr };       // Weather image
-    time_t updated{ 0 };             // Time last updated
+    unsigned int city_id{ 0 };       //!< City ID number
+    string city_name;                //!< Location name
+    lat_long_t city_location;        //!< Latitude and longitude
+    string iso_country;              //!< ISO country code (eg GB)
+    float timezone_hr{ 0.0F };       //!< Timezone difference (hours)
+    time_t sunrise{ 0 };             //!< Sunrise (UTC)
+    time_t sunset{ 0 };              //!< Sunset (UTC)
+    float temperature_K{ 0.0F };     //!< Temperature (kelvin) 
+    float subjective_K{ 0.0F };      //!< Subjective temperature
+    unsigned int humidity_pc{ 0 };   //!< Relative humidity
+    unsigned int pressure_hPa{ 0 };  //!< Air pressure (hPa - aka mbar)
+    float wind_speed_ms{ 0.0F };     //!< Wind speed (m/s)
+    string wind_name;                //!< Wind name (Beaufort scale?)
+    unsigned int wind_dirn{ 0 };     //!< Wind direction (degrees);
+    string wind_cardinal;            //!< Cardinal (sixteenth) whence the wind
+    float gusting_ms{ 0.0F };        //!< Gusting up to ... (m/s)
+    unsigned int cloud_cover{ 0 };   //!< Percentage cloud cover
+    string cloud_name;               //!< Cloud cover description
+    unsigned int visibility_m{ 0 };  //!< Visibility (m - max 10 km)
+    string precipitation;            //!< Precipitation "no", "rain", "snow"
+    float precip_mm{ 0 };            //!< Precipitation in last hour (mm)
+    string description;              //!< Overall weather description
+    Fl_Image* icon{ nullptr };       //!< Weather image
+    time_t updated{ 0 };             //!< Time last updated
 
 };
 
-// This class decodes a weather report receved from openweathermap.org
-// as an XML file
+//! This class decodes a weather report receved from openweathermap.org as an XML file
 class wx_handler : public xml_reader {
 
 public:
-    
+    //! Constructor.
     wx_handler();
+    //! Destructor.
     ~wx_handler();
 
     // openweathermap.org key
@@ -83,65 +83,67 @@ public:
 
     // XML reader overloads
     // Overloadable XML handlers
-    // Start 
+    //! Start Element 
     virtual bool start_element(string name, map<string, string>* attributes);
-    // End
+    //! End Element
     virtual bool end_element(string name);
-    // Special element
+    //! Special element
     virtual bool declaration(xml_element::element_t element_type, string name, string content);
-    // Processing instruction
+    //! Processing instruction
     virtual bool processing_instr(string name, string content);
-    // characters
+    //! characters
     virtual bool characters(string content);
 
-    // Update weather report - forecd
+    //! Update weather report - forecd
     void update();
-    // Timer 
+    //! Implement timer actions 
     void ticker();
+    //! Callback from ticker every 30 minutes (3 minutes in DEBUG_QUICK mode).
     static void cb_ticker(void* v);
-    // Fetch complete callback
+    //! Callback from fetch thread when complete
     static void cb_fetch_done(void* v);
-    // Fetch error
+    //! Callback from fetch thread on error.
     static void cb_fetch_error(void* v);
     
     // Get the various weather items - 
-    // summation icon
+    //! Returns icon
     Fl_Image* icon();
-    // Description
+    //! Returns description
     string description();
-    // Temperature (K)
+    //! Returns temperature (in kelvins)
     float temperature();
-    // Wind-speed (m/s)
+    //! Returns wind-speed (in metres per second)
     float wind_speed();
-    // Wind speed name
+    //! Returns wind speed name
     string wind_name();
-    // Wind direction (16th cardinals)
+    //! Returns wind direction (in 16th cardinals)
     string wind_direction();
-    // Wind direction (degrees)
+    //! Returns wind direction (in degrees)
     unsigned int wind_degrees();
-    // Cloudiness
+    //! Returns fraction cloud cover.
     float cloud();
-    // Name
+    //! Returns cloud description
     string cloud_name();
-    // Sunris
+    //! Returns sunrise time
     time_t sun_rise();
-    // Sun set
+    //! Returns suset time
     time_t sun_set();
-    // Last updated
+    //! Returns last updated
     time_t last_updated();
-    // Location
+    //! Returns location
     string location();
-    // Location lat/long
+    //! Returns location coordinates
     string latlong();
-    // Atmospheric pressue (hPa)
+    //! Returns atmospheric pressue (in hectopascals)
     float pressure();
 
 protected:
 
-    // The overall XML container
+    //! Start The overall XML container
     bool start_current();
+    //! end The overall XML container
     bool end_current();
-    // City data
+    //! Start City data
     bool start_city(map<string, string>* attributes);
     bool end_city();
     // City coordinates

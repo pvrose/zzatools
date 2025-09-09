@@ -50,7 +50,6 @@ web_dialog::web_dialog(int X, int Y, int W, int H, const char* label) :
 	, qrz_data_(nullptr)
 	, email_data_(nullptr)
 {
-	image_widgets_.clear();
 
 	do_creation(X, Y);
 }
@@ -58,15 +57,6 @@ web_dialog::web_dialog(int X, int Y, int W, int H, const char* label) :
 // Destructor
 web_dialog::~web_dialog()
 {
-	// For each widget with images
-	for (auto it = image_widgets_.begin(); it != image_widgets_.end(); it++) {
-		// Delete the image
-		Fl_RGB_Image* i = (Fl_RGB_Image*)(*it)->image();
-		if (i != nullptr) {
-			delete i;
-			(*it)->image(nullptr);
-		}
-	}
 }
 
 // Handle
@@ -174,8 +164,6 @@ void web_dialog::create_form(int X, int Y) {
 	create_email(rx, ry, rw, rh);
 
 	tabs->end();
-
-	image_widgets_.clear();
 
 	Fl_Group::end();
 }

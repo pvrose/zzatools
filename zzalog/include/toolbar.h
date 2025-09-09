@@ -13,47 +13,54 @@ class Fl_Widget;
 
 typedef size_t qso_num_t;
 
-	// This class provides a tool-bar providing buttons providing shortcuts to certain menu items
+	//! This class provides a tool-bar providing buttons providing shortcuts to certain menu items.
 	class toolbar : public Fl_Group
 	{
 	public:
-		toolbar(int X, int Y, int W, int H, const char* label = 0);
+		//! Constructor.
+
+		//! \param X horizontal position within host window
+		//! \param Y vertical position with hosr window
+		//! \param W width 
+		//! \param H height
+		//! \param L label
+		toolbar(int X, int Y, int W, int H, const char* L = 0);
+		//! Destructor.
 		~toolbar();
 
+		//! Inherited from Fl_Group to allow keyboard F1 to open userguide.
 		virtual int handle(int event);
 
-		// Button callback - calls specific menu callback
+		//! Callback from buttons that are associated with a menu item: \p v passes menu item label.
 		static void cb_bn_menu(Fl_Widget* w, void* v);
-		// Call back for search button
+		//! Callback for search button
 		static void cb_bn_search(Fl_Widget* w, void* v);
-		// Call back for extract button
+		//! Callback for extract button
 		static void cb_bn_extract(Fl_Widget* w, void* v);
-		// Call back for parsing and explaining a callsign
+		//! Call back for parsing and explaining a callsign
 		static void cb_bn_explain(Fl_Widget* w, void* v);
-		// Callback for starting auto-import
-		static void cb_bn_import(Fl_Widget* w, void* v);
-		// Callback to (dis)connect rig
+		//! Callback to (dis)connect rig
 		static void cb_bn_rig(Fl_Widget* w, void* v);
-		// Callback to open international dialog
+		//! Callback to open international dialog
 		static void cb_bn_intl(Fl_Widget* w, void* v);
-		// Supply minimum width of toolbar
+		//! Supply minimum width of toolbar
 		int min_w();
-		// Add selected callsign as default input
+		//! Add selected callsign as default input
 		void search_text(int record_num);
-		// Set search text to a specific calllsign
+		//! Set search text to a specific calllsign
 		void search_text(string callsign);
-		// Update button status
+		//! Update button status
 		void update_items();
 
 	protected:
-		// text to search for
+		//! text to search for
 		string search_text_;
-		// Record number when stepping the search through the log
+		//! Index of QSO record when stepping the search through the log
 		qso_num_t record_num_;
-		// The search input
+		//! The search input
 		Fl_Widget* ip_search_;
 
-		// Minimum resizable
+		//! Minimum resizable
 		int min_w_;
 	};
 #endif

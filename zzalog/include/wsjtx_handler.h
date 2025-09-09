@@ -16,52 +16,53 @@ using namespace std;
 class record;
 class socket_server;
 
-	// This class provides the interface to handle UDP datagrams as a server to the
-	// WSJT-X client(s)
+	//! This class provides the interface to handle UDP datagrams as a server to the WSJT-X client(s)
 	class wsjtx_handler
 	{
 
 	public:
+		//! Consructor.
 		wsjtx_handler();
+		//! Destructor.
 		~wsjtx_handler();
 
-		// We have a server
+		//! Returns true if server has been started
 		static bool has_server();
-		// Start server
+		//! Start server
 		void run_server();
-		// Close servver
+		//! Close servver
 		void close_server();
 
-		// Search for match in ALL.TXT
+		//! Search for match for \p qso in ALL.TXT and update \p qso if \p update_qso is true.
 		bool match_all_txt(record* qso, bool update_qso);
 
-		// 15s ticker
+		//! Called by cb_ticker callback.
 		void ticker();
-		// Static version
+		//! Callback from ticker every 15 seconds
 		static void cb_ticker(void* v);
-		// Remove QSO from cache
+		//! Remove \p call from gridsquare cache
 		void delete_qso(string call);
 
-		// Received a packet
+		//! Return true if a packet has been received.
 		static bool has_data();
 
-		// Used in static methods to point to the single instance of this class
+		//! Used in static methods to point to the single instance of this class
 		static wsjtx_handler* that_;
 
 	protected:
 
-		// The datagram gets sent for every decode
+		//! The datagram gets sent for every decode
 		struct decode_dg {
-			string id;
-			bool new_decode;
-			uint32_t time;
-			int32_t snr;
-			double d_time;
-			uint32_t d_freq;
-			string mode;
-			string message;
-			bool low_confidence;
-			bool off_air;
+			string id;          //!< Unique key for WSJT-X instance
+			bool new_decode;    //!< If true indicates anew decode
+			uint32_t time;      //!< Time (in milliseconds) since midnight UTC
+			int32_t snr;        //!< S+N/N ratio
+			double d_time;      //!< Delta time of decode
+			uint32_t d_freq;    //!< Delta frequency from VFO (in hertz)
+			string mode;        //!< Mode
+			string message;     //!< Decoded mesasge
+			bool low_confidence;//!< If true decode is of low confidence
+			bool off_air;       //!< If true decoded from file
 
 			decode_dg() {
 				id = "";
@@ -77,7 +78,7 @@ class socket_server;
 			}
 		};
 
-		// The datagram gets sent every change in the status
+		//! The datagram gets sent every change in the status
 		struct status_dg {
 			/*Status        Out       1                      quint32
 				* Id(unique key)        utf8
@@ -103,47 +104,46 @@ class socket_server;
 				* Configuration Name     utf8
 				* TX Message
 			*/
-			string id;
-			uint64_t dial_freq{ 0 };
-			string mode;
-			string dx_call;
-			string report;
-			string tx_mode;
-			bool tx_eanbled{ false };
-			bool transmitting{ false };
-			bool decoding{ false };
-			uint32_t rx_offset{ 0 };
-			uint32_t tx_offset{ 0 };
-			string own_call;
-			string own_grid;
-			string dx_grid;
-			bool tx_watchdog{ false };
-			string submode;
-			bool fast_mode{ false };
-			uint8_t special_op{ 0 };
-			uint32_t freq_tolerance{ 0 };
-			uint32_t tx_rx_period{ 0 };
-			string config_name;
-			string tx_message;
+			string id;                    //!< Unique key
+			uint64_t dial_freq{ 0 };      //!< Dial frequency (in hertz)
+			string mode;                  //!< Mode
+			string dx_call;               //!< Value in DX Call window
+			string report;                //!< Value in report window
+			string tx_mode;               //!< Transmit mode
+			bool tx_eanbled{ false };     //!< Transmit enabled
+			bool transmitting{ false };   //!< Transmitting
+			bool decoding{ false };       //!< Decoding
+			uint32_t rx_offset{ 0 };      //!< Receive offset frequency (in hertz)
+			uint32_t tx_offset{ 0 };      //!< Transmit offset frequency (in hertz)
+			string own_call;              //!< Station callsign
+			string own_grid;              //!< Staton gridsquare
+			string dx_grid;               //!< Value in DX Gridsquare window
+			bool tx_watchdog{ false };    //!< Transmit watchdog triggered
+			string submode;               //!< Submode
+			bool fast_mode{ false };      //!< Fast decode mode set
+			uint8_t special_op{ 0 };      //!< Special operation 
+			uint32_t freq_tolerance{ 0 }; //!< Frequency tolerance
+			uint32_t tx_rx_period{ 0 };   //!< Transmit/Receive period
+			string config_name;           //!< Configuration name
+			string tx_message;            //!< Message sent by user.
 		};
 
-		// Represents the message format being sent (and received)
-		// So represents the state of the QSO
+		//! Represents the message format being sent (and received), so represents the state of the QSO
 		enum message_t {
-			TX1,       // CALL1 CALL2 GRID
-			TX1A,      // CALL1 CALL2 - no excahnge 
-			TX2,       // CALL1 CALL2 Report
-			TX3,       // CALL1 CALL2 R-report
-			TX4,       // CALL1 CALL2 RRR
-			TX4A,      // CALL1 CALL2 RR73
-			TX5,       // CALL1 CALL2 73
-			TX6,       // CQ +  CALL2 GRID
-			TX6A,      // CQ + CALL2  - no exchange
-			MISC,      // Miscellaneous transmit (eg TUNE)
-			TEXT,      // Any other decode
+			TX1,       //!< CALL1 CALL2 GRID
+			TX1A,      //!< CALL1 CALL2 - no excahnge 
+			TX2,       //!< CALL1 CALL2 Report
+			TX3,       //!< CALL1 CALL2 R-report
+			TX4,       //!< CALL1 CALL2 RRR
+			TX4A,      //!< CALL1 CALL2 RR73
+			TX5,       //!< CALL1 CALL2 73
+			TX6,       //!< CQ +  CALL2 GRID
+			TX6A,      //!< CQ + CALL2  - no exchange
+			MISC,      //!< Miscellaneous transmit (eg TUNE)
+			TEXT,      //!< Any other decode
 		};
 
-		// 
+		//! Mapping from message state to text representation.
 		map<message_t, string> mess_char_ = {
 			{ TX1, "TX1"},
 			{ TX1A, "TX1A"},
@@ -158,107 +158,113 @@ class socket_server;
 			{ TEXT, "TEXT"}
 		};
 
-		// The message decoded
+		//! The message decoded
 		struct decoded_msg {
-			message_t type{ TX1 };		// Message format
-			string target;		// The call the message is for
-			string sender;		// The call the message is from
-			string exchange;	// The message payload (grid, report)
+			message_t type{ TX1 };  //!< Message format
+			string target;		    //!< The call the message is for
+			string sender;		    //!< The call the message is from
+			string exchange;	    //!< The message payload (grid, report)
 		};
 
-		// Receive a datagram from WSJT-X
+		//! Callback from server thread: Receive a datagram from WSJT-X, returns the type of datagram.
 		static int rcv_request(stringstream& os);
-		// Receive a datagram from WSJT-X
+		//! Receive a datagram from WSJT-X, returns the type of datagram.
 		int rcv_dgram(stringstream& os);
 
-		// handle heartbeat datagram
+		//! handle heartbeat datagram from output stream \p os.
 		int handle_hbeat(stringstream& os);
-		// send heartbeat datagram
+		//! send heartbeat datagram
 		int send_hbeat();
-		// handle "Logged ADIF" datagram
+		//! handle "Logged ADIF" datagram from output stream \p os.
 		int handle_log(stringstream& os);
-		// handle "Close" datagram
+		//! handle "Close" datagram from output stream \p os.
 		int handle_close(stringstream& os);
-		// handle default datagrams
+		//! handle default datagrams from output stream \p os.
 		int handle_default(stringstream& os, uint32_t type);
-		// handle decode
+		//! handle decode from output stream \p os.
 		int handle_decode(stringstream& os);
-		// handle decode
+		//! handle decode from output stream \p os.
 		int handle_reply(stringstream& os);
-		// handle status
+		//! handle status from output stream \p os.
 		int handle_status(stringstream& os);
-		// Get the utf8 from the dgram
+		//! Takes the utf8 from the dgram  from output stream \p os.
 		string get_utf8(stringstream& os);
-		// Get 32-bit unsigned integer
+		//! Takes 32-bit unsigned integer from output stream \p os.
 		uint32_t get_uint32(stringstream& os);
-		// Get 64-bit unsigned integer
+		//! Takes 64-bit unsigned integer from output stream \p os.
 		uint64_t get_uint64(stringstream& os);
-		// Get bool
+		//! Takes bool from output stream \p os.
 		bool get_bool(stringstream& os);
-		// Get 8-bit unsigned int
+		//! Takes 8-bit unsigned int from output stream \p os.
 		uint8_t get_uint8(stringstream& ss);
-		// Get double
+		//! Takes double from output stream \p os.
 		double get_double(stringstream& ss);
-		// Add the utf8 to the dgram
+		//! Adds the utf8 to the dgram
 		void put_utf8(stringstream& os, string s);
-		// Add 32-but unsigned integer
+		//! Adds 32-but unsigned integer
 		void put_uint32(stringstream& os, const unsigned int i);
 
-		// Decode the message
+		//! Decode the message and return message type.
 		decoded_msg decode_message(string message);
-		// Update QSO with message
+		//! Update QSO with message
+		
+		//! \param tx If true transmit, otherwise receive.
+		//! \param time Time of QSO, Date taken from system clock.
+		//! \param audio_freq Transmit offset (in hertz)
+		//! \param message Transmit or Received message.
+		//! \param match QSO record to update, if nullptr create a new one.
+		//! \param dial_frequency Dial frequency.
+		//! \param mode Mode.
 		record* update_qso(bool tx, string time, double audio_freq, string message,
 		    record* match = nullptr, double dial_frequency = 0.0, string mode = "");
 
-		// Get a QSO record for this callsign
+		//! Returns the QSO record for this callsign, if necessary create it.
 		record* qso_call(string call, bool create);
-		// Create a record for this call
+		//! Creates and returns a QSO record for this call
 		record* new_qso(string call);
-		// Parse the ALL.TXT record
+		//! Parse the ALL.TXT line against the \p match QSO record: returns true if it matches.
 		bool parse_all_txt(record* match, string line);
 
-		// Decode the message
-
-		// Socket server
+		//! Socket server
 		socket_server* server_;
 
-		// Received magic number
+		//! Received magic number
 		uint32_t magic_number_;
-		// Received schema number
+		//! Received schema number
 		uint32_t schema_;
-		// Expected magic number
+		//! Expected magic number
 		const uint32_t expected_magic_ = 0xadbccbda;
-		// Min. schema supported
+		//! Min. schema supported
 		uint32_t minimum_schema_ = 2;
-		// Received first datagram
+		//! Received first datagram
 		bool received_datagram_;
-		// Number status received
+		//! Number status received
 		unsigned int status_rcvd_;
-		// My call
+		//! Station callsign
 		string my_call_;
-		// My bracketed call
+		//! Station callsign in angle brackets.
 		string my_bracketed_call_;
-		// Previous status datagram
+		//! Previous status datagram
 		status_dg prev_status_;
-		// Grid locations worked
+		//! Cache of grid locations seen: Maps callsign to gridsquare.
 		map<string, string> grid_cache_;
-		// Interface QSO record
+		//! Map of callsigns to QSO records.
 		map<string, record*> qsos_;
-		// Dial frequency (MHz)
+		//! Dial frequency (MHz)
 		double dial_frequency_;
-		// Current mode
+		//! Current mode
 		string mode_;
-		// Received partnet ID
+		//! Received partner ID
 		string id_;
 
 		// Heartbeat management -
-		// REeceived heartbeats
+		//! Reeceived heartbeats
 		set<string> received_beats_;
-		// Check missing heartbeats
+		//! Check missing heartbeats
 		bool check_beats_;
-		// WSJT-X connected
+		//! WSJT-X connected
 		bool connected_;
-		// Semaphore to prevent multiple cretions of a QSO for the same status 
+		//! Semaphore to prevent multiple creations of a QSO for the same status 
 		atomic_flag tx_semaphore_;
 		
 	};
