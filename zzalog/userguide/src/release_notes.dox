@@ -7,6 +7,7 @@
 - Refinements to callsign parsing algorithm.
 - Added Doxygen comments to all header files. This identified a number
 of redundancies in the code that have been removed.
+- Included hamlib v4.6.5 in Windows build.
 - Bug fixes:
   - Errors in callsign parsing algorithm.
   - Starting to log QSO in WSJT-X state RX.TX1 results in confusion (revoking previous mod).

@@ -74,7 +74,7 @@
     <LibraryPath>C:\Users\pvros\Documents\dev\deps\lib;C:\Users\pvros\Documents\dev\fltk-master\build\lib\RelWithDebInfo;C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\lib;C:\Users\pvros\Documents\dev\zzatools\Release;$(LibraryPath);C:\Program Files %28x86%29\hamlib-w32-4.5.3\lib\msvc</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>${LibraryPath};C:\Program Files\hamlib-w64-4.6.4\lib\msvc;C:\Users\pvros\source\repos\fltk\build\lib\Debug;C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x86-release-static-ipv6-sspi-schannel-obj-lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>${LibraryPath};C:\Program Files\hamlib-w64-4.6.5\lib\msvc;C:\Users\pvros\source\repos\fltk\build\lib\Debug;C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x86-release-static-ipv6-sspi-schannel-obj-lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LibraryPath>${LibraryPath};C:\Program Files\hamlib-w64-4.6.4\lib\msvc;C:\Users\pvros\source\repos\fltk\build\lib\Release;C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x86-release-static-ipv6-sspi-schannel-obj-lib;$(LibraryPath)</LibraryPath>
@@ -127,7 +127,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\pvros\source\repos\pvrose\zzatools\zzalog\include;C:\Users\pvros\source\repos\fltk\build;C:\Program Files\hamlib-w64-4.6.4\include;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\pthread-win32;C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x64-release-dll-ipv6-sspi-schannel\include;C:\Users\pvros\source\repos\fltk\png;C:\Users\pvros\source\repos\fltk\zlib;C:\Users\pvros\source\repos\pvrose\zzatools\common\include;C:\Users\pvros\source\repos\pvrose\zzatools\widgets\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\pvros\source\repos\pvrose\zzatools\zzalog\include;C:\Users\pvros\source\repos\fltk\build;C:\Program Files\hamlib-w64-4.6.5\include;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\pthread-win32;C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x64-release-dll-ipv6-sspi-schannel\include;C:\Users\pvros\source\repos\fltk\png;C:\Users\pvros\source\repos\fltk\zlib;C:\Users\pvros\source\repos\pvrose\zzatools\common\include;C:\Users\pvros\source\repos\pvrose\zzatools\widgets\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>CURL_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
