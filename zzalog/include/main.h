@@ -75,10 +75,19 @@ using namespace std;
 //! \mainpage ZZALOG Code Documentation
 //! 
 //! This document describes the code interfaces between the constituent parts
-//! of ZZALOG. For the user interface see <A HREF=file:///../../userguide/html/index.html>Userguide</A>.
+//! of ZZALOG. For the user interface see 
+//! <A HREF=file:///C:/ProgramData/GM3ZZA/ZZALOG/html/index.html>Userguide (Windows)</A>
+//! or <A HREF=file:///etc/fltk/GM3ZZA/ZZALOG/html/index.html>Userguide (Linux)</A>
 //! 
+//! ZZALOG uses the following third-party libraries:
+//! - <A HREF=https://www.fltk.org/doc-1.4/index.html>FLTK</A>.
+//! - <A HREF=https://github.com/Hamlib/Hamlib/wiki/Hamlib>hamlib</A>
+//! - <A HREF=https://curl.se/libcurl/c/libcurl.html>libcurl</A>
 //! 
-//! 
+//! \copyright Philip Rose GM3ZZA 2018-2025. All rights reserved.
+//!
+//! ZZALOG is based in part on the work of the FLTK project https ://www.fltk.org.
+
 
 //! Program copyright - displayed in all windows.
 string COPYRIGHT = "\302\251 Philip Rose GM3ZZA 2018-2025. All rights reserved.";

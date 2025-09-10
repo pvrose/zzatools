@@ -174,7 +174,7 @@ using namespace std;
 	//! Performs "XOR" encrypt/decrypt
 	 
 	//! \param str string of chaarcters to encrypt/decrypt in-place.
-	//! \param len length of string \str. Zero-termination cannot be used 
+	//! \param len length of string \p str. Zero-termination cannot be used 
 	//! as an encrypted value may contain them.
 	//! \param seed Seed to generate a pseudo-random sequence of characters to use as an encryption key.
 	//! \param offset Offset into generated pseudo-random sequence to start process.
