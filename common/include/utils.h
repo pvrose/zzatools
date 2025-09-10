@@ -19,55 +19,57 @@ using namespace std;
 
 
 
-	// Latitude/longitude pair
+	//! Latitude/longitude pair
 	struct lat_long_t {
-		double latitude{ 0.0 };    // latitude (positive = N)
-		double longitude{ 0.0 };   // longitude (positive = E)
+		double latitude{ 0.0 };    //!< latitude (positive = N)
+		double longitude{ 0.0 };   //!< longitude (positive = E)
 
+		//! Return NAN if either coordinate is not a valid number.
 		bool is_nan() {
 			return isnan(latitude) || isnan(longitude);
 		}
 
+		//! Returns true if both cordinates compare.
 		bool operator==(lat_long_t rhs) {
 			return (latitude == rhs.latitude && longitude == rhs.longitude);
 		}
 	};
 
-	// Tip display - 2 seconds
+	//! Tooltip display - 2 seconds
 	const double TIP_SHOW = 2.0;
-	// π to maximum precision in double - let the compiler take the strain
+	//! π to maximum precision in double - let the compiler take the strain
 	const double PI = 3.14159265358979323846264338327950288419716939937510;
 	// Conversion factors - angle
-	const double DEGREE_RADIAN = PI / 180.0;
-	const double RADIAN_DEGREE = 180.0 / PI;
-	// radius of earth in kilometers - yes I know the earth is an oblate sphere
+	const double DEGREE_RADIAN = PI / 180.0;    //!< Conversion from degress to radians
+	const double RADIAN_DEGREE = 180.0 / PI;    //!< Conversion from radians to degrees
+	//! radius of earth in kilometres - yes I know the earth is an oblate sphere
 	const double EARTH_RADIUS = 6371.0088;
 
-	// Split a text line into separate "words" on separator
+	//! Split a text \p line into separate \p words on \p separator
 	void split_line(const string& line, vector<string>& words, const char separator);
-	// Recombine separate words into a string
+	//! Recombine separate \p words into a string with \p separator and return the result.
 	string join_line(vector<string> words, const char separator);
-	// Converts display format text to a tm object for reformatting
+	//! Converts display format text to a tm object for reformatting
 	bool string_to_tm(string text, tm& time, string format);
-	// Convert a string e.g. 00-06:08 to an array of UINTs {0,1,2,3,4,5,6,8}
+	//! Convert a string e.g. 00-06:08 to an array of UINTs {0,1,2,3,4,5,6,8}
 	void string_to_ints(string& text, vector<unsigned int>& ints);
-	// get the time in specific fomat
+	//! Returns the current time in specific fomat
 	string now(bool local, const char* format, bool add_ms = false);
-	// Get the time stamp to millisecond
+	//! Returns the current time to milliseconds
 	string now_ms();
-	// test for leap year
+	//! Returns true if the /p date is a leap year
 	bool is_leap(tm* date);
-	// refresh the tm struct after modifying it
+	//! refresh the tm struct after modifying it
 	void refresh_tm(tm* date);
-	// get the days in the month
+	//! Retunrs the number of days in the month
 	int days_in_month(tm* date);
-	// Create a tip window - data tip, position(root_x, root_y)
+	//! Create a tip window - data \p tip, position(\p root_x, \p root_y)
 	Fl_Window* tip_window(const string& tip, int x_root, int y_root);
-	// Create upper version of a string
+	//! Returns \p data in upper case
 	string to_upper(const string& data);
-	// Create lower version of a string
+	//! Returns \p data in lower case
 	string to_lower(const string& data);
-	// Check the whole string is an integer
+	//! Returns true if the whole string is an integer
 	bool is_integer(const string& data);
 	// Limited string search - return the position of the sought char(s) or length if not present
 	size_t find(const char* data, size_t length, const char* match);

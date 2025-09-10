@@ -24,18 +24,18 @@ using namespace std;
 
 extern bool DEBUG_ERRORS;
 
-	// Datatypes to pass to radio and or_check button callbacks 
+	//! Datatypes to pass to radio and or_check button callbacks 
 	struct radio_param_t {
-		// Value assigned to radio button
+		//! Value assigned to radio button
 		unsigned int value;
-		// The int or enum to receive the value
+		//! The integer object to receive the value
 		int* attribute;
-		// Default constructor
+		//! Default constructor
 		radio_param_t() {
 			value = 0;
 			attribute = nullptr;
 		}
-		// Constructor to initialise structure
+		//! Constructor to initialise structure
 		radio_param_t(unsigned int a, int* b) {
 			value = a;
 			attribute = b;
@@ -43,6 +43,7 @@ extern bool DEBUG_ERRORS;
 	};
 
 	// Datatype to pass to a file/directory browse button call back
+	//! \todo There is still one location this is used.
 	struct browser_data_t {
 		// Message for the file browser label
 		string message;
@@ -78,28 +79,28 @@ extern bool DEBUG_ERRORS;
 
 	// Common callbacks
 
-	// Template callback to get a DATA value from a WIDGET widget - compiler should catch incompatible value types
+	//! Template callback to get a DATA value from a WIDGET widget - compiler should catch incompatible value types
 	template <class WIDGET, class DATA>
 	static void cb_value(Fl_Widget* w, void* v) {
 		DATA value = (DATA)((WIDGET*)w)->value();
 		DATA* target = (DATA*)v;
 		*target = value;
 	}
-	// Template callback to get text as a DATA item from a WIDGET widget
+	//! Template callback to get text as a DATA item from a WIDGET widget
 	template <class WIDGET, class DATA>
 	static void cb_text(Fl_Widget* w, void* v) {
 		DATA text = ((WIDGET*)w)->text();
 		DATA* target = (DATA*)v;
 		*target = text;
 	}
-	// Template callback to get an enum (DATA) item from a WIDGET widget that has int value
+	//! Template callback to get an enum (DATA) item from a WIDGET widget that has int value
 	template <class WIDGET, class DATA>
 	static void cb_value_enum(Fl_Widget* w, void* v) {
 		int value = ((WIDGET*)w)->value();
 		DATA* target = (DATA*)v;
 		*target = (DATA)value;
 	}
-	// Callback to get an int value from a WIDGET widget that has char* value - returns 0 if first character is non-integer
+	//! Callback to get an int value from a WIDGET widget that has char* value - returns 0 if first character is non-integer
 	template <class WIDGET>
 	static void cb_value_int(Fl_Widget* w, void* v) {
 		const char* value = ((WIDGET*)w)->value();
@@ -113,7 +114,7 @@ extern bool DEBUG_ERRORS;
 		}
 		*target = i;
 	}
-	// Callback to get an ull/uint64_t value from a WIDGET widget that has char* value - returns 0 if first character is non-integer
+	//! Callback to get an ull/uint64_t value from a WIDGET widget that has char* value - returns 0 if first character is non-integer
 	template <class WIDGET>
 	static void cb_value_ull(Fl_Widget* w, void* v) {
 		const char* value = ((WIDGET*)w)->value();
@@ -127,7 +128,7 @@ extern bool DEBUG_ERRORS;
 		}
 		*target = i;
 	}
-	// Callback to get a float value from a widget that has char* - returns nan if not numeric
+	//! Callback to get a float value from a widget that has char* - returns nan if not numeric
 	template <class WIDGET>
 	static void cb_value_float(Fl_Widget* w, void* v) {
 		const char* value = ((WIDGET*)w)->value();
@@ -141,7 +142,7 @@ extern bool DEBUG_ERRORS;
 		}
 		*target = f;
 	}
-	// Callback to get a double value from a widget that has char* - returns nan if not numeric
+	//! Callback to get a double value from a widget that has char* - returns nan if not numeric
 	template <class WIDGET>
 	static void cb_value_double(Fl_Widget* w, void* v) {
 		const char* value = ((WIDGET*)w)->value();
@@ -155,26 +156,26 @@ extern bool DEBUG_ERRORS;
 		}
 		*target = d;
 	}
-	// Call back  to get an tm value from a widget that has char*
+	//! Callback to get an tm value from a widget that has char*
 	template <class WIDGET>
 	static void cb_value_tm(Fl_Widget* w, void* v) {
 		const char* value = ((WIDGET*)w)->value();
 		tm* target = (tm*)v;
 		string_to_tm(string(value), *target, "%Y%m%d");
 	}
-	// Callback to get a radio value from a set of radio buttons
+	//! Callback to get a radio value from a set of radio buttons
 	static void cb_radio(Fl_Widget* w, void* v) {
 		radio_param_t* param = (radio_param_t*)v;
 		*(param->attribute) = param->value;
 	}
-	// tip timer callback - deletes the tip window
+	//! Tooltip timer callback - deletes the tip window
 	static void cb_timer_tip(void* v) {
 		// delete the tip window displayed
 		Fl_Widget* w = (Fl_Widget*)v;
 		Fl::delete_widget(w);
 	}
 
-	// Callback that ors a number of check boxes (Fl_Check_Button or Fl_Light_Button) that implement a bit-wise attribute
+	//! Callback that ors a number of check boxes (Fl_Check_Button or Fl_Light_Button) that implement a bit-wise attribute
 	template <class WIDGET>
 	static void cb_ch_or(Fl_Widget* w, void* v) {
 		radio_param_t* param = (radio_param_t*)v;
@@ -189,10 +190,11 @@ extern bool DEBUG_ERRORS;
 		}
 	}
 
-	// Callback to provide standard behaviour when clicking in an Fl_Tree
-	// Open a tree item: But keep the children close
-	// Select an item: open it and its children
-	// Deselect: close it and its children
+	//! Callback to provide standard behaviour when clicking in an Fl_Tree
+	
+	//! Open a tree item: But keep the children close
+	//! Select an item: open it and its children
+	//! Deselect: close it and its children
 	static void cb_tree(Fl_Widget* w, void* v) {
 		Fl_Tree* that = (Fl_Tree*)w;
 		Fl_Tree_Item* item = that->callback_item();
@@ -237,7 +239,7 @@ extern bool DEBUG_ERRORS;
 		}
 	}
 
-	// Returns the selected text into the string pointed at by v
+	//! Returns the selected text into the string pointed at by v
 	static void cb_choice_text(Fl_Widget* w, void* v) {
 		Fl_Choice* choice = (Fl_Choice*)w;
 		string* enum_value = (string*)v;
