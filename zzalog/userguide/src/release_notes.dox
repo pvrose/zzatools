@@ -5,6 +5,8 @@
 - Save a copy of the latest data before each save. Upto 8 copies are saved.
 - Add further acknowledgments of third-party data and libraries.
 - Refinements to callsign parsing algorithm.
+- Added Doxygen comments to all header files. This identified a number
+of redundancies in the code that have been removed.
 - Bug fixes:
   - Errors in callsign parsing algorithm.
   - Starting to log QSO in RX.TX1 results in confusion (revoking previous mod).

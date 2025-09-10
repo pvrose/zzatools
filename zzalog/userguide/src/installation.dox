@@ -6,7 +6,7 @@ A file zzalog.msi is available from https://sourceforge.net/projects/zzalog/. Pl
 instructions to install this. ZZALOG will be installed in
 "C:\Program Files\GM3ZZA\ZZALOG\". 
 Data used by ZZALOG will be installed in 
-"C:\ProgramData\GM3ZZA\ZZALOG\"
+"C:\ProgramData\GM3ZZA\ZZALOG\".
 
 \subsection win_source Compiling from source
 
