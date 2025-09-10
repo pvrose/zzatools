@@ -457,5 +457,5 @@ bool qsl_writer::write_value(string name, bool data) {
 
 // Encrypt data and convert to hex digits
 string qsl_writer::encrypt(string s, uchar off) {
-    return string_to_hex(xor_crypt(s, seed_, off));
+    return to_hex(xor_crypt(s, seed_, off));
 }

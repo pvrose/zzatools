@@ -21,10 +21,12 @@ using namespace std;
 		virtual ~about_dialog();
 
 		//! Callback when \p OK button is clicked.
+		
 		//! \param w the clicked button
 		//! \param v not used.
 		static void cb_bn_ok(Fl_Widget* w, void* v);
 		//! Callback when \p CANCEL button clicked.
+		
 		//! \param w the clicked button
 		//! \param v not used.
 		static void cb_bn_cancel(Fl_Widget* w, void * v);

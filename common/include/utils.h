@@ -42,6 +42,7 @@ using namespace std;
 	// Conversion factors - angle
 	const double DEGREE_RADIAN = PI / 180.0;    //!< Conversion from degress to radians
 	const double RADIAN_DEGREE = 180.0 / PI;    //!< Conversion from radians to degrees
+
 	//! radius of earth in kilometres - yes I know the earth is an oblate sphere
 	const double EARTH_RADIUS = 6371.0088;
 
@@ -71,68 +72,119 @@ using namespace std;
 	string to_lower(const string& data);
 	//! Returns true if the whole string is an integer
 	bool is_integer(const string& data);
-	// Limited string search - return the position of the sought char(s) or length if not present
+	//! Returns the position of any characters in \p match in \p data (\p length): returns \p length if not found. 
 	size_t find(const char* data, size_t length, const char* match);
+	//! Returns the position of \p match in \p data (\p length): returns \p length if not found. 
 	size_t find(const char* data, size_t length, const char match);
+	//! Returns the position of string \p match (\p len_substr) in \p data (\p length): returns \p length if not found. 
 	size_t find_substr(const char* data, size_t length, const char* match, size_t len_substr);
+	//! Returns the position of any characters not in \p match in \p data (\p length): returns \p length if not found. 
 	size_t find_not(const char* data, size_t length, const char* match);
-	// Escape certain characters (when generating URLs)
+	//! \brief Returns \p text with any character in \p chars (\p allow = false) or
+	//! not in \p chars (\p allow = true) replaced with hex representation. 
 	string escape_hex(string text, bool allow, const char* chars);
+	//! Returns \p text with any non-alphanumeric characters replaced with hex representation 
 	string escape_url(string text);
+	//! Returns \p text with && and %% characters escaped for menu items.
 	string escape_menu(string text);
+	//! Returns \p text with hex characters (%%nnx) replaced by 8-bit character.
 	string unescape_hex(string text);
-	// Escape characters - add a '\' before any characters in escapees
+	//! Escape characters - Returns \p text adding a '\' before any characters in \p escapees.
 	string escape_string(const string text, const string escapees);
-	// Unescape characters - remove '\'
+	//! Unescape characters - Returns .p with '\' removed.
 	string unescape_string(const string text);
-	// Convert floating degree value to ° ' " (degree, minute, second)
+	//! \brief Returns \p value expressed as degrees, minutes and seconds: 
+	//! if \p is_lat is true treat as latitude, otherwise as longitude.
 	string degrees_to_dms(float value, bool is_lat);
-	// Convert lat long pair to gridsquare
+	//! Returns coordinate pair as gridsquare equivalent with \p num_chars characters.
 	string latlong_to_grid(lat_long_t location, int num_chars);
-	// Convert grid square to lat long pair
+	//! Returns coordinate pair for \p gridsquare.
 	lat_long_t grid_to_latlong(string gridsquare);
-	// Decode Base 64
+	//! Returns character equivalent of base64 encoded character \p c
+	
+	/*! \code
+	A-Z => 0x00 to 0x19
+	a-z => 0x1A to 0x33
+	0-9 => 0x34 to 0x3D
+    +   => 0x3E
+	/   => 0x3F
+	=   => 0xFF (padding byte)
+	\endcode
+	*/
 	unsigned char decode_base_64(unsigned char c);
+	//! Returns decoded base64 string \p s.
 	string decode_base_64(string s);
-	// Encode Base 64
+	//! Returns base64 encoding of 6-bit character \p c
+
+	/*! \code
+	A-Z <= 0x00 to 0x19
+	a-z <= 0x1A to 0x33
+	0-9 <= 0x34 to 0x3D
+	+   <= 0x3E
+	/   <= 0x3F
+	=   <= 0x40 to 0xFF
+	\endcode
+	*/
 	unsigned char encode_base_64(unsigned char c);
+	//! Returns base64 encoding of string \p s.
 	string encode_base_64(string s);
-	// Decode hex
+	//! Returns \p data as hex encoded string.
 	string to_hex(string data);
-	// Encode hex
+	//! Returns hex-encoded string \p data as string of 8-bit characters.
 	string to_ascii(string data);
-	// Decode single ch aracter
+	//! Returns string representing hex encode of \p data: a string is added in \p add_space is true.
 	string to_hex(unsigned char data, bool add_space = true);
-	// Encode single character - starting at data[ix] and incrementing ix to end of it.
+	//! \brief Returns the single 8-bit byte from hex-encoded string \p data at position \p ix, which then
+	//! points to the position after the decoded characters. 
 	unsigned char to_ascii(string data, int& ix);
-	// Convert int to BCD
+	//! Returns value in BCD format.
+	
+	//! \param value Integer to encode.
+	//! \param size umber of bytes in encoded string.
+	//! \param least_first Data returned least signficant byte first.
 	string int_to_bcd(int value, int size, bool least_first);
-	// Convert BCD to int
+	//! Returns BCD value as an integer
+	
+	//! \param least_first First byte of data is least significant.
 	int bcd_to_int(string, bool least_first);
-	// Convert BCD tp Float
+	//! Returns BCD value as a double-precision value
+
+	//! \param decimals Number of characters after the decimal point.
+	//! \param least_first First byte of data is least significant.
 	double bcd_to_double(string, int decimals, bool least_first);
-	// Convert string to hex
-	string string_to_hex(string, bool escape = false);
-	// Convert string to hex
-	string hex_to_string(string);
-	// Calculate the great circle bearing and distance between two locations on the Earth's surface
+	//! Calculate the great circle bearing and distance between two locations on the Earth's surface
+	
+	//! \param source Coordinates of location measuring from.
+	//! \param destination Coordinates of location measuring to.
+	//! \param bearing Receives the bearing from \p source to \p destination (in degress).
+	//! \param distance Receives the distance from \p sourec to \p destination (in kilometres). 
 	void great_circle(lat_long_t source, lat_long_t destination, double& bearing, double& distance);
-	// Replace '/' with '_' throughout
+	//! Replace '/' with '_' throughout \p data.
 	void de_slash(string& data);
-	// Replace '_' with '/' throughout
+	//! Replace '_' with '/' throughout \p data.
 	void re_slash(string& data);
-	// Replace '\\' with '/'
+	//! Replace '\\' (single backslass character) with '/'
 	void forward_slash(string& data);
-	// get the directroy part of a a filename
+	//! Returns the directroy part of a a filename
 	string directory(string filename);
+	//! Returns the terminal part of a filename.
 	string terminal(string filename);
-	// Simple 8-bit hash
+	//! Returns a simple 8-bit hash of \p src (zero-terminated)
 	uchar hash8(const char* src);
-	// "XOR" encrypt/decrypt - use seed and offset to define the key string
+	//! Performs "XOR" encrypt/decrypt
+	 
+	//! \param str string of chaarcters to encrypt/decrypt in-place.
+	//! \param len length of string \str. Zero-termination cannot be used 
+	//! as an encrypted value may contain them.
+	//! \param seed Seed to generate a pseudo-random sequence of characters to use as an encryption key.
+	//! \param offset Offset into generated pseudo-random sequence to start process.
 	void xor_crypt(char* str, int len, uint32_t seed, uchar offset);
+	//! Performs "XOR" encrypt/decrypt using string data and returns encrypted string.
+	
+	//! \see xor_crypt.
 	string xor_crypt(string, uint32_t seed, uchar offset);
 
-	// template function to find the enclosing widget of class WIDGET
+	//! Returns the widget of class WIDGET that encloses \p w.
 	template <class WIDGET>
 	WIDGET* ancestor_view(Fl_Widget* w) {
 		Fl_Widget* p = w;

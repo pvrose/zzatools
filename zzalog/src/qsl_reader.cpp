@@ -845,7 +845,7 @@ bool qsl_reader::parse_bool(string s) {
 
 // Decrypt stored value - stored as hex digits 
 string qsl_reader::decrypt(string s, uchar off) {
-	return xor_crypt(hex_to_string(s), seed_, off);
+	return xor_crypt(to_ascii(s), seed_, off);
 }
 // Check app version is >= version in settings file
 bool qsl_reader::check_version(string v) {

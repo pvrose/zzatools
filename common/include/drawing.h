@@ -1,4 +1,4 @@
-﻿/*! \file Standard drawing types and constants for use in views and dialogs
+﻿/*! Standard drawing types and constants for use in views and dialogs
 
 */
 
