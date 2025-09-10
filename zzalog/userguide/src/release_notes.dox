@@ -9,7 +9,7 @@
 of redundancies in the code that have been removed.
 - Bug fixes:
   - Errors in callsign parsing algorithm.
-  - Starting to log QSO in RX.TX1 results in confusion (revoking previous mod).
+  - Starting to log QSO in WSJT-X state RX.TX1 results in confusion (revoking previous mod).
   - Code check uncovered bug in base contest algorithm code.
   - Displayed clock can be a noticeable fraction of a second out.
 
