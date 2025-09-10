@@ -70,6 +70,33 @@ struct wx_report {
 };
 
 //! This class decodes a weather report receved from openweathermap.org as an XML file
+
+//! \todo Shut the stable door after the horse has bolted! Keys en-clair.
+/*! \code
+<current>
+  <city id="2656565" name="Ballater">
+    <coord lon="-3" lat="57"/>
+    <country>GB</country>
+    <timezone>3600</timezone>
+    <sun rise="2025-09-10T05:32:49" set="2025-09-10T18:45:28"/>
+  </city>
+  <temperature value="282.8" min="282.8" max="282.8" unit="kelvin"/>
+  <feels_like value="280.96" unit="kelvin"/>
+  <humidity value="86" unit="%"/>
+  <pressure value="1003" unit="hPa"/>
+  <wind>
+    <speed value="3.52" unit="m/s" name="Gentle Breeze"/>
+    <gusts value="11.9"/>
+    <direction value="143" code="SE" name="SouthEast"/>
+  </wind>
+  <clouds value="25" name="scattered clouds"/>
+  <visibility value="10000"/>
+  <precipitation mode="no"/>
+  <weather number="802" value="scattered clouds" icon="03d"/>
+  <lastupdate value="2025-09-10T07:24:59"/>
+</current>
+\endcode
+*/
 class wx_handler : public xml_reader {
 
 public:
@@ -78,9 +105,11 @@ public:
     //! Destructor.
     ~wx_handler();
 
+    //! \cond
     // openweathermap.org key
     const char* key_ = "0b2145b6b923a9561f4b4831f5d6d66f";
-
+    //! \endcond
+    
     // XML reader overloads
     // Overloadable XML handlers
     //! Start Element 
@@ -126,7 +155,7 @@ public:
     string cloud_name();
     //! Returns sunrise time
     time_t sun_rise();
-    //! Returns suset time
+    //! Returns sunset time
     time_t sun_set();
     //! Returns last updated
     time_t last_updated();
@@ -139,100 +168,134 @@ public:
 
 protected:
 
-    //! Start The overall XML container
+    //! Start The overall XML container CURRENT
     bool start_current();
-    //! end The overall XML container
+    //! end The overall XML container CURRENT
     bool end_current();
-    //! Start City data
+    //! Start CITY: Attributes id, name.
     bool start_city(map<string, string>* attributes);
+    //! End CITY
     bool end_city();
-    // City coordinates
+    //! Start COORD: Attributes lon, lat.
     bool start_coord(map<string, string>* attributes);
+    //! End COORD Element
     bool end_coord();
-    // Country
+    //! Start COUNTRY Element: Data 2-character ISO code.
     bool start_country();
+    //! End COUNTRY Element
     bool end_country();
-    // Timezone
+    //! Start TIMEZONE element: Data Delta from UTC in seconds
     bool start_timezone();
+    //! End TIMEZONE
     bool end_timezone();
-    // Sunrise/set
+    //! Start SUN element: Attributes rise, set as XML date/time format (UTC).
     bool start_sun(map<string, string>* attributes);
+    //! End SUN element
     bool end_sun();
-    // Gemperature
+    //! Start TEMPERATURE element: Attributes value, min, max, unit.
+    
+    //! Unit is celsius, fahrenheit or kelvin.
     bool start_temperature(map<string, string>* attributes);
+    //! End TEMPERATURE
     bool end_temperature();
-    // Feelslike
+    //! Start FEELS_LIKE element: Attrubutes value, unit
+
+    //! Unit is celsius, fahrenheit or kelvin.
     bool start_subjective(map<string, string>* attributes);
+    //! End FEELS_LIKE 
     bool end_subjective();
-    // Humidity
+    //! Start HUMIDITY element: Attributes value, unit
+    
+    //! Unit is percentage
     bool start_humidity(map<string, string>* attributes);
+    //! End HUMIDITY
     bool end_humidity();
-    // Pressure
+    //! Start PRESSURE element : Attributes value unit
+    
+    //! Unit is hPa (hectopascal)
     bool start_pressure(map<string, string>* attributes);
+    //! End PRESSURE
     bool end_pressure();
-    //Wind
+    //! Start WIND element
     bool start_wind();
+    //! End WIND
     bool end_wind();
-    // Wind speed
+    //! Start (WIND)SPEED element: Attributes value, unit name
+     
+    //! Unit is m/s (meters per second) or mph (miles per hour)
     bool start_wind_speed(map<string, string>* attributes);
+    //! End WIND(SPEED)
     bool end_wind_speed();
-    // Wind direction
+    //! Start WIND(DIRECTION) element: Attributes value, code, name
     bool start_wind_dirn(map<string, string>* attributes);
+    //! End WIND(DIRECTION)
     bool end_wind_dirn();
-    // Win d gusts
+    //! Start WIND(GUSTS) element: Attributes value
     bool start_gusts(map<string, string>* attributes);
+    //! End WIND(GUSTS)
     bool end_gusts();
-    // Cloud cover
+    //! Start CLOUDS element: Attributes value name - value in percentage
     bool start_clouds(map<string, string>* attributes);
+    //! End CLOUDS
     bool end_clouds();
-    // Visibility
+    //! Start VISIBILITY element: attributes value - value in metres (maximum 10 km)
     bool start_visibility(map<string, string>* attributes);
+    //! End VISIBILITY
     bool end_visibility();
-    // Precipitation
+    //! Start PRECIPITATION element: attributes mode
     bool start_precipitation(map<string, string>* attributes);
+    //! End PRECIPITATION
     bool end_precipitation();
-    // Overall weathre
+    //! Start WEATHER element: attributes number, value, icon
     bool start_weather(map<string, string>* attributes);
+    //! End WEATHER
     bool end_weather();
-    // Last update
+    //! Start LASTUPDATE element: attributes value - value in XML date/time format (UTC)
     bool start_updated(map<string, string>* attributes);
+    //! End LASTUPDATE
     bool end_update();
-    // Error handling
+    //! Start CLIENTEROR element
     bool start_clienterror();
+    //! End CLIENTERROR
     bool end_clienterror();
-    // Error code
+    //! Start COD element: data error code.
     bool start_cod();
+    //! End COD
     bool end_cod();
-    // Error message
+    //! Start MESSAGE element: data error message.
     bool start_message();
+    //! End MESSAGE
     bool end_message();
 
 
-    // Convert ISO format to time_t
+    //! Convert ISO format to time_t
+    
+    //! \todo isn't this also implemented in xml_reader?
     time_t convert_date(string s);
-    // Fetch icon
+    //! Fetch icon
     Fl_Image* fetch_icon(string name);
 
-    // Run the fetch thread
+    //! Run the fetch thread
     static void do_thread(wx_handler* that);
-    // The thread
+    //! The fetch thread
     thread* wx_thread_;
-    // Thread control
+    //! True when data has been received from weather server
     atomic<bool> wx_valid_;
+    //! True start fetching data from weather server.
     atomic<bool> wx_fetch_;
 
 
-    // Current elements being processed
+    //! Stack of elements currently being processed
     list<wxe_element_t> elements_;
-    // Current weather report
+    //! Current weather report
     wx_report report_;
-    // Element data
+    //! Element data
     string element_data_;
-    // Unit value
+    //! Unit value
     string unit_;
-    // Error code
+    //! Error code
     int error_code_;
-    // Error message
+    //! Error message
     string error_message_;
 
 };
