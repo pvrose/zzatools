@@ -130,7 +130,6 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 				if (!in.good()) if (in.eof()) result = LR_EOF; else result = LR_BAD;
 				// Read data item value
 				for (unsigned int u = 0; u < count && in.good(); u++) {
-					// Add CR if LF seen without previous CR - TODO: do we need to handle CR only?
 					// adjust number of bytes read as count assumes CR/LF pairs.
 					if (c == '\n' && (value.length() == 0 || value.back() != '\r')) {
 						value += '\r';

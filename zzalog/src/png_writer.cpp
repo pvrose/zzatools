@@ -141,9 +141,6 @@ bool png_writer::initialise_png() {
 	png_time ts;
 	png_convert_from_time_t(&ts, now);
 	png_set_tIME(png_, info_, &ts);
-	// Add metadate
-	// TODO:
-
 	// Write all data so far
 	png_write_info(png_, info_);
 

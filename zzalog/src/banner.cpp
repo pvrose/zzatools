@@ -235,7 +235,6 @@ void banner::add_message(status_t type, const char* msg) {
 	}
 	copy_msg_display(type, msg);
 	redraw();
-	// TODO: This appears to cause more trouble than it is worth.
 	if (visible()) Fl::check();
 }
 

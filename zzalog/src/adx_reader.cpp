@@ -442,7 +442,6 @@ bool adx_reader::start_adx() {
 	}
 	// Note we are processing <ADX>...</ADX>
 	elements_.push_back(AET_ADX);
-	// Empty the book - TODO: should we already have an empty book?
 	my_book_->clear();
 	return false;
 }
