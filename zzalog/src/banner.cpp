@@ -103,7 +103,7 @@ void banner::create_form() {
 	int curr_x = x() + GAP;
 	int curr_y = y() + GAP;
 	
-	Fl_Group* g_top = new Fl_Group(curr_x, curr_y, WOP + HICON, H_TOP);
+	Fl_Group* g_top = new Fl_Group(x(), curr_y, w(), H_TOP);
 	g_top->box(FL_FLAT_BOX);
 
 	Fl_Group* g_topleft = new Fl_Group(curr_x, curr_y, HICON, HICON + HMULT + GAP);
