@@ -994,7 +994,6 @@ void qsl_editor::cb_callsign(Fl_Widget* w, void* v) {
 	that->data_ = qsl_dataset_->get_card(that->callsign_, that->qsl_type_, true);
 	that->qsl_->set_card(that->data_);
 	if (that->data_->filename_valid) {
-		that->filedata_.filename = &(that->data_->filename);
 		that->ip_filename_->value(that->data_->filename.c_str());
 		that->ip_filename_->user_data(&that->data_->filename);
 	}
@@ -1095,7 +1094,6 @@ void qsl_editor::cb_qsl_type(Fl_Widget* w, void* v) {
 	that->data_ = qsl_dataset_->get_card(that->callsign_, that->qsl_type_, true);
 	that->qsl_->set_card(that->data_);
 	if (that->data_->filename_valid) {
-		that->filedata_.filename = &(that->data_->filename);
 		that->ip_filename_->value(that->data_->filename.c_str());
 		that->ip_filename_->user_data(&that->data_->filename);
 	}

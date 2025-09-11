@@ -42,41 +42,6 @@ extern bool DEBUG_ERRORS;
 		}
 	};
 
-	// Datatype to pass to a file/directory browse button call back
-	//! \todo There is still one location this is used.
-	struct browser_data_t {
-		// Message for the file browser label
-		string message;
-		// The file pattern (e.g. *.txt)
-		string pattern;
-		// Initial filename
-		string* filename;
-		// Bool variable to receive the enable check value
-		bool* enable;
-		// The input widget to receive the selected filename
-		Fl_Input* input_w;
-		// The check widget to receive the enablr
-		Fl_Check_Button* enable_w;
-		// DEfault constructor
-		browser_data_t() {
-			message = "";
-			pattern = "";
-			filename = nullptr;
-			enable = nullptr;
-			input_w = nullptr;
-			enable_w = nullptr;
-		}
-		// Initialising constructor
-		browser_data_t(string m, string p, string* f, bool* e, Fl_Input* i, Fl_Check_Button* w) {
-			message = m;
-			pattern = p;
-			filename = f;
-			enable = e;
-			input_w = i;
-			enable_w = w;
-		}
-	};
-
 	// Common callbacks
 
 	//! Template callback to get a DATA value from a WIDGET widget - compiler should catch incompatible value types

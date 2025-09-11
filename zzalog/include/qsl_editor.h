@@ -132,9 +132,7 @@ protected:
 
     //! Station callsign to read parameters.
     string callsign_;
-    //! Data for file browser
-    browser_data_t filedata_;
-    // display window coordinates
+   // display window coordinates
     int win_x_;     //!< X coordinate of display window.
     int win_y_;     //!< Y coordinate of display window.
     //! Use current QSO as an example image.
