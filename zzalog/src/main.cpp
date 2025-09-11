@@ -396,7 +396,6 @@ void show_help() {
 	"\t-p|--private\tDo not update recent files list\n"
 	"\t-q|--quiet\tDo not publish QSOs to online sites (sticky)\n"
 	"\t-r|--read_only\tOpen file in read only mode\n"
-	"\t-s|--new-settings\tUse new settings file\n"
 	"\t-t|--test\tTest mode: infers -q -w\n"
 	"\t-u|--usual\tNormal mode: infers -a -n\n"
 	"\t-w|--wait_save\tDo not automatically save each change (sticky)\n"
