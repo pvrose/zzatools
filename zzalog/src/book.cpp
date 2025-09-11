@@ -1681,7 +1681,8 @@ bool book::has_record(record* qso) {
 void book::add_dirty_record(record* qso, string reason) {
 	if (has_record(qso)) { 
 		if (!main_loading_)
-			printf("Marking %s %s %s dirty - %s\n",
+			printf("%s Marking %s %s %s dirty - %s\n",
+				OBJECT_NAMES.at(book_type_),
 				qso->item("QSO_DATE").c_str(),
 				qso->item("TIME_ON").c_str(),
 				qso->item("CALL").c_str(),
@@ -1691,7 +1692,7 @@ void book::add_dirty_record(record* qso, string reason) {
 	}
 	else if (qso == header_) {
 		if (!main_loading_)
-			printf("Marking header dirty - %s", reason.c_str());
+			printf("%s Marking header dirty - %s", OBJECT_NAMES.at(book_type_), reason.c_str());
 		dirty_qsos_.insert(qso);
 		been_modified_ = true;
 	}
@@ -1699,7 +1700,12 @@ void book::add_dirty_record(record* qso, string reason) {
 
 // Remove this record from the dirty set
 void book::delete_dirty_record(record* qso) {
-	if (has_record(qso)) {
+	if (is_dirty_record(qso)) {
+		printf("%s Marking %s %s %s clean\n",
+			OBJECT_NAMES.at(book_type_),
+			qso->item("QSO_DATE").c_str(),
+			qso->item("TIME_ON").c_str(),
+			qso->item("CALL").c_str());
 		dirty_qsos_.erase(qso);
 	}
 }
