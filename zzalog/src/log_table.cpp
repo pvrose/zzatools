@@ -855,6 +855,7 @@ void log_table::dbl_click_column(int col) {
 		case SORTED_DOWN:
 			if (field_info.field == sorted_field_) {
 				// If sorting on same field, sort up the way
+				((extract_data*)my_book_)->correct_record_order();
 				((extract_data*)my_book_)->sort_records(field_info.field, false);
 				order_ = SORTED_UP;
 			}
@@ -868,6 +869,7 @@ void log_table::dbl_click_column(int col) {
 		case SORTED_UP:
 			if (field_info.field == sorted_field_) {
 				// If sorting on same field, sort down the way
+				((extract_data*)my_book_)->correct_record_order();
 				((extract_data*)my_book_)->sort_records(field_info.field, true);
 				order_ = SORTED_DOWN;
 			}
