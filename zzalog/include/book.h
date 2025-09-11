@@ -543,10 +543,6 @@ using namespace std;
 		int number_dupes_removed_;
 		//! Number of possible duplicate records not deleted.
 		int number_dupes_kept_;
-		//! Flag that indicates that the book has been modified
-		
-		//! \todo Check whether this can be replaced using a function of dirty_qsos_?
-		bool been_modified_;
 		//! File loading
 		
 		//! \todo Is this still required. It is used, but for what.

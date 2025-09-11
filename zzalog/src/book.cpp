@@ -81,7 +81,6 @@ book::book(object_t type)
 	, save_in_progress_(false)
 	, delete_in_progress_(false)
 	, old_record_(nullptr)
-	, been_modified_(false)
 	, main_loading_(false)
 	, save_level_(0)
 	, adi_reader_(nullptr)
@@ -841,7 +840,6 @@ void book::delete_record(bool force) {
 			// Tell the views a record has been deleted and to redraw from the current selection
 			selection(current_item_, HT_DELETED);
 			new_record_ = false;
-			been_modified_ = true;
 			deleted_record_ = true;
 			// After selection has done its all can allow another delete
 			delete_in_progress_ = false;
@@ -1592,7 +1590,7 @@ bool book::upload_qso(qso_num_t record_num) {
 
 // Return the been_modified_ flag
 bool book::been_modified() {
-	return been_modified_;
+	return is_dirty();
 }
 
 // return entrring new record
@@ -1688,13 +1686,11 @@ void book::add_dirty_record(record* qso, string reason) {
 				qso->item("CALL").c_str(),
 				reason.c_str());
 		dirty_qsos_.insert(qso);
-		been_modified_ = true;
 	}
 	else if (qso == header_) {
 		if (!main_loading_)
 			printf("%s Marking header dirty - %s", OBJECT_NAMES.at(book_type_), reason.c_str());
 		dirty_qsos_.insert(qso);
-		been_modified_ = true;
 	}
 }
 
