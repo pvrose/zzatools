@@ -15,6 +15,8 @@ of redundancies in the code that have been removed.
   - Code check uncovered bug in base contest algorithm code.
   - Displayed clock can be a noticeable fraction of a second out.
   - If there are no QSLs to upload an empty extract is displayed which cannot be cleared from qso_qsl.
+  - Occasionally not all records marked clean after eQSL download
+   completes and writes data back to filestore.
 
 \section rev_366 Revision 3.6.6
 
