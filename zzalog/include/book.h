@@ -543,9 +543,7 @@ using namespace std;
 		int number_dupes_removed_;
 		//! Number of possible duplicate records not deleted.
 		int number_dupes_kept_;
-		//! File loading
-		
-		//! \todo Is this still required. It is used, but for what.
+		//! File loading: used to validate updates to dynamic enumerations.
 		bool main_loading_;
 		//! Save enabled level.
 		
