@@ -566,9 +566,15 @@ void qso_qsl::qsl_extract(extract_data::extract_mode_t server) {
 		enable_widgets();
 		extract_records_->extract_qsl(server);
 		extract_in_progress_ = false;
-		tabbed_forms_->activate_pane(OT_EXTRACT, true);
-		navigation_book_->selection(0);
-		via_code_ = "";
+		if (extract_records_->size()) {
+			// If there are records to upload then display them
+			tabbed_forms_->activate_pane(OT_EXTRACT, true);
+			navigation_book_->selection(0);
+			via_code_ = "";
+		}
+		else {
+			tabbed_forms_->activate_pane(OT_EXTRACT, false);
+		}
 		enable_widgets();
 	} else {
 		status_->misc_status(ST_ERROR, "Not ready to extract - finish operating");

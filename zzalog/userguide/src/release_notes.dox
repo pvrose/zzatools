@@ -14,6 +14,7 @@ of redundancies in the code that have been removed.
   - Starting to log QSO in WSJT-X state RX.TX1 results in confusion (revoking previous mod).
   - Code check uncovered bug in base contest algorithm code.
   - Displayed clock can be a noticeable fraction of a second out.
+  - If there are no QSLs to upload an empty extract is displayed which cannot be cleared from qso_qsl.
 
 \section rev_366 Revision 3.6.6
 
