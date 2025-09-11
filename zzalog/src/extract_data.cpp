@@ -957,27 +957,23 @@ void extract_data::add_record(qso_num_t record_num) {
 	qso_manager_->enable_widgets();
 }
 
-// Swap two records
-void extract_data::swap_records(item_num_t first, item_num_t second) {
-	// Swap records
-	record* record_1 = at(first);
-	at(first) = at(second);
-	at(second) = record_1;
-	// Swap mapping data
-	qso_num_t record_num_1 = mapping_.at(first);
-	mapping_.at(first) = mapping_.at(second);
-	mapping_.at(second) = record_num_1;
-	// Repair the reverse mapping
-	rev_mapping_[mapping_.at(first)] = first;
-	rev_mapping_[mapping_.at(second)] = second;
-}
-
+// Compare records
 bool extract_data::comp_records(record* lhs, record* rhs, string field, bool reversed) {
-	if (reversed) {
-		return rhs->item(field) < lhs->item(field);
+	if (field.length()) {
+		if (reversed) {
+			return rhs->item(field) < lhs->item(field);
+		}
+		else {
+			return lhs->item(field) < rhs->item(field);
+		}
 	}
 	else {
-		return lhs->item(field) < rhs->item(field);
+		if (reversed) {
+			return rhs->timestamp() < lhs->timestamp();
+		}
+		else {
+			return lhs->timestamp() < rhs->timestamp();
+		}
 	}
 }
 
@@ -1063,35 +1059,36 @@ int extract_data::pick_node(sort_node* n) {
 
 // Undo the above sort 
 void extract_data::correct_record_order() {
-	fl_cursor(FL_CURSOR_WAIT);
-	item_num_t count = size();
-	int num_scans = 0;
-	char message[100];
-	snprintf(message, 100, "EXTRACT: Starting sorting %zu records on date/time", size());
-	status_->misc_status(ST_NOTE, message);
-	status_->progress(size(), book_type(), "Undoing custom sort", "Sorting passes");
-	// Repeat until we no longer swap anything
-	// NB: We may have to implement more efficient sort algorithm, if size() increases much.
-	// Current 2K+ records takes a couple of seconds
-	while (count > 0) {
-		count = 0;
-		// Compare each record with its immediate follower - swap if it's larger
-		for (item_num_t ix = 0; ix < size() - 1; ix++) {
-			if (*at(ix) > *at(ix + 1)) {
-				swap_records(ix, ix + 1);
-				count++;
-			}
-		}
-		num_scans++;
-		status_->progress(num_scans, book_type());
-	}
-	snprintf(message, 100, "EXTRACT: Done - %d passes required", num_scans);
-	status_->misc_status(ST_OK, message);
-	// Note may have taken fewer passes than primed progress bar with - stop progress if it has
-	if (num_scans < (signed)size()) {
-		status_->progress("Taken fewer passes", book_type());
-	}
-	fl_cursor(FL_CURSOR_DEFAULT);
+	sort_records("", false);
+	//fl_cursor(FL_CURSOR_WAIT);
+	//item_num_t count = size();
+	//int num_scans = 0;
+	//char message[100];
+	//snprintf(message, 100, "EXTRACT: Starting sorting %zu records on date/time", size());
+	//status_->misc_status(ST_NOTE, message);
+	//status_->progress(size(), book_type(), "Undoing custom sort", "Sorting passes");
+	//// Repeat until we no longer swap anything
+	//// NB: We may have to implement more efficient sort algorithm, if size() increases much.
+	//// Current 2K+ records takes a couple of seconds
+	//while (count > 0) {
+	//	count = 0;
+	//	// Compare each record with its immediate follower - swap if it's larger
+	//	for (item_num_t ix = 0; ix < size() - 1; ix++) {
+	//		if (*at(ix) > *at(ix + 1)) {
+	//			swap_records(ix, ix + 1);
+	//			count++;
+	//		}
+	//	}
+	//	num_scans++;
+	//	status_->progress(num_scans, book_type());
+	//}
+	//snprintf(message, 100, "EXTRACT: Done - %d passes required", num_scans);
+	//status_->misc_status(ST_OK, message);
+	//// Note may have taken fewer passes than primed progress bar with - stop progress if it has
+	//if (num_scans < (signed)size()) {
+	//	status_->progress("Taken fewer passes", book_type());
+	//}
+	//fl_cursor(FL_CURSOR_DEFAULT);
 }
 
 // Return whether an existing upload is in progress

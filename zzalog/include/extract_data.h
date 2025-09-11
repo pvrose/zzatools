@@ -61,7 +61,7 @@ using namespace std;
 		void extract_call(string callsign);
 		//! Add record with index \p record_num in full logbook to the extracted book.
 		void add_record(qso_num_t record_num);
-		//! Sort records by \p field_name, in reverse order if \p reverse is set.
+		//! Sort records by \p field_name (timestamp if empty string), in reverse order if \p reverse is set.
 		void sort_records(string field_name, bool reverse);
 		//! Special extract (\p for reason = NO_NAME, NO_QTH, LOCATOR).
 		void extract_special(extract_mode_t reason);
@@ -129,14 +129,13 @@ using namespace std;
 		string short_comment();
 		//! Swap two records.
 		
-		//! \todo This was used in a linear sort algorithm. It still appears to
-		//! be used in correct_record_order().
-		void swap_records(item_num_t record_num_1, item_num_t record_num_2);
 		//! Check \p qso is within the extraction criteria
 		bool meets_criteria(record* qso);
 
 		//! Returns true if \p field in \p lhs QSO is less than \p rhs QSO unless
 		//! \p reversed is true.
+		
+		//! If field is an empty string, then the timestamp is used.
 		bool comp_records(record* lhs, record* rhs, string field, bool reversed);
 
 		//! The list of extract criteria

@@ -8,6 +8,7 @@
 - Added Doxygen comments to all header files. This identified a number
 of redundancies in the code that have been removed.
 - Included hamlib v4.6.5 in Windows build.
+- Address performance issues in sorting extracted data.
 - Cosmetic changes.
 - Bug fixes:
   - Errors in callsign parsing algorithm.
