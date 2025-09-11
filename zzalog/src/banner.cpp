@@ -51,9 +51,6 @@ std::thread::id main_thread_id_ = std::this_thread::get_id();
 
 banner::banner(int W, int H, const char* L) :
 	Fl_Double_Window(W, H, L)
-	, large_(false)
-	, h_large_(0)
-	, h_small_(0)
 	, can_close_(false)
 {
 	// Set the ticker for 2 seconds
@@ -100,18 +97,40 @@ void banner::draw() {
 void banner::create_form() {
 	const int HMULT = 2 * HBUTTON;
 	const int HICON = HMULT * 2 + GAP;
-	const int WOP = WEDIT * 2;
-	const int WCL = HICON + GAP + WOP;
+	const int WOP = w() - GAP - GAP - HICON - GAP;
+	const int H_TOP = HMULT + GAP + HMULT + GAP + HMULT + GAP;
+
 	int curr_x = x() + GAP;
 	int curr_y = y() + GAP;
+	
+	Fl_Group* g_top = new Fl_Group(curr_x, curr_y, WOP + HICON, H_TOP);
+	g_top->box(FL_FLAT_BOX);
 
+	Fl_Group* g_topleft = new Fl_Group(curr_x, curr_y, HICON, HICON + HMULT + GAP);
+	g_topleft->box(FL_FLAT_BOX);
 	// Create a box to hild the icon and resize it thereinto
 	bx_icon_ = new Fl_Box(curr_x, curr_y, HICON, HICON);
 	Fl_Image* image = main_icon_.copy();
 	image->scale(HICON, HICON);
 	bx_icon_->image(image);
 
+	curr_y += HICON + GAP;
+	// Progress "clock"
+	fd_progress_ = new Fl_Fill_Dial(curr_x + HICON - HMULT, curr_y, HMULT, HMULT);
+	fd_progress_->minimum(0.0);
+	fd_progress_->maximum(1.0);
+	fd_progress_->color(FL_BACKGROUND_COLOR);
+	fd_progress_->angles(180, 540);
+	fd_progress_->box(FL_OVAL_BOX);
+
+	g_topleft->end();
+
 	curr_x += HICON + GAP;
+	curr_y = y() + GAP;
+
+	Fl_Group* g_topright = new Fl_Group(curr_x, curr_y, WOP, H_TOP);
+	g_topright->box(FL_FLAT_BOX);
+
 	// Output to display low severity (< WARNING) message
 	op_msg_low_ = new Fl_Multiline_Output(curr_x, curr_y, WOP, HMULT);
 	op_msg_low_->wrap(true);
@@ -122,24 +141,8 @@ void banner::create_form() {
 	op_msg_high_ = new Fl_Multiline_Output(curr_x, curr_y, WOP, HMULT);
 	op_msg_high_->wrap(true);
 	op_msg_high_->textsize(FL_NORMAL_SIZE);
+
 	curr_y = max(curr_y + HMULT, y() + GAP + HICON) + GAP;
-	curr_x = x() + GAP;
-
-	// button to pull down the full text display
-	bn_pulldown_ = new Fl_Button(curr_x, curr_y, HMULT, HBUTTON, "Full");
-	bn_pulldown_->callback(cb_bn_pulldown, nullptr);
-	bn_pulldown_->labelsize(FL_NORMAL_SIZE);
-
-	curr_x += HMULT + GAP;
-	// Progress "clock"
-	fd_progress_ = new Fl_Fill_Dial(curr_x, curr_y, HMULT, HMULT);
-	fd_progress_->minimum(0.0);
-	fd_progress_->maximum(1.0);
-	fd_progress_->color(FL_BACKGROUND_COLOR);
-	fd_progress_->angles(180, 540);
-	fd_progress_->box(FL_OVAL_BOX);
-
-	curr_x = op_msg_high_->x();
 
 	// Progress message
 	op_prog_title_ = new Fl_Output(curr_x, curr_y, WOP, HBUTTON);
@@ -147,21 +150,39 @@ void banner::create_form() {
 
 	curr_y += HBUTTON;
 	// Progress value
-	bx_prog_value_ = new Fl_Box(curr_x, curr_y, WEDIT, HBUTTON);
+	bx_prog_value_ = new Fl_Box(curr_x, curr_y, WOP, HBUTTON);
 	bx_prog_value_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 
-	curr_y += HBUTTON;
+	curr_x = x() + GAP;
 
-	bx_closing_ = new Fl_Box(bx_icon_->x(), bx_icon_->y(), WCL, HICON, "CLOSING!");
+	g_topright->end();
+	g_top->resizable(g_topright);
+	g_top->end();
+
+
+	curr_x = op_msg_high_->x();
+
+	bx_closing_ = new Fl_Box(bx_icon_->x(), bx_icon_->y(), w(), HICON, "CLOSING!");
 	bx_closing_->labelsize(FL_NORMAL_SIZE * 5);
 	bx_closing_->labelcolor(FL_YELLOW);
 	bx_closing_->box(FL_BORDER_FRAME);
 	bx_closing_->hide();
 
-	int max_x = curr_x + WOP;
 	curr_x = x() + GAP;
+	curr_y += fd_progress_->h();
 
-	Fl_Box* bx_copyright = new Fl_Box(curr_x, curr_y, max_x - x(), HBUTTON);
+	int h_display = h() - (curr_y + HBUTTON);
+
+	// Text display for all messages
+	display_ = new Fl_Text_Display(curr_x, curr_y, w() - GAP - GAP, h_display);
+	display_->color(STATUS_COLOURS.at(ST_NONE).bg);
+	Fl_Text_Buffer* text = new Fl_Text_Buffer;
+	display_->buffer(text);
+	Fl_Text_Buffer* style = new Fl_Text_Buffer;
+	display_->highlight_data(style, &style_table_[0], NUMBER_STYLES, ' ', nullptr, nullptr);
+
+	curr_y += display_->h();
+	Fl_Box* bx_copyright = new Fl_Box(curr_x, curr_y, w() - GAP - GAP, HBUTTON);
 	char msg[128];
 	snprintf(msg, sizeof(msg), "%s %s     ", COPYRIGHT.c_str(), CONTACT.c_str());
 	bx_copyright->copy_label(msg);
@@ -169,21 +190,9 @@ void banner::create_form() {
 	bx_copyright->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 
 	curr_y += HBUTTON + GAP;
-	h_small_ = curr_y - y();
 
-	curr_x = x() + GAP;
-	// Text display for all messages
-	display_ = new Fl_Text_Display(curr_x, curr_y, max_x - curr_x, 10 * HBUTTON);
-	display_->color(STATUS_COLOURS.at(ST_NONE).bg);
-	Fl_Text_Buffer* text = new Fl_Text_Buffer;
-	display_->buffer(text);
-	Fl_Text_Buffer* style = new Fl_Text_Buffer;
-	display_->highlight_data(style, &style_table_[0], NUMBER_STYLES, ' ', nullptr, nullptr);
-
-	h_large_ = h_small_ + display_->h() + GAP;
-
-	resizable(nullptr);
-	size(max_x + GAP - x(), h_small_);
+	resizable(display_);
+	size_range(w(), h());
 	// Center the banner in the middle of the screen (windows manager permitting)
 	int sx, sy, sw, sh;
 	Fl::screen_xywh(sx, sy, sw, sh, x(), y());
@@ -323,19 +332,6 @@ void banner::cancel_progress(const char* msg) {
 	op_prog_title_->value(text);
 	redraw();
 	if (visible()) Fl::check();
-}
-
-// Callback - drop down viewer
-void banner::cb_bn_pulldown(Fl_Widget* w, void* v) {
-	banner* that = ancestor_view<banner>(w);
-	if (that->h() == that->h_small_) {
-		that->size(that->w(), that->h_large_);
-	}
-	else {
-		that->size(that->w(), that->h_small_);
-	}
-	that->redraw();
-
 }
 
 // Callback - close button - ignore

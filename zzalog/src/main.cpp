@@ -1022,7 +1022,7 @@ int main(int argc, char** argv)
 	// Ctreate status to handle status messages
 	status_ = new status();
 	// Create banner
-	banner_ = new banner(100, 100);
+	banner_ = new banner(400, 200);
 	string title = PROGRAM_ID + " " + PROGRAM_VERSION;
 	banner_->copy_label(title.c_str());
 

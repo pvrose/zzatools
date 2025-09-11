@@ -69,11 +69,6 @@ public:
     //! by the system close button.
     void allow_close();
  
-    //! Callback - the button "Full" has been clicked. 
-    
-    //! This changes the state of the banner between showing the message history widget 
-    //! and not shwoing it.
-    static void cb_bn_pulldown(Fl_Widget* w, void* v);
     //! Callback - system close button.
     
     //! The callback normally ignores the click of this button, but can
@@ -94,7 +89,6 @@ protected:
 
     // Widgets
     Fl_Box* bx_icon_;                   //!< holder for the ZZALOG icon.
-    Fl_Button* bn_pulldown_;            //!< "Full" button.
     Fl_Fill_Dial* fd_progress_;         //!< progress "clock".
     Fl_Multiline_Output* op_msg_low_;   //!< output for low cetegory messages (ST_WARNING and below).
     Fl_Multiline_Output* op_msg_high_;  //!< output for high category messages (ST_ERROR and above).
@@ -103,12 +97,6 @@ protected:
     Fl_Text_Display* display_;          //!< display for message history log.
     Fl_Box* bx_closing_;                //!< container for "CLOSING" message.
 
-    //! Overall height - without message history display.
-    int h_small_;
-    //! Overall height - with message history display.
-    int h_large_;
-    //! Message history is being displayed.
-    bool large_;
     //! Progress maximum value
     uint64_t max_value_;
     //! Delta value to trigger update of progress. Set to a fixed fraction of the maximum value.
