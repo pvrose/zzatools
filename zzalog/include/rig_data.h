@@ -52,12 +52,8 @@ public:
 protected:
     //! Load data from rigs.xml
     void load_data();
-    //! Load data from rigs.xml.
-    bool load_xml();
     //! Store data  to rigs,xml.
     bool store_data();
-    //! Store data to rigs.xml.
-    bool store_xml();
     //! Configuration data for all rigs.
     map<string, rig_data_t*> data_;
     //! Load failed.

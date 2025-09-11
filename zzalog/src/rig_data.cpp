@@ -65,39 +65,22 @@ rig_data_t* rig_data::get_rig(string rig) {
 }
 
 void rig_data::load_data() {
-    Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
-    if (!load_xml()) {
-        load_failed_ = true;
-    }
-}
-
-bool rig_data::store_data() {
-    if (!load_failed_) {
-        Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
-        settings.delete_group("CAT");
-        return store_xml();
-    }
-    else {
-        return false;
-    }
-}
-
-bool rig_data::load_xml() {
     string filename = default_data_directory_ + "rigs.xml";
+    load_failed_ = false;
     ifstream is;
     is.open(filename, ios_base::in);
     if (is.good()) {
         rig_reader* reader = new rig_reader();
         if(reader->load_data(&data_, is)) {
             status_->misc_status(ST_OK, "RIG DATA: XML loaded OK");
-            return true;
+            return;
         } 
     }
     status_->misc_status(ST_WARNING, "RIG DATA: XML data failed to load");
-    return false;
+    load_failed_ = true;
 }
 
-bool rig_data::store_xml() {
+bool rig_data::store_data() {
     string filename = default_data_directory_ + "rigs.xml";
     ofstream os;
     os.open(filename, ios_base::out);
