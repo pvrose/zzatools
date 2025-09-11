@@ -451,12 +451,6 @@ void add_properties() {
 	Fl_Tooltip::size(size);
 	Fl_Tooltip::font(font);
 	Fl_Tooltip::delay(duration);
-	// Default message properties
-	fl_message_size_ = FL_NORMAL_SIZE;
-	fl_message_font_ = 0;
-	fl_message_title_default(PROGRAM_ID.c_str());
-	// Default scrollbar
-	Fl::scrollbar_size(10);
 }
 
 // Get the recent files from settings
@@ -831,6 +825,12 @@ void customise_fltk() {
 	fl_add_symbol("eyeopen", &draw_eyeopen, true);
 	fl_add_symbol("calendar", &draw_calendar, true);
 	fl_add_symbol("mail", &draw_mail, true);
+	// Default message properties
+	fl_message_size_ = FL_NORMAL_SIZE;
+	fl_message_font_ = 0;
+	fl_message_title_default(PROGRAM_ID.c_str());
+	// Default scrollbar
+	Fl::scrollbar_size(10);
 }
 
 // Some switches get saved between sessions - so-called sticky switches

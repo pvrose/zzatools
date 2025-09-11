@@ -269,7 +269,6 @@ void print_args(int argc, char** argv);
 //! \return true if the QSO is within the surrent session.
 bool in_current_session(record* this_record);
 //! Customises various aspects when using FLTK widgets
-//! \todo Merge with add_properties?
 void customise_fltk();
 //! Read the sticky switches from the settings.
 void read_saved_switches();
