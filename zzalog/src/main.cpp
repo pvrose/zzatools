@@ -396,7 +396,6 @@ void show_help() {
 	"\t-p|--private\tDo not update recent files list\n"
 	"\t-q|--quiet\tDo not publish QSOs to online sites (sticky)\n"
 	"\t-r|--read_only\tOpen file in read only mode\n"
-	"\t-s|--new-settings\tUse new settings file\n"
 	"\t-t|--test\tTest mode: infers -q -w\n"
 	"\t-u|--usual\tNormal mode: infers -a -n\n"
 	"\t-w|--wait_save\tDo not automatically save each change (sticky)\n"
@@ -625,7 +624,6 @@ void main_window_label(string text) {
 	// e.g. ZZALOG 3.0.0: <filename> - PROGRAM_VERSION includes (Debug) if compiled under _DEBUG
 	string label = PROGRAM_ID + " " + PROGRAM_VERSION + ": " + text;
 	main_window_->copy_label(label.c_str());
-	printf("%s\n", label.c_str());
 }
 
 // Create the main window
@@ -979,6 +977,8 @@ int main(int argc, char** argv)
 {
 	// Allow the main thread to respond to Fl::awake() requests
 	Fl::lock();
+	// 
+	printf("%s %s: Loading...\n", PROGRAM_ID.c_str(), PROGRAM_VERSION.c_str());
 	// Parse command-line arguments - accept FLTK standard arguments and custom ones (in cb_args)
 	int i = 1;
 	Fl::args(argc, argv, i, cb_args);
@@ -1048,6 +1048,7 @@ int main(int argc, char** argv)
 	Fl::check();
 	// Read in log book data - uses progress - use supplied argument for filename
 	add_book(filename_);
+	printf("%s\n", main_window_->label());
 	Fl::check();
 	// Connect to the rig - load all hamlib backends once only here
 	load_rig_data();
