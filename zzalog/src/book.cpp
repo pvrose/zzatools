@@ -601,7 +601,7 @@ item_num_t book::selection() {
 // Insert a record in its chronological position 
 qso_num_t book::insert_record(record* record) {
 	// Always mark a new record dirty
-	add_dirty_record(record);
+	add_dirty_record(record, "Inserting record");
 	// Get the offset where to add the record and insert it into the array
 	item_num_t pos_record = get_insert_point(record);
 	insert_record_at(pos_record, record);
@@ -611,7 +611,7 @@ qso_num_t book::insert_record(record* record) {
 // Append a record at the end of the book
 item_num_t book::append_record(record* record) {
 	// Always mark a new record dirty
-	add_dirty_record(record);
+	add_dirty_record(record, "Appending record");
 	item_num_t pos_record = size();
 	insert_record_at(pos_record, record);
 	return pos_record;
@@ -724,7 +724,7 @@ void book::insert_record_at(item_num_t pos_record, record* record) {
 	// get the iterator to the insert position
 	insert(begin() + pos_record, record);
 	if (!loading()) {
-		add_dirty_record(record);
+		add_dirty_record(record, "Inserting record");
 	}
 	if (book_type_ == OT_MAIN) {
 		// Update summary lookups
@@ -1678,12 +1678,20 @@ bool book::has_record(record* qso) {
 }
 
 // Add this record to the dirty set
-void book::add_dirty_record(record* qso) {
+void book::add_dirty_record(record* qso, string reason) {
 	if (has_record(qso)) { 
+		if (!main_loading_)
+			printf("Marking %s %s %s dirty - %s\n",
+				qso->item("QSO_DATE").c_str(),
+				qso->item("TIME_ON").c_str(),
+				qso->item("CALL").c_str(),
+				reason.c_str());
 		dirty_qsos_.insert(qso);
 		been_modified_ = true;
 	}
 	else if (qso == header_) {
+		if (!main_loading_)
+			printf("Marking header dirty - %s", reason.c_str());
 		dirty_qsos_.insert(qso);
 		been_modified_ = true;
 	}

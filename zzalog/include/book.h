@@ -454,7 +454,8 @@ using namespace std;
 		//! A dirty record is one which has been modified and not yet written to filestore.
 		//! \param qso QSO record that has been modified. Add this to the list of "dirty"
 		//! records.
-		void add_dirty_record(record* qso);
+		//! \param reason Add reason for mrking ot dirty (debug feature).
+		void add_dirty_record(record* qso, string reason);
 		//! Mark this record clean.
 		
 		//! A clean record is one that has the same contents as its version in filestore.

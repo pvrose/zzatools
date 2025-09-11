@@ -124,7 +124,9 @@ void record::item(string field, string value, bool formatted/* = false*/, bool d
 				orig_value = "";
 			}
 			if (orig_value != "") {
-				book_->add_dirty_record(this);
+				char msg[32];
+				snprintf(msg, sizeof(msg), "%s=%s", field.c_str(), value.c_str());
+				book_->add_dirty_record(this, msg);
 			}
 		}
 		erase(field);
@@ -286,7 +288,9 @@ void record::item(string field, string value, bool formatted/* = false*/, bool d
 			orig_value = "";
 		}
 		if (orig_value != formatted_value) {
-			book_->add_dirty_record(this);
+			char msg[32];
+			snprintf(msg, sizeof(msg), "%s=%s", field.c_str(), value.c_str());
+			book_->add_dirty_record(this, msg);
 		}
 	}
 	// Set in item
@@ -473,7 +477,7 @@ bool record::item_exists(string field) {
 void record::header(string comment) {
 	is_header_ = true;
 	header_comment_ = comment;
-	book_->add_dirty_record(this);
+	book_->add_dirty_record(this, comment);
 }
 
 // get the header information
