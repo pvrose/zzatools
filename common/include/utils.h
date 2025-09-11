@@ -152,6 +152,10 @@ using namespace std;
 	//! \param decimals Number of characters after the decimal point.
 	//! \param least_first First byte of data is least significant.
 	double bcd_to_double(string, int decimals, bool least_first);
+	//! Convert string to hex
+	string string_to_hex(string, bool escape = false);
+	//! Convert string to hex
+	string hex_to_string(string);
 	//! Calculate the great circle bearing and distance between two locations on the Earth's surface
 	
 	//! \param source Coordinates of location measuring from.
