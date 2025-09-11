@@ -12,8 +12,6 @@ using namespace std;
 struct hamlib_data_t;
 
 //! This structure provides the configuration data for the rig interface.
-
-//! \todo Remove level of indirection in load_data and store_data.
 struct cat_data_t {
     hamlib_data_t* hamlib = nullptr;   //!< Hamlib API configuration  
     bool use_cat_app = false;          //!< Use another app for accessing CAT interface.
