@@ -56,8 +56,6 @@ public:
 		SAVE_VIEW,          //!< Save the QSO being edited and remain in viewing mode.
 		SAVE_NEW,           //!< Save the current QSO and start a new one.
 		SAVE_CONTINUE,      //!< Save the current QSO setting TIME_OFF and keep editing it. 
-		WORKED_B4,          //!< Checked worked before status \todo is this still necessary?
-		PARSE,              //!< Display DXCC details \todo is this still necessary?
 		NAV_FIRST,          //!< Navigate to first QSO in log (or net in net entry mode). 
 		NAV_PREV,           //!< Navigate to previous QSO.
 		NAV_NEXT,           //!< Navigate to next QSO.
@@ -112,10 +110,6 @@ public:
 	static void cb_start(Fl_Widget* w, void* v);
 	//! Callback to enter edit mode
 	static void cb_edit(Fl_Widget* w, void* v);
-	//! Callback - Worked B4? button
-	static void cb_wkb4(Fl_Widget* w, void* v);
-	//! Callback - Parse callsign
-	static void cb_parse(Fl_Widget* w, void* v);
 	//! Callback for navigate buttons
 	static void cb_bn_navigate(Fl_Widget*, void* v);
 	//! Callback to browse QSO record.

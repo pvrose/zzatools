@@ -31,7 +31,7 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 		qso_buttons::DELETE_QSO, qso_buttons::START_NET, qso_buttons::BROWSE, qso_buttons::VIEW_QSO } },
 	{ qso_data::QSO_STARTED, { qso_buttons::SAVE_QSO, qso_buttons::SAVE_VIEW, qso_buttons::SAVE_NEW,
 		qso_buttons::SAVE_CONTINUE, qso_buttons::CANCEL_QSO, 
-		qso_buttons::START_NET, qso_buttons::UPDATE_STATION, qso_buttons::WORKED_B4, qso_buttons::PARSE, qso_buttons::QRZ_COM } },
+		qso_buttons::START_NET, qso_buttons::UPDATE_STATION, qso_buttons::QRZ_COM } },
 	{ qso_data::QSO_ENTER, { qso_buttons::SAVE_NEW, qso_buttons::SAVE_EXIT, 
 		qso_buttons::SAVE_CONTINUE, qso_buttons::UPDATE_STATION, qso_buttons::CANCEL_QSO } },
 	{ qso_data::QSO_EDIT, { qso_buttons::SAVE_EDIT, qso_buttons::SAVE_EXIT, 
@@ -87,7 +87,6 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::SAVE_QSO, { "Save", "Log the QSO (set start time if not set) and quit", qso_buttons::cb_save, (void*)qso_buttons::SAVE_QSO } },
 	{ qso_buttons::CANCEL_QSO, { "Quit QSO", "Cancel the current QSO entry", qso_buttons::cb_cancel, 0 } },
 	{ qso_buttons::DELETE_QSO, { "Delete QSO", "Delete the selected QSO", qso_buttons::cb_bn_delete_qso, 0 } },
-	{ qso_buttons::WORKED_B4, { "B4?", "Display all previous QSOs with this callsign", qso_buttons::cb_wkb4, 0 } },
 	{ qso_buttons::SAVE_EDIT, { "Save", "Copy changed record back to book", qso_buttons::cb_save, (void*)qso_buttons::SAVE_EDIT}},
 	{ qso_buttons::SAVE_CONTINUE, { "Save && Edit", "Set TIME_OFF and allow continued edit", qso_buttons::cb_save, (void*)qso_buttons::SAVE_CONTINUE}},
 	{ qso_buttons::SAVE_EXIT, { "Save && Exit", "Copy changed record and return to previous activity", qso_buttons::cb_save, (void*)qso_buttons::SAVE_EXIT }},
@@ -99,7 +98,6 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::NAV_PREV, { "@<-", "Select previous record in net or book", qso_buttons::cb_bn_navigate, (void*)NV_PREV } },
 	{ qso_buttons::NAV_NEXT, { "@->", "Select next record in net or book", qso_buttons::cb_bn_navigate, (void*)NV_NEXT } },
 	{ qso_buttons::NAV_LAST, { "@->|", "Select last record in net or book", qso_buttons::cb_bn_navigate, (void*)NV_LAST } },
-	{ qso_buttons::PARSE, { "DX?", "Display the DX details for this callsign", qso_buttons::cb_parse, 0 } },
 	{ qso_buttons::CANCEL_BROWSE, { "Quit Browse", "Quit browse mode", qso_buttons::cb_cancel, 0 } },
 	{ qso_buttons::ADD_QUERY, { "Add QSO", "Add queried QSO to log", qso_buttons::cb_bn_add_query, 0 }},
 	{ qso_buttons::REJECT_QUERY, {"Reject QSO", "Do not add queried QSO to log", qso_buttons::cb_bn_reject_query, 0} },
@@ -484,37 +482,6 @@ void qso_buttons::cb_bn_view_qso(Fl_Widget* w, void* v) {
 	default:
 		break;
 	}
-	that->enable_widgets();
-}
-
-// Callback - Worked B4? button
-// v is not used
-void qso_buttons::cb_wkb4(Fl_Widget* w, void* v) {
-	qso_buttons* that = ancestor_view<qso_buttons>(w);
-	that->disable_widgets();
-	extract_records_->extract_call(that->qso_data_->get_call());
-	book_->selection(that->qso_data_->get_default_number(), HT_SELECTED);
-	that->enable_widgets();
-}
-
-// Callback - Parse callsign
-// v is not used
-void qso_buttons::cb_parse(Fl_Widget* w, void* v) {
-	qso_buttons* that = ancestor_view<qso_buttons>(w);
-	that->disable_widgets();
-	// Create a temporary record to parse the callsign
-	record* tip_record = that->qso_data_->dummy_qso();
-	string message = "";
-	// Set the callsign in the temporary record
-	tip_record->item("CALL", string(that->qso_data_->get_call()));
-	// Parse the temporary record
-	message = cty_data_->get_tip(tip_record);
-	// Create a tooltip window at the parse button (in w) X and Y
-	Fl_Window* qw = ancestor_view<qso_manager>(w);
-	Fl_Window* tw = ::tip_window(message, qw->x_root() + w->x() + w->w() / 2, qw->y_root() + w->y() + w->h() / 2);
-	// Set the timeout on the tooltip
-	Fl::add_timeout(Fl_Tooltip::delay(), cb_timer_tip, tw);
-	delete tip_record;
 	that->enable_widgets();
 }
 
