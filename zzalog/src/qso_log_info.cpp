@@ -6,7 +6,6 @@
 #include "utils.h"
 #include "record.h"
 
-#include <FL/Fl_Fill_Dial.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Button.H>
@@ -31,7 +30,7 @@ qso_log_info::qso_log_info(int X, int Y, int W, int H, const char* l) :
 	create_form(X, Y);
 	enable_widgets();
 
-	// Add 1s clock
+	// Add 100 ms clock
 	ticker_->add_ticker(this, cb_ticker, 1);
 }
 
@@ -70,14 +69,10 @@ void qso_log_info::create_form(int X, int Y) {
 	int curr_y = Y;
 
 	// Display progress in loading or saving the log
-	pr_loadsave_ = new Fl_Fill_Dial(curr_x, curr_y, HBUTTON, HBUTTON, nullptr);
-	pr_loadsave_->color(FL_BACKGROUND_COLOR, FL_BLUE);
-	pr_loadsave_->box(FL_OVAL_BOX);
-	pr_loadsave_->tooltip("Displays loading or saving progress");
-	pr_loadsave_->minimum(0.0);
-	pr_loadsave_->maximum(1.0);
-	pr_loadsave_->angles(180, 540);
-
+	bn_loadsave_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, nullptr);
+	bn_loadsave_->color(FL_BACKGROUND_COLOR, FL_BLUE);
+	bn_loadsave_->box(FL_OVAL_BOX);
+	
 	curr_x += HBUTTON;
 
 	// Display current status of the log
@@ -89,7 +84,7 @@ void qso_log_info::create_form(int X, int Y) {
 
 	curr_y += op_status_->h();
 	
-	int max_x = pr_loadsave_->x() + pr_loadsave_->w() + GAP;
+	int max_x = bn_loadsave_->x() + bn_loadsave_->w() + GAP;
 
 	curr_x = X + GAP;
 
@@ -122,23 +117,19 @@ void qso_log_info::create_form(int X, int Y) {
 // Configure timer dependent widgets
 void qso_log_info::enable_timer_widgets() {
 	if (book_->empty()) {
-		pr_loadsave_->color(FL_BACKGROUND_COLOR, FL_BACKGROUND_COLOR);
-		pr_loadsave_->value(0.0);
+		bn_loadsave_->color(FL_BACKGROUND_COLOR);
 	}
 	else if (book_->storing()) {
-		pr_loadsave_->color(FL_RED, FL_GREEN);
-		pr_loadsave_->value(book_->get_complete());
+		bn_loadsave_->color(COLOUR_ORANGE);
 	}
 	else if (book_->loading()) {
-		pr_loadsave_->color(FL_BACKGROUND_COLOR, FL_GREEN);
-		pr_loadsave_->value(book_->get_complete());
+		bn_loadsave_->color(COLOUR_APPLE);
 	} else {
-		pr_loadsave_->value(0.0);
 		if (book_->is_dirty()) {
-			pr_loadsave_->color(FL_RED);
+			bn_loadsave_->color(FL_RED);
 		}
 		else {
-			pr_loadsave_->color(FL_GREEN);
+			bn_loadsave_->color(FL_GREEN);
 		}
 	}
 	enable_widgets();

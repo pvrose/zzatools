@@ -5,7 +5,6 @@
 using namespace std;
 
 class Fl_Output;
-class Fl_Fill_Dial;
 class Fl_Button;
 class Fl_Check_Button;
 
@@ -40,8 +39,6 @@ public:
 	void enable_timer_widgets();
 
 	//! Callback every 100 ms.
-	
-	//! \todo does this need to be this frequent?
 	static void cb_ticker(void* v);
 
 	//! Callback from "Save/QSO" button. 
@@ -54,8 +51,8 @@ public:
 protected:
 	//! Output: textual description of status.
 	Fl_Output* op_status_;
-	//! Dial: indicates status through colour and indicates progress changing from one status to another.
-	Fl_Fill_Dial* pr_loadsave_;
+	//! Button: indicates status through colour.
+	Fl_Button* bn_loadsave_;
 	//! Check button: indicates and controls whether to save every QSO record cahnge.
 	Fl_Check_Button* bn_save_enable_;
 	//! Button: Force save.

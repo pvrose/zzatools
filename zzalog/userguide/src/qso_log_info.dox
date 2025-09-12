@@ -10,10 +10,10 @@ The top line, enclosed in red below, indicates the status of the log. The circle
 of the log-book in local memory, and is accompanied by the equivalent text:
 
 - <B>No Data</B> <I>Grey</I> There is no data.
-- <B>Loading</B> <I>Turning green from grey</I> Loading data.
+- <B>Loading</B> <I>Light green</I> Loading data.
 - <B>Unmodified</B> <I>Green</I> Data has not been modified, or has been written back.
 - <B>Modified</B> <I>Red</I> Data has been modified.
-- <B>Storing</B> <I>Turning green from red</I> Writing data.
+- <B>Storing</B> <I>Orange</I> Writing data.
 
 The check-box, labeled "Save/QSO" when checked indicates that the log will be written back
 after the completion of every QSO, or at other times when a record has been changed. Clicking
