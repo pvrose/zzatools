@@ -19,6 +19,7 @@ of redundancies in the code that have been removed.
   - Occasionally not all records marked clean after eQSL download
    completes and writes data back to filestore.
   - Exception adding an image to a QSL design.
+  - Timezone label on clock doesn't redraw properly.
 
 \section rev_366 Revision 3.6.6
 

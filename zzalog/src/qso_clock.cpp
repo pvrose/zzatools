@@ -114,6 +114,7 @@ void qso_clock::enable_widgets() {
 			bn_date_->copy_label(result);
 		}
 	}
+	parent()->redraw();
 }
 
 // Clock

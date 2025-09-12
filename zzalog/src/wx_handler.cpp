@@ -419,7 +419,7 @@ bool wx_handler::start_sun(map<string, string>* attributes) {
     elements_.push_back(WXE_SUN);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
         string att_name = to_upper(it->first);
-        time_t value = convert_date(it->second);
+        time_t value = convert_xml_datetime(it->second);
         if (att_name == "RISE") {
             report_.sunrise = value;
         }
@@ -705,7 +705,7 @@ bool wx_handler::start_updated(map<string, string>* attributes) {
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
         string att_name = to_upper(it->first);
         if (att_name == "VALUE") {
-            time_t value = convert_date(it->second);
+            time_t value = convert_xml_datetime(it->second);
             report_.updated = value;
         }
     }
@@ -753,33 +753,6 @@ bool wx_handler::start_message() {
 bool wx_handler::end_message() {
     error_message_ = element_data_;
     return true;
-}
-
-// Convert ISO format to time_t
-time_t wx_handler::convert_date(string s) {
-    tm temp;
-    // TRy the various formats - unextended
-    bool ok = string_to_tm(s, temp, "%Y%m%dT%H%M%S");
-    if (!ok) {
-        // Extended
-        ok = string_to_tm(s, temp, "%Y-%m-%dT%H:%M:%S");
-    }
-    if (!ok) {
-        // date extended - time not
-        ok = string_to_tm(s, temp, "%Y-%m-%dT%H%M%S");
-    }
-    if (!ok) {
-        // date not extended, time extended
-        ok = string_to_tm(s, temp, "Y%m%dT%H:%M:%S");
-    }
-    if (ok) {
-        return mktime(&temp);
-    } else {
-        char msg[128];
-        snprintf(msg, sizeof(msg), "WX_HANDLER: Invalid date received %s", s.c_str());
-        Fl::awake(cb_fetch_error, msg);
-        return 0;
-    }
 }
 
 // Fetch icon

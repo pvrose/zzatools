@@ -628,30 +628,34 @@ time_t xml_reader::convert_xml_datetime(string value) {
 	tv.tm_min = stoi(value.substr(14, 2));
 	tv.tm_sec = stoi(value.substr(17, 2));
 	tv.tm_isdst = false;
-	bool subtract = value[19] == '+';
-	long tz_hour = stoi(value.substr(20, 2));
-	long tz_min = stoi(value.substr(23, 2));
-	double seconds = (3600.0 * tz_hour) + (60.0 * tz_min);
-	long adjust = (long)(seconds / resolution);
 #ifdef _WIN32
 	time_t result = _mkgmtime(&tv);
-	// dates pre 1970 return -1
-	if (tv.tm_year < 70) {
-		tv.tm_year += 100;
-		double day_s = 24 * 60 * 60;
-		double cent_s = (100 * 365 + 24) * day_s;
-		result = _mkgmtime(&tv);
-		long long cent_t = cent_s / resolution;
-		result = result - cent_t;
-	}
 #else
 	time_t result = timegm(&tv);
 #endif
-	if (subtract) {
-		result -= adjust;
-	}
-	else {
-		result += adjust;
+	if (value.length() > 19) {
+		bool subtract = value[19] == '+';
+		long tz_hour = stoi(value.substr(20, 2));
+		long tz_min = stoi(value.substr(23, 2));
+		double seconds = (3600.0 * tz_hour) + (60.0 * tz_min);
+		long adjust = (long)(seconds / resolution);
+#ifdef _WIN32
+		// dates pre 1970 return -1
+		if (tv.tm_year < 70) {
+			tv.tm_year += 100;
+			double day_s = 24 * 60 * 60;
+			double cent_s = (100 * 365 + 24) * day_s;
+			result = _mkgmtime(&tv);
+			long long cent_t = cent_s / resolution;
+			result = result - cent_t;
+		}
+#endif
+		if (subtract) {
+			result -= adjust;
+		}
+		else {
+			result += adjust;
+		}
 	}
 	return result;
 }

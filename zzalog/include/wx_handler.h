@@ -268,10 +268,6 @@ protected:
     bool end_message();
 
 
-    //! Convert ISO format to time_t
-    
-    //! \todo isn't this also implemented in xml_reader?
-    time_t convert_date(string s);
     //! Fetch icon
     Fl_Image* fetch_icon(string name);
 
