@@ -75,7 +75,7 @@ using namespace std;
 //! \mainpage ZZALOG Code Documentation
 //! 
 //! This document describes the code interfaces between the constituent parts
-//! of ZZALOG. For the user interface see <A HREF=file:../../userguide/html/index.html>Userguide.</A>
+//! of ZZALOG. For the user interface see <A class="el" HREF=file:../../userguide/html/index.html>Userguide.</A>
 //! 
 //! ZZALOG uses the following third-party libraries:
 //! - <A HREF=https://www.fltk.org/doc-1.4/index.html>FLTK</A>: Graphical user interface library.

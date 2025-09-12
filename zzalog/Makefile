@@ -11,7 +11,7 @@ EXEC_DIR = $(BUILD_DIR)/$(BUILD_TYPE)
 INSTALL_DIR := /usr/local/bin
 LIBRARY_DIR := /usr/local/lib
 APPDATA_DIR := ${HOME}/.config/GM3ZZA/ZZALOG
-USERGUIDE_DIR := /etc/fltk/GM3ZZA/ZZALOG
+DOCUMENTS_DIR := /etc/fltk/GM3ZZA/ZZALOG
 
 # Standard compilers and debuggers
 CC = gcc
@@ -117,13 +117,13 @@ endif
 
 # Create a target to run the compiled code
 .PHONY: run
-run: $(EXEC_DIR)/$(TARGET_EXEC) $(TREFS)
-	@$(EXEC_DIR)/$(TARGET_EXEC) $(ARGS)
+run: $(EXEC_DIR)/$(TARGET_EXEC) $(TREFS) documents
+	@$(EXEC_DIR)/$(TARGET_EXEC) $(ARGS) -g ./
 
 # Create a target to run debugger
 .PHONY: debug
 debug: $(EXEC_DIR)/$(TARGET_EXEC)
-	@$(DBG) --args $(EXEC_DIR)/$(TARGET_EXEC) $(ARGS)
+	@$(DBG) --args $(EXEC_DIR)/$(TARGET_EXEC) $(ARGS) -g ./
 
 .PHONY: clean
 clean:
@@ -132,7 +132,7 @@ clean:
 .PHONY: clean_ug
 clean_ug:
 	rm -r $(UG_DIR)/html
-	sudo rm -r $(APPDATA_DIR)/html $(APPDATA_DIR)/images
+	sudo rm -r $(DOCUMENTS_DIR)
 
 # Copy references
 $(APPDATA_DIR)/%: $(REF_DIR)/%
@@ -141,12 +141,20 @@ $(APPDATA_DIR)/%: $(REF_DIR)/%
 	@cp $< $@
 
 # Copy User guide
-$(USERGUIDE_DIR)/html/index.html : $(UG_DIR)/html/index.html ./Doxyfile
-	@echo Copying HTML files
-	@sudo mkdir -p $(USERGUIDE_DIR)/html
-	@sudo cp -r $(UG_DIR)/html/* $(USERGUIDE_DIR)/html/
-	@sudo mkdir -p $(USERGUIDE_DIR)/images
-	@sudo cp $(UG_DIR)/images/* $(USERGUIDE_DIR)/images/
+$(DOCUMENTS_DIR)/userguide/html/index.html : $(UG_DIR)/html/index.html ./Doxyfile
+	@echo Copying Userguide HTML files
+	@sudo mkdir -p $(DOCUMENTS_DIR)/userguide/html
+	@sudo cp -r $(UG_DIR)/html/* $(DOCUMENTS_DIR)/userguide/html/
+	@sudo mkdir -p $(DOCUMENTS_DIR)/userguide/images
+	@sudo cp $(UG_DIR)/images/* $(DOCUMENTS_DIR)/userguide/images/
+
+# Copy Code documenation
+$(DOCUMENTS_DIR)/docs/html/index.html : $(UG_DIR)/html/index.html ./Doxyfile
+	@echo Copying Code Documentation HTML files
+	@sudo mkdir -p $(DOCUMENTS_DIR)/docs/html
+	@sudo cp -r $(CDX_DIR)/html/* $(DOCUMENTS_DIR)/docs/html/
+# 	@sudo mkdir -p $(DOCUMENTS_DIR)/docs/images
+# 	@sudo cp $(CDX_DIR)/images/* $(DOCUMENTS_DIR)/docs/images/
 
 
 $(UG_DIR)/html/index.html: ./Doxyfile $(DOXS)
@@ -160,6 +168,9 @@ $(CDX_DIR)/html/index.html: ./Doxyfile_code $(INCS)
 .PHONY: documents
 documents: $(UG_DIR)/html/index.html $(CDX_DIR)/html/index.html
 
+.PHONY: install_docs
+install_docs: $(DOCUMENTS_DIR)/userguide/html/index.html $(DOCUMENTS_DIR)/docs/html/index.html
+
 # # force recompile
 # .PHONY: touch_main
 # touch_main:
@@ -167,7 +178,7 @@ documents: $(UG_DIR)/html/index.html $(CDX_DIR)/html/index.html
 
 # install
 .PHONY: install
-install: documents $(TREFS) $(USERGUIDE_DIR)/html/index.html $(INSTALL_DIR)/$(TARGET_EXEC)
+install: install_docs $(TREFS)  $(INSTALL_DIR)/$(TARGET_EXEC)
 
 $(INSTALL_DIR)/$(TARGET_EXEC): $(EXEC_DIR)/$(TARGET_EXEC)
 	@echo Installing $(INSTALL_DIR)/$(TARGET_EXEC)
