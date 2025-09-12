@@ -18,6 +18,7 @@ of redundancies in the code that have been removed.
   - If there are no QSLs to upload an empty extract is displayed which cannot be cleared from qso_qsl.
   - Occasionally not all records marked clean after eQSL download
    completes and writes data back to filestore.
+  - Exception adding an image to a QSL design.
 
 \section rev_366 Revision 3.6.6
 

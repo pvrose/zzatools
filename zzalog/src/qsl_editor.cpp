@@ -154,31 +154,8 @@ void qsl_editor::create_form(int X, int Y) {
 	w10101->value((int)qsl_type_);
 	w10101->tooltip("Select the type of QSL display you want, eg for a label for printing or a file for e-mailing");
 
-	curr_x += w10101->w() + GAP;
-	Fl_Check_Button* w10102 = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "Load TSV");
-	w10102->align(FL_ALIGN_RIGHT);
-	w10102->callback(cb_bn_loadtsv, &load_tsv_);
-	w10102->value(load_tsv_);
-	w10102->tooltip("Select to enable loading from TSV file");
-	bn_loadtsv_ = w10102;
-
-	max_x = w10102->x() + w10102->w() + WLABEL + GAP;
-    curr_y += HBUTTON;
-	curr_x = g_1_->x() + GAP;
-
-	// Input field to specify filename
-    filename_input* w102 = new filename_input(curr_x, curr_y, WEDIT * 2, HBUTTON);
-    w102->callback(cb_filename, &data_->filename);
-    w102->when(FL_WHEN_CHANGED);
-    w102->value(data_->filename.c_str());
-    w102->tooltip("Please enter the QSL template");
-	w102->type(filename_input::FILE);
-	w102->title("Please select QSL Template");
-	w102->pattern("TSV\t*.tsv" );
-	ip_filename_ = w102;
-
-    curr_x += w102->w() + GAP;
-	curr_y += w102->h() + GAP;
+    curr_x += w10101->w() + GAP;
+	curr_y += w10101->h() + GAP;
 
 	max_x = max(max_x, curr_x);
 
@@ -443,14 +420,6 @@ void qsl_editor::save_values() {
 	Fl_Preferences qsl_win_settings(windows_settings, "QSL Design");
 	qsl_win_settings.set("Top", win_y_);
 	qsl_win_settings.set("Left", win_x_);
-
-	if (data_->filename_valid && data_->filename.length() == 0) {
-		char msg[128];
-		snprintf(msg, sizeof(msg), "QSL: No filename specified to save drawing items for %s %s - data may be lost",
-			callsign_.c_str(),
-			QSL_TYPES[qsl_type_].c_str());
-		status_->misc_status(ST_ERROR, msg);
-	}
 	qsl_dataset_->save_data();
 }
 // Create the card data item data widgets
@@ -799,13 +768,6 @@ void qsl_editor::create_iparams(int& curr_x, int& curr_y, qsl_data::image_def* i
 
 // After editing the item data, redraw the window
 void qsl_editor::redraw_display(bool dirty) {
-	// Update qsl_display
-	if (data_->items.size()) {
-		load_tsv_ = false;
-		bn_loadtsv_->deactivate();		
-	} else {
-		bn_loadtsv_->activate();
-	}
 	if (show_example_) {
 		example_qso_ = qso_manager_->data()->current_qso();
 		if (example_qso_ && example_qso_->item("STATION_CALLSIGN") == callsign_) {
@@ -816,12 +778,6 @@ void qsl_editor::redraw_display(bool dirty) {
 			ip_callsign_->value(callsign_.c_str());
 			// Load the display settings for this callsign
 			data_ = qsl_dataset_->get_card(callsign_, qsl_type_, true);
-			if (data_->filename_valid || load_tsv_) {
-				ip_filename_->value(data_->filename.c_str());
-				ip_filename_->activate();
-			} else {
-				ip_filename_->deactivate();
-			}
 			qsl_->set_qsos(&example_qso_, 1);
 		} else {
 			// Either there is no qSO ipor a different callsign was used
@@ -832,13 +788,6 @@ void qsl_editor::redraw_display(bool dirty) {
 			qsl_->set_qsos(nullptr, 0);
 		}
 	} else {
-		// Do not show an example QSO
-		if (data_->filename_valid || load_tsv_) {
-			ip_filename_->value(data_->filename.c_str());
-			ip_filename_->activate();
-		} else {
-			ip_filename_->deactivate();
-		}
 		qsl_->set_qsos(nullptr, 0);
 	}
 	// We may have changed the size
@@ -993,22 +942,11 @@ void qsl_editor::cb_callsign(Fl_Widget* w, void* v) {
     cb_value<field_input, string>(w, v);
 	that->data_ = qsl_dataset_->get_card(that->callsign_, that->qsl_type_, true);
 	that->qsl_->set_card(that->data_);
-	if (that->data_->filename_valid) {
-		that->ip_filename_->value(that->data_->filename.c_str());
-		that->ip_filename_->user_data(&that->data_->filename);
-	}
 	that->update_dimensions();
 	// Only using existing data - not edited
     that->redraw_display(false);  
 	that->create_items();
 	that->redraw();
-}
-
-// Load TSV
-void qsl_editor::cb_bn_loadtsv(Fl_Widget* w, void* v) {
-    qsl_editor* that = ancestor_view<qsl_editor>(w);
-	cb_value<Fl_Check_Button, bool>(w, v);
-	that->redraw_display(false);
 }
 
 // Field
@@ -1019,16 +957,6 @@ void qsl_editor::cb_ch_field(Fl_Widget* w, void* v) {
 	string* item_field = (string*)v;
 	*item_field = field;
 	that->redraw_display(true);
-}
-
-// Filename changed so update display
-void qsl_editor::cb_filename(Fl_Widget* w, void* v) {
-    qsl_editor* that = ancestor_view<qsl_editor>(w);
-	cb_value<Fl_Input, string>(w, &(that->data_->filename));
-	qsl_dataset_->load_items(that->data_);
-	that->redraw_display(true);
-	that->create_items();
-	that->redraw();
 }
 
 // Type choice
@@ -1048,9 +976,6 @@ void qsl_editor::cb_new_item(Fl_Widget* w, void* v) {
 	Fl_Choice* ch = (Fl_Choice*)w;
 	qsl_data::item_def* item = new qsl_data::item_def();
 	item->type = (qsl_data::item_type)ch->value();
-	if (item->type == qsl_data::IMAGE) {
-		item->image.filename = that->data_->filename;
-	}
 	that->data_->items.push_back(item);
 	that->redraw_display(true);
 	that->create_items();
@@ -1065,7 +990,7 @@ void qsl_editor::cb_image(Fl_Widget* w, void* v) {
 	if (!that->relative_filename(image.filename)) {
 		char msg[256];
 		snprintf(msg, sizeof(msg), "QSL: Unable to create a path relative to %s for %s",
-			that->data_->filename.c_str(), image.filename.c_str());
+			qsl_dataset_->get_path().c_str(), image.filename.c_str());
 		status_->misc_status(ST_WARNING, msg);
 	}
 	that->redraw_display(true);
@@ -1093,10 +1018,6 @@ void qsl_editor::cb_qsl_type(Fl_Widget* w, void* v) {
 	qsl_editor* that = ancestor_view<qsl_editor>(w);
 	that->data_ = qsl_dataset_->get_card(that->callsign_, that->qsl_type_, true);
 	that->qsl_->set_card(that->data_);
-	if (that->data_->filename_valid) {
-		that->ip_filename_->value(that->data_->filename.c_str());
-		that->ip_filename_->user_data(&that->data_->filename);
-	}
 	that->update_dimensions();
 	// Only using existing data - not edited
 	that->redraw_display(false);

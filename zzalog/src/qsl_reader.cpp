@@ -144,8 +144,6 @@ bool qsl_reader::start_qsl(xml_wreader* that, map<string, string>* attributes) {
 		(*call_data)[call] = qd;
 		(*((qsl_reader*)that)->data_)[type] = call_data;
 		((qsl_reader*)that)->current_ = qd;
-		// Used to indicate that data not loaded from XML
-		qd->filename_valid = false;
 		return true;
 	}
 	// else

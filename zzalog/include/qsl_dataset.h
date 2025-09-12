@@ -63,8 +63,6 @@ public:
 	void save_data();
 	//! Save XML data
 	void save_xml(Fl_Preferences& settings);
-	//! Load data from file
-	void load_items(qsl_data* data);
 	//! Create server data
 	bool new_server(string server);
 

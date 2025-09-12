@@ -278,10 +278,12 @@ void qsl_display::draw_text(qsl_data::text_def& text) {
 // Draw an image item -
 void qsl_display::draw_image(qsl_data::image_def& image) {
 	string filename = image.filename;
-	absolute_filename(filename);
-	Fl_Image* image_data = get_image(filename);
-	if (image_data) {
-		draw_image(image.dx, image.dy, image_data);
+	if (filename.length()) {
+		absolute_filename(filename);
+		Fl_Image* image_data = get_image(filename);
+		if (image_data) {
+			draw_image(image.dx, image.dy, image_data);
+		}
 	}
 }
 

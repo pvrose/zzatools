@@ -32,8 +32,6 @@ const qsl_data LABEL_QSL_DATA =
 	1,                    // max_qsos
 	qsl_data::FMT_Y4MD_ADIF,   // date_format
 	qsl_data::FMT_HMS_ADIF,    // time_format
-	false,                // filename_valid
-	string(""),           // filename
 	{}                    // items
 };
 const qsl_data FILE_QSL_DATA =
@@ -50,8 +48,6 @@ const qsl_data FILE_QSL_DATA =
 	1,                    // max_qsos
 	qsl_data::FMT_Y4MD_ADIF,   // date_format
 	qsl_data::FMT_HMS_ADIF,    // time_format
-	false,                // filename_valid
-	"",                   // filename
 	{}                    // items
 };
 const map<qsl_data::qsl_type, qsl_data> DEFAULT_QSL_DATA = {
@@ -124,81 +120,6 @@ void qsl_dataset::load_data() {
 		//load_prefs(settings);
 	}
 
-}
-
-void qsl_dataset::load_items(qsl_data* data) {
-	ifstream ip;
-	ip.open(data->filename.c_str(), fstream::in);
-	string line;
-	vector<string> words;
-	// For each line in the file.. 
-	while (ip.good()) {
-		getline(ip, line);
-		// Split lines on the 'tab' character
-		split_line(line, words, '\t');
-		if (words.size() > 1 && (qsl_data::item_type)stoi(words[0]) != qsl_data::NONE) {
-			// The line probably contains good data
-			qsl_data::item_def* item = new qsl_data::item_def;
-			item->type = (qsl_data::item_type)stoi(words[0]);
-			switch (item->type) {
-			case qsl_data::FIELD: {
-				// Line contains a single field item data
-				if (words.size() >= 15) {
-					item->field.field = words[1];
-					item->field.label = words[2];
-					item->field.l_style.font = (Fl_Font)stoi(words[3]);
-					item->field.l_style.size = (Fl_Fontsize)stoi(words[4]);
-					item->field.l_style.colour = (Fl_Color)stoi(words[5]);
-					item->field.t_style.font = (Fl_Font)stoi(words[6]);
-					item->field.t_style.size = (Fl_Fontsize)stoi(words[7]);
-					item->field.t_style.colour = (Fl_Color)stoi(words[8]);
-					item->field.dx = stoi(words[9]);
-					item->field.dy = stoi(words[10]);
-					item->field.vertical = (bool)stoi(words[11]);
-					item->field.multi_qso = (bool)stoi(words[12]);
-					item->field.box = (bool)stoi(words[13]);
-					item->field.display_empty = (bool)stoi(words[14]);
-				}
-				break;
-			}
-			case qsl_data::TEXT: {
-				// A line contains a single text item data
-				if (words.size() >= 7) {
-					item->text.text = words[1];
-					item->text.t_style.font = (Fl_Font)stoi(words[2]);
-					item->text.t_style.size = (Fl_Fontsize)stoi(words[3]);
-					item->text.t_style.colour = (Fl_Color)stoi(words[4]);
-					item->text.dx = stoi(words[5]);
-					item->text.dy = stoi(words[6]);
-					if (words.size() >= 8) {
-						item->text.vertical = (bool)stoi(words[7]);
-					}
-				}
-				break;
-			}
-			case qsl_data::IMAGE: {
-				// A line contains a single image item data (except actual image data)
-				if (words.size() >= 4) {
-					if (directory(words[1]) == "")
-						item->image.filename = directory(data->filename) + '/' + words[1];
-					else
-						item->image.filename = words[1];
-					item->image.dx = stoi(words[2]);
-					item->image.dy = stoi(words[3]);
-				}
-				break;
-			}
-			default:
-				break;
-			}
-			// Add the item's data to the data structure
-			data->items.push_back(item);
-		}
-	}
-	ip.close();
-	char msg[128];
-	snprintf(msg, sizeof(msg), "QSL: %zd items read from %s", data->items.size(), data->filename.c_str());
-	status_->misc_status(ST_OK, msg);
 }
 
 string qsl_dataset::xml_file(Fl_Preferences& settings) {

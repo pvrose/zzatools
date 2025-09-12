@@ -82,12 +82,6 @@ protected:
     // Callbacks
     //! Callback indicating station callsign has changed: reload all data.
     static void cb_callsign(Fl_Widget* w, void* v);
-    //! Callback indicating filename has changed: relead data from filename. 
-    static void cb_filename(Fl_Widget* w, void* v);
-    //! Callback indicating "Load TSV" clicked: reload from TSV file.
-    
-    //! \todo is this still needed now that ZZALOG has ligrated to XML format.
-    static void cb_bn_loadtsv(Fl_Widget* w, void* v);
     //! Callback on one of the dimension radio button: \p v as dim_unit indicates which button. 
     static void cb_radio_dim(Fl_Widget* w, void* v);
     //! Callback when a size parameter has changed.
@@ -156,8 +150,6 @@ protected:
     // Filename input and browse button
     Fl_Group* g_1_;
     field_input* ip_callsign_;            //!< Station callsign.
-    filename_input* ip_filename_;         //!< Input filename.
-    Fl_Check_Button* bn_loadtsv_;         //!< "Load TSV" button.
 
     // Inputs to define size and formats
     Fl_Group* g_dim_;        

@@ -112,13 +112,7 @@ struct qsl_data {
     int max_qsos{ 1 };                //!< maximum number of QSOs per label
     date_format f_date{ FMT_Y4MD_ADIF };   //!< Format for date to be printed
     time_format f_time{ FMT_HMS_ADIF };    //!< Format for time to be printed
-    bool filename_valid{ false };     //!< Layout data file used (else from XML)  
-    string filename{ "" };            //!< Filename of layout data file - relative to  QSL datapath
     vector<item_def*> items;          //!< layout items read in from file 
-
-    //qsl_data() {
-    //    items.clear();
-    //}
 };
 
 //! Initialise the text used to describe the card types. 
