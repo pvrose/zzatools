@@ -35,15 +35,9 @@ web_dialog::web_dialog(int X, int Y, int W, int H, const char* label) :
 	, grp_eqsl_(nullptr)
 	, grp_lotw_(nullptr)
 	, grp_qrz_(nullptr)
-	, grp_fldigi_(nullptr)
 	, grp_email_(nullptr)
 	, grp_server_(nullptr)
 	, grp_club_(nullptr)
-	, grp_wsjtx_(nullptr)
-	, wsjtx_enable_(true)
-	, wsjtx_udp_port_(0)
-	, fldigi_enable_(true)
-	, fldigi_rpc_port_(0)
 	, eqsl_data_(nullptr)
 	, lotw_data_(nullptr)
 	, club_data_(nullptr)
@@ -85,22 +79,6 @@ int web_dialog::handle(int event) {
 
 // Load initial values from settings
 void web_dialog::load_values() {
-	// Get the various settings
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences nw_settings(settings, "Network");
-	Fl_Preferences wsjtx_settings(nw_settings, "WSJT-X");
-	Fl_Preferences fllog_settings(nw_settings, "Fllog");
-
-	// Server ports
-	char* temp;
-	wsjtx_settings.get("Address", temp, "127.0.0.1");
-	wsjtx_udp_addr_ = temp;
-	free(temp);
-	wsjtx_settings.get("Port Number", wsjtx_udp_port_, 2237);
-	fllog_settings.get("Address", temp, "127.0.0.1");
-	fldigi_rpc_addr_ = temp;
-	free(temp);
-	fllog_settings.get("Port Number", fldigi_rpc_port_, 8421);
 
 	eqsl_data_ = get_server("eQSL");
 	lotw_data_ = get_server("LotW");
@@ -160,7 +138,6 @@ void web_dialog::create_form(int X, int Y) {
 	create_lotw(rx, ry, rw, rh);
 	create_qrz(rx, ry, rw, rh);
 	create_club(rx, ry, rw, rh);
-	create_server(rx, ry, rw, rh);
 	create_email(rx, ry, rw, rh);
 
 	tabs->end();
@@ -629,88 +606,6 @@ void web_dialog::create_club(int rx, int ry, int rw, int rh) {
 
 }
 
-// Create Network ports
-void web_dialog::create_server(int rx, int ry, int rw, int rh) {
-	// Group 5 Network ports
-	const int GRP5 = ry + GAP;
-	const int R5_1 = GRP5 + GAP;
-	const int H5_1 = HBUTTON;
-	const int R5_2 = R5_1 + H5_1;
-	const int H5_2 = HBUTTON;
-	// main columns
-	const int C1 = rx + GAP;
-
-	// Group for Fl_Tabs
-	Fl_Group* gp05 = new Fl_Group(rx, ry, rw, rh, "Network");
-
-	Fl_Group* gp5 = new Fl_Group(rx, ry, rw, rh);
-	gp5->labelsize(FL_NORMAL_SIZE + 2);
-	gp5->labelfont(FL_BOLD);
-	gp5->box(FL_FLAT_BOX);
-	gp5->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-
-	Fl_Check_Button* bn5_1_1 = new Fl_Check_Button(C1, R5_1, HBUTTON, HBUTTON, "En");
-	bn5_1_1->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	bn5_1_1->value(wsjtx_enable_);
-	bn5_1_1->callback(cb_bn_wsjtx);
-	bn5_1_1->when(FL_WHEN_CHANGED);
-	bn5_1_1->tooltip("Enable port, disable changing port");
-
-	const int C51 = EDGE + HBUTTON + WLABEL;
-	const int C52 = C51 + WSMEDIT;
-	const int WG5 = C52 + WBUTTON - rx;
-
-	Fl_Group* gp5a = new Fl_Group(C51, R5_1, WG5, H5_1, "WSJT-X");
-	gp5a->box(FL_FLAT_BOX);
-	gp5a->align(FL_ALIGN_LEFT);
-	
-	Fl_Input* ip5_1_1 = new Fl_Input(C51, R5_1, WSMEDIT, H5_1, "Address");
-	ip5_1_1->align(FL_ALIGN_TOP);
-	ip5_1_1->value(wsjtx_udp_addr_.c_str());
-	ip5_1_1->callback(cb_value<Fl_Input, string>, &wsjtx_udp_addr_);
-	ip5_1_1->tooltip("Specify WSJT-X UDP server address - blank for any");
-
-	Fl_Input* ip5_1_2 = new Fl_Input(C52, R5_1, WBUTTON, H5_1, "Port");
-	ip5_1_2->align(FL_ALIGN_TOP);
-	ip5_1_2->value(to_string(wsjtx_udp_port_).c_str());
-	ip5_1_2->callback(cb_value_int<Fl_Input>, &wsjtx_udp_port_);
-	ip5_1_2->when(FL_WHEN_CHANGED);
-	ip5_1_2->tooltip("Specify WSJT-X UDP server port number");
-
-	gp5a->end();
-
-	grp_wsjtx_ = gp5a;
-
-	Fl_Check_Button* bn5_2_1 = new Fl_Check_Button(C1, R5_2, HBUTTON, HBUTTON);
-	bn5_2_1->value(fldigi_enable_);
-	bn5_2_1->callback(cb_bn_fldigi);
-	bn5_2_1->when(FL_WHEN_CHANGED);
-	bn5_2_1->tooltip("Enable port, disable changing port");
-
-	Fl_Group* gp5b = new Fl_Group(C51, R5_2, WG5, H5_2, "Fllog");
-	gp5b->box(FL_FLAT_BOX);
-	gp5b->align(FL_ALIGN_LEFT);
-	
-	Fl_Input* ip5_2_1 = new Fl_Input(C51, R5_2, WSMEDIT, H5_2);
-	ip5_2_1->value(fldigi_rpc_addr_.c_str());
-	ip5_2_1->callback(cb_value<Fl_Input, string>, &fldigi_rpc_addr_);
-	ip5_2_1->tooltip("Specify Fllog server address - blank for any");
-
-	Fl_Input* ip5_2_2 = new Fl_Input(C52, R5_2, WBUTTON, H5_2);
-	ip5_2_2->value(to_string(fldigi_rpc_port_).c_str());
-	ip5_2_2->callback(cb_value_int<Fl_Input>, &fldigi_rpc_port_);
-	ip5_2_2->when(FL_WHEN_CHANGED);
-	ip5_2_2->tooltip("Specify Fldigi server port number");
-	gp5b->end();
-
-	grp_fldigi_ = gp5b;
-
-	gp5->end();
-
-	gp05->end();
-
-
-}
 
 // Create the e-mail details screen
 void web_dialog::create_email(int rx, int ry, int rw, int rh) {
@@ -764,16 +659,6 @@ void web_dialog::create_email(int rx, int ry, int rw, int rh) {
 
 // Save values to settings
 void web_dialog::save_values() {
-	// Get settings
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences nw_settings(settings, "Network");
-	Fl_Preferences wsjtx_settings(nw_settings, "WSJT-X");
-	Fl_Preferences fllog_settings(nw_settings, "Fllog");
-	// Network settings
-	wsjtx_settings.set("Address", wsjtx_udp_addr_.c_str());
-	wsjtx_settings.set("Port Number", wsjtx_udp_port_);
-	fllog_settings.set("Address", fldigi_rpc_addr_.c_str());
-	fllog_settings.set("Port Number", fldigi_rpc_port_);
 	qsl_dataset_->save_data();
 
 }
@@ -827,18 +712,6 @@ void web_dialog::enable_widgets() {
 	else {
 		grp_club_->deactivate();
 	}
-	//WSJTX widgets
-	if (wsjtx_enable_) {
-		grp_wsjtx_->deactivate();
-	} else {
-		grp_wsjtx_->activate();
-	}
-	// FLDIGI widgets
-	if (fldigi_enable_) {
-		grp_fldigi_->deactivate();
-	} else {
-		grp_fldigi_->activate();
-	}
 	// Standard tab formats
 	// value() returns the selected widget. We need to test which widget it is.
 	Fl_Tabs* tabs = (Fl_Tabs*)child(0);
@@ -857,34 +730,6 @@ void web_dialog::enable_widgets() {
 		}
 	}
 
-}
-
-// Callback to implement WSJTX enable
-void web_dialog::cb_bn_wsjtx(Fl_Widget* w, void* v) {
-	web_dialog* that = ancestor_view<web_dialog>(w);
-	cb_value<Fl_Check_Button, bool>(w, &that->wsjtx_enable_);
-	that->save_values();
-	that->enable_widgets();
-
-	if(that->wsjtx_enable_) {
-		wsjtx_handler_->run_server();
-	} else {
-		wsjtx_handler_->close_server();
-	}
-}
-
-// Callback to implement Fldigi enable
-void web_dialog::cb_bn_fldigi(Fl_Widget* w, void* v) {
-	web_dialog* that = ancestor_view<web_dialog>(w);
-	cb_value<Fl_Check_Button, bool>(w, &that->fldigi_enable_);
-	that->save_values();
-	that->enable_widgets();
-
-	if(that->fldigi_enable_) {
-		fllog_emul_->run_server();
-	} else {
-		fllog_emul_->close_server();
-	}
 }
 
 // Callback on changing tab

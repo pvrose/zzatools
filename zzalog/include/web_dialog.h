@@ -50,10 +50,6 @@ struct server_data_t;
 
 	protected:
 		// Callbacks
-		// Callback from "WSJT-X" Check: Enables/disables WSJT-X
-		static void cb_bn_wsjtx(Fl_Widget* w, void* v);
-		// 
-		static void cb_bn_fldigi(Fl_Widget* w, void* v);
 		//! Callback when switching tabs: reformats labels.
 		static void cb_tab(Fl_Widget* w, void* v);
 
@@ -65,8 +61,6 @@ struct server_data_t;
 		void create_qrz(int rx, int ry, int rw, int rh);
 		//! Instatntiate the widgets to configure the Clublog.org interface.
 		void create_club(int rx, int ry, int rw, int rh);
-		// Create the server group
-		void create_server(int rx, int ry, int rw, int rh);
 		//! Instantiate the widgets to configure the e-Mail interface. 
 		void create_email(int rx, int ry, int rw, int rh);
 
@@ -90,10 +84,6 @@ struct server_data_t;
 		// Widgets for e-mail
 		Fl_Group* grp_email_;           //!< e-Mail widget group/#
 
-		// 
-		Fl_Group* grp_wsjtx_;
-		Fl_Group* grp_fldigi_;
-
 		//! Mapping of callsign to widget groups per QRZ.com logbook
 		map<string, Fl_Group*> grp_api_books_;
 		//! Mapping of callsign to eQSL last download date widgets.
@@ -104,15 +94,6 @@ struct server_data_t;
 		server_data_t* club_data_;       //! Clublog.org configuration data
 		server_data_t* qrz_data_;        //! QRZ.com configuration data
 		server_data_t* email_data_;      //! e-Mail configuration data
-
-		// wsjt-x udp PORT CONNECTION
-		int wsjtx_udp_port_;
-		string wsjtx_udp_addr_;
-		bool wsjtx_enable_;
-		// Fl-digi log xmlrpc server
-		int fldigi_rpc_port_;
-		string fldigi_rpc_addr_;
-		bool fldigi_enable_;
 
 	};
 #endif

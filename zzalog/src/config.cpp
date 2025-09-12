@@ -55,7 +55,7 @@ config::config(int W, int H, const char* label) :
 	// get client area 
 	tabs_->client_area(rx, ry, rw, rh, 0);
 	// Web URLs, user-names and passwords
-	web_dialog* aweb = new web_dialog(rx, ry, rw, rh, "Web/Network");
+	web_dialog* aweb = new web_dialog(rx, ry, rw, rh, "Web sites");
 	aweb->labelfont(FL_BOLD);
 	aweb->labelsize(FL_NORMAL_SIZE + 2);
 	aweb->tooltip("Allows the setting of user details for the various on-line services");
@@ -81,14 +81,14 @@ config::config(int W, int H, const char* label) :
 	user->tooltip("Allows limited configuration of fonts and tip timeouts");
 	children_ids_.push_back(DLG_USER);
 	// QSL design
-	qsl_editor* qsle = new qsl_editor(rx, ry, rw, rh, "QSL Design");
+	qsl_editor* qsle = new qsl_editor(rx, ry, rw, rh, "QSL design");
 	qsle->labelfont(FL_BOLD);
 	qsle->labelsize(FL_NORMAL_SIZE + 2);
 	qsle->tooltip("Allows the creation of QSL designs");
 	children_ids_.push_back(DLG_QSLE);
 	updatable_views_.insert(qsle);
 	// Contest definition
-	contest_dialog* ctdlg = new contest_dialog(rx, ry, rw, rh, "Contest Def.");
+	contest_dialog* ctdlg = new contest_dialog(rx, ry, rw, rh, "Contests");
 	ctdlg->labelfont(FL_BOLD);
 	ctdlg->labelsize(FL_NORMAL_SIZE + 2);
 	ctdlg->tooltip("Allows the definition of contests - exchanges & scoring");
@@ -96,7 +96,7 @@ config::config(int W, int H, const char* label) :
 	updatable_views_.insert(ctdlg);
 
 	// Lastly - a tree display showing all config
-	Fl_Group* all_settings = new config_tree(rx, ry, rw, rh, "All Settings");
+	Fl_Group* all_settings = new config_tree(rx, ry, rw, rh, "All settings");
 	all_settings->labelfont(FL_BOLD);
 	all_settings->labelsize(FL_NORMAL_SIZE + 2);
 	all_settings->tooltip("Displays the current config in tree format");

@@ -106,13 +106,13 @@ extern Fl_Preferences::Root prefs_mode_;
 
 	// Settings operations
 	{ "&Settings", 0, 0, 0, FL_SUBMENU },
-		{ "&Web/Network", 0, menu::cb_mi_settings, (void*)config::DLG_WEB },
+		{ "&Web sites", 0, menu::cb_mi_settings, (void*)config::DLG_WEB },
 		{ "&Fields", 0, menu::cb_mi_settings, (void*)config::DLG_COLUMN },
 		{ "&Station", 0, menu::cb_mi_settings, (void*)config::DLG_STATION },
 		{ "&User config", 0, menu::cb_mi_settings, (void*)config::DLG_USER },
 		{ "&QSL design", 0, menu::cb_mi_settings, (void*)config::DLG_QSLE },
 		{ "&Contests", 0, menu::cb_mi_settings, (void*)config::DLG_CONTEST },
-		{ "&All", 0, menu::cb_mi_settings, (void*)config::DLG_ALL },
+		{ "&All settings", 0, menu::cb_mi_settings, (void*)config::DLG_ALL },
 		{ 0 },
 
 	// Windows viewing
