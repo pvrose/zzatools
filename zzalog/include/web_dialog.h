@@ -17,8 +17,6 @@ struct qsl_call_data;
 struct server_data_t;
 
 	//! This class provides a dialog to let the user supply web addresses, usernames and passwords.
-	
-	//! \todo Remone "Network" tab as this functionality is now implemented in qso_apps.
 	class web_dialog :
 		public page_dialog
 	{
