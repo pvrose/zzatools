@@ -298,18 +298,9 @@ void record::item(string field, string value, bool formatted/* = false*/, bool d
 }
 
 // Get an item - as string
-string record::item(string field, bool formatted/* = false*/, bool indirect/* = false*/) {
+string record::item(string field, bool formatted/* = false*/) {
 	string result;
-	if (indirect) {
-		// Get the formatted version if exists
-		result = item(field, formatted);
-		if (result == "") {
-			// Not set in the item
-			// If station location details fetch them the settings.
-			string qth_name;
-		}
-	}
-	else if (formatted) {
+	if (formatted) {
 		// Return the display format for the field
 		string unformatted_value = item(field);
 		// Convert empty string to empty string
@@ -336,7 +327,7 @@ string record::item(string field, bool formatted/* = false*/, bool indirect/* = 
 						result = unformatted_value;
 					} 
 					else if (item_exists(field + "_EXT")) {
-						result = unformatted_value + item(field + "_EXT", formatted, indirect);
+						result = unformatted_value + item(field + "_EXT", formatted);
 					}
 				}
 				else {
@@ -347,7 +338,7 @@ string record::item(string field, bool formatted/* = false*/, bool indirect/* = 
 			case 'E':
 				// Special case for MODE - use SUBMODE if it exists
 				if (field == "MODE" && item_exists("SUBMODE")) {
-					result = item("SUBMODE", formatted, indirect);
+					result = item("SUBMODE", formatted);
 				}
 				// No other formatting
 				else {
@@ -434,7 +425,7 @@ void record::item(string field, double& value) {
 			// If it's not a valid decimal it may be in LAT/LON format
 			if (field == "LAT" || field == "LON" || field == "MY_LAT" || field == "MY_LON") {
 				// Get formatted version
-				string item_value = item(field, true, true);
+				string item_value = item(field, true);
 				try {
 					value = stod(item_value);
 				}
@@ -538,7 +529,7 @@ lat_long_t record::location(bool my_station, location_t& source) {
 	if (isnan(lat_long.latitude) || isnan(lat_long.longitude)) {
 		// Use either Gridsquare or prefix centre if that is more accurate
 		if (my_station) {
-			value_1 = item("MY_GRIDSQUARE", false, true);
+			value_1 = item("MY_GRIDSQUARE", false);
 			// No gridsquare for user. 
 			if (value_1.length() == 0) {
 				source = LOC_NONE;
@@ -1175,10 +1166,10 @@ string record::item_merge(string data, bool indirect /*=false*/) {
 			if (close != result.npos) {
 				len = atoi(result.substr(left + right + 1, close).c_str());
 			}
-			result.replace(left, right + close + 2, item(field_name, indirect, true).substr(0, len));
+			result.replace(left, right + close + 2, item(field_name, indirect).substr(0, len));
 		}
 		else {
-			result.replace(left, right + 1, item(field_name, indirect, true));
+			result.replace(left, right + 1, item(field_name, indirect));
 		}
 		left = result.find('<');
 		if (left != result.npos) right = result.substr(left).find_first_of(":>");

@@ -86,7 +86,7 @@ using namespace std;
 		//! \param formatted if true converts data to the displayed format.
 		//! \param indirect \todo is this still required as no longer use macros.
 		//! \return Field value.
-		string item(string field, bool formatted = false, bool indirect = false);
+		string item(string field, bool formatted = false);
 		//! Gets an integer item
 		
 		//! \param field Field name

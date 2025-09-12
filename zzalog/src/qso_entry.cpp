@@ -299,7 +299,7 @@ void qso_entry::copy_qso_to_display(int flags) {
 			if (field.length()) {
 				if (flags == CF_ALL_FLAGS) {
 					// Copy all fields that have edit fields defined
-					ip_field_[i]->value(qso_->item(field, false, true).c_str());
+					ip_field_[i]->value(qso_->item(field, false).c_str());
 				}
 				else {
 					// Copy per flag bits
@@ -307,7 +307,7 @@ void qso_entry::copy_qso_to_display(int flags) {
 						copy_flags f = (*sf);
 						if (flags & f) {
 							for (auto fx = COPY_FIELDS.at(f).begin(); fx != COPY_FIELDS.at(f).end(); fx++) {
-								if ((*fx) == field)	ip_field_[i]->value(qso_->item(field, false, true).c_str());
+								if ((*fx) == field)	ip_field_[i]->value(qso_->item(field, false).c_str());
 							}
 						}
 					}
@@ -318,7 +318,7 @@ void qso_entry::copy_qso_to_display(int flags) {
 			}
 		}
 		// Handle NOTES separately 
-		ip_notes_->value(qso_->item("NOTES", false, true).c_str());
+		ip_notes_->value(qso_->item("NOTES", false).c_str());
 	}
 	else {
 		// Clear all fields

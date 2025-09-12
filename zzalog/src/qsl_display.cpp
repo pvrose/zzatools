@@ -123,7 +123,7 @@ void qsl_display::draw_field(qsl_data::field_def& field) {
 		for (int i = 0; i < num_records_; i++) {
 			// Separate each QSL's value with new-line
 			if (i > 0) text += '\n';
-			string value = qsos_[i]->item(field.field, false, true);
+			string value = qsos_[i]->item(field.field, false);
 			// Format date and time items, leave others as is
 			if (field.field == "QSO_DATE" ||
 				field.field == "QSO_DATE_OFF") {
@@ -140,7 +140,7 @@ void qsl_display::draw_field(qsl_data::field_def& field) {
 		set<string> values;
 		// Only print each values once
 		for (int i = 0; i < num_records_; i++) {
-			string value = qsos_[i]->item(field.field, false, true);
+			string value = qsos_[i]->item(field.field, false);
 			// Format date and time items, leave others as is
 			if (field.field == "QSO_DATE" ||
 				field.field == "QSO_DATE_OFF") {

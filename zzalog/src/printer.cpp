@@ -247,7 +247,7 @@ void printer::print_record(record* record) {
 		// Limit drawing area to the cell
 		fl_push_clip(current_x + 1, current_y_, it->width - 2, height);
 		// Draw the text
-		fl_draw(record->item(it->field, true, true).c_str(), current_x + 1, current_y_ + delta_y);
+		fl_draw(record->item(it->field, true).c_str(), current_x + 1, current_y_ + delta_y);
 		// Inter field lines
 		if (it != fields_.begin()) {
 			fl_color(FL_DARK1);

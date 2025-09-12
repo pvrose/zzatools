@@ -561,7 +561,7 @@ void qso_qsl_vwr::enable_widgets() {
 			current_qso_->item("QSO_DATE").c_str(),
 			current_qso_->item("TIME_ON").c_str(),
 			current_qso_->item("BAND").c_str(),
-			current_qso_->item("MODE", true, true).c_str());
+			current_qso_->item("MODE", true).c_str());
 	}
 	win_full_view_->copy_label(title);
 	// Display the image choice buttons

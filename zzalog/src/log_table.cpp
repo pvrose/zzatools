@@ -620,8 +620,8 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 					fl_color(fl_contrast(FL_FOREGROUND_COLOR, bg_colour));
 				}
 				// get the formatted data from the field of the record
-				string direct = this_record->item((*log_fields_)[C].field, true, false);
-				text = this_record->item((*log_fields_)[C].field, true, true);
+				string direct = this_record->item((*log_fields_)[C].field, true);
+				text = this_record->item((*log_fields_)[C].field, true);
 				Fl_Font font = font_;
 				if (direct == text) font = font;
 				else font ^= FL_ITALIC;
