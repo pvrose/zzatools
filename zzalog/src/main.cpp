@@ -290,6 +290,14 @@ int cb_args(int argc, char** argv, int& i) {
 		NEW_BOOK = true;
 		i+=1;
 	}
+	// HTML Directory
+	else if (strcmp("-g", argv[i]) == 0 || strcmp("--userguide", argv[i]) == 0) {
+		i += 1;
+		if (i < argc) {
+			default_html_directory_ = argv[i];
+			i += 1;
+		}
+	}
 	// Debug
 	else if (strcmp("-d", argv[i]) == 0 || strcmp("--debug", argv[i]) == 0) {
 		i += 1;
@@ -387,6 +395,7 @@ void show_help() {
 	"\t\tt|threads\tProvide debug tracing on thread use\n"
 	"\t\t\tnot|nothreads\n"
 	"\t-e|--new\tCreate new file\n"
+	"\t-g|--userguide\tSpecify HTML Directory\n"
 	"\t-h|--help\tPrint this\n"
 	"\t-i|--individual\tIndividual mode (sticky)\n"
 	"\t-k|--dark\tDark mode (sticky)\n"
@@ -880,8 +889,13 @@ bool open_settings() {
 	Fl_Preferences sys_settings(Fl_Preferences::SYSTEM_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 
 	char stemp[128];
-	if (sys_settings.getUserdataPath(stemp, sizeof(stemp))) {
-		default_html_directory_ = string(stemp) + "html/";;
+	if (default_html_directory_.length() == 0) {
+		if (sys_settings.getUserdataPath(stemp, sizeof(stemp))) {
+			default_html_directory_ = string(stemp) + "userguide/html/";;
+		}
+	}
+	else {
+		default_html_directory_ += "userguide/html/";
 	}
 
 	char* temp;
@@ -1173,7 +1187,9 @@ void open_html(const char* file) {
 	HINSTANCE result = ShellExecute(NULL, "open", full_filename.c_str(), NULL, NULL, SW_SHOWNORMAL);
 	if ((intptr_t)result <= 32) {
 		char msg[128];
-		snprintf(msg, sizeof(msg), "ZZALOG: Error opening HTML. Error code: %d", (int)(intptr_t)result);
+		snprintf(msg, sizeof(msg), "ZZALOG: Error opening HTML %s. Error code: %d", 
+			full_filename.c_str(),
+			(int)(intptr_t)result);
 		status_->misc_status(ST_ERROR, msg);
 	}
 #else 
@@ -1181,7 +1197,9 @@ void open_html(const char* file) {
 	int res = system(cmd.c_str());
 	if (res != 0) {
 		char msg[128];
-		snprintf(msg, sizeof(msg), "ZZALOG: Error opening HTML. Error code: %d", res);
+		snprintf(msg, sizeof(msg), "ZZALOG: Error opening HTML %s. Error code: %d", 
+			full_filename.c_str(),
+			res);
 		status_->misc_status(ST_ERROR, msg);
 	}
 #endif
