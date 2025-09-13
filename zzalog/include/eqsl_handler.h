@@ -129,7 +129,7 @@ typedef size_t qso_num_t;
 		//! Download the data from eqsl into the data stream \p adif.
 		bool download_eqsl_log(stringstream* adif);
 		//! Control the scheduling from the request queue.
-		//! 
+		
 		//! \param control One of EQ_START, EQ_PAUSE or EQ_ABANDON.
 		void enable_fetch(queue_control_t control);
 		//! Upload the QSO records from the extracted logbook.
@@ -157,8 +157,6 @@ typedef size_t qso_num_t;
 		//! Remove a request from the download queue
 		void dequeue_request();
 
-		////! Receives 1 s ticker: After 10 ticks will dequeue a request.
-		//static void cb_timer_deq(void* v);
 		//! Perform the eQSL card image request. 
 		response_t request_eqsl(request_t request);
 		//! Get the remote filename of the card
@@ -176,7 +174,7 @@ typedef size_t qso_num_t;
 		//! \return response structure.
 		response_t download(string remote_filename, string local_filename);
 		//! Get user details from internal QSL server database.
-		//! 
+		
 		//! \param username returns username.
 		//! \param password returns password.
 		//! \param last_access returns date of last eQSL upload.
@@ -214,6 +212,8 @@ typedef size_t qso_num_t;
 		bool upload_done(upload_response_t* response);
 		//! Open the Help Viewer to display the response from eQSL.
 		void display_response(string response);
+		//! Progress the image downloads
+		void progress_download();
 
 	protected:
 		//! The card inage request queue between main and request threads.
@@ -240,16 +240,19 @@ typedef size_t qso_num_t;
 		atomic<upload_response_t*> upload_response_;
 		//! Set of field names used in QSO uploads.
 		field_list adif_fields_;
+
 		//! Image download count.
 		
 		//! Incremented when request enqueued.
 		//! Set to zero when dequeuing last request.
 		int download_count_;
+
 		//! Image download throttle count.
 		
 		//! Set to zero when a request dequeued.
 		//! Incremented on 1 second tick
 		int tick_count_;
+
 		// Window and Help viewer for displaying response
 		Fl_Window* help_window_;        //!< Window launched when displaying response from e!SL.cc
 		Fl_Help_View* help_viewer_;     //!< Rudimentary HTML display widget for such response.

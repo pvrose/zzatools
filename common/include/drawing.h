@@ -112,7 +112,7 @@ const map<object_t, const char*> OBJECT_NAMES = {
 	{ OT_QSLS, "QSL" },
 	{ OT_STN, "STN DATA" },
 	{ OT_CONTEST, "CONTEST" },
-	{ OT_EQSL_IMAGE, "eQSL IMAGES" },
+	{ OT_EQSL_IMAGE, "EQSL" },
 };
 
 //! Default width for main window

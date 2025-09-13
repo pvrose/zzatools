@@ -64,8 +64,6 @@ public:
     void qsl_1_send_email(record* qso);
 
     //! Update eQSL image download count.
-    
-    //! \todo Move progress clock to status_.
     void update_eqsl(int count);
 
 protected:

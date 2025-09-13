@@ -96,27 +96,37 @@ void eqsl_handler::enqueue_request(qso_num_t record_num, bool force /*=false*/) 
 	sprintf(message, "EQSL: %zu Card requests pending", request_queue_.size());
 	status_->misc_status(ST_NOTE, message);
 	download_count_++;
-	status_->progress(download_count_ * 10, OT_EQSL_IMAGE, "eQSL Image download", "counts");
 	qso_manager_->qsl_control()->update_eqsl(request_queue_.size());
 }
 
 // One second ticker
 void eqsl_handler::cb_ticker(void* v) {
 	eqsl_handler* that = (eqsl_handler*)v;
-	if (that->empty_queue_enable_) {
-		if (that->tick_count_ > EQSL_THROTTLE) {
-			if (that->request_queue_.empty()) {
-				that->download_count_ = 0;
+	that->progress_download();
+}
+
+// Progress downloads
+void eqsl_handler::progress_download() {
+	if (empty_queue_enable_) {
+		// If we have passed the throttling point?
+		if (tick_count_ > EQSL_THROTTLE) {
+			// If we are empty
+			if (request_queue_.empty()) {
+				download_count_ = 0;
 			}
 			else {
-				that->dequeue_request();
-				that->tick_count_ = 0;
+				dequeue_request();
+				if (request_queue_.empty()) {
+					download_count_ = 0;
+					empty_queue_enable_ = false;
+				}
 			}
 		}
-		if (that->download_count_) {
-			int pg = (that->download_count_ - that->request_queue_.size()) * 10;
-			pg -= that->tick_count_;
+		if (download_count_) {
+			int pg = (download_count_ - request_queue_.size()) * 10;
+			pg += tick_count_;
 			status_->progress(pg, OT_EQSL_IMAGE);
+			tick_count_++;
 		}
 	}
 }
@@ -180,6 +190,7 @@ void eqsl_handler::dequeue_request() {
 		case ER_SKIPPED:
 			// request skipped - remove request from queue
 			request_queue_.pop();
+			tick_count_ = EQSL_THROTTLE;
 			book_->enable_save(true, "Skipped eQSL image request");
 			break;
 		case ER_THROTTLED:
@@ -224,6 +235,7 @@ void eqsl_handler::dequeue_request() {
 			case ER_SKIPPED:
 			case ER_HTML_ERR:
 				// Can issue it immediately as this request wasn't made - assumes user has fixed the internet problem
+				tick_count_ = EQSL_THROTTLE;
 				break;
 			default:
 				// Wait for the throttle period - currently 10 s.
@@ -708,6 +720,7 @@ void eqsl_handler::enable_fetch(queue_control_t control) {
 	switch (control) {
 	case EQ_START:
 		// start timer immediately
+		status_->progress(download_count_ * 10, OT_EQSL_IMAGE, "eQSL Image download", "counts");
 		tick_count_ = EQSL_THROTTLE;
 		break;
 	case EQ_PAUSE:

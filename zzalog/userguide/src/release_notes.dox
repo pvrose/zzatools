@@ -9,6 +9,7 @@
 of redundancies in the code that have been removed.
 - Included hamlib v4.6.5 in Windows build.
 - Address performance issues in sorting extracted data.
+- Move eQSL image download progress display to main progress dial.
 - Cosmetic changes.
 - Bug fixes:
   - Errors in callsign parsing algorithm.
