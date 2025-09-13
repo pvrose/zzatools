@@ -62,8 +62,6 @@ qso_qsl::qso_qsl(int X, int Y, int W, int H, const char* L) :
 	load_values();
 	create_form();
 	enable_widgets();
-
-	ticker_->add_ticker(this, cb_ticker, 10);
 }
 
 // Destructor
@@ -161,19 +159,6 @@ void qso_qsl::create_form() {
 	bn_upld_eqsl_ = new Fl_Button(C6, curr_y, W6, HBUTTON, "@8->");
 	bn_upld_eqsl_->callback(cb_upload, (void*)extract_data::EQSL);
 	bn_upld_eqsl_->tooltip("Upload extracted records to eQSL");
-	// Fetch cards
-	op_eqsl_count_ = new Fl_Fill_Dial(C7 + W7 - HBUTTON, curr_y, HBUTTON, HBUTTON, nullptr);
-	char text[10];
-	snprintf(text, sizeof(text), "%d", os_eqsl_dnld_);
-	op_eqsl_count_->copy_label(text);
-	op_eqsl_count_->labelcolor(FL_FOREGROUND_COLOR);
-	op_eqsl_count_->tooltip("Displays the number of outstanding image downloads");
-	op_eqsl_count_->minimum(0.0);
-	op_eqsl_count_->maximum(1.0);
-	op_eqsl_count_->value(0.0);
-	op_eqsl_count_->color(FL_WHITE, FL_YELLOW);
-	op_eqsl_count_->align(FL_ALIGN_INSIDE);
-	op_eqsl_count_->angles(180, 540);
 
 	curr_y += HBUTTON;
 
@@ -433,26 +418,6 @@ void qso_qsl::enable_widgets() {
      	bn_send_email_->deactivate();
 		bn_email_done_->deactivate();
 	}
-	char text[10];
-	int curr = atoi(op_eqsl_count_->label());
-	snprintf(text, sizeof(text), "%d", os_eqsl_dnld_);
-	op_eqsl_count_->copy_label(text);
-	if (os_eqsl_dnld_ == 0) {
-		op_eqsl_count_->labelcolor(FL_FOREGROUND_COLOR);
-		op_eqsl_count_->labelfont(0);
-		op_eqsl_count_->color(FL_BACKGROUND_COLOR);
-		op_eqsl_count_->value(0.0);
-	} else if ( os_eqsl_dnld_ > curr) {
-		op_eqsl_count_->labelcolor(FL_FOREGROUND_COLOR);
-		op_eqsl_count_->labelfont(FL_BOLD);
-		op_eqsl_count_->color(FL_WHITE, FL_DARK_YELLOW);
-		op_eqsl_count_->value(tkr_value_);
-	} else {
-		op_eqsl_count_->labelcolor(FL_RED);
-		op_eqsl_count_->labelfont(FL_BOLD);
-		op_eqsl_count_->color(FL_WHITE, FL_DARK_YELLOW);
-		op_eqsl_count_->value(tkr_value_);
-	} 
 }
 
 // callbacks
@@ -771,19 +736,4 @@ void qso_qsl::update_eqsl(int count) {
 	os_eqsl_dnld_ = count;
 	tkr_value_ = 0.0;
 	enable_widgets();
-}
-
-// Update ticker
-void qso_qsl::ticker() {
-	if (os_eqsl_dnld_ > 0) {
-		if (tkr_value_ < 1.0) {
-			tkr_value_ += 0.1;
-			enable_widgets();
-		}
-	}
-}
-
-// 1 s ticker
-void qso_qsl::cb_ticker(void* v) {
-	((qso_qsl*)v)->ticker();
 }

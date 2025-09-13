@@ -79,24 +79,24 @@ typedef size_t qso_num_t;
 		};
 		//! Request queue
 		typedef queue<request_t> queue_t;
-		//! Information required when removing entry from queue
-		struct dequeue_param_t {
-			//! Pointer to the request queue.
-			queue_t* queue;
-			//! Pointer to this eqsl_handler.
-			eqsl_handler* handler;
-			//! Default constructor.
-			dequeue_param_t() {
-				queue = nullptr;
-				handler = nullptr;
-			}
-			//! Constructor to create an instance.
-			dequeue_param_t(queue_t* q, eqsl_handler* h)
-				: queue(q)
-				, handler(h)
-			{
-			}
-		};
+		////! Information required when removing entry from queue
+		//struct dequeue_param_t {
+		//	//! Pointer to the request queue.
+		//	queue_t* queue;
+		//	//! Pointer to this eqsl_handler.
+		//	eqsl_handler* handler;
+		//	//! Default constructor.
+		//	dequeue_param_t() {
+		//		queue = nullptr;
+		//		handler = nullptr;
+		//	}
+		//	//! Constructor to create an instance.
+		//	dequeue_param_t(queue_t* q, eqsl_handler* h)
+		//		: queue(q)
+		//		, handler(h)
+		//	{
+		//	}
+		//};
 		//! Upload response.
 		struct upload_response_t {
 			//! Response status.
@@ -151,10 +151,14 @@ typedef size_t qso_num_t;
 		bool upload_single_qso(qso_num_t record_num);
 
 	protected:
-		//! Timer callback.
+		//! Timer callback: 1 second ticker
+		static void cb_ticker(void* v);
 
-		//! Takes the first request in the queue and sends it to eQSL.cc
-		static void cb_timer_deq(void* v);
+		//! Remove a request from the download queue
+		void dequeue_request();
+
+		////! Receives 1 s ticker: After 10 ticks will dequeue a request.
+		//static void cb_timer_deq(void* v);
 		//! Perform the eQSL card image request. 
 		response_t request_eqsl(request_t request);
 		//! Get the remote filename of the card
@@ -214,8 +218,6 @@ typedef size_t qso_num_t;
 	protected:
 		//! The card inage request queue between main and request threads.
 		queue_t request_queue_;
-		//! dequeue parameter
-		dequeue_param_t dequeue_parameter_;
 		//! Request queue is allowed to empty
 		bool empty_queue_enable_;
 		//! Username
@@ -238,7 +240,16 @@ typedef size_t qso_num_t;
 		atomic<upload_response_t*> upload_response_;
 		//! Set of field names used in QSO uploads.
 		field_list adif_fields_;
+		//! Image download count.
 		
+		//! Incremented when request enqueued.
+		//! Set to zero when dequeuing last request.
+		int download_count_;
+		//! Image download throttle count.
+		
+		//! Set to zero when a request dequeued.
+		//! Incremented on 1 second tick
+		int tick_count_;
 		// Window and Help viewer for displaying response
 		Fl_Window* help_window_;        //!< Window launched when displaying response from e!SL.cc
 		Fl_Help_View* help_viewer_;     //!< Rudimentary HTML display widget for such response.

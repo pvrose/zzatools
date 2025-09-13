@@ -71,6 +71,7 @@ enum object_t : char {
 	OT_QSLS,             //!< Redaing QSL data XML file
 	OT_STN,              //!< Reading Station data XML file
 	OT_CONTEST,          //!< Processing contest data
+	OT_EQSL_IMAGE,       //!< Downloading eQSL iamges
 };
 
 //! Default colours to use in tab view labels and/or progress bar
@@ -91,6 +92,7 @@ const map<object_t, Fl_Color> OBJECT_COLOURS = {
 	{ OT_QSLS, COLOUR_MAUVE },
 	{ OT_STN, COLOUR_APPLE },
 	{ OT_CONTEST, COLOUR_ORANGE },
+	{ OT_EQSL_IMAGE, fl_darker(FL_YELLOW) },
 };
 
 //! Names of the objects
@@ -110,6 +112,7 @@ const map<object_t, const char*> OBJECT_NAMES = {
 	{ OT_QSLS, "QSL" },
 	{ OT_STN, "STN DATA" },
 	{ OT_CONTEST, "CONTEST" },
+	{ OT_EQSL_IMAGE, "eQSL IMAGES" },
 };
 
 //! Default width for main window

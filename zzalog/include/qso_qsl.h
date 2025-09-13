@@ -7,7 +7,6 @@
 
 class Fl_Button;
 class Fl_Check_Button;
-class Fl_Fill_Dial;
 
 //! \brief This class controls the download and upload of QSLs to the various servers
 //! and for printing off labels
@@ -68,11 +67,6 @@ public:
     
     //! \todo Move progress clock to status_.
     void update_eqsl(int count);
-
-    //! Non-static implementation of second-by-second updates.
-    void ticker();
-    //! Callback every 1 second.
-    static void cb_ticker(void* v);
 
 protected:
     // callbacks
@@ -143,7 +137,6 @@ protected:
     Fl_Button* bn_send_email_;        //!< Button: send e-Mails
     Fl_Button* bn_email_done_;        //!< Button: "Done" e-Mails
     Fl_Button* bn_down_oqrs_;         //!< Button: "OQRS"
-    Fl_Fill_Dial* op_eqsl_count_;     //!< Dial: eQSL progress.
 
 };
 

@@ -1,16 +1,18 @@
 #include "eqsl_handler.h"
 
-#include "record.h"
-#include "book.h"
-#include "status.h"
 #include "adi_writer.h"
+#include "book.h"
+#include "fields.h"
+#include "qsl_dataset.h"
 #include "qso_manager.h"
 #include "qso_qsl.h"
-#include "qsl_dataset.h"
-#include "utils.h"
+#include "record.h"
+#include "status.h"
+#include "ticker.h"
 #include "url_handler.h"
+
 #include "callback.h"
-#include "fields.h"
+#include "utils.h"
 
 #include <cstdio>
 #include <fstream>
@@ -30,6 +32,7 @@
 extern book* book_;
 extern status* status_;
 extern qso_manager* qso_manager_;
+extern ticker* ticker_;
 extern url_handler* url_handler_;
 extern bool DEBUG_THREADS;
 extern string default_station_;
@@ -43,11 +46,15 @@ extern Fl_Preferences::Root prefs_mode_;
 // Constructor
 eqsl_handler::eqsl_handler()
 	: empty_queue_enable_(false)
-	, dequeue_parameter_({ &request_queue_, this })
+	, download_count_(0)
+	, tick_count_(0)
 {
 	run_threads_ = true;
 	if (DEBUG_THREADS) printf("EQSL MAIN: Starting thread\n");
 	th_upload_ = new thread(thread_run, this);
+
+	// Start ticket
+	ticker_->add_ticker(this, cb_ticker, 10);
 
 	// Create help window
 	const int WHELP = 400;
@@ -87,34 +94,53 @@ void eqsl_handler::enqueue_request(qso_num_t record_num, bool force /*=false*/) 
 	// Update status
 	char message[512];
 	sprintf(message, "EQSL: %zu Card requests pending", request_queue_.size());
-	qso_manager_->qsl_control()->update_eqsl(request_queue_.size());
 	status_->misc_status(ST_NOTE, message);
+	download_count_++;
+	status_->progress(download_count_ * 10, OT_EQSL_IMAGE, "eQSL Image download", "counts");
+	qso_manager_->qsl_control()->update_eqsl(request_queue_.size());
 }
 
-// handle the timeout for the request queue - it takes the first request in the queue and sends it to eQSL.cc
-void eqsl_handler::cb_timer_deq(void* v) {
-	// Get the dequeue parameters
-	dequeue_param_t* param = (dequeue_param_t*)v;
-	queue_t* request_queue = param->queue;
-	eqsl_handler* that = param->handler;
+// One second ticker
+void eqsl_handler::cb_ticker(void* v) {
+	eqsl_handler* that = (eqsl_handler*)v;
+	if (that->empty_queue_enable_) {
+		if (that->tick_count_ > EQSL_THROTTLE) {
+			if (that->request_queue_.empty()) {
+				that->download_count_ = 0;
+			}
+			else {
+				that->dequeue_request();
+				that->tick_count_ = 0;
+			}
+		}
+		if (that->download_count_) {
+			int pg = (that->download_count_ - that->request_queue_.size()) * 10;
+			pg -= that->tick_count_;
+			status_->progress(pg, OT_EQSL_IMAGE);
+		}
+	}
+}
+
+// Reomve a request from the queue
+void eqsl_handler::dequeue_request() {
 	char message[512];
 	// Do not send any requests if we have reached the limit in a session
-	if (that->allowed_fetches_ == 0) {
+	if (allowed_fetches_ == 0) {
 		snprintf(message, sizeof(message), "EQSL: Reached the session limit for fetching card images - abandoning");
 		status_->misc_status(ST_ERROR, message);
-		while (!request_queue->empty()) {
-			request_queue->pop();
+		while (!request_queue_.empty()) {
+			request_queue_.pop();
 			book_->enable_save(true, "Cancelling eQSL image request");
 		}
 	}
-	if (!request_queue->empty() && that->empty_queue_enable_) {
+	if (!request_queue_.empty() && empty_queue_enable_) {
 		// send the next eQSL request in the queue - but leave it in the queue until we've seen the response
-		request_t request = request_queue->front();
+		request_t request = request_queue_.front();
 		// Let user know what we are doing
 		sprintf(message, "EQSL: Downloading card %s", book_->get_record(request.record_num, false)->item("CALL").c_str());
 		status_->misc_status(ST_NOTE, message);
 		// Request the eQSL card
-		response_t response = that->request_eqsl(request);
+		response_t response = request_eqsl(request);
 		bool cards_skipped = false;
 		switch (response) {
 		case ER_FAILED:
@@ -126,8 +152,8 @@ void eqsl_handler::cb_timer_deq(void* v) {
 				break;
 			case 1:
 				// Cancel - delete all requests in the queue
-				while (!request_queue->empty()) {
-					request_queue->pop();
+				while (!request_queue_.empty()) {
+					request_queue_.pop();
 					book_->enable_save(true, "Cancelling eQSL image request");
 				}
 				cards_skipped = true;
@@ -139,7 +165,7 @@ void eqsl_handler::cb_timer_deq(void* v) {
 					qso->item("EQSL_QSL_RCVD", string(""));
 					qso->item("EQSL_QSLRDATE", string(""));
 				}
-				request_queue->pop();
+				request_queue_.pop();
 				book_->enable_save(true, "Failed eQSL image request");
 				cards_skipped = true;
 				break;
@@ -147,13 +173,13 @@ void eqsl_handler::cb_timer_deq(void* v) {
 			break;
 		case ER_OK:
 			// request succeeded - remove request from queue
-			request_queue->pop();
+			request_queue_.pop();
 			book_->enable_save(true, "Dequeued eQSL image request");
-			that->allowed_fetches_--;
+			allowed_fetches_--;
 			break;
 		case ER_SKIPPED:
 			// request skipped - remove request from queue
-			request_queue->pop();
+			request_queue_.pop();
 			book_->enable_save(true, "Skipped eQSL image request");
 			break;
 		case ER_THROTTLED:
@@ -168,15 +194,15 @@ void eqsl_handler::cb_timer_deq(void* v) {
 				break;
 			case 1:
 				// Cancel - delete all requests in the queue
-				while (!request_queue->empty()) {
-					request_queue->pop();
+				while (!request_queue_.empty()) {
+					request_queue_.pop();
 					book_->enable_save(true, "Failed eqSL image request");
 				}
 				cards_skipped = true;
 				break;
 			case 2:
 				// Request failed and repeat not wanted - delete request from queue
-				request_queue->pop();
+				request_queue_.pop();
 				book_->enable_save(true, "Failed eQSL image request");
 				cards_skipped = true;
 				break;
@@ -186,23 +212,22 @@ void eqsl_handler::cb_timer_deq(void* v) {
 			break;
 		}
 		// Set the timeout again if the queue is still not empty and fetches are enabled
-		if (!request_queue->empty() && that->empty_queue_enable_) {
+		if (!request_queue_.empty() && empty_queue_enable_) {
 			// Let user know
-			request = request_queue->front();
+			request = request_queue_.front();
 			// Now peek the queue and select the front request so user sees the QSO being requested
 			book_->selection(request.record_num);
-			sprintf(message, "EQSL: %zu card requests pending - next request %s", request_queue->size(), book_->get_record()->item("CALL").c_str());
+			sprintf(message, "EQSL: %zu card requests pending - next request %s", request_queue_.size(), book_->get_record()->item("CALL").c_str());
 			status_->misc_status(ST_NOTE, message);
 
 			switch (response) {
 			case ER_SKIPPED:
 			case ER_HTML_ERR:
 				// Can issue it immediately as this request wasn't made - assumes user has fixed the internet problem
-				Fl::repeat_timeout(0.0, cb_timer_deq, v);
 				break;
 			default:
 				// Wait for the throttle period - currently 10 s.
-				Fl::repeat_timeout(EQSL_THROTTLE, cb_timer_deq, v);
+				tick_count_ = 0;
 				break;
 			}
 		}
@@ -215,7 +240,7 @@ void eqsl_handler::cb_timer_deq(void* v) {
 			}
 		}
 	}
-	qso_manager_->qsl_control()->update_eqsl(request_queue->size());
+	qso_manager_->qsl_control()->update_eqsl(request_queue_.size());
 }
 
 // Make the eQSL card image request
@@ -683,16 +708,16 @@ void eqsl_handler::enable_fetch(queue_control_t control) {
 	switch (control) {
 	case EQ_START:
 		// start timer immediately
-		Fl::add_timeout(0, cb_timer_deq, (void*)&dequeue_parameter_);
+		tick_count_ = EQSL_THROTTLE;
 		break;
 	case EQ_PAUSE:
-		// remove timer
-		Fl::remove_timeout(cb_timer_deq, (void*)&dequeue_parameter_);
 		break;
 	case EQ_ABANDON:
 		// remove timer and empty queue
-		Fl::remove_timeout(cb_timer_deq, (void*)&dequeue_parameter_);
 		while (!request_queue_.empty()) request_queue_.pop();
+		download_count_ = 0;
+		tick_count_ = 0;
+		status_->progress("Abandoning eQSL image download", OT_EQSL_IMAGE);
 		break;
 	}
 }
