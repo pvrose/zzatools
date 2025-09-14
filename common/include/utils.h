@@ -26,7 +26,7 @@ utils.h - various utility methods
 
 		//! Return NAN if either coordinate is not a valid number.
 		bool is_nan() {
-			return isnan(latitude) || isnan(longitude);
+			return std::isnan(latitude) || std::isnan(longitude);
 		}
 
 		//! Returns true if both cordinates compare.

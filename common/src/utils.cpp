@@ -262,9 +262,9 @@ void string_to_ints(std::string& text, std::vector<unsigned int>& ints) {
 std::string now(bool local, const char* format, bool add_ms) {
 	std::chrono::system_clock::time_point p = std::chrono::system_clock::now();
 
-	std::chrono::milliseconds ms = duration_cast<std::chrono::milliseconds>(p.time_since_epoch());
+	std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(p.time_since_epoch());
 
-	std::chrono::seconds s = duration_cast<std::chrono::seconds>(ms);
+	std::chrono::seconds s = std::chrono::duration_cast<std::chrono::seconds>(ms);
 	time_t t = s.count();
 	tm* now = local ? localtime(&t) : gmtime(&t);
 	size_t fractional_seconds = ms.count() % 1000;
@@ -598,7 +598,7 @@ std::string unescape_string(const std::string text) {
 
 // Convert a floating point degree value to � ' " N/E/S/W
 std::string degrees_to_dms(float value, bool is_latitude) {
-	if (isnan(value)) {
+	if (std::isnan(value)) {
 		return "NAN";
 	}
 	int num_degrees;
