@@ -7,7 +7,7 @@
 
 #include <string>
 
-using namespace std;
+
 
 
 
@@ -19,8 +19,8 @@ using namespace std;
 	};
 
 	//! Default prefix database
-	const string PREFIX_FILE = "/Prefix.lst";
+	const std::string PREFIX_FILE = "/Prefix.lst";
 
 	//! Default specification database
-	const string ADIF_FILE = "all.xml";
+	const std::string ADIF_FILE = "all.xml";
 #endif

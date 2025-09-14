@@ -12,7 +12,7 @@
 #include <FL/Fl_Table_Row.H>
 #include <FL/Enumerations.H>
 
-using namespace std;
+
 
 class book;
 class field_choice;
@@ -118,7 +118,7 @@ class Fl_Window;
 		//! How the records are ordered.
 		order_;   
 		//! Field on which sort was done.
-		string sorted_field_;
+		std::string sorted_field_;
 		//! The edit input.
 		field_input* edit_input_;
 		//! Edited row number.

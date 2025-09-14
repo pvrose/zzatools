@@ -25,14 +25,14 @@ namespace contests {
         
         //! The value in \a text is split into the RST_RCVD and ITUZ fields
         //! of the supplied \a qso.
-        virtual void parse_exchange(record * qso, string text);
+        virtual void parse_exchange(record * qso, std::string text);
 
         //! Algorithm specific method to generate text from a number of fields.
         
         //! The \a qso fields APP_ZZA_MY_CONT and MY_ITU_ZONE are written
         //! from the user's details. The \a qso fields RST_SENT and
         //! MY_ITU_ZONE are conctenated and returned from the method.
-        virtual string generate_exchange(record * qso);
+        virtual std::string generate_exchange(record * qso);
 
         //! Algorithm specific method to score an individual QSO.
         
@@ -44,7 +44,7 @@ namespace contests {
         //! - Multiplier = count(ITUZ x BAND).
         //! 
         //! \return { points, multiplier }.
-        virtual score_result score_qso(record * qso, set<string>& multipliers);
+        virtual score_result score_qso(record * qso, std::set<std::string>& multipliers);
 
         //! This algorithm does not use serial numbers.
         

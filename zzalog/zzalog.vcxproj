@@ -128,7 +128,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>C:\Users\pvros\source\repos\pvrose\zzatools\zzalog\include;C:\Users\pvros\source\repos\fltk\build;C:\Program Files\hamlib-w64-4.6.5\include;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\pthread-win32;C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x64-release-dll-ipv6-sspi-schannel\include;C:\Users\pvros\source\repos\fltk\png;C:\Users\pvros\source\repos\fltk\zlib;C:\Users\pvros\source\repos\pvrose\zzatools\common\include;C:\Users\pvros\source\repos\pvrose\zzatools\widgets\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>CURL_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_HAS_STD_BYTE=0;CURL_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalDependencies>gdiplus.lib;gdi32.lib;libcurl.lib;Crypt32.lib;ws2_32.lib;normaliz.lib;winmm.lib;wldap32.lib;libhamlib-4.lib;fltkd.lib;fltk_jpegd.lib;fltk_pngd.lib;fltk_zd.lib;fltk_imagesd.lib;comctl32.lib;comdlg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -142,7 +143,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>C:\Users\pvros\source\repos\pvrose\zzatools\zzalog\include;C:\Users\pvros\source\repos\fltk\build;C:\Program Files\hamlib-w64-4.6.4\include;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\pthread-win32;C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x64-release-dll-ipv6-sspi-schannel\include;C:\Users\pvros\source\repos\fltk\png;C:\Users\pvros\source\repos\fltk\zlib;C:\Users\pvros\source\repos\pvrose\zzatools\common\include;C:\Users\pvros\source\repos\pvrose\zzatools\widgets\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>CURL_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_HAS_STD_BYTE=0;CURL_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalDependencies>gdiplus.lib;gdi32.lib;libcurl.lib;Crypt32.lib;ws2_32.lib;normaliz.lib;winmm.lib;wldap32.lib;libhamlib-4.lib;fltk.lib;fltk_jpeg.lib;fltk_png.lib;fltk_z.lib;fltk_images.lib;comctl32.lib;comdlg32.lib;%(AdditionalDependencies)</AdditionalDependencies>

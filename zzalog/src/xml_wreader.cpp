@@ -17,8 +17,8 @@ xml_wreader::~xml_wreader() {
 
 }
 
-bool xml_wreader::start_element(string name, map<string, string>* attributes) {
-	string element_name = to_upper(name);
+bool xml_wreader::start_element(std::string name, std::map<std::string, std::string>* attributes) {
+	std::string element_name = to_upper(name);
 	bool result = true;
 	char msg[128];
 	if (element_map_.find(element_name) == element_map_.end()) {
@@ -49,8 +49,8 @@ bool xml_wreader::start_element(string name, map<string, string>* attributes) {
 }
 
 // End element - call the appropriate handler
-bool xml_wreader::end_element(string name) {
-	string element_name = to_upper(name);
+bool xml_wreader::end_element(std::string name) {
+	std::string element_name = to_upper(name);
 	char msg[128];
 	if (element_map_.find(element_name) == element_map_.end()) {
 		snprintf(msg, sizeof(msg), "%s: Unexpected XML element %s encountered - ignored",
@@ -81,15 +81,15 @@ bool xml_wreader::end_element(string name) {
 	}
 }
 
-bool xml_wreader::declaration(xml_element::element_t e, string n, string c) {
+bool xml_wreader::declaration(xml_element::element_t e, std::string n, std::string c) {
 	return true;
 }
 
-bool xml_wreader::process_instr(string n, string c) {
+bool xml_wreader::process_instr(std::string n, std::string c) {
 	return true;
 }
 
-bool xml_wreader::characters(string content) {
+bool xml_wreader::characters(std::string content) {
 	char msg[128];
 	if (elements_.size()) {
 		char e = elements_.back();

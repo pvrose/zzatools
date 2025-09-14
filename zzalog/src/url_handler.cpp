@@ -5,13 +5,13 @@
 #include <FL/fl_ask.H>
 
 extern bool DEBUG_CURL;
-extern string PROGRAM_ID;
-extern string PROGRAM_VERSION;
+extern std::string PROGRAM_ID;
+extern std::string PROGRAM_VERSION;
 
-string USER_AGENT = PROGRAM_ID + '/' + PROGRAM_VERSION;
+std::string USER_AGENT = PROGRAM_ID + '/' + PROGRAM_VERSION;
 
 // Make sure only one HTML transfer happens at once
-recursive_mutex url_handler::lock_;
+std::recursive_mutex url_handler::lock_;
 
 // Constructor
 url_handler::url_handler()
@@ -33,8 +33,8 @@ size_t url_handler::cb_write(char* data, size_t size, size_t nmemb, void* os) {
 	// calculate the number of bytes in data
 	size_t real_size = size * nmemb;
 	// Send data to the output stream
-	((ostream*)os)->write((char*)data, real_size);
-	if (((ostream*)os)->good()) {
+	((std::ostream*)os)->write((char*)data, real_size);
+	if (((std::ostream*)os)->good()) {
 		// Successful - tell CURL 
 		return real_size;
 	}
@@ -49,10 +49,10 @@ size_t url_handler::cb_read(char* data, size_t size, size_t nmemb, void* is) {
 	// Calculate the number of bytes in data
 	size_t read_size = size * nmemb;
 	// Read data from the input stream and send to CURL
-	((istream*)is)->read((char*)data, read_size);
+	((std::istream*)is)->read((char*)data, read_size);
 	// If successful - tell CURL number of bytes actually sent
-	if (((istream*)is)->good() || ((istream*)is)->eof()) {
-		return (size_t)((istream*)is)->gcount();
+	if (((std::istream*)is)->good() || ((std::istream*)is)->eof()) {
+		return (size_t)((std::istream*)is)->gcount();
 	}
 	else {
 		return 0;
@@ -60,7 +60,7 @@ size_t url_handler::cb_read(char* data, size_t size, size_t nmemb, void* is) {
 }
 
 // Read the URL (HTTP GET) and write it back to the output stream
-bool url_handler::read_url(string url, ostream* os) {
+bool url_handler::read_url(std::string url, std::ostream* os) {
 
 
 	lock_.lock();
@@ -113,7 +113,7 @@ bool url_handler::read_url(string url, ostream* os) {
 }
 
 // Perform an HTTP PUT operation - this may respond with data
-bool url_handler::post_url(string url, string resource, istream* req, ostream* resp) {
+bool url_handler::post_url(std::string url, std::string resource, std::istream* req, std::ostream* resp) {
 
     lock_.lock();
 	CURLcode result;
@@ -121,11 +121,11 @@ bool url_handler::post_url(string url, string resource, istream* req, ostream* r
 	curl_ = curl_easy_init();
 
 	// Get the request length
-	streampos startpos = req->tellg();
-	req->seekg(0, ios::end);
-	streampos endpos = req->tellg();
+	std::streampos startpos = req->tellg();
+	req->seekg(0, std::ios::end);
+	std::streampos endpos = req->tellg();
 	long req_length = (long)(endpos - startpos);
-	req->seekg(0, ios::beg);
+	req->seekg(0, std::ios::beg);
 
 	// Specify the URL
 	curl_easy_setopt(curl_, CURLOPT_URL, url.c_str());
@@ -183,7 +183,7 @@ bool url_handler::post_url(string url, string resource, istream* req, ostream* r
 }
 
 // Performa an HTTP POST FORM operation 
-bool url_handler::post_form(string url, vector<field_pair> fields, istream* req, ostream* resp) {
+bool url_handler::post_form(std::string url, std::vector<field_pair> fields, std::istream* req, std::ostream* resp) {
 	lock_.lock();
 	CURLcode result;
 	// Start a new transfer
@@ -208,16 +208,16 @@ bool url_handler::post_form(string url, vector<field_pair> fields, istream* req,
 		field = curl_mime_addpart(form);
 		curl_mime_name(field, (*it).name.c_str());
 		if ((*it).value.length()) {
-			// We have specified a non-empty string so use that
+			// We have specified a non-empty std::string so use that
 			curl_mime_data(field, (*it).value.c_str(), (*it).value.length());
 		}
 		else if (req != nullptr) {
 			// Get the request length
-			streampos startpos = req->tellg();
-			req->seekg(0, ios::end);
-			streampos endpos = req->tellg();
+			std::streampos startpos = req->tellg();
+			req->seekg(0, std::ios::end);
+			std::streampos endpos = req->tellg();
 			long req_length = (long)(endpos - startpos);
-			req->seekg(0, ios::beg);
+			req->seekg(0, std::ios::beg);
 			// Use the specified input stream
 			curl_mime_data_cb(field, req_length, cb_read, nullptr, nullptr, req);
 		}
@@ -271,9 +271,9 @@ bool url_handler::post_form(string url, vector<field_pair> fields, istream* req,
 }
 
 // Send an e-mail
-bool url_handler::send_email(string url, string user, string password,
-	vector<string> to_list, vector<string> cc_list, vector<string> bcc_list,
-	string subject, string payload, vector<string> attachments, vector<string> formats) {
+bool url_handler::send_email(std::string url, std::string user, std::string password,
+	std::vector<std::string> to_list, std::vector<std::string> cc_list, std::vector<std::string> bcc_list,
+	std::string subject, std::string payload, std::vector<std::string> attachments, std::vector<std::string> formats) {
 
 	lock_.lock();
 	CURLcode result;
@@ -301,7 +301,7 @@ bool url_handler::send_email(string url, string user, string password,
 	// Set SSL
 	curl_easy_setopt(curl_, CURLOPT_USE_SSL, CURLUSESSL_ALL);
 
-	// set the sender 
+	// std::set the sender 
 	snprintf(text, sizeof(text), "<%s>", user.c_str());
 	curl_easy_setopt(curl_, CURLOPT_MAIL_FROM, text);
 	// Add the recipients - which hopefully should not be seen
@@ -322,7 +322,7 @@ bool url_handler::send_email(string url, string user, string password,
 	// Add the header Date:, To: From: Cc: Subject:
 	struct curl_slist* headers = nullptr;
 	// Date
-	string date = now(true, "%a, %d %b %Y %T %z");
+	std::string date = now(true, "%a, %d %b %Y %T %z");
 	snprintf(text, sizeof(text), "Date: %s", date.c_str());
 	headers = curl_slist_append(headers, text);
 	for (auto it = to_list.begin(); it != to_list.end(); it++) {

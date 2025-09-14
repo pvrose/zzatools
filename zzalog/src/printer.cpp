@@ -71,7 +71,7 @@ int printer::print_book() {
 	status_->misc_status(ST_NOTE, message);
 	// Get page title for log print
 	if (navigation_book_->size() > 0) {
-		string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
+		std::string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
 		const char* temp = fl_input("Please specify the page title", callsign.c_str());
 		if (temp != nullptr) page_title_ = temp;
 		else page_title_ = callsign;
@@ -155,10 +155,10 @@ void printer::calculate_properties() {
 	// get the font for the field header - and ditto
 	fl_font(PRINT_FONT + FL_BOLD + FL_ITALIC, ROW_SIZE);
 	available_height -= (fl_height() + LINE_WIDTH);
-	// set the record font - keep 1 point margin
+	// std::set the record font - keep 1 point margin
 	fl_font(PRINT_FONT, ROW_SIZE);
 	int item_height = fl_height() + LINE_WIDTH + LINE_MARGIN;
-	// set page properties
+	// std::set page properties
 	items_per_page_ = available_height / item_height;
 	number_pages_ = (((signed)(navigation_book_->size() - 1)) / items_per_page_) + 1;
 }
@@ -235,7 +235,7 @@ void printer::print_page_header(int page_number) {
 
 // Print a record
 void printer::print_record(record* record) {
-	// set up the record font and calculate depth dimensions
+	// std::set up the record font and calculate depth dimensions
 	fl_color(FL_BLACK);
 	fl_font(PRINT_FONT, ROW_SIZE);
 	int height = fl_height();
@@ -310,7 +310,7 @@ int printer::print_cards() {
 		for (auto it = navigation_book_->begin(); it != navigation_book_->end(); it++) {
 			char message[128];
 			snprintf(message, 128, "PRINTER: Setting %s %s QSL_SENT to Q", (*it)->item("QSO_DATE").c_str(), (*it)->item("CALL").c_str());
-			(*it)->item("QSL_SENT", string("Q"));
+			(*it)->item("QSL_SENT", std::string("Q"));
 		}
 	}
 	return error;
@@ -356,7 +356,7 @@ int printer::print_page_cards(size_t &item_num) {
 
 // Get the various dimensions of the card page 
 int printer::card_properties() {
-	string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
+	std::string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
 	card_data_ = qsl_dataset_->get_card(callsign, qsl_data::LABEL, false);
 	if (card_data_ == nullptr) {
 		char msg[128];

@@ -3,7 +3,7 @@
 #include "xml_writer.h"
 #include "qsl_data.h"
 
-using namespace std;
+
 
 enum qsl_element_t : char;
 struct qsl_call_data;
@@ -27,9 +27,9 @@ public:
     //! \param os output data stream.
     //! \return true if successful.
     bool store_data(
-        map<qsl_data::qsl_type, map<string, qsl_data*>* >* data, 
-        map<string, server_data_t*>* servers,
-        ostream& os);
+        std::map<qsl_data::qsl_type, std::map<std::string, qsl_data*>* >* data, 
+        std::map<std::string, server_data_t*>* servers,
+        std::ostream& os);
 
     //! Write an individual XML element.
     bool write_element(qsl_element_t element);
@@ -37,24 +37,24 @@ public:
 protected:
 
     //! Converts a font number to the appropriate text
-    string font2text(Fl_Font f);
-    //! write an individual string value name/data pair.
-    bool write_value(string name, string data);
+    std::string font2text(Fl_Font f);
+    //! write an individual std::string value name/data pair.
+    bool write_value(std::string name, std::string data);
     //! write an individual integer value name/data pair.
-    bool write_value(string name, int data);
+    bool write_value(std::string name, int data);
     //! write an individual double precision value name/data pair.
-    bool write_value(string name, double data);
+    bool write_value(std::string name, double data);
     //! write an individual Boolean value name/data pair.
-    bool write_value(string nam, bool data);
+    bool write_value(std::string nam, bool data);
     //! Encrypt data \p s using offset \p off into keychain.
-    string encrypt(string s, uchar off);
+    std::string encrypt(std::string s, uchar off);
 
     //! QSL design data.
-    map<qsl_data::qsl_type, map<string, qsl_data*>* >* data_;
+    std::map<qsl_data::qsl_type, std::map<std::string, qsl_data*>* >* data_;
     //! QSL server credentials.
-    map<string, server_data_t*>* servers_;
+    std::map<std::string, server_data_t*>* servers_;
     //! Current station callsign.
-    string callsign_;
+    std::string callsign_;
     //! Current QSL type.
     qsl_data::qsl_type type_;
 
@@ -65,11 +65,11 @@ protected:
     //! Current server data
     server_data_t* server_;
     //! Name of current server
-    string server_name_;
+    std::string server_name_;
     //! Current QRZ logbook api credentials
     qsl_call_data* api_data_;
     //! Name of current log book
-    string logbook_name_;
+    std::string logbook_name_;
     //! Encryption offset
     uchar offset_;
 };

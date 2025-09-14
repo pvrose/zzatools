@@ -7,7 +7,7 @@
 #include <vector>
 #include <list>
 
-using namespace std;
+
 
 
 	//! This class is a container of records that have been extracted from the main log. 
@@ -58,11 +58,11 @@ using namespace std;
 		//! Upload data - on previously saved server.
 		void upload();
 		//! Extract for specific criteria - all records with \p callsign.
-		void extract_call(string callsign);
+		void extract_call(std::string callsign);
 		//! Add record with index \p record_num in full logbook to the extracted book.
 		void add_record(qso_num_t record_num);
-		//! Sort records by \p field_name (timestamp if empty string), in reverse order if \p reverse is set.
-		void sort_records(string field_name, bool reverse);
+		//! Sort records by \p field_name (timestamp if empty std::string), in reverse order if \p reverse is std::set.
+		void sort_records(std::string field_name, bool reverse);
 		//! Special extract (\p for reason = NO_NAME, NO_QTH, LOCATOR).
 		void extract_special(extract_mode_t reason);
 		//! Special extract for QSO records matched with eQSL.cc but have no image.
@@ -74,7 +74,7 @@ using namespace std;
 		//! \param and_search True indicates a further filtering.
 		//! \param start Start date for search.
 		//! \param endd End date for search.
-		void extract_field(string field_name, string value, bool and_search, string start = "", string endd = "");
+		void extract_field(std::string field_name, std::string value, bool and_search, std::string start = "", std::string endd = "");
 		//! Sort records in chronological order.
 		void correct_record_order();
 		//! Returns true if upload in progress, false if not.
@@ -86,7 +86,7 @@ using namespace std;
 		//! Check and add record: \p record_num is index in full log. 
 		void check_add_record(qso_num_t record_num);
 
-		//! Map index \p record_num in full map to the last index in extracted data.
+		//! Map index \p record_num in full std::map to the last index in extracted data.
 		void map_record(qso_num_t record_num);
 
 		//! Return the index in the full log representing the index in this log
@@ -124,9 +124,9 @@ using namespace std;
 		//! Extract records for the criteria
 		void extract_records();
 		//! Generate description extract criterion for use in the header comment
-		string comment();
+		std::string comment();
 		//! Short form comment for status log
-		string short_comment();
+		std::string short_comment();
 		//! Swap two records.
 		
 		//! Check \p qso is within the extraction criteria
@@ -135,15 +135,15 @@ using namespace std;
 		//! Returns true if \p field in \p lhs QSO is less than \p rhs QSO unless
 		//! \p reversed is true.
 		
-		//! If field is an empty string, then the timestamp is used.
-		bool comp_records(record* lhs, record* rhs, string field, bool reversed);
+		//! If field is an empty std::string, then the timestamp is used.
+		bool comp_records(record* lhs, record* rhs, std::string field, bool reversed);
 
-		//! The list of extract criteria
-		list<search_criteria_t> extract_criteria_;
+		//! The std::list of extract criteria
+		std::list<search_criteria_t> extract_criteria_;
 		//! The mapping of indices in this log to those in full log.
-		vector<qso_num_t> mapping_;
+		std::vector<qso_num_t> mapping_;
 		//! The mapping of indices in the full log to those in this log.
-		map<item_num_t, qso_num_t> rev_mapping_;
+		std::map<item_num_t, qso_num_t> rev_mapping_;
 		//! Current use mode
 		extract_mode_t use_mode_;
 

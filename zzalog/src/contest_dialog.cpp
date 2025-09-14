@@ -19,10 +19,10 @@
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Text_Display.H>
 
-extern map<string, contest_algorithm*>* algorithms_;
+extern std::map<std::string, contest_algorithm*>* algorithms_;
 extern contest_data* contest_data_;
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
 extern void open_html(const char*);
 
@@ -144,32 +144,32 @@ void contest_dialog::save_values() {
 	if (!contest_) contest_ = contest_data_->get_contest(contest_id_, contest_index_, true);
 	if (contest_) {
 		contest_->algorithm = w_algorithm_->value();
-		string start_date = w_start_date_->value();
-		string start_time = w_start_time_->value();
+		std::string start_date = w_start_date_->value();
+		std::string start_time = w_start_time_->value();
 		tm* start = new tm;
-		start->tm_year = stoi(start_date.substr(0, 4)) - 1900;
-		start->tm_mon = stoi(start_date.substr(4, 2)) - 1;
-		start->tm_mday = stoi(start_date.substr(6, 2));
-		start->tm_hour = stoi(start_time.substr(0, 2));
-		start->tm_min = stoi(start_time.substr(2, 2));
+		start->tm_year = std::stoi(start_date.substr(0, 4)) - 1900;
+		start->tm_mon = std::stoi(start_date.substr(4, 2)) - 1;
+		start->tm_mday = std::stoi(start_date.substr(6, 2));
+		start->tm_hour = std::stoi(start_time.substr(0, 2));
+		start->tm_min = std::stoi(start_time.substr(2, 2));
 		start->tm_sec = 0;
 		start->tm_isdst = false;
-		string finish_date = w_finish_date_->value();
-		string finish_time = w_finish_time_->value();
+		std::string finish_date = w_finish_date_->value();
+		std::string finish_time = w_finish_time_->value();
 		tm* finish = new tm;
-		finish->tm_year = stoi(finish_date.substr(0, 4)) - 1900;
-		finish->tm_mon = stoi(finish_date.substr(4, 2)) - 1;
-		finish->tm_mday = stoi(finish_date.substr(6, 2));
-		finish->tm_hour = stoi(finish_time.substr(0, 2));
-		finish->tm_min = stoi(finish_time.substr(2, 2));
+		finish->tm_year = std::stoi(finish_date.substr(0, 4)) - 1900;
+		finish->tm_mon = std::stoi(finish_date.substr(4, 2)) - 1;
+		finish->tm_mday = std::stoi(finish_date.substr(6, 2));
+		finish->tm_hour = std::stoi(finish_time.substr(0, 2));
+		finish->tm_min = std::stoi(finish_time.substr(2, 2));
 		finish->tm_sec = 0;
 		finish->tm_isdst = false;
 #ifdef _WIN32
-		contest_->date.start = system_clock::from_time_t(_mkgmtime(start));
-		contest_->date.finish = system_clock::from_time_t(_mkgmtime(finish));
+		contest_->date.start = std::chrono::system_clock::from_time_t(_mkgmtime(start));
+		contest_->date.finish = std::chrono::system_clock::from_time_t(_mkgmtime(finish));
 #else
-		contest_->date.start = system_clock::from_time_t(timegm(start));
-		contest_->date.finish = system_clock::from_time_t(timegm(finish));
+		contest_->date.start = std::chrono::system_clock::from_time_t(timegm(start));
+		contest_->date.finish = std::chrono::system_clock::from_time_t(timegm(finish));
 #endif
 	}
 	contest_data_->save_data();
@@ -200,8 +200,8 @@ void contest_dialog::update_timeframe() {
 	time_t finish;
 	if (contest_) {
 		ct_date_t* timeframe = &contest_->date;
-		start = chrono::system_clock::to_time_t(timeframe->start);
-		finish = chrono::system_clock::to_time_t(timeframe->finish);
+		start = std::chrono::system_clock::to_time_t(timeframe->start);
+		finish = std::chrono::system_clock::to_time_t(timeframe->finish);
 	}
 	else {
 		start = time(nullptr);
@@ -243,7 +243,7 @@ void contest_dialog::cb_index(Fl_Widget* w, void* v) {
 
 // Populate contest index choice
 void contest_dialog::populate_ct_index() {
-	set<string>* indices = contest_data_->get_contest_indices(contest_id_);
+	std::set<std::string>* indices = contest_data_->get_contest_indices(contest_id_);
 	w_contest_ix_->clear();
 	w_contest_ix_->add("");
 	if (indices) {

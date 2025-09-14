@@ -35,7 +35,7 @@ extern spec_data* spec_data_;
 extern bool DARK;
 extern void open_html(const char*);
 
-map <string, string> CONTINENTS = {
+std::map <std::string, std::string> CONTINENTS = {
 	{ "AF", "Africa" },
 	{ "AN", "Antarctica" },
 	{ "AS", "Asia" },
@@ -462,11 +462,11 @@ void qso_dxcc::wb4_table::set_data() {
 
 	double freq;
 	qd->qso_->item("FREQ", freq);
-	string band = spec_data_->band_for_freq(freq);
-	string mode = qd->qso_->item("MODE");
-	string grid = qd->qso_->item("GRIDSQUARE").substr(0, 4);
+	std::string band = spec_data_->band_for_freq(freq);
+	std::string mode = qd->qso_->item("MODE");
+	std::string grid = qd->qso_->item("GRIDSQUARE").substr(0, 4);
 	band_set* dxcc_b = book_->used_bands(WK_DXCC, qd->dxcc_, qd->station_);
-	set<string>* dxcc_m = book_->used_modes(WK_DXCC, qd->dxcc_, qd->station_);
+	std::set<std::string>* dxcc_m = book_->used_modes(WK_DXCC, qd->dxcc_, qd->station_);
 	if (dxcc_b) {
 		wkd_matrix_[WK_DXCC].any = (bool)dxcc_b->size() == 0;
 		wkd_matrix_[WK_DXCC].band = dxcc_b->find(band) == dxcc_b->end();
@@ -484,7 +484,7 @@ void qso_dxcc::wb4_table::set_data() {
 	wkd_matrix_[WK_DXCC].text = qd->nickname_;
 
 	band_set* grid_b = book_->used_bands(WK_GRID4, grid, qd->station_);
-	set<string>* grid_m = book_->used_modes(WK_GRID4, grid, qd->station_);
+	std::set<std::string>* grid_m = book_->used_modes(WK_GRID4, grid, qd->station_);
 	if (grid_b) {
 		wkd_matrix_[WK_GRID4].any = (bool)grid_b->size() == 0;
 		wkd_matrix_[WK_GRID4].band = grid_b->find(band) == grid_b->end();
@@ -502,7 +502,7 @@ void qso_dxcc::wb4_table::set_data() {
 	wkd_matrix_[WK_GRID4].text = grid;
 
 	band_set* cqz_b = book_->used_bands(WK_CQZ, qd->cq_zone_, qd->station_);
-	set<string>* cqz_m = book_->used_modes(WK_CQZ, qd->cq_zone_, qd->station_);
+	std::set<std::string>* cqz_m = book_->used_modes(WK_CQZ, qd->cq_zone_, qd->station_);
 	if (cqz_b) {
 		wkd_matrix_[WK_CQZ].any = (bool)cqz_b->size() == 0;
 		wkd_matrix_[WK_CQZ].band = cqz_b->find(band) == cqz_b->end();
@@ -520,7 +520,7 @@ void qso_dxcc::wb4_table::set_data() {
 	wkd_matrix_[WK_CQZ].text = qd->cq_zone_ > 0 ? "CQZ " + to_string(qd->cq_zone_) : "";
 
 	band_set* ituz_b = book_->used_bands(WK_ITUZ, qd->itu_zone_, qd->station_);
-	set<string>* ituz_m = book_->used_modes(WK_ITUZ, qd->itu_zone_, qd->station_);
+	std::set<std::string>* ituz_m = book_->used_modes(WK_ITUZ, qd->itu_zone_, qd->station_);
 	if (ituz_b) {
 		wkd_matrix_[WK_ITUZ].any = (bool)ituz_b->size() == 0;
 		wkd_matrix_[WK_ITUZ].band = ituz_b->find(band) == ituz_b->end();
@@ -538,7 +538,7 @@ void qso_dxcc::wb4_table::set_data() {
 	wkd_matrix_[WK_ITUZ].text = qd->itu_zone_ > 0 ? "ITUZ " + to_string(qd->itu_zone_) : "";
 
 	band_set* cont_b = book_->used_bands(WK_CONT, qd->continent_, qd->station_);
-	set<string>* cont_m = book_->used_modes(WK_CONT, qd->continent_, qd->station_);
+	std::set<std::string>* cont_m = book_->used_modes(WK_CONT, qd->continent_, qd->station_);
 	if (cont_b) {
 		wkd_matrix_[WK_CONT].any = (bool)cont_b->size() == 0;
 		wkd_matrix_[WK_CONT].band = cont_b->find(band) == cont_b->end();

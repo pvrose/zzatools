@@ -250,8 +250,8 @@ void fields_table::cb_field(Fl_Widget* w, void* v) {
 void fields_table::cb_header(Fl_Widget* w, void* v) {
     fields_table* that = ancestor_view<fields_table>(w);
     int row = (int)(intptr_t)v;
-    string header;
-    cb_value<intl_input, string>(w, &header);
+    std::string header;
+    cb_value<intl_input, std::string>(w, &header);
     (*that->data_)[row].header = header;
     w->hide();
     that->edit_row_ = -1;
@@ -393,14 +393,14 @@ void fields_dialog::create_form(int X, int Y) {
     Fl_Button* w301 = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Up");
     w301->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
     w301->callback(cb_move, (void*)(intptr_t)true);
-    w301->tooltip("Move the selected field up the list");
+    w301->tooltip("Move the selected field up the std::list");
     bn_up_ = w301;
 
     curr_x += w301->w() + GAP;
     Fl_Button* w302 = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Down");
     w302->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
     w302->callback(cb_move, (void*)(intptr_t)false);
-    w302->tooltip("Move the selected field down the list");
+    w302->tooltip("Move the selected field down the std::list");
     bn_down_ = w302;
 
     end();
@@ -542,7 +542,7 @@ void fields_dialog::populate_app(Fl_Choice* ch) {
 // :Populate the collection choice
 void fields_dialog::populate_coll(Fl_Input_Choice* ch) {
     ch->clear();
-    set<string> names = fields_->coll_names();
+    std::set<std::string> names = fields_->coll_names();
     for (auto it = names.begin(); it != names.end(); it++) {
         ch->add((*it).c_str());
     }

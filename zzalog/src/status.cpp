@@ -17,20 +17,20 @@
 #include <FL/Fl_Native_File_Chooser.H>
 #include <FL/fl_ask.H>
 
-using namespace std;
+
 
 extern menu* menu_;
 extern main_window* main_window_;
 extern status* status_;
 extern qso_manager* qso_manager_;
 extern bool READ_ONLY;
-extern string PROGRAM_ID;
-extern string PROGRAM_VERSION;
+extern std::string PROGRAM_ID;
+extern std::string PROGRAM_VERSION;
 extern bool DEBUG_PRETTY;
-extern string VENDOR;
+extern std::string VENDOR;
 extern ticker* ticker_;
 extern banner* banner_;
-extern string default_data_directory_;
+extern std::string default_data_directory_;
 extern bool keep_banner_;
 extern Fl_Preferences::Root prefs_mode_;
 
@@ -72,10 +72,10 @@ void status::progress(const char* message, object_t object) {
 	banner_->cancel_progress(message);
 }
 
-// Update miscellaneous status - set text and colour, log the status
+// Update miscellaneous status - std::set text and colour, log the status
 void status::misc_status(status_t status, const char* label) {
 	// Start each entry with a timestamp
-	string timestamp = now(false, "%Y/%m/%d %H:%M:%S", true);
+	std::string timestamp = now(false, "%Y/%m/%d %H:%M:%S", true);
 	char f_message[256];
 	// X YYYY/MM/DD HH:MM:SS Message 
 	// X is a single letter indicating the message severity
@@ -88,14 +88,14 @@ void status::misc_status(status_t status, const char* label) {
 		// Save previous files
 		for (char c = '8'; c > '0'; c--) {
 			// Rename will fail if file does not exist, so no need to test file exists
-			string oldfile = report_filename_ + c;
+			std::string oldfile = report_filename_ + c;
 			char c2 = c + 1;
-			string newfile = report_filename_ + c2;
+			std::string newfile = report_filename_ + c2;
 			fl_rename(oldfile.c_str(), newfile.c_str());
 		}
 		fl_rename(report_filename_.c_str(), (report_filename_ + '1').c_str());
 		// Create a new file 
-		report_file_ = new ofstream(report_filename_, ios::out | ios::trunc);
+		report_file_ = new std::ofstream(report_filename_, std::ios::out | std::ios::trunc);
 		if (!report_file_->good()) {
 			// File didn't open correctly
 			delete report_file_;
@@ -103,7 +103,7 @@ void status::misc_status(status_t status, const char* label) {
 			file_unusable_ = true;
 			fl_alert("STATUS: Failed to open status report file %s", report_filename_.c_str());
 			// It doesn'r exist get a new filename
-			// open file dialog, get it and set it.
+			// open file dialog, get it and std::set it.
 			report_filename_ = "";
 			while (report_filename_.length() == 0) {
 				// Create an Open dialog; the default file name extension is ".txt".
@@ -119,7 +119,7 @@ void status::misc_status(status_t status, const char* label) {
 				delete chooser;
 			}
 			// Create a new file 
-			report_file_ = new ofstream(report_filename_, ios::out | ios::trunc);
+			report_file_ = new std::ofstream(report_filename_, std::ios::out | std::ios::trunc);
 		}
 	}
 	if (report_file_) {
@@ -163,7 +163,7 @@ void status::misc_status(status_t status, const char* label) {
 }
 
 // Return the terminal escape code for the particular colour
-string status::colour_code(status_t status, bool fg) {
+std::string status::colour_code(status_t status, bool fg) {
 	char result[25];
 	unsigned char r, g, b;
 	if (fg) {
@@ -175,5 +175,5 @@ string status::colour_code(status_t status, bool fg) {
 		Fl::get_color(colour, r, g, b);
 		snprintf(result, sizeof(result), "\033[48;2;%d;%d;%dm", r, g, b);
 	}
-	return string(result);
+	return std::string(result);
 }

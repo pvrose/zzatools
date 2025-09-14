@@ -5,10 +5,10 @@
 #include <cstdint>
 #include <list>
 #include <map>
-#include <ostream>
+#include<ostream>
 #include <string>
 
-using namespace std;
+
 
 class cty_filter;
 
@@ -28,8 +28,8 @@ public:
 	};
 	//! Time range - in ADIF date format "YYYYMMDD".
 	struct time_scope {
-		string start = "*";     //!< Start of validity of data.
-		string finish = "*";    //!< End of validity of data.
+		std::string start = "*";     //!< Start of validity of data.
+		std::string finish = "*";    //!< End of validity of data.
 	};
 	//! Merge error response
 	typedef uint8_t error_t; 
@@ -61,7 +61,7 @@ public:
 	//! DXCC identifier - -1=invalid, 0=valid, but not an entity
 	int dxcc_id_ = -1;
 	//! Element name
-	string name_ = "";
+	std::string name_ = "";
 	//! Time validity
 	time_scope time_validity_;
 	//! CQ Zone - -1=invalid
@@ -69,13 +69,13 @@ public:
 	//! ITU Zone
 	int itu_zone_ = -1;
 	//! Continent
-	string continent_ = "";
+	std::string continent_ = "";
 	//! Co-ordinates
 	lat_long_t coordinates_ = { nan(""), nan("") };
 	//! Item is no longer valid, but has been.
 	bool deleted_ = false;
 	//! Filters that can be applied to this item.
-	list<cty_filter*> filters_ = {};
+	std::list<cty_filter*> filters_ = {};
 
 	//! Merge a similar element \p elem into this one, returning error_t showing any clash.
 	error_t merge(cty_element* elem);
@@ -85,12 +85,12 @@ public:
 	//! Returns true if this validity wholly contains \p elem validity.
 	bool time_contains(cty_element* elem);
 	//! Return true if supplied time (\p when) is within this validity.
-	bool time_contains(string when);
+	bool time_contains(std::string when);
 
 };
 
 //! Output streaming operator "<<" for a cty_element.
-ostream& operator<<(ostream& os, const cty_element& elem);
+std::ostream& operator<<(std::ostream& os, const cty_element& elem);
 
 //! Version of cty_element to be used for entities.
 class cty_entity : public cty_element {
@@ -107,12 +107,12 @@ public:
 
 	// Additional fields
 	//! Entitiy nickname - usually the primary prefix (eg GM for Scotland).
-	string nickname_ = "";
+	std::string nickname_ = "";
 
 };
 
 //! Output streaming operator "<<" for a cty_entity.
-ostream& operator<<(ostream& os, const cty_entity& rhs);
+std::ostream& operator<<(std::ostream& os, const cty_entity& rhs);
 
 //! Vesrion of cty_element to be used for prefixes
 class cty_prefix : public cty_element {
@@ -127,7 +127,7 @@ public:
 };
 
 //! Output streaming operator "<<" for a cty_prefix.
-ostream& operator<<(ostream& os, const cty_prefix& elem);
+std::ostream& operator<<(std::ostream& os, const cty_prefix& elem);
 
 // Version of cty_exception to be used for exceptions
 class cty_exception : public cty_element {
@@ -150,7 +150,7 @@ public:
 };
 
 //! Output streaming operator "<<" for a cty_exception.
-ostream& operator<<(ostream& os, const cty_exception& rhs);
+std::ostream& operator<<(std::ostream& os, const cty_exception& rhs);
 
 // Version of cty_element to be used in geographic or usage filter
 class cty_filter : public cty_element {
@@ -169,16 +169,16 @@ public:
 	} filter_type_ = FT_NOT_USED;
 
 	//! Filtering patterns.
-	string pattern_ = "";
+	std::string pattern_ = "";
 	//! Nickname used for filter. 
-	string nickname_ = "";
+	std::string nickname_ = "";
 	//! Reason for filter
-	string reason_ = "";
+	std::string reason_ = "";
 
 };
 
 //! Output streaming operator "<<" for a cty_filter.
-ostream& operator <<(ostream& os, const cty_filter& rhs);
+std::ostream& operator <<(std::ostream& os, const cty_filter& rhs);
 
 //! Version of cty_element used for geographic filters.
 class cty_geography : public cty_filter {
@@ -189,9 +189,9 @@ public:
 	//! Destructor.
 	~cty_geography();
 	//! Primary administrative sub-division where unique to this filter.
-	string province_ = "";
+	std::string province_ = "";
 
 };
 
 //! Output streaming operator "<<" for a cty_geography.
-ostream& operator <<(ostream& os, const cty_geography& rhs);
+std::ostream& operator <<(std::ostream& os, const cty_geography& rhs);

@@ -10,7 +10,7 @@
 #include <FL/Fl_Tree.H>
 #include <FL/Fl_Tree_Item.H>
 
-using namespace std;
+
 
 typedef size_t qso_num_t;
 struct spec_dataset;
@@ -52,7 +52,7 @@ struct spec_dataset;
 
 	protected:
 		//! Add the ADIF spec item \p dataset with \p name to the tree at node \p parent.
-		void insert_adif_spec(Fl_Tree_Item* parent, const spec_dataset& dataset, const string& name);
+		void insert_adif_spec(Fl_Tree_Item* parent, const spec_dataset& dataset, const std::string& name);
 
 		// Attributes
 		//! Hang point for primary administrative subdivision

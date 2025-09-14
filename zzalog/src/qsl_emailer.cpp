@@ -11,14 +11,14 @@
 #include <FL/Fl_Preferences.H>
 #include <FL/fl_ask.H>
 
-using namespace std;
+
 
 extern status* status_;
 extern url_handler* url_handler_;
 extern qsl_dataset* qsl_dataset_;
 
-const string SUBJECT = "QSL for <CALL> <QSO_DATE> <BAND> <MODE> from <STATION_CALLSIGN>";
-const string BODY = 
+const std::string SUBJECT = "QSL for <CALL> <QSO_DATE> <BAND> <MODE> from <STATION_CALLSIGN>";
+const std::string BODY = 
 "Dear <NAME>,\n\n"
 "Confirming our <BAND> <MODE> contact on <QSO_DATE> <TIME_ON>Z\n"
 "Please find attached a QSL card image for our QSO.\n\n"
@@ -46,7 +46,7 @@ bool qsl_emailer::generate_email(record* qso) {
 	qso_ = new record(*qso);
 	// Firstly look in record for e-mail address
 	to_address_ = qso_->item("EMAIL");
-	if (to_address_.length() == 0 || to_address_.find('@') == string::npos) {
+	if (to_address_.length() == 0 || to_address_.find('@') == std::string::npos) {
 		const char* temp = fl_input("Invalid or no e-mail address recorded in log for %s, please enter",
 			"", qso_->item("CALL").c_str());
 		if (temp == nullptr) {
@@ -55,13 +55,13 @@ bool qsl_emailer::generate_email(record* qso) {
 			status_->misc_status(ST_WARNING, msg);
 			return false;
 		} else {
-			to_address_ = string(temp);
+			to_address_ = std::string(temp);
 			qso_->item("EMAIL", to_address_);
 		}
 	}
 	// Set record name to "Op" if it's not in the record
 	if (qso_->item("NAME").length() == 0) {
-		qso_->item("NAME", string("Op"));
+		qso_->item("NAME", std::string("Op"));
 	}
 	subject_ = qso_->item_merge(SUBJECT, true);
 	text_body_ = qso_->item_merge(BODY, true);
@@ -95,8 +95,8 @@ bool qsl_emailer::send_email() {
 		email_user_,        // e-mailuser
 		email_password_,    // password
 		{ to_address_ },    // recipient(s)
-		{ cc_address_ },    // cc-list
-		{ },                // bcc list
+		{ cc_address_ },    // cc-std::list
+		{ },                // bcc std::list
 		subject_,           // Subject line
 		text_body_,         // e-mail text
 		{ qsl_filename_ },  // file attachment

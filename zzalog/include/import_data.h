@@ -7,7 +7,7 @@
 #include <vector>
 #include <ctime>
 
-using namespace std;
+
 
 class book;
 
@@ -33,7 +33,7 @@ class book;
 			DATAGRAM,        //!< Data received from WSJT-X datagram.
 			CLIPBOARD,       //!< Data pasted from clipboard.
 			SINGLE_ADIF,     //!< Import a single ADIF.
-			OQRS,            //!< Book contains a list of OQRS QSL requests
+			OQRS,            //!< Book contains a std::list of OQRS QSL requests
 		};
 
 	public:
@@ -73,9 +73,9 @@ class book;
 		//! \param filename file to read the data for importing.
 		//! \param mode controls how the import is handled.
 		//! \return true if the load is successful.
-		bool load_data(string filename, update_mode_t mode);
+		bool load_data(std::string filename, update_mode_t mode);
 		//! Load data from a stream \p adif for \p mode purpose.
-		void load_stream(stringstream& adif, update_mode_t mode);
+		void load_stream(std::stringstream& adif, update_mode_t mode);
 		//! Load record \p qso for \p mode purpose.
 		void load_record(record* qso, update_mode_t mode = SINGLE_ADIF);
 		//! Returns last record loaded

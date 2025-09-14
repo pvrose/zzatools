@@ -6,10 +6,10 @@
 
 #include <regex>
 
-using namespace std;
+
 
 extern status* status_;
-extern string PROGRAM_VERSION;
+extern std::string PROGRAM_VERSION;
 extern uint32_t seed_;
 
 // Constructor
@@ -26,7 +26,7 @@ qsl_reader::qsl_reader() :
     elements_.clear();
 	xml_wreader::method_map_ = method_map_;
 	xml_wreader::element_map_ = element_map_;
-	data_ = new map<qsl_data::qsl_type, map<string, qsl_data*>* >;
+	data_ = new std::map<qsl_data::qsl_type, std::map<std::string, qsl_data*>* >;
 }
 
 qsl_reader::~qsl_reader() {
@@ -34,18 +34,18 @@ qsl_reader::~qsl_reader() {
 }
 
 bool qsl_reader::load_data(
-	map<qsl_data::qsl_type, map<string, qsl_data*>* >* data, 
-	map<string, server_data_t*>* servers,
-	istream& in) {
+	std::map<qsl_data::qsl_type, std::map<std::string, qsl_data*>* >* data, 
+	std::map<std::string, server_data_t*>* servers,
+	std::istream& in) {
     data_ = data;
 	servers_ = servers;
   	// calculate the file size and initialise the progress bar
-	streampos startpos = in.tellg();
-	in.seekg(0, ios::end);
-	streampos endpos = in.tellg();
+	std::streampos startpos = in.tellg();
+	in.seekg(0, std::ios::end);
+	std::streampos endpos = in.tellg();
 	long file_size = (long)(endpos - startpos);
 	// reposition back to beginning
-	in.seekg(0, ios::beg);
+	in.seekg(0, std::ios::beg);
 	// Initialsie the progress
 	status_->misc_status(ST_NOTE, "QSL: Started");
 	status_->progress(file_size, OT_QSLS, "Converting XML into QSL Design database", "bytes");
@@ -64,7 +64,7 @@ bool qsl_reader::load_data(
 }
 
 // <qsl_data version="....">
-bool qsl_reader::start_qsl_data(xml_wreader* that, map<string, string>* attributes) {
+bool qsl_reader::start_qsl_data(xml_wreader* that, std::map<std::string, std::string>* attributes) {
 	if (that->elements_.size()) {
 		status_->misc_status(ST_ERROR, "QSL: Unexpected QSL_DATA element");
 		return false;
@@ -72,7 +72,7 @@ bool qsl_reader::start_qsl_data(xml_wreader* that, map<string, string>* attribut
 	// else
 	that->elements_.push_back(QSL_QSL_DATA);
 	for (auto it : *attributes) {
-		string name = to_upper(it.first);
+		std::string name = to_upper(it.first);
 		if (name == "VERSION") {
 			//if (!((qsl_reader*)that)->check_version(it.second)) {
 			//	return false;
@@ -90,7 +90,7 @@ bool qsl_reader::start_qsl_data(xml_wreader* that, map<string, string>* attribut
 }
 
 // <qsls>
-bool qsl_reader::start_qsls(xml_wreader* that, map<string, string>* attributes) {
+bool qsl_reader::start_qsls(xml_wreader* that, std::map<std::string, std::string>* attributes) {
 	// Only expect in QSL
 	if (that->elements_.back() != QSL_QSL_DATA) {
 		status_->misc_status(ST_ERROR, "QSL: Unexpected QSLS element");
@@ -102,7 +102,7 @@ bool qsl_reader::start_qsls(xml_wreader* that, map<string, string>* attributes) 
 }
 
 // <qsl call="GM3ZZA" type="label">
-bool qsl_reader::start_qsl(xml_wreader* that, map<string, string>* attributes) {
+bool qsl_reader::start_qsl(xml_wreader* that, std::map<std::string, std::string>* attributes) {
 	char msg[128];
 	// Only expect in QSLS
 	if (that->elements_.back() != QSL_QSLS) {
@@ -112,11 +112,11 @@ bool qsl_reader::start_qsl(xml_wreader* that, map<string, string>* attributes) {
 	// else
 	that->elements_.push_back(QSL_QSL);
 	// get the name
-	string call = "";
+	std::string call = "";
 	qsl_data::qsl_type type = qsl_data::MAX_TYPE;
-	string stype;
+	std::string stype;
 	for (auto it : *attributes) {
-		string name = to_upper(it.first);
+		std::string name = to_upper(it.first);
 		if (name == "CALL") call = it.second;
 		else if (name == "TYPE") {
 			stype = it.second;
@@ -138,16 +138,16 @@ bool qsl_reader::start_qsl(xml_wreader* that, map<string, string>* attributes) {
 	((qsl_reader*)that)->callsign_ = call;
 	((qsl_reader*)that)->type_ = type;
 	if (((qsl_reader*)that)->data_->find(type) == ((qsl_reader*)that)->data_->end()) {
-		// New outer level map so new inner is also required
+		// New outer level std::map so new inner is also required
 		qsl_data* qd = new qsl_data();
-		map<string, qsl_data*>* call_data = new map<string, qsl_data*>;
+		std::map<std::string, qsl_data*>* call_data = new std::map<std::string, qsl_data*>;
 		(*call_data)[call] = qd;
 		(*((qsl_reader*)that)->data_)[type] = call_data;
 		((qsl_reader*)that)->current_ = qd;
 		return true;
 	}
 	// else
-	map<string, qsl_data*>* call_data = ((qsl_reader*)that)->data_->at(type);
+	std::map<std::string, qsl_data*>* call_data = ((qsl_reader*)that)->data_->at(type);
 	if (call_data->find(call) == call_data->end()) {
 		qsl_data* qd = new qsl_data();
 		(*call_data)[call] = qd;
@@ -161,7 +161,7 @@ bool qsl_reader::start_qsl(xml_wreader* that, map<string, string>* attributes) {
 }
 
 // <size unit="inch|mm|point" width="nn" height="nn" />
-bool qsl_reader::start_size(xml_wreader* that, map<string, string>* attributes) {
+bool qsl_reader::start_size(xml_wreader* that, std::map<std::string, std::string>* attributes) {
 	// Only expect in QSL
 	if (that->elements_.back() != QSL_QSL) {
 		status_->misc_status(ST_ERROR, "QSL: Unexpected SIZE element");
@@ -172,14 +172,14 @@ bool qsl_reader::start_size(xml_wreader* that, map<string, string>* attributes) 
 	qsl_data* data = ((qsl_reader*)that)->current_;
 	bool ok = true;
 	for (auto it : *attributes) {
-		string name = to_upper(it.first);
+		std::string name = to_upper(it.first);
 		if (name == "UNIT") {
 			if (it.second == "inch") data->unit = qsl_data::INCH;
 			else if (it.second == "mm") data->unit = qsl_data::MILLIMETER;
 			else if (it.second == "point") data->unit = qsl_data::POINT;
 			else ok = false;
-		} else if (name == "WIDTH") data->width = stod(it.second);
-		else if (name == "HEIGHT") data->height = stod(it.second);
+		} else if (name == "WIDTH") data->width = std::stod(it.second);
+		else if (name == "HEIGHT") data->height = std::stod(it.second);
 		else {
 			ok = false;
 			break;
@@ -192,7 +192,7 @@ bool qsl_reader::start_size(xml_wreader* that, map<string, string>* attributes) 
 }
 
 // <array rows="nn" columns="nn" x_offset=.. y_offset=.. x_delta= y_delta= />
-bool qsl_reader::start_array(xml_wreader* that, map<string, string>* attributes) {
+bool qsl_reader::start_array(xml_wreader* that, std::map<std::string, std::string>* attributes) {
 	// Only expect in QSL
 	if (that->elements_.back() != QSL_QSL) {
 		status_->misc_status(ST_ERROR, "QSL: Unexpected ARRAY element");
@@ -203,13 +203,13 @@ bool qsl_reader::start_array(xml_wreader* that, map<string, string>* attributes)
 	qsl_data* data = ((qsl_reader*)that)->current_;
 	bool ok = true;
 	for (auto it : *attributes) {
-		string name = to_upper(it.first);
-		if (name == "ROWS") data->rows = stoi(it.second);
-		else if (name == "COLUMNS") data->columns = stoi(it.second);
-		else if (name == "X_OFFSET") data->col_left = stod(it.second);
-		else if (name == "Y_OFFSET") data->row_top = stod(it.second);
-		else if (name == "X_DELTA") data->col_width = stod(it.second);
-		else if (name == "Y_DELTA") data->row_height = stod(it.second);
+		std::string name = to_upper(it.first);
+		if (name == "ROWS") data->rows = std::stoi(it.second);
+		else if (name == "COLUMNS") data->columns = std::stoi(it.second);
+		else if (name == "X_OFFSET") data->col_left = std::stod(it.second);
+		else if (name == "Y_OFFSET") data->row_top = std::stod(it.second);
+		else if (name == "X_DELTA") data->col_width = std::stod(it.second);
+		else if (name == "Y_DELTA") data->row_height = std::stod(it.second);
 		else {
 			ok = false;
 			break;
@@ -222,7 +222,7 @@ bool qsl_reader::start_array(xml_wreader* that, map<string, string>* attributes)
 }
 
 // <formats date="..." time="...." max_qsos="nn" />
-bool qsl_reader::start_formats(xml_wreader* that, map<string, string>* attributes) {
+bool qsl_reader::start_formats(xml_wreader* that, std::map<std::string, std::string>* attributes) {
 	char msg[128];
 	// Only expect in QSL
 	if (that->elements_.back() != QSL_QSL) {
@@ -234,10 +234,10 @@ bool qsl_reader::start_formats(xml_wreader* that, map<string, string>* attribute
 	qsl_data* data = ((qsl_reader*)that)->current_;
 	bool ok = true;
 	for (auto it : *attributes) {
-		string name = to_upper(it.first);
+		std::string name = to_upper(it.first);
 		if (name == "DATE") data->f_date = parse_date(it.second);
 		else if (name == "TIME") data->f_time = parse_time(it.second);
-		else if (name == "MAX_QSOS") data->max_qsos = stoi(it.second);
+		else if (name == "MAX_QSOS") data->max_qsos = std::stoi(it.second);
 		else {
 			ok = false;
 			break;
@@ -263,7 +263,7 @@ bool qsl_reader::start_formats(xml_wreader* that, map<string, string>* attribute
 }
 
 // <DESIGN>
-bool qsl_reader::start_design(xml_wreader* that, map<string, string>* attributes) {
+bool qsl_reader::start_design(xml_wreader* that, std::map<std::string, std::string>* attributes) {
 	// Only expect in QSL
 	if (that->elements_.back() != QSL_QSL) {
 		status_->misc_status(ST_ERROR, "QSL: Unexpected QSL element");
@@ -280,7 +280,7 @@ bool qsl_reader::start_design(xml_wreader* that, map<string, string>* attributes
 }
 
 // <TEXT>
-bool qsl_reader::start_text(xml_wreader* that, map<string, string>* attributes) {
+bool qsl_reader::start_text(xml_wreader* that, std::map<std::string, std::string>* attributes) {
 	// Only expect in QSL
 	if (that->elements_.back() != QSL_DESIGN) {
 		status_->misc_status(ST_ERROR, "QSL: Unexpected TEXT element");
@@ -297,7 +297,7 @@ bool qsl_reader::start_text(xml_wreader* that, map<string, string>* attributes) 
 }
 
 // <POSITION X="nn" Y="nn" />
-bool qsl_reader::start_position(xml_wreader* that, map<string, string>* attributes) {
+bool qsl_reader::start_position(xml_wreader* that, std::map<std::string, std::string>* attributes) {
 	switch(that->elements_.back()) {
 	case QSL_TEXT:
 	case QSL_FIELD:
@@ -349,9 +349,9 @@ bool qsl_reader::start_position(xml_wreader* that, map<string, string>* attribut
 	that->elements_.push_back(QSL_POSITION);
 
 	for (auto it : *attributes) {
-		string name = to_upper(it.first);
-		if (name == "X") *dx = stoi(it.second);
-		else if (name == "Y") *dy = stoi(it.second);
+		std::string name = to_upper(it.first);
+		if (name == "X") *dx = std::stoi(it.second);
+		else if (name == "Y") *dy = std::stoi(it.second);
 		else {
 			ok = false;
 			break;
@@ -364,7 +364,7 @@ bool qsl_reader::start_position(xml_wreader* that, map<string, string>* attribut
 }
 
 // <LABEL SIZE="nn" FONT="nn" COLOUR="nn">[text]</LABEL>
-bool qsl_reader::start_label(xml_wreader* that, map<string, string>* attributes) {
+bool qsl_reader::start_label(xml_wreader* that, std::map<std::string, std::string>* attributes) {
 	qsl_data::style_def* style;
 	bool ok = true;
 	qsl_data::item_def* item = ((qsl_reader*)that)->item_;
@@ -386,10 +386,10 @@ bool qsl_reader::start_label(xml_wreader* that, map<string, string>* attributes)
 	}
 	that->elements_.push_back(QSL_LABEL);
 	for (auto it : *attributes) {
-		string name = to_upper(it.first);
+		std::string name = to_upper(it.first);
 		if (name == "FONT") style->font = parse_font(it.second);
-		else if (name == "SIZE") style->size = stoi(it.second);
-		else if (name == "COLOUR") style->colour = stoi(it.second);
+		else if (name == "SIZE") style->size = std::stoi(it.second);
+		else if (name == "COLOUR") style->colour = std::stoi(it.second);
 		else {
 			ok = false;
 			break;
@@ -402,7 +402,7 @@ bool qsl_reader::start_label(xml_wreader* that, map<string, string>* attributes)
 }
 
 // <FIELD>
-bool qsl_reader::start_field(xml_wreader* that, map<string, string>* attributes) {
+bool qsl_reader::start_field(xml_wreader* that, std::map<std::string, std::string>* attributes) {
 	// Only expect in QSL
 	if (that->elements_.back() != QSL_DESIGN) {
 		status_->misc_status(ST_ERROR, "QSL: Unexpected FIELD element");
@@ -419,7 +419,7 @@ bool qsl_reader::start_field(xml_wreader* that, map<string, string>* attributes)
 }
 
 // <DATA FONT= SIZE= COLOUR=>[field|text]</DATA?
-bool qsl_reader::start_data(xml_wreader* that, map<string, string>* attributes) {
+bool qsl_reader::start_data(xml_wreader* that, std::map<std::string, std::string>* attributes) {
 	qsl_data::style_def* style;
 	bool ok = true;
 	qsl_data::item_def* item = ((qsl_reader*)that)->item_;
@@ -449,10 +449,10 @@ bool qsl_reader::start_data(xml_wreader* that, map<string, string>* attributes) 
 	that->elements_.push_back(QSL_DATA);
 
 	for (auto it : *attributes) {
-		string name = to_upper(it.first);
+		std::string name = to_upper(it.first);
 		if (name == "FONT") style->font = parse_font(it.second);
-		else if (name == "SIZE") style->size = stoi(it.second);
-		else if (name == "COLOUR") style->colour = stoi(it.second);
+		else if (name == "SIZE") style->size = std::stoi(it.second);
+		else if (name == "COLOUR") style->colour = std::stoi(it.second);
 		else {
 			ok = false;
 			break;
@@ -465,7 +465,7 @@ bool qsl_reader::start_data(xml_wreader* that, map<string, string>* attributes) 
 }
 
 // <OPTIONS VERTICAL="Y|N" BOXED="Y|N" MULTI_QSO="Y|N" ALWAYS="Y|N"/>
-bool qsl_reader::start_options(xml_wreader* that, map<string, string>* attributes) {
+bool qsl_reader::start_options(xml_wreader* that, std::map<std::string, std::string>* attributes) {
 	bool* vertical = nullptr;
 	bool* boxed = nullptr;
 	bool* multi_qso = nullptr;
@@ -500,7 +500,7 @@ bool qsl_reader::start_options(xml_wreader* that, map<string, string>* attribute
 	}
 	that->elements_.push_back(QSL_OPTIONS);
 	for (auto it : *attributes) {
-		string name = to_upper(it.first);
+		std::string name = to_upper(it.first);
 		if (name == "VERTICAL" && vertical) *vertical = parse_bool(it.second);
 		else if (name == "BOXED" && boxed) *boxed = parse_bool(it.second);
 		else if (name == "MULTI_QSO" && multi_qso) *multi_qso = parse_bool(it.second);
@@ -517,7 +517,7 @@ bool qsl_reader::start_options(xml_wreader* that, map<string, string>* attribute
 }
 
 // <IMAGE>
-bool qsl_reader::start_image(xml_wreader* that, map<string, string>* attributes) {
+bool qsl_reader::start_image(xml_wreader* that, std::map<std::string, std::string>* attributes) {
 	// Only expect in QSL
 	if (that->elements_.back() != QSL_DESIGN) {
 		status_->misc_status(ST_ERROR, "QSL: Unexpected IMAGE element");
@@ -533,7 +533,7 @@ bool qsl_reader::start_image(xml_wreader* that, map<string, string>* attributes)
 }
 
 // <FILE>[filename]</FILE>
-bool qsl_reader::start_file(xml_wreader* that, map<string, string>* attributes) {
+bool qsl_reader::start_file(xml_wreader* that, std::map<std::string, std::string>* attributes) {
 	// Only expect in QSL
 	if (that->elements_.back() != QSL_IMAGE) {
 		status_->misc_status(ST_ERROR, "QSL: Unexpected FILE element");
@@ -545,7 +545,7 @@ bool qsl_reader::start_file(xml_wreader* that, map<string, string>* attributes) 
 }
 
 // <SERVERS>
-bool qsl_reader::start_servers(xml_wreader* that, map<string, string>* attributes) {
+bool qsl_reader::start_servers(xml_wreader* that, std::map<std::string, std::string>* attributes) {
 	if (that->elements_.back() != QSL_QSL_DATA) {
 		status_->misc_status(ST_ERROR, "QSL: Unexpected QSLS element");
 		return false;
@@ -554,9 +554,9 @@ bool qsl_reader::start_servers(xml_wreader* that, map<string, string>* attribute
 	that->elements_.push_back(QSL_SERVERS);
 	char msg[128];
 	for (auto it : *attributes) {
-		string name = to_upper(it.first);
+		std::string name = to_upper(it.first);
 		if (name == "SEED") {
-			uint32_t new_seed = stoi(it.second);
+			uint32_t new_seed = std::stoi(it.second);
 			if (seed_ == 0) {
 				seed_ = new_seed;
 			} else {
@@ -575,7 +575,7 @@ bool qsl_reader::start_servers(xml_wreader* that, map<string, string>* attribute
 }
 
 // <SERVER name="[server]">
-bool qsl_reader::start_server(xml_wreader* w, map<string, string>* attributes) {
+bool qsl_reader::start_server(xml_wreader* w, std::map<std::string, std::string>* attributes) {
 	qsl_reader* that = (qsl_reader*)w;
 	if (that->elements_.back() != QSL_SERVERS) {
 		status_->misc_status(ST_ERROR, "QSL: Unexpected SERVER element");
@@ -585,9 +585,9 @@ bool qsl_reader::start_server(xml_wreader* w, map<string, string>* attributes) {
 	that->elements_.push_back(QSL_SERVER);
 	char msg[128];
 	for (auto it : *attributes) {
-		string name = to_upper(it.first);
+		std::string name = to_upper(it.first);
 		if (name == "NAME") {
-			string sname = it.second;
+			std::string sname = it.second;
 			if (that->servers_->find(sname) != that->servers_->end()) {
 				snprintf(msg, sizeof(msg), "QSL: Already have data for QSL server %s", sname.c_str());
 				status_->misc_status(ST_WARNING, msg);
@@ -613,7 +613,7 @@ bool qsl_reader::start_server(xml_wreader* w, map<string, string>* attributes) {
 	return true;
 }
 
-bool qsl_reader::start_logbook(xml_wreader* w, map<string, string>* attributes) {
+bool qsl_reader::start_logbook(xml_wreader* w, std::map<std::string, std::string>* attributes) {
 	qsl_reader* that = (qsl_reader*)w;
 	if (that->elements_.back() != QSL_SERVER) {
 		status_->misc_status(ST_ERROR, "QSL: Unexpected LOGBOOK element");
@@ -623,9 +623,9 @@ bool qsl_reader::start_logbook(xml_wreader* w, map<string, string>* attributes) 
 	that->elements_.push_back(QSL_LOGBOOK);
 	char msg[128];
 	for (auto it : *attributes) {
-		string name = to_upper(it.first);
+		std::string name = to_upper(it.first);
 		if (name == "CALL") {
-			string sname = it.second;
+			std::string sname = it.second;
 			if (that->server_->call_data.find(sname) != that->server_->call_data.end()) {
 				snprintf(msg, sizeof(msg), "QSL: Already have api data for QRZ callsign %s", sname.c_str());
 				status_->misc_status(ST_WARNING, msg);
@@ -651,7 +651,7 @@ bool qsl_reader::start_logbook(xml_wreader* w, map<string, string>* attributes) 
 
 }
 
-bool qsl_reader::start_value(xml_wreader* w, map<string, string>* attributes) {
+bool qsl_reader::start_value(xml_wreader* w, std::map<std::string, std::string>* attributes) {
 	qsl_reader* that = (qsl_reader*)w;
 	switch(that->elements_.back()) {
 		case QSL_SERVER:
@@ -659,7 +659,7 @@ bool qsl_reader::start_value(xml_wreader* w, map<string, string>* attributes) {
 			that->elements_.push_back(QSL_VALUE);
 			// get the name
 			for (auto it : *attributes) {
-				string name = to_upper(it.first);
+				std::string name = to_upper(it.first);
 				if (name == "NAME") {
 					// Iyt might be an empty value
 					that->value_data_ = "";
@@ -706,8 +706,8 @@ bool qsl_reader::end_value(xml_wreader* w) {
 	qsl_element_t parent = (qsl_element_t)that->elements_.back();
 	server_data_t* sd = that->server_;
 	qsl_call_data* ad = that->api_data_;
-	string& vn = that->value_name_;
-	string& vd = that->value_data_;
+	std::string& vn = that->value_name_;
+	std::string& vd = that->value_data_;
 	uchar& off = that->offset_;
 	switch(parent) {
 	case QSL_SERVER:
@@ -747,7 +747,7 @@ bool qsl_reader::end_value(xml_wreader* w) {
 	}
 }
 // <FILE>[filename]</FILE>
-bool qsl_reader::chars_file(xml_wreader* w, string content) {
+bool qsl_reader::chars_file(xml_wreader* w, std::string content) {
 	qsl_reader* that = (qsl_reader*)w;
 	if (that->item_->type == qsl_data::IMAGE) {
 		that->item_->image.filename = content;
@@ -761,7 +761,7 @@ bool qsl_reader::chars_file(xml_wreader* w, string content) {
 
 
 // <LABEL FONT=.....>[Text to use]</LABEL
-bool qsl_reader::chars_label(xml_wreader* w, string content) {
+bool qsl_reader::chars_label(xml_wreader* w, std::string content) {
 	qsl_reader* that = (qsl_reader*)w;
 	switch(that->item_->type) {
 	case qsl_data::FIELD:
@@ -773,7 +773,7 @@ bool qsl_reader::chars_label(xml_wreader* w, string content) {
 	}
 }
 
-bool qsl_reader::chars_data(xml_wreader* w, string content) {
+bool qsl_reader::chars_data(xml_wreader* w, std::string content) {
 	qsl_reader* that = (qsl_reader*)w;
 	switch(that->item_->type) {
 	case qsl_data::FIELD:
@@ -788,35 +788,35 @@ bool qsl_reader::chars_data(xml_wreader* w, string content) {
 	}
 }
 
-bool qsl_reader::chars_value(xml_wreader* w, string content) {
+bool qsl_reader::chars_value(xml_wreader* w, std::string content) {
 	((qsl_reader*)w)->value_data_ = content;
 	return true;
 }
 
 // Valid date - YYYYMMDD from 1930
-const basic_regex<char> REGEX_Y4MDA("(19[0-9]{2}|[2-9][0-9]{3})(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[01])");
+const std::basic_regex<char> REGEX_Y4MDA("(19[0-9]{2}|[2-9][0-9]{3})(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[01])");
 // Valid date - YYYY/MM/DD from 1930
-const basic_regex<char> REGEX_Y4MD("(19[0-9]{2}|[2-9][0-9]{3})/(0[1-9]|1[0-2])/(0[1-9]|[1-2][0-9]|3[01])");
+const std::basic_regex<char> REGEX_Y4MD("(19[0-9]{2}|[2-9][0-9]{3})/(0[1-9]|1[0-2])/(0[1-9]|[1-2][0-9]|3[01])");
 // Valid date - YY/MM/DD from 2001
-const basic_regex<char> REGEX_Y2MD("([0-9]{2})/(0[1-9]|1[0-2])/(0[1-9]|[1-2][0-9]|3[01])");
+const std::basic_regex<char> REGEX_Y2MD("([0-9]{2})/(0[1-9]|1[0-2])/(0[1-9]|[1-2][0-9]|3[01])");
 // Valid Time - HHMMSS
-const basic_regex<char> REGEX_HMSA("([01][0-9]|2[0-3])[0-5][0-9][0-5][0-9]");
+const std::basic_regex<char> REGEX_HMSA("([01][0-9]|2[0-3])[0-5][0-9][0-5][0-9]");
 // Valid Time - HHMM
-const basic_regex<char> REGEX_HMA("([01][0-9]|2[0-3])[0-5][0-9]");
+const std::basic_regex<char> REGEX_HMA("([01][0-9]|2[0-3])[0-5][0-9]");
 // Valid Time - HH:MM:SS
-const basic_regex<char> REGEX_HMS("([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]");
+const std::basic_regex<char> REGEX_HMS("([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]");
 // Valid Time - HH:MM
-const basic_regex<char> REGEX_HM("([01][0-9]|2[0-3]):[0-5][0-9]");
+const std::basic_regex<char> REGEX_HM("([01][0-9]|2[0-3]):[0-5][0-9]");
 
 // Parse date and time formats
-qsl_data::date_format qsl_reader::parse_date(string s) {
+qsl_data::date_format qsl_reader::parse_date(std::string s) {
 	if (regex_match(s.c_str(), REGEX_Y4MDA)) return qsl_data::FMT_Y4MD_ADIF;
 	if (regex_match(s.c_str(), REGEX_Y4MD)) return qsl_data::FMT_Y4MD;
 	if (regex_match(s.c_str(), REGEX_Y2MD)) return qsl_data::FMT_Y2MD;
 	return qsl_data::FMT_INVALID_DATA;
 }
 
-qsl_data::time_format qsl_reader::parse_time(string s) {
+qsl_data::time_format qsl_reader::parse_time(std::string s) {
 	if (regex_match(s.c_str(), REGEX_HMSA)) return qsl_data::FMT_HMS_ADIF;
 	if (regex_match(s.c_str(), REGEX_HMA)) return qsl_data::FMT_HM_ADIF;
 	if (regex_match(s.c_str(), REGEX_HMS)) return qsl_data::FMT_HMS;
@@ -825,9 +825,9 @@ qsl_data::time_format qsl_reader::parse_time(string s) {
 
 }
 
-Fl_Font qsl_reader::parse_font(string s) {
+Fl_Font qsl_reader::parse_font(std::string s) {
 	Fl_Font f;
-	string src = to_upper(s);
+	std::string src = to_upper(s);
 	if (regex_search(src, regex("COURIER"))) f = FL_COURIER;
 	else if(regex_search(src, regex("HELVETICA"))) f = FL_HELVETICA;
 	else if (regex_search(src, regex("TIMES"))) f = FL_TIMES;
@@ -836,29 +836,29 @@ Fl_Font qsl_reader::parse_font(string s) {
 	return f;	
 }
 
-bool qsl_reader::parse_bool(string s) {
+bool qsl_reader::parse_bool(std::string s) {
 	if (to_upper(s) == "YES") return true;
 	else return false;
 }
 
 // Decrypt stored value - stored as hex digits 
-string qsl_reader::decrypt(string s, uchar off) {
+std::string qsl_reader::decrypt(std::string s, uchar off) {
 	return xor_crypt(hex_to_string(s), seed_, off);
 }
 // Check app version is >= version in settings file
-bool qsl_reader::check_version(string v) {
-	vector<string> file_words;
+bool qsl_reader::check_version(std::string v) {
+	std::vector<std::string> file_words;
 	split_line(v, file_words, '.');
-	vector<string> prog_words;
+	std::vector<std::string> prog_words;
 	split_line(PROGRAM_VERSION, prog_words, '.');
-	if (stoi(prog_words[0]) > stoi(file_words[0])) {
+	if (std::stoi(prog_words[0]) > std::stoi(file_words[0])) {
 		return true;
 	} else if (prog_words[0] == file_words[0]) {
-		if (stoi(prog_words[1]) > stoi(file_words[1])) {
+		if (std::stoi(prog_words[1]) > std::stoi(file_words[1])) {
 			return true;
 		}
 		else if (prog_words[1] == file_words[1]) {
-			if (stoi(prog_words[2]) >= stoi(file_words[2])) {
+			if (std::stoi(prog_words[2]) >= std::stoi(file_words[2])) {
 				return true;
 			}
 		}

@@ -27,11 +27,11 @@
 extern eqsl_handler* eqsl_handler_;
 extern status* status_;
 extern book* book_;
-extern string default_station_;
+extern std::string default_station_;
 extern tabbed_forms* tabbed_forms_;
 extern qsl_dataset* qsl_dataset_;
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
 extern void open_html(const char*);
 
@@ -387,7 +387,7 @@ void qso_qsl_vwr::create_form() {
 	bn_card_reqd_->callback(cb_bn_card_reqd, (void*)"R");
 	bn_card_reqd_->when(FL_WHEN_RELEASE);
 	curr_x += WBUTTON;
-	// Button - QSO partner declines a card - set QSL_SENT=N
+	// Button - QSO partner declines a card - std::set QSL_SENT=N
 	bn_card_decl_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Declined");
 	bn_card_decl_->tooltip("Mark QSO as declining a card QSL");
 	bn_card_decl_->callback(cb_bn_card_reqd, (void*)"N");
@@ -454,7 +454,7 @@ void qso_qsl_vwr::cb_rad_card(Fl_Widget* w, void* v) {
 // v is record_num_t* containing the number of the record to fetch the eQSL card for
 void qso_qsl_vwr::cb_bn_fetch(Fl_Widget* w, void* v) {
 	qso_qsl_vwr* that = ancestor_view<qso_qsl_vwr>(w);
-	// Put the card request onto the eQSL request queue - so that requests are made
+	// Put the card request onto the eQSL request std::queue - so that requests are made
 	eqsl_handler_->enqueue_request(that->current_qso_num_, true);
 	eqsl_handler_->enable_fetch(eqsl_handler::EQ_START);
 	// Wait until donwload complete
@@ -465,19 +465,19 @@ void qso_qsl_vwr::cb_bn_fetch(Fl_Widget* w, void* v) {
 }
 
 // Set the QSL_RCVD and QSLRDATE values in current record
-// Set QSL_SENT to QUEUED if not already set
+// Set QSL_SENT to QUEUED if not already std::set
 // v selects scanned card (QI_CARD_FRONT) or e-mail (QI_EMAIL)
 void qso_qsl_vwr::cb_bn_log_card(Fl_Widget* w, void* v) {
 	qso_qsl_vwr* that = ancestor_view<qso_qsl_vwr>(w);
 	const char* source = (const char*)v;
-	string today = now(false, "%Y%m%d");
+	std::string today = now(false, "%Y%m%d");
 	that->current_qso_->item("QSLRDATE", today);
-	that->current_qso_->item("QSL_RCVD", string("Y"));
-	that->current_qso_->item("QSL_RCVD_VIA", string(source));
-	if (that->current_qso_->item("QSL_SENT") != string("Y") ||
-		that->current_qso_->item("QSL_SENT_VIA") != string(source)) {
-		that->current_qso_->item("QSL_SENT", string("Q"));
-		that->current_qso_->item("QSL_SENT_VIA", string(source));
+	that->current_qso_->item("QSL_RCVD", std::string("Y"));
+	that->current_qso_->item("QSL_RCVD_VIA", std::string(source));
+	if (that->current_qso_->item("QSL_SENT") != std::string("Y") ||
+		that->current_qso_->item("QSL_SENT_VIA") != std::string(source)) {
+		that->current_qso_->item("QSL_SENT", std::string("Q"));
+		that->current_qso_->item("QSL_SENT_VIA", std::string(source));
 	}
 	// now pretend the Card Front radio button has been pressed
 	if (*source == 'E') {
@@ -507,10 +507,10 @@ void qso_qsl_vwr::cb_bn_image(Fl_Widget* w, void* v) {
 void qso_qsl_vwr::cb_bn_card_reqd(Fl_Widget* w, void* v) {
 	qso_qsl_vwr* that = ancestor_view<qso_qsl_vwr>(w);
 	char* value = (char*)v;
-	that->current_qso_->item("QSL_SENT", string(value));
+	that->current_qso_->item("QSL_SENT", std::string(value));
 	switch (*value) {
 	case 'R':
-		that->current_qso_->item("QSL_SENT_VIA", string("B"));
+		that->current_qso_->item("QSL_SENT_VIA", std::string("B"));
 		break;
 	}
 	qso_data* data = ancestor_view<qso_data>(that);
@@ -525,7 +525,7 @@ void qso_qsl_vwr::cb_tabs(Fl_Widget* w, void* v) {
 	that->enable_widgets();
 }
 
-// set the current QSO
+// std::set the current QSO
 void qso_qsl_vwr::set_qso(record* qso, qso_num_t number) {
 	if (current_qso_ == qso) qso_changed_ = false;
 	else qso_changed_ = true;
@@ -600,7 +600,7 @@ void qso_qsl_vwr::set_image() {
 				thumb->set_qsos(&current_qso_, 1);
 			} else {
 				qso_manager* mgr = ancestor_view<qso_manager>(this);
-				string def_call = mgr->get_default(qso_manager::CALLSIGN);
+				std::string def_call = mgr->get_default(qso_manager::CALLSIGN);
 				card = qsl_dataset_->get_card(def_call, type, false);
 				full->set_card(card);
 				full->set_qsos(nullptr, 0);
@@ -615,14 +615,14 @@ void qso_qsl_vwr::set_image() {
 			bool found_image = false;
 			bool png_is_jpeg = false;
 			char filename[256];
-			string target_name = "";
-			// string default_name;
+			std::string target_name = "";
+			// std::string default_name;
 			if (current_qso_ != nullptr) {
 				// We want to display the received card (eQSL or scanned image)
 				// Get callsign
-				string call = current_qso_->item("CALL");
+				std::string call = current_qso_->item("CALL");
 				// OPtional file types
-				string file_types[] = { ".png", ".jpg", ".bmp" };
+				std::string file_types[] = { ".png", ".jpg", ".bmp" };
 				const int num_types = 3;
 				if (call != "") {
 					// Replace all / with _ - e.g. PA/GM3ZZA/P => PA_GM3ZZA_P
@@ -634,7 +634,7 @@ void qso_qsl_vwr::set_image() {
 					// Look for a possible image file and try and load into the image object
 					delete raw_image_;
 					raw_image_ = nullptr;
-					string station = current_qso_->item("STATION_CALLSIGN");
+					std::string station = current_qso_->item("STATION_CALLSIGN");
 					de_slash(station);
 
 					// Select the image type: eQSL or scanned in card (front or back)
@@ -679,7 +679,7 @@ void qso_qsl_vwr::set_image() {
 					// Images could be any graphic format
 					// Test first with existing filename then replace with default station
 					for (int ia = 0; ia < 2 && !found_image; ia++) {
-						string testname = filename;
+						std::string testname = filename;
 						if (ia == 1) {
 							size_t pos = testname.find(station);
 							testname.replace(pos, station.length(), default_station_);
@@ -780,7 +780,7 @@ void qso_qsl_vwr::set_image() {
 					status_->misc_status(ST_WARNING, message);
 					break;
 				case 1:
-					string jpeg_name = full_name_;
+					std::string jpeg_name = full_name_;
 					size_t pos = jpeg_name.find(".png");
 					jpeg_name.replace(pos, 4, ".jpg");
 					snprintf(message, sizeof(message),
@@ -921,7 +921,7 @@ void qso_qsl_vwr::set_qsl_status() {
 		}
 		if (current_qso_->item("QSL_RCVD") == "Y") {
 			bn_card_rstatus_->value(true);
-			string s = current_qso_->item("QSL_RCVD_VIA");
+			std::string s = current_qso_->item("QSL_RCVD_VIA");
 			bn_card_rstatus_->copy_label(s.c_str());
 		}
 		else {
@@ -956,7 +956,7 @@ void qso_qsl_vwr::set_qsl_status() {
 		}
 		if (current_qso_->item("QSL_SENT") == "Y") {
 			bn_card_sstatus_->value(true);
-			string s = current_qso_->item("QSL_SENT_VIA");
+			std::string s = current_qso_->item("QSL_SENT_VIA");
 			bn_card_sstatus_->copy_label(s.c_str());
 		}
 		else {

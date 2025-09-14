@@ -19,12 +19,12 @@ class Fl_Output;
 
 struct ct_data_t;
 
-using namespace std;
+
 
 // The records are kept in a container with size_t as index
 typedef size_t item_num_t;    // Position of item within this book
 typedef size_t qso_num_t;     // Position of item within book_ instance
-typedef vector<string> field_list;
+typedef std::vector<std::string> field_list;
 
 //! This class displays the running status of scoring during a contest activation.
 class contest_scorer :
@@ -88,24 +88,24 @@ public:
     //! What is the contest?
     
     //! \return identifier of the current contest.
-    string contest_id();
+    std::string contest_id();
 
     //! What fields are being used in the contest.
     
-    //! \return list of fields used in contest exchanges.
+    //! \return std::list of fields used in contest exchanges.
     field_list fields();
 
     //! Serial number
     
-    //! \return serial number as string
-    string serial();
+    //! \return serial number as std::string
+    std::string serial();
 
     //! Add score from this QSO, unless \p check_only is true when it checks what it would be.
     void score_qso(record* qso, bool check_only);
     //! Parse exchange and adds data to the \p QSO record.
-    void parse_exchange(record* qso, string text);
+    void parse_exchange(record* qso, std::string text);
     //! Generate exchange to send for this \p QSO.
-    string generate_exchange(record* qso);
+    std::string generate_exchange(record* qso);
 
 
 protected:
@@ -128,10 +128,10 @@ protected:
     void copy_points_to_display();
 
     // data
-    string contest_id_;       //!< Identifier of the current contest.
-    string contest_index_;    //!< Identifier of the current contest instance.
-    string start_time_;       //!< Contest start time as text.
-    string finish_time_;      //!< Contest finish time as text.
+    std::string contest_id_;       //!< Identifier of the current contest.
+    std::string contest_index_;    //!< Identifier of the current contest instance.
+    std::string start_time_;       //!< Contest start time as text.
+    std::string finish_time_;      //!< Contest finish time as text.
     bool active_;             //!< Contest is active.
 
     //! Contest description.
@@ -171,7 +171,7 @@ protected:
     contest_algorithm* algorithm_;
 
     //! Set of multipliers worked so far in this contest.
-    set<string> multipliers_;
+    std::set<std::string> multipliers_;
 
     // Widgets
     Fl_Choice* w_contest_;       //!< Choice to select contest from those supported.

@@ -9,7 +9,7 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Table.H>
 
-using namespace std;
+
 
 class record;
 class Fl_Output;
@@ -60,10 +60,10 @@ protected:
         //! inherited from Fl_Table_Row::draw_cell that draws the data in each cell.
         virtual void draw_cell(TableContext context, int R = 0, int C = 0, int X = 0, int Y = 0,
             int W = 0, int H = 0);
-        //! Concatenate \p names, \p qths, \p locators and \p states into a single list.
+        //! Concatenate \p names, \p qths, \p locators and \p states into a single std::list.
         
         //! This is referenced by draw_cell when drawing the table.
-        void set_data(set<string> names, set<string> qths, set<string> locators, set<string> states);
+        void set_data(std::set<std::string> names, std::set<std::string> qths, std::set<std::string> locators, std::set<std::string> states);
         //! Callback from table that copies the selexted item into the current QSO record.
         static void cb_table(Fl_Widget* w, void* v);
 
@@ -81,11 +81,11 @@ protected:
         //! The contents of each row.
         struct item_details {
             item_type type;    //!< Field identifier.
-            string value;      //!< Foeld value from previous QSO.
+            std::string value;      //!< Foeld value from previous QSO.
         };
 
         //! The items to display.
-        vector<item_details> items_;
+        std::vector<item_details> items_;
 
         //! The row headers.
         struct item_names {
@@ -94,7 +94,7 @@ protected:
         };
 
         //! Maps the field indentifier to row header details.
-        const map<item_type, item_names> name_map_ = {
+        const std::map<item_type, item_names> name_map_ = {
             {NAME, {"NAME ", "NAME"}},
             {QTH, {"QTH ", "QTH"}},
             {LOCATOR, {"GRID ", "GRIDSQUARE" }},
@@ -127,11 +127,11 @@ protected:
         
         //! \param items QSOs that match band, mode an station callsign.
         //! \param possibles QSOs that mismatch on one or more.
-        void set_data(set<qso_num_t> items, set<qso_num_t> possibles);
+        void set_data(std::set<qso_num_t> items, std::set<qso_num_t> possibles);
             
     protected:
         //! The previous QSOs: exact matches are listed first followed by possible matches.
-        vector<qso_num_t> items_;
+        std::vector<qso_num_t> items_;
 
     };
 
@@ -144,7 +144,7 @@ protected:
     //widgets
     Fl_Output* op_call_;        //! Output showing callsign.
     table_d* table_details_;    //! Table showing callsign's details from previous QSOs.
-    table_q* table_qsos_;       //! Table showing list of previous QSOs with callsign.
+    table_q* table_qsos_;       //! Table showing std::list of previous QSOs with callsign.
 
 
 };

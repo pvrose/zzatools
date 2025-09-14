@@ -82,7 +82,7 @@ bool cty_element::time_contains(cty_element* elem) {
 }
 
 // Return true if supplied time is within this validity
-bool cty_element::time_contains(string when) {
+bool cty_element::time_contains(std::string when) {
 	time_scope lhs = time_validity_;
 	if (lhs.start == "*") lhs.start = "00000000";
 	if (lhs.finish == "*") lhs.finish = "99999999";
@@ -91,7 +91,7 @@ bool cty_element::time_contains(string when) {
 }
 
 // Output streaming operator
-ostream& operator<<(ostream& os, const cty_element& rhs) {
+std::ostream& operator<<(std::ostream& os, const cty_element& rhs) {
 	os << "(" << rhs.time_validity_.start << "-" << rhs.time_validity_.finish << ") " <<
 		"Name=" << rhs.name_ << ", CQ=" << rhs.cq_zone_ << ", ITU=" << rhs.itu_zone_ <<
 		", Cont=" << rhs.continent_ << ", Coords=" << degrees_to_dms(rhs.coordinates_.latitude, true) <<
@@ -129,7 +129,7 @@ cty_element::error_t cty_entity::merge(cty_element* elem) {
 	return result;
 }
 
-ostream& operator<<(ostream& os, const cty_entity& rhs) {
+std::ostream& operator<<(std::ostream& os, const cty_entity& rhs) {
 	os << (cty_element)rhs << " Nickname=" << rhs.nickname_ << ", " << rhs.filters_.size() << " Filters";
 	return os;
 }
@@ -140,7 +140,7 @@ cty_prefix::cty_prefix() : cty_element() {
 // Ddstructor - delete children
 cty_prefix::~cty_prefix() { }
 
-ostream& operator<<(ostream& os, const cty_prefix& rhs) {
+std::ostream& operator<<(std::ostream& os, const cty_prefix& rhs) {
 	os << (cty_element)rhs;
 	return os;
 }
@@ -151,7 +151,7 @@ cty_exception::cty_exception() : cty_element() {
 }
 cty_exception::~cty_exception() {}
 
-ostream& operator<<(ostream& os, const cty_exception& rhs) {
+std::ostream& operator<<(std::ostream& os, const cty_exception& rhs) {
 	os << (cty_element)rhs << (rhs.exc_type_ == cty_exception::EXC_INVALID ? " (INVALID)" : "");
 	return os;
 }
@@ -165,7 +165,7 @@ cty_filter::cty_filter() : cty_element () {
 }
 cty_filter::~cty_filter() {}
 
-ostream& operator<<(ostream& os, const cty_filter& rhs) {
+std::ostream& operator<<(std::ostream& os, const cty_filter& rhs) {
 	os << (cty_element)rhs << ", Filter=" << rhs.pattern_ << ", Reason=" << rhs.reason_ <<
 		", Nickname=" << rhs.nickname_;
 	return os;
@@ -179,7 +179,7 @@ cty_geography::cty_geography() : cty_filter() {
 }
 cty_geography::~cty_geography() { }
 
-ostream& operator<<(ostream& os, const cty_geography& rhs) {
+std::ostream& operator<<(std::ostream& os, const cty_geography& rhs) {
 	os << (cty_filter)rhs << ", PAS=" << rhs.province_;
 	return os;
 }

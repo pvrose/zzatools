@@ -10,10 +10,10 @@
 #include <fstream>
 #include <list>
 #include <map>
-#include <ostream>
+#include<ostream>
 #include <string>
 
-using namespace std;
+
 
 class record;
 
@@ -23,7 +23,7 @@ class cty_data
 
 public:
 
-	//! Source of the data - set by type()
+	//! Source of the data - std::set by type()
 	enum cty_type_t : uint8_t {
 		ADIF = 0,          //!< Data from ADIF Specification.
 		CLUBLOG,           //!< Data from Clublog.org.
@@ -40,11 +40,11 @@ protected:
 	//! Database structure.
 	struct all_data {
 		//! All the entities - indexed by dxcc_id.
-		map < int, cty_entity* > entities;
-		//! All the entity level prefixes - indexed by starting string.
-		map < string, list<cty_prefix*> > prefixes;
+		std::map < int, cty_entity* > entities;
+		//! All the entity level prefixes - indexed by starting std::string.
+		std::map < std::string, std::list<cty_prefix*> > prefixes;
 		//! All the exceptions - indexed by callsign.
-		map < string, list<cty_exception*> > exceptions;
+		std::map < std::string, std::list<cty_exception*> > exceptions;
 	};
 
 public:
@@ -65,9 +65,9 @@ public:
 	virtual ~cty_data();
 
 	// Return various fields of entity
-	string nickname(record* qso);  //!< Returns the nickname for the entity in the \p QSO. 
-	string name(record* qso);      //!< Returns the name of the entity in the \p QSO.
-	string continent(record* qso); //!< Returns the continent of the entity in the \p QSO.
+	std::string nickname(record* qso);  //!< Returns the nickname for the entity in the \p QSO. 
+	std::string name(record* qso);      //!< Returns the name of the entity in the \p QSO.
+	std::string continent(record* qso); //!< Returns the continent of the entity in the \p QSO.
 	int cq_zone(record* qso);      //!< Returns the CQ Zone of the callsign in the \p QSO.
 	int itu_zone(record* qso);     //!< Returns the ITU Zone of the callsign in the \p QSO.
 	// Get location
@@ -82,7 +82,7 @@ public:
 	
 	//! \param qso QSO record to parse.
 	//! \return text information about parsing for displaying in a tooltip.
-	string get_tip(record* qso);
+	std::string get_tip(record* qso);
 	//! Parsing source
 	
 	//! \param qso QSO to parse.
@@ -91,43 +91,43 @@ public:
 	//! Returns the DXCC identifier of the entity worked in \p qso. 
 	int entity(record* qso);
 	//! Returns geography information relating to the callsign worked in \p qso.
-	string geography(record* qso);
+	std::string geography(record* qso);
 	//! Returns usage information relating to the callsign worked in \p qso.
-	string usage(record* qso);
+	std::string usage(record* qso);
 
 	//! Returns the DXCC identifier for the entity with \p nickname.
-	int entity(string nickname);
+	int entity(std::string nickname);
 	//! Returns the entity nickname for the entity with DXCC identifier \p adif_id.
-	string nickname(int adif_id);
+	std::string nickname(int adif_id);
 
 	//! Add the entity \p entry to the database.
 	void add_entity(cty_entity* entry);
 	//! Add the prefix \p entry mapped by \p pattern to the database.
-	void add_prefix(string pattern, cty_prefix* entry);
+	void add_prefix(std::string pattern, cty_prefix* entry);
 	//! Add the exception \p entry mapped by \p pattern to the database.
-	void add_exception(string pattern, cty_exception* entry);
+	void add_exception(std::string pattern, cty_exception* entry);
 	//! Add the filter \p entry to the specified \p element in the database. 
 	void add_filter(cty_element* element, cty_filter* entry);
 
 	//! Returns the current output stream
-	ostream& out() { return os_; };
+	std::ostream& out() { return os_; };
 	//! Returns the recorded timestamp for the data source by \p type.
-	chrono::system_clock::time_point timestamp(cty_type_t type);
+	std::chrono::system_clock::time_point timestamp(cty_type_t type);
 	//! Download the latest data from data source by \p type.
 	
 	//! Returns true if successful, false if not.
 	bool fetch_data(cty_type_t type);
 	//! Returns the version of the data source by \p type.
-	string version(cty_type_t type);
+	std::string version(cty_type_t type);
 
 protected:
 
 	//! Load the data from the \p filename specified. 
-	bool load_data(string filename);
+	bool load_data(std::string filename);
 	//! Delete data
 	void delete_data(all_data* data);
 	//! Returns the filename for the current data type.
-	string get_filename();
+	std::string get_filename();
 	//! Merge imported data from latest source.
 	void merge_data();
 	//! Prepopulate from ADIF Specification.
@@ -135,7 +135,7 @@ protected:
 	//! Find the entity, pattern and sub-patterns for the supplied QSO: updates internal attributes.
 	void parse(record* qso);
 	//! Use the attached \p suffix to "mutate" the \p call to parse eg W1ABC/2 type calls.
-	void mutate_call(string& call, char suffix);
+	void mutate_call(std::string& call, char suffix);
 
 	//! Find element that matches the call.
 	
@@ -143,13 +143,13 @@ protected:
 	//! \param when Date of QSO.
 	//! \param matched_call Returns the part of the callsign that matches the element.
 	//! \return The matching element: either an exception record or an entity.
-	cty_element* match_pattern(string call, string when, string& matched_call);
+	cty_element* match_pattern(std::string call, std::string when, std::string& matched_call);
 	//! Find specific prefix element that matches call.
 	
 	//! \param call Callsign to match.
 	//! \param when Date of QSO.
 	//! \return The matching prefix record.
-	cty_element* match_prefix(string call, string when);
+	cty_element* match_prefix(std::string call, std::string when);
 	//! Find specific secondary filter that matches the call and type.
 	
 	//! \param element The starting point of the match search - usually an entity element or
@@ -157,10 +157,10 @@ protected:
 	//! \param type Either FT_GEOGRAPHY or FT_USAGE.
 	//! \param call The callsign to match.
 	//! \param when The date of the QSO.
-	cty_filter* match_filter(cty_element* element, cty_filter::filter_t type, string call, string when);
+	cty_filter* match_filter(cty_element* element, cty_filter::filter_t type, std::string call, std::string when);
 
 	//! Split \p call into call \p body and \p alt (alternate).
-	void split_call(string call, string& alt, string& body);
+	void split_call(std::string call, std::string& alt, std::string& body);
 	//! Dump database into a file - for checking data loaded cotrrectly.
 	void dump_database();
 
@@ -174,7 +174,7 @@ protected:
 	//! \param filename Filename.
 	//! \param old_age Age in days the filename is considered valid. A warning is raised if the file is older.
 	//! \return the system timestamp of the file.
-	chrono::system_clock::time_point get_timestamp(string filename, int old_age);
+	std::chrono::system_clock::time_point get_timestamp(std::string filename, int old_age);
 
 	//! The result of a parse request.
 	struct {
@@ -189,7 +189,7 @@ protected:
 	} parse_result_;
 
 	//! Previous callsign that was parsed, to avoid unnecessary re-parsing.
-	string current_call_ = "";
+	std::string current_call_ = "";
 	//! Previous QSO that was parsed.
 	record* current_qso_ = nullptr;
 
@@ -200,7 +200,7 @@ protected:
 	all_data* import_ = nullptr;
 
 	//! Output stream for the merge report.
-	ofstream os_;
+	std::ofstream os_;
 
 	//! Warnings have been reported during data merge.
 	bool report_warnings_ = false;
@@ -208,11 +208,11 @@ protected:
 	bool report_errors_ = false;
 
 	//! Mapping of data timestamps by data source.
-	map<cty_type_t, chrono::system_clock::time_point> timestamps_;
+	std::map<cty_type_t, std::chrono::system_clock::time_point> timestamps_;
 	//! Time at start of loading.
-	chrono::system_clock::time_point now_;
+	std::chrono::system_clock::time_point now_;
 	//! Mapping of data versions by data source.
-	map<cty_type_t, string> versions_;
+	std::map<cty_type_t, std::string> versions_;
 
 };
 

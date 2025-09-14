@@ -2,7 +2,7 @@
 #include "stn_data.h"
 #include "status.h"
 
-using namespace std;
+
 
 extern status* status_;
 extern bool closing_;
@@ -29,21 +29,21 @@ stn_reader::~stn_reader() {
 
 // Loaddata
 bool stn_reader::load_data(
-	map<string, qth_info_t*>* qths,
-	map<string, oper_info_t*>* opers,
-	map<string, string>* scalls,
-	istream& in) {
+	std::map<std::string, qth_info_t*>* qths,
+	std::map<std::string, oper_info_t*>* opers,
+	std::map<std::string, std::string>* scalls,
+	std::istream& in) {
 	qths_ = qths;
 	opers_ = opers;
 	scalls_ = scalls;
 	in_file_ = &in;
 	// calculate the file size and initialise the progress bar
-	streampos startpos = in.tellg();
-	in.seekg(0, ios::end);
-	streampos endpos = in.tellg();
+	std::streampos startpos = in.tellg();
+	in.seekg(0, std::ios::end);
+	std::streampos endpos = in.tellg();
 	long file_size = (long)(endpos - startpos);
 	// reposition back to beginning
-	in.seekg(0, ios::beg);
+	in.seekg(0, std::ios::beg);
 	// Initialsie the progress
 	status_->misc_status(ST_NOTE, "STN DATA: Started");
 	status_->progress(file_size, OT_STN, "Converting XML into Station database", "bytes");
@@ -68,7 +68,7 @@ bool stn_reader::load_data(
 }
 
 // The start methods
-bool stn_reader::start_station(xml_wreader* rdr, map<string, string>* attributes) {
+bool stn_reader::start_station(xml_wreader* rdr, std::map<std::string, std::string>* attributes) {
 	if (rdr->elements_.size()) {
 		status_->misc_status(ST_ERROR, "STN DATA: Unexpected STATION element");
 		return false;
@@ -77,7 +77,7 @@ bool stn_reader::start_station(xml_wreader* rdr, map<string, string>* attributes
 	return true;
 }
 
-bool stn_reader::start_location(xml_wreader* rdr, map<string, string>* attributes) {
+bool stn_reader::start_location(xml_wreader* rdr, std::map<std::string, std::string>* attributes) {
 	// Only expect in STATION
 	if (rdr->elements_.back() != STN_STATION) {
 		status_->misc_status(ST_ERROR, "STN DATA: Unexpected LOCATION element");
@@ -88,7 +88,7 @@ bool stn_reader::start_location(xml_wreader* rdr, map<string, string>* attribute
 	char msg[128];
 	// Getthe name
 	for (auto it : *attributes) {
-		string name = to_upper(it.first);
+		std::string name = to_upper(it.first);
 		if (name == "ID") {
 			if (that->qths_->find(it.second) != that->qths_->end()) {
 				snprintf(msg, sizeof(msg), "STN DATA: Duplicate QTH %s found",
@@ -114,7 +114,7 @@ bool stn_reader::start_location(xml_wreader* rdr, map<string, string>* attribute
 
 }
 
-bool stn_reader::start_item(xml_wreader* rdr, map<string, string>* attributes) {
+bool stn_reader::start_item(xml_wreader* rdr, std::map<std::string, std::string>* attributes) {
 	stn_reader* that = (stn_reader*)rdr;
 	switch (rdr->elements_.back()) {
 	case STN_LOCATION:
@@ -122,7 +122,7 @@ bool stn_reader::start_item(xml_wreader* rdr, map<string, string>* attributes) {
 		that->elements_.push_back(STN_ITEM);
 		// get the name
 		for (auto it : *attributes) {
-			string name = to_upper(it.first);
+			std::string name = to_upper(it.first);
 			if (name == "NAME") {
 				// Iyt might be an empty value
 				that->item_value_ = "";
@@ -141,7 +141,7 @@ bool stn_reader::start_item(xml_wreader* rdr, map<string, string>* attributes) {
 	}
 }
 
-bool stn_reader::start_operator(xml_wreader* rdr, map<string, string>* attributes) {
+bool stn_reader::start_operator(xml_wreader* rdr, std::map<std::string, std::string>* attributes) {
 	// Only expect in STATION
 	if (rdr->elements_.back() != STN_STATION) {
 		status_->misc_status(ST_ERROR, "STN DATA: Unexpected OPERATOR element");
@@ -152,7 +152,7 @@ bool stn_reader::start_operator(xml_wreader* rdr, map<string, string>* attribute
 	char msg[128];
 	// Getthe name
 	for (auto it : *attributes) {
-		string name = to_upper(it.first);
+		std::string name = to_upper(it.first);
 		if (name == "ID") {
 			if (that->opers_->find(it.second) != that->opers_->end()) {
 				snprintf(msg, sizeof(msg), "STN DATA: Duplicate Operator %s found",
@@ -177,7 +177,7 @@ bool stn_reader::start_operator(xml_wreader* rdr, map<string, string>* attribute
 	return true;
 }
 
-bool stn_reader::start_scallsign(xml_wreader* rdr, map<string, string>* attributes) {
+bool stn_reader::start_scallsign(xml_wreader* rdr, std::map<std::string, std::string>* attributes) {
 	// Only expect in STATION
 	if (rdr->elements_.back() != STN_STATION) {
 		status_->misc_status(ST_ERROR, "STN DATA: Unexpected OPERATOR element");
@@ -185,10 +185,10 @@ bool stn_reader::start_scallsign(xml_wreader* rdr, map<string, string>* attribut
 	}
 	rdr->elements_.push_back(STN_SCALLSIGN);
 	stn_reader* that = (stn_reader*)rdr;
-	string call = "";
-	string description = "";
+	std::string call = "";
+	std::string description = "";
 	for (auto it : *attributes) {
-		string name = to_upper(it.first);
+		std::string name = to_upper(it.first);
 		if (name == "CALL") call = it.second;
 		else if (name == "DESCRIPTION") description = it.second;
 		else {
@@ -220,7 +220,7 @@ bool stn_reader::end_location(xml_wreader* rdr) {
 	return true;
 }
 
-map<string, qth_value_t> stn_reader::qth_value_map_ = {
+std::map<std::string, qth_value_t> stn_reader::qth_value_map_ = {
 	{ "Street", STREET },
 	{ "City", CITY },
 	{ "Postcode", POSTCODE },
@@ -236,7 +236,7 @@ map<string, qth_value_t> stn_reader::qth_value_map_ = {
 	{ "WAB", WAB }
 };
 
-map<string, oper_value_t> stn_reader::oper_value_map_ = {
+std::map<std::string, oper_value_t> stn_reader::oper_value_map_ = {
 	{ "Name", NAME },
 	{ "Callsign", CALLSIGN }
 };
@@ -286,7 +286,7 @@ bool stn_reader::end_operator(xml_wreader* rdr) {
 }
 
 // Character methods
-bool stn_reader::chars_item(xml_wreader* rdr, string content) {
+bool stn_reader::chars_item(xml_wreader* rdr, std::string content) {
 	stn_reader* that = (stn_reader*)rdr;
 	that->item_value_ = content;
 	return true;

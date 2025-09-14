@@ -9,7 +9,7 @@ class Fl_Button;
 class Fl_Input;
 class Fl_Input_Choice;
 
-using namespace std;
+
 
 //! This class provides the log-in dialog for a club station operator.
 class club_stn_dlg :
@@ -45,10 +45,10 @@ protected:
     //! Add the entered station callsign if not known.
     void add_callsign();
 
-    string club_name_;       //!< Name of the club.
-    string club_call_;       //!< Station callsign of the club.
-    string club_location_;   //!< Location of the club station.
-    string nickname_;        //!< Nickname of the operator.
+    std::string club_name_;       //!< Name of the club.
+    std::string club_call_;       //!< Station callsign of the club.
+    std::string club_location_;   //!< Location of the club station.
+    std::string nickname_;        //!< Nickname of the operator.
 
     Fl_Input* w_club_name_;       //!< input for club name.
     Fl_Input* w_club_call_;       //!< input for club station callsign.

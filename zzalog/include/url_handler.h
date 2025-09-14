@@ -2,15 +2,15 @@
 #define __URL_HANDLER__
 
 #include <string>
-#include <ostream>
-#include <istream>
+#include<ostream>
+#include<istream>
 #include <cstdio>
 #include <vector>
 #include <mutex>
 
 #include <curl/curl.h>
 
-using namespace std;
+
 
 
 
@@ -25,10 +25,10 @@ using namespace std;
 
 		//! Structure to pass various object types
 		struct field_pair {
-			string name;      //!< Object name
-			string value;     //!< Value for a string data item
-			string filename;  //!< Value for a filename 
-			string type;      //!< Value for a data-type.
+			std::string name;      //!< Object name
+			std::string value;     //!< Value for a std::string data item
+			std::string filename;  //!< Value for a filename 
+			std::string type;      //!< Value for a data-type.
 		};
 
 		//! Libcurl callback to write data received from curl to the output stream
@@ -49,21 +49,21 @@ using namespace std;
 		
 		//! \param url Address of web resource.
 		//! \param data Data stream to send data to.
-		bool read_url(string url, ostream* data);
+		bool read_url(std::string url, std::ostream* data);
 		//! Perform an HTTP POST operation.
 		 
 		//! \param url Address of web resource
 		//! \param resource Identifier of resource type
 		//! \param req Data stream to send to URL
 		//! \param resp Data stream to receive any response.
-		bool post_url(string url, string resource, istream* req, ostream* resp);
+		bool post_url(std::string url, std::string resource, std::istream* req, std::ostream* resp);
 		//! Performa an HTTP POST FORM operation.
 		 
 		//! \param url Address of web resource.
 		//! \param fields POST FORM parameter name/value pairs.
 		//! \param req Data stream to send to URL if \p fields is nullptr.
 		//! \param resp Data stream to receive any response.
-		bool post_form(string url, vector<field_pair> fields, istream* req, ostream* resp);
+		bool post_form(std::string url, std::vector<field_pair> fields, std::istream* req, std::ostream* resp);
 		//! Send an e-mail
 		 
 		//! \param url Address of e-Mail server
@@ -76,9 +76,9 @@ using namespace std;
 		//! \param payload e-Mai contents
 		//! \param attachments List of attached files.
 		//! \param formats Formats of attached files,
-		bool send_email(string url, string user, string password,
-			vector<string> to_list, vector<string> cc_list, vector<string> bcc_list,
-			string subject, string payload, vector<string> attachments, vector<string> formats);
+		bool send_email(std::string url, std::string user, std::string password,
+			std::vector<std::string> to_list, std::vector<std::string> cc_list, std::vector<std::string> bcc_list,
+			std::string subject, std::string payload, std::vector<std::string> attachments, std::vector<std::string> formats);
 
 	protected:
 		//! Output the associated data to the stream for debugging purposes.
@@ -102,6 +102,6 @@ using namespace std;
 		CURL * curl_;
 		
 		//! Lock to ensure only 1 CURL operation at once
-		static recursive_mutex lock_;
+		static std::recursive_mutex lock_;
 	};
 #endif

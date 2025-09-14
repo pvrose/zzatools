@@ -38,7 +38,7 @@ public:
     void enable_widgets();
 
    // Shared download method
-    //! Download list of QSLs from \p server.
+    //! Download std::list of QSLs from \p server.
     void qsl_download(import_data::update_mode_t server);
     //! Extract data for uploading to \p server.
     void qsl_extract(extract_data::extract_mode_t server);
@@ -105,7 +105,7 @@ protected:
     //! Upload only selected QSL
     bool single_qso_;
     //! Enumeration value for QSL_SENT_VIA update when "Done" is clicked.
-    string via_code_;
+    std::string via_code_;
 
     // Widgets
     Fl_Check_Button* bn_single_qso_;  //!< Check button "...selected QSO".

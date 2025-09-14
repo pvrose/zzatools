@@ -45,7 +45,7 @@ public:
 	};
 
 	//! Map copy_flags to the specific fields being copied.
-	const map < copy_flags, set<string> > COPY_FIELDS =
+	const std::map < copy_flags, std::set<std::string> > COPY_FIELDS =
 	{
 		{ CF_RIG_ETC, { "MY_RIG", "MY_ANTENNA", "STATION_CALLSIGN" } },
 		{ CF_CAT, { "MODE", "FREQ", "SUBMODE", "TX_PWR", "BAND" } },
@@ -56,8 +56,8 @@ public:
 		{ CF_REPORTS, { "RST_SENT", "RST_RCVD", "SRX", "STX" }}
 	};
 
-	//! The set of all copy flags
-	const set < copy_flags > COPY_SET = { CF_RIG_ETC, CF_CAT, CF_DATE, CF_TIME, CF_CALL, CF_DETAILS, CF_REPORTS };
+	//! The std::set of all copy flags
+	const std::set < copy_flags > COPY_SET = { CF_RIG_ETC, CF_CAT, CF_DATE, CF_TIME, CF_CALL, CF_DETAILS, CF_REPORTS };
 
 	// Loggable field names
 	static const int NUMBER_FIXED = 2;                 //!< Fields that cannot be changed.
@@ -68,7 +68,7 @@ public:
 
 protected:
 	//! Maps fieldname to the index of the input used for its value.
-	map<string, int> field_ip_map_;
+	std::map<std::string, int> field_ip_map_;
 	//! List of fields that are displayed.
 	field_list fields_in_use_;
 
@@ -122,8 +122,8 @@ public:
 	void copy_contest_to_qso();
 	//! Initialise which fields are processed by which pair of widgets (choice and input).
 	void initialise_field_map();
-	//! Returns fields in use as a comma-separated list.
-	string get_defined_fields();
+	//! Returns fields in use as a comma-separated std::list.
+	std::string get_defined_fields();
 	//! Clear all input widgets for field values.
 	void clear_display();
 	//! Clear fields in current QSO record and copy itt o the display.
@@ -138,7 +138,7 @@ public:
 	void save_focus(Fl_Widget* w);
 
 	//! Add the supplied \p field to the display at index \p ix.
-	void action_add_field(int ix, string field);
+	void action_add_field(int ix, std::string field);
 	//! Remove the field at index \p ix of the display.
 	void action_del_field(int ix);
 
@@ -153,9 +153,9 @@ public:
 	void set_focus_saved();
 
 protected:
-	//! Callback from selecting field input value: \p v provides index in field list.
+	//! Callback from selecting field input value: \p v provides index in field std::list.
 	static void cb_ip_field(Fl_Widget* w, void* v);
-	//! Callback from selecting field choice: \p v provides index in field list.
+	//! Callback from selecting field choice: \p v provides index in field std::list.
 	static void cb_ch_field(Fl_Widget* w, void* v);
 	//! Callback from "NOTES" input.
 	static void cb_ip_notes(Fl_Widget* w, void* v);
@@ -180,9 +180,9 @@ protected:
 	//! Current QSO number
 	qso_num_t qso_number_;
 	//! Previous value of QTH.
-	string previous_qth_;
+	std::string previous_qth_;
 	//! Previous value of locator.
-	string previous_locator_;
+	std::string previous_locator_;
 	//! Previous contest serial number
 	int previous_serial_;
 	//! Index of the input that should get focus when redrawn.

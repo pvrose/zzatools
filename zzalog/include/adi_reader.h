@@ -3,11 +3,11 @@
 
 #include "files.h"
 
-#include <istream>
+#include<istream>
 #include <string>
 #include <set>
 
-using namespace std;
+
 
 // Forward declaration
 class book;
@@ -35,13 +35,13 @@ class record;
 		//! Load data from the specified input stream \a in into the specified \p book.
 		//! \param book logbook that will be loaded.
 		//! \param in input stream.
-		bool load_book(book* book, istream& in);
+		bool load_book(book* book, std::istream& in);
 		//! Load data to an individual record, failure is reported in result.
 		//! \param record QSO to be written from input.
 		//! \param in input stream.
 		//! \param result result of the input read.
 		//! \return the state of the input stream after the read.
-		istream & load_record(record* record, istream& in, load_result_t& result);
+		std::istream & load_record(record* record, std::istream& in, load_result_t& result);
 
 		//! Used to report progress while reading
 		//! \return fraction of the input stream loaded into the book.
@@ -62,7 +62,7 @@ class record;
 		int record_count_;
 
 		//! Set of external application-defined fields that have been encountered altready
-		set<string> known_app_fields;
+		std::set<std::string> known_app_fields;
 	};
 
 

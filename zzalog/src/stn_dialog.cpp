@@ -139,7 +139,7 @@ void stn_dialog::cb_tab(Fl_Widget* w, void* v) {
 }
 
 // Set tab
-void stn_dialog::set_tab(tab_type t, string id) {
+void stn_dialog::set_tab(tab_type t, std::string id) {
 	for (int ix = 0; ix < tabs_->children(); ix++) {
 		single_tab* w = (single_tab*)tabs_->child(ix);
 		if (w->type() == t) {
@@ -164,7 +164,7 @@ stn_dialog::single_tab::single_tab(int rx, int ry, int rw, int rh, char type,
 stn_dialog::single_tab::~single_tab() {}
 
 // Tooltips for the specific fields entrie
-map <qth_value_t, string> QTH_TIPS = {
+std::map <qth_value_t, std::string> QTH_TIPS = {
 	{ STREET, "Please enter your street address - optional" },
 	{ CITY, "Please enter your town or city - recommended" },
 	{ POSTCODE, "Please enter your postal code - optional" },
@@ -179,7 +179,7 @@ map <qth_value_t, string> QTH_TIPS = {
 	{ IOTA, "Please enter the IOTA id for your location - if a registered island location" },
 	{ WAB, "Please enter the Worked All Britain (4-caharacter Ordnance Survey geolocator) for your location - optional" }
 };
-map <oper_value_t, string> OPER_TIPS = {
+std::map <oper_value_t, std::string> OPER_TIPS = {
 	{ NAME, "Please enter your name as you want to see it in exchanges - recommended"},
 	{ CALLSIGN, "Please enter your callsign appropriate for operating this station - mandatory"}
 };
@@ -310,7 +310,7 @@ void stn_dialog::single_tab::enable_widgets() {
 				int dxcc;
 				bool has_states = true;
 				if (qth_->data.find(DXCC_ID) != qth_->data.end() && qth_->data.at(DXCC_ID).length()) {
-					dxcc = stoi(qth_->data.at(DXCC_ID));
+					dxcc = std::stoi(qth_->data.at(DXCC_ID));
 					if (!spec_data_->has_states(dxcc)) has_states = false;
 				}
 				for (auto it : QTH_ADIF_MAP) {
@@ -403,7 +403,7 @@ void stn_dialog::single_tab::save_data() {
 			}
 			qth_ = stn_data_->get_qth(current_id_);
 			for (auto it : QTH_ADIF_MAP) {
-				string data;
+				std::string data;
 				switch (it.first) {
 				case STREET:
 				case CITY:
@@ -423,7 +423,7 @@ void stn_dialog::single_tab::save_data() {
 			}
 			oper_ = stn_data_->get_oper(current_id_);
 			for (auto it : OPER_ADIF_MAP) {
-				string data;
+				std::string data;
 				switch (it.first) {
 				case NAME:
 					data = ip_values_[(int)it.first]->value();
@@ -449,8 +449,8 @@ void stn_dialog::single_tab::save_data() {
 // Save new ID value
 void stn_dialog::single_tab::cb_ch_id(Fl_Widget* w, void* v) {
 	single_tab* that = ancestor_view<single_tab>(w);
-	string s;
-	cb_value<Fl_Input_Choice, string>(w, &s);
+	std::string s;
+	cb_value<Fl_Input_Choice, std::string>(w, &s);
 	that->id(s);
 	that->enable_widgets();
 }
@@ -499,10 +499,10 @@ void stn_dialog::single_tab::type(char t) {
 char stn_dialog::single_tab::type() { return Fl_Group::type(); }
 
 // Return current ID
-string stn_dialog::single_tab::id() { return current_id_; }
+std::string stn_dialog::single_tab::id() { return current_id_; }
 
 // Set ID and initialise data
-void stn_dialog::single_tab::id(string s) {
+void stn_dialog::single_tab::id(std::string s) {
 	current_id_ = s;
 	switch (type()) {
 	case QTH:
@@ -524,7 +524,7 @@ void stn_dialog::single_tab::populate_choice(Fl_Input_Choice* ch, tab_type t) {
 	switch (t) {
 	case QTH:
 	{
-		const map<string, qth_info_t*>* qths = stn_data_->get_qths();
+		const std::map<std::string, qth_info_t*>* qths = stn_data_->get_qths();
 		for (auto it : *qths) {
 			ch->add(escape_menu(it.first).c_str());
 		}
@@ -532,7 +532,7 @@ void stn_dialog::single_tab::populate_choice(Fl_Input_Choice* ch, tab_type t) {
 	}
 	case OPERATOR:
 	{
-		const map<string, oper_info_t*>* opers = stn_data_->get_opers();
+		const std::map<std::string, oper_info_t*>* opers = stn_data_->get_opers();
 		for (auto it : *opers) {
 			ch->add(escape_menu(it.first).c_str());
 		}
@@ -540,7 +540,7 @@ void stn_dialog::single_tab::populate_choice(Fl_Input_Choice* ch, tab_type t) {
 	}
 	case CALLSIGN:
 	{
-		const map<string, string>* calls = stn_data_->get_calls();
+		const std::map<std::string, std::string>* calls = stn_data_->get_calls();
 		for (auto it : *calls) {
 			ch->add(escape_menu(it.first).c_str());
 		}
@@ -554,7 +554,7 @@ void stn_dialog::single_tab::update_from_call() {
 	switch (type()) {
 	case QTH: {
 		record* dummy_qso = qso_manager_->dummy_qso();
-		dummy_qso->item("CALL", string(ch_call_->value()));
+		dummy_qso->item("CALL", std::string(ch_call_->value()));
 		cty_data_->update_qso(dummy_qso, true);
 		for (auto it : QTH_ADIF_MAP) {
 			if (dummy_qso->item(it.second).length()) {

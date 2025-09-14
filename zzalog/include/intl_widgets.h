@@ -28,7 +28,7 @@ the international character dialog
 		//! Destructor.
 		virtual ~intl_editor();
 
-		//! Event handler - handle event as normal then set the cursor depending on current insert mode.
+		//! Event handler - handle event as normal then std::set the cursor depending on current insert mode.
 		int handle(int event);
 	};
 

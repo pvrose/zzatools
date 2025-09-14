@@ -29,7 +29,7 @@ void qso_net_entry::create_form(int X, int Y) {
 	box(FL_BORDER_BOX);
 	labelfont(FL_BOLD);
 
-	// Tabbed set of qso_entry forms
+	// Tabbed std::set of qso_entry forms
 	entries_ = new Fl_Tabs(X, Y + HTEXT, w(), h());
 	entries_->callback(cb_entries);
 	entries_->handle_overflow(Fl_Tabs::OVERFLOW_PULLDOWN);

@@ -44,7 +44,7 @@ void xml_writer::indent(xml_writer::format_style_t output_style, int depth) {
 }
 
 // Output the data to the stream
-bool xml_writer::data(ostream& os) {
+bool xml_writer::data(std::ostream& os) {
 	if (element_ == nullptr || prolog_ == nullptr) {
 		return false;
 	}
@@ -61,7 +61,7 @@ bool xml_writer::data(ostream& os) {
 }
 
 // Write the prolog - <?xml ...attributes?>
-bool xml_writer::write_prolog(xml_element* prolog, ostream& os) {
+bool xml_writer::write_prolog(xml_element* prolog, std::ostream& os) {
 	char temp[1024];
 	snprintf(temp, 1024, "<?%s %s?>", prolog->name().c_str(), prolog->content().c_str());
 	os << temp;
@@ -69,7 +69,7 @@ bool xml_writer::write_prolog(xml_element* prolog, ostream& os) {
 }
 
 // Write the element <NAME ATTR=VALUE...>content children</NAME> or empty <NAME ATTR=VALUE/>
-bool xml_writer::write_element(xml_element* element, ostream& os, int level) {
+bool xml_writer::write_element(xml_element* element, std::ostream& os, int level) {
 	// Depending on element type
 	switch (element->type()) {
 	case xml_element::ELEMENT: {
@@ -112,7 +112,7 @@ bool xml_writer::write_element(xml_element* element, ostream& os, int level) {
 				write_indent(os, level);
 			}
 			// Add any character content
-			string escaped = escape_string(element->content());
+			std::string escaped = escape_string(element->content());
 			snprintf(temp, 1024, "%s</%s>", escaped.c_str(), element->name().c_str());
 			os << temp;
 		}
@@ -133,7 +133,7 @@ bool xml_writer::write_element(xml_element* element, ostream& os, int level) {
 }
 
 // output any indentation to the stream
-bool xml_writer::write_indent(ostream& os, int level) {
+bool xml_writer::write_indent(std::ostream& os, int level) {
 	if (style_ == INDENT || style_ == TAB_INDENT || style_ == LINE_FEED) {
 		os << '\n';
 		for (int i = 0; i < indent_depth_ * level; i++) {
@@ -144,22 +144,22 @@ bool xml_writer::write_indent(ostream& os, int level) {
 }
 
 // Escape special characters
-string xml_writer::escape_string(string source) {
-	string result = "";
+std::string xml_writer::escape_string(std::string source) {
+	std::string result = "";
 	// For the length of the source striing
 	for (size_t i = 0; i < source.length(); i++) {
 		char c = source[i];
 		bool is_entity = false;
-		string key;
+		std::string key;
 		// Look up the character in the entities
 		for (auto it = entities_.begin(); it != entities_.end() && !is_entity; it++) {
-			// If it is one get the entity string
+			// If it is one get the entity std::string
 			if (it->second[0] == c) {
 				is_entity = true;
 				key = it->first;
 			}
 		}
-		// Append either the entity string or the original character
+		// Append either the entity std::string or the original character
 		if (is_entity) {
 			result += key;
 		//}
@@ -172,7 +172,7 @@ string xml_writer::escape_string(string source) {
 	return result;
 }
 
-string xml_writer::convert_xml_datetime(time_t t) {
+std::string xml_writer::convert_xml_datetime(time_t t) {
 	tm* value = gmtime(&t);
 	char result[128];
 	// YYYY-MM-DDTHH:MM:SS+HH:MM
@@ -184,5 +184,5 @@ string xml_writer::convert_xml_datetime(time_t t) {
 		value->tm_hour,
 		value->tm_min,
 		value->tm_sec);
-	return string(result);
+	return std::string(result);
 }

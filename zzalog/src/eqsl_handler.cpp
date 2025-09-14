@@ -16,7 +16,7 @@
 
 #include <cstdio>
 #include <fstream>
-#include <istream>
+#include<istream>
 #include <sstream>
 #include <chrono>
 
@@ -35,12 +35,12 @@ extern qso_manager* qso_manager_;
 extern ticker* ticker_;
 extern url_handler* url_handler_;
 extern bool DEBUG_THREADS;
-extern string default_station_;
+extern std::string default_station_;
 extern fields* fields_;
 // extern uint32_t seed_;
 extern qsl_dataset* qsl_dataset_;
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
 
 // Constructor
@@ -50,8 +50,8 @@ eqsl_handler::eqsl_handler()
 	, tick_count_(0)
 {
 	run_threads_ = true;
-	if (DEBUG_THREADS) printf("EQSL MAIN: Starting thread\n");
-	th_upload_ = new thread(thread_run, this);
+	if (DEBUG_THREADS) printf("EQSL MAIN: Starting std::thread\n");
+	th_upload_ = new std::thread(thread_run, this);
 
 	// Start ticket
 	ticker_->add_ticker(this, cb_ticker, 10);
@@ -80,11 +80,11 @@ eqsl_handler::~eqsl_handler()
 	delete th_upload_;
 }
 
-/* The request queue is filled as the downloaded update is processed. It is emptied one request every 10 s
+/* The request std::queue is filled as the downloaded update is processed. It is emptied one request every 10 s
    to avoid overwhelming the eQSL server. 
 */
 
-// Put the image request on to the queue 
+// Put the image request on to the std::queue 
 void eqsl_handler::enqueue_request(qso_num_t record_num, bool force /*=false*/) {
 	// eQSL requests can be disabled when compiled with _DEBUG
 	// Inhibit saving log
@@ -131,7 +131,7 @@ void eqsl_handler::progress_download() {
 	}
 }
 
-// Reomve a request from the queue
+// Reomve a request from the std::queue
 void eqsl_handler::dequeue_request() {
 	char message[512];
 	// Do not send any requests if we have reached the limit in a session
@@ -144,7 +144,7 @@ void eqsl_handler::dequeue_request() {
 		}
 	}
 	if (!request_queue_.empty() && empty_queue_enable_) {
-		// send the next eQSL request in the queue - but leave it in the queue until we've seen the response
+		// send the next eQSL request in the std::queue - but leave it in the std::queue until we've seen the response
 		request_t request = request_queue_.front();
 		// Let user know what we are doing
 		sprintf(message, "EQSL: Downloading card %s", book_->get_record(request.record_num, false)->item("CALL").c_str());
@@ -158,10 +158,10 @@ void eqsl_handler::dequeue_request() {
 			fl_beep(FL_BEEP_QUESTION);
 			switch (fl_choice("eQSL download failed, do you want try again or cancel all", fl_yes, fl_cancel, fl_no)) {
 			case 0:
-				// Try again - leave the request on the queue
+				// Try again - leave the request on the std::queue
 				break;
 			case 1:
-				// Cancel - delete all requests in the queue
+				// Cancel - delete all requests in the std::queue
 				while (!request_queue_.empty()) {
 					request_queue_.pop();
 					book_->enable_save(true, "Cancelling eQSL image request");
@@ -169,11 +169,11 @@ void eqsl_handler::dequeue_request() {
 				cards_skipped = true;
 				break;
 			case 2:
-				// Request failed and repeat not wanted - remove request from queue
+				// Request failed and repeat not wanted - remove request from std::queue
 				if (fl_choice("Do you want to remove eQSL received flag?", fl_yes, fl_no, nullptr) == 0) {
 					record* qso = book_->get_record(request.record_num, false);
-					qso->item("EQSL_QSL_RCVD", string(""));
-					qso->item("EQSL_QSLRDATE", string(""));
+					qso->item("EQSL_QSL_RCVD", std::string(""));
+					qso->item("EQSL_QSLRDATE", std::string(""));
 				}
 				request_queue_.pop();
 				book_->enable_save(true, "Failed eQSL image request");
@@ -182,29 +182,29 @@ void eqsl_handler::dequeue_request() {
 			}
 			break;
 		case ER_OK:
-			// request succeeded - remove request from queue
+			// request succeeded - remove request from std::queue
 			request_queue_.pop();
 			book_->enable_save(true, "Dequeued eQSL image request");
 			allowed_fetches_--;
 			break;
 		case ER_SKIPPED:
-			// request skipped - remove request from queue
+			// request skipped - remove request from std::queue
 			request_queue_.pop();
 			tick_count_ = EQSL_THROTTLE;
 			book_->enable_save(true, "Skipped eQSL image request");
 			break;
 		case ER_THROTTLED:
-			// Request remains on queue to be tried again
+			// Request remains on std::queue to be tried again
 			break;
 		case ER_HTML_ERR:
 			// HTML error
 			fl_beep(FL_BEEP_QUESTION);
 			switch (fl_choice("Internet access failed, do you want to try again or cancel all?", fl_yes, fl_cancel, fl_no)) {
 			case 0:
-				// Yes - leave on queue
+				// Yes - leave on std::queue
 				break;
 			case 1:
-				// Cancel - delete all requests in the queue
+				// Cancel - delete all requests in the std::queue
 				while (!request_queue_.empty()) {
 					request_queue_.pop();
 					book_->enable_save(true, "Failed eqSL image request");
@@ -212,7 +212,7 @@ void eqsl_handler::dequeue_request() {
 				cards_skipped = true;
 				break;
 			case 2:
-				// Request failed and repeat not wanted - delete request from queue
+				// Request failed and repeat not wanted - delete request from std::queue
 				request_queue_.pop();
 				book_->enable_save(true, "Failed eQSL image request");
 				cards_skipped = true;
@@ -222,11 +222,11 @@ void eqsl_handler::dequeue_request() {
 		default:
 			break;
 		}
-		// Set the timeout again if the queue is still not empty and fetches are enabled
+		// Set the timeout again if the std::queue is still not empty and fetches are enabled
 		if (!request_queue_.empty() && empty_queue_enable_) {
 			// Let user know
 			request = request_queue_.front();
-			// Now peek the queue and select the front request so user sees the QSO being requested
+			// Now peek the std::queue and select the front request so user sees the QSO being requested
 			book_->selection(request.record_num);
 			sprintf(message, "EQSL: %zu card requests pending - next request %s", request_queue_.size(), book_->get_record()->item("CALL").c_str());
 			status_->misc_status(ST_NOTE, message);
@@ -260,7 +260,7 @@ eqsl_handler::response_t eqsl_handler::request_eqsl(request_t request) {
 	// Get the record
 	record* record = book_->get_record(request.record_num, false);
 	// get where to store the card locally
-	string local_filename = card_filename_l(record);
+	std::string local_filename = card_filename_l(record);
 	if (card_file_valid(local_filename) && !request.force) {
 		// already have the card and it's valid PNG and we are not deliberately requesting it again
 		char message[200];
@@ -274,8 +274,8 @@ eqsl_handler::response_t eqsl_handler::request_eqsl(request_t request) {
 		sprintf(message, "EQSL: Info: Fetching %s", local_filename.c_str());
 		status_->misc_status(ST_NOTE, message);
 		// fetch it
-		string remote_filename;
-		string file_type;
+		std::string remote_filename;
+		std::string file_type;
 		// Request the filename from eQSL.cc
 		response_t response= card_filename_r(record, remote_filename, file_type);
 		switch (response) {
@@ -297,21 +297,21 @@ eqsl_handler::response_t eqsl_handler::request_eqsl(request_t request) {
 }
 
 // Get the local filename for the card - hard-defined directory structure, but configurable top directory name
-string eqsl_handler::card_filename_l(record* record, bool use_default) {
-	string call = record->item("CALL");
+std::string eqsl_handler::card_filename_l(record* record, bool use_default) {
+	std::string call = record->item("CALL");
 	// Replace all / in call-sign with _ - e.g. PA/GM3ZZA/P => PA_GM3ZZA_P
 	de_slash(call);
 	// Get QSO details
-	string qso_date = record->item("QSO_DATE");
-	string time_on = record->item("TIME_ON");
-	string mode = record->item("MODE");
-	string band = record->item("BAND");
-	string station = use_default ? default_station_ : record->item("STATION_CALLSIGN");
+	std::string qso_date = record->item("QSO_DATE");
+	std::string time_on = record->item("TIME_ON");
+	std::string mode = record->item("MODE");
+	std::string band = record->item("BAND");
+	std::string station = use_default ? default_station_ : record->item("STATION_CALLSIGN");
 	de_slash(station);
 	// Location of top-directory for QSL card images
 	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences datapath_settings(settings, "Datapath");
-	string qsl_directory;
+	std::string qsl_directory;
 	char * temp;
 	datapath_settings.get("QSLs", temp, "");
 	qsl_directory = temp;
@@ -338,14 +338,14 @@ string eqsl_handler::card_filename_l(record* record, bool use_default) {
 }
 
 // Check to see if the file already exists and is a valid PNG file.
-bool eqsl_handler::card_file_valid(string& filename) {
+bool eqsl_handler::card_file_valid(std::string& filename) {
 	// Create the directory structure to this file
 	fl_make_path_for_file(filename.c_str());
 
 	// Check if PNG file already exists
 	bool file_exists = false;
 	// Try and open the file
-	string testname = filename + ".png";
+	std::string testname = filename + ".png";
 	ifstream file(testname.c_str());
 	if (!file.good()) {
 		file.close();
@@ -367,11 +367,11 @@ bool eqsl_handler::card_file_valid(string& filename) {
 
 // get the remote filename of the card
 eqsl_handler::response_t eqsl_handler::card_filename_r(
-		record* record, string& card_filename, string& filetype) {
+		record* record, std::string& card_filename, std::string& filetype) {
 	// Get username and password for building url to fetch front page
 	response_t response = ER_OK;
-	string username;
-	string password;
+	std::string username;
+	std::string password;
 	char message[256];
 	// Get users details
 	if (!user_details(&username, &password, nullptr, nullptr, nullptr, nullptr)) {
@@ -385,36 +385,36 @@ eqsl_handler::response_t eqsl_handler::card_filename_r(
 	// url to get the front page of the eQSL card fetch interface
 	char url_format[] = "http://www.eqsl.cc/qslcard/GeteQSL.cfm?Username=%s&Password=%s&CallsignFrom=%s&QSOYear=%s&QSOMonth=%s&QSODay=%s&QSOHour=%s&QSOMinute=%s&QSOBand=%s&QSOMode=%s";
 	char url[2048];
-	string call = record->item("CALL");
-	string qso_date = record->item("QSO_DATE");
-	string time_on = record->item("TIME_ON");
-	string mode = record->item("MODE");
-	string band = record->item("BAND");
-	string station = record->item("STATION_CALLSIGN");
+	std::string call = record->item("CALL");
+	std::string qso_date = record->item("QSO_DATE");
+	std::string time_on = record->item("TIME_ON");
+	std::string mode = record->item("MODE");
+	std::string band = record->item("BAND");
+	std::string station = record->item("STATION_CALLSIGN");
 	if (station.length() == 0) station = username;
 	// Apply fields to complete the URL
 	sprintf(url, url_format, station.c_str(), password.c_str(), call.c_str(), qso_date.substr(0, 4).c_str(), 
 		qso_date.substr(4, 2).c_str(), qso_date.substr(6, 2).c_str(),
 		time_on.substr(0, 2).c_str(), time_on.substr(2, 2).c_str(), band.c_str(), mode.c_str());
 	// Stream to receive the data
-	stringstream eqsl_ss;
+	std::stringstream eqsl_ss;
 	// Download page
 	if (url_handler_->read_url(url, &eqsl_ss)) {
 		// Page fetched OK.
 		// Signatures to look for
-		string error_signature = "Error:";
-		string image_signature = "<img src=\"";
-		string throttle_signature = "Warning: Processor Overload - Throttling invoked";
-		string text_line;
+		std::string error_signature = "Error:";
+		std::string image_signature = "<img src=\"";
+		std::string throttle_signature = "Warning: Processor Overload - Throttling invoked";
+		std::string text_line;
 		bool got_card_filename = false;
 		int char_pos = 0;
-		string file = "";
+		std::string file = "";
 		// Interpret returned page - read a line at a time looking for one of the signatures
 		while (getline(eqsl_ss, text_line) && eqsl_ss.good() && !got_card_filename) {
 			file += text_line;
-			// First look for Error: and set status to error message
+			// First look for Error: and std::set status to error message
 			char_pos = text_line.find(error_signature);
-			if (char_pos != string::npos) {
+			if (char_pos != std::string::npos) {
 				// We have an error
 				got_card_filename = false;
 				response = ER_FAILED;
@@ -425,7 +425,7 @@ eqsl_handler::response_t eqsl_handler::card_filename_r(
 			else {
 				// No error on this line - check for throttled warning
 				char_pos = text_line.find(throttle_signature);
-				if (char_pos != string::npos) {
+				if (char_pos != std::string::npos) {
 					// We have been throttled
 					response = ER_THROTTLED;
 					got_card_filename = false;
@@ -433,15 +433,15 @@ eqsl_handler::response_t eqsl_handler::card_filename_r(
 					status_->misc_status(ST_ERROR, message);
 				}
 				else {
-					// The look for <img src=" and set image file name to what then follows
+					// The look for <img src=" and std::set image file name to what then follows
 					char_pos = text_line.find(image_signature);
-					if (char_pos != string::npos) {
+					if (char_pos != std::string::npos) {
 						// Position to after the first quote
 						char_pos += image_signature.length();
 						// now look for second quote ending the filename
 						int end_pos = text_line.find("\"", char_pos);
 						// incorrectly formatted response
-						if (end_pos == string::npos) {
+						if (end_pos == std::string::npos) {
 							response = ER_FAILED;
 							got_card_filename = false;
 							sprintf(message, "EQSL: error: %s Cannot find image file name", call.c_str());
@@ -451,7 +451,7 @@ eqsl_handler::response_t eqsl_handler::card_filename_r(
 						else {
 							card_filename = text_line.substr(char_pos, end_pos - char_pos);
 							size_t dot_pos = card_filename.find_last_of('.');
-							if (dot_pos == string::npos) {
+							if (dot_pos == std::string::npos) {
 								response = ER_FAILED;
 								got_card_filename = false;
 								sprintf(message, "EQSL: error: %s Cannot find file type", call.c_str());
@@ -479,7 +479,7 @@ eqsl_handler::response_t eqsl_handler::card_filename_r(
 
 // Download the card image file to local filestore
 eqsl_handler::response_t eqsl_handler::download(
-	string remote_filename, string local_filename) {
+	std::string remote_filename, std::string local_filename) {
 
 	// We have a remote file name - prepend with web-site to generate url to fetch image
 	char url[2048];
@@ -488,7 +488,7 @@ eqsl_handler::response_t eqsl_handler::download(
 	sprintf(message, "EQSL: Getting remote image %s", remote_filename.c_str());
 	status_->misc_status(ST_NOTE, message);
 	// Create an output stream to the local filename and fetch the file (handled directly by url_handler)
-	ofstream* os = new ofstream(local_filename, ios_base::out | ios_base::binary);
+	std::ofstream* os = new std::ofstream(local_filename, std::ios_base::out | std::ios_base::binary);
 	if (url_handler_->read_url(url, os)) {
 		os->close();
 		status_->misc_status(ST_OK, "EQSL: Download successful");
@@ -504,16 +504,16 @@ eqsl_handler::response_t eqsl_handler::download(
 
 // Returns user details from the settings
 bool eqsl_handler::user_details(
-	string* username, 
-	string* password, 
-	string* last_access, 
-	string* qsl_message, 
-	string* swl_message,
+	std::string* username, 
+	std::string* password, 
+	std::string* last_access, 
+	std::string* qsl_message, 
+	std::string* swl_message,
 	bool* confirmed) {
 
 	server_data_t* eqsl_data = qsl_dataset_->get_server_data("eQSL");
 
-	string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
+	std::string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
 
 	// Check user name
 	if (username != nullptr) {
@@ -555,7 +555,7 @@ bool eqsl_handler::user_details(
 		*confirmed = eqsl_data->download_confirmed;
 	}
 	if (username == nullptr || *username == "" || password == nullptr || *password == "") {
-		// User name or password not set
+		// User name or password not std::set
 		return false;
 	}
 	else {
@@ -563,9 +563,9 @@ bool eqsl_handler::user_details(
 	}
 }
 
-// Download the eQSL inbox - ADIF is an internal stringstream that is later loaded into import_data_ in ADIF format
-bool eqsl_handler::download_eqsl_log(stringstream* adif) {
-	string filename;
+// Download the eQSL inbox - ADIF is an internal std::stringstream that is later loaded into import_data_ in ADIF format
+bool eqsl_handler::download_eqsl_log(std::stringstream* adif) {
+	std::string filename;
 	// Takes time as it's online
 	fl_cursor(FL_CURSOR_WAIT);
 	// get eQSL.cc filename
@@ -581,11 +581,11 @@ bool eqsl_handler::download_eqsl_log(stringstream* adif) {
 }
 
 // Download the inbox front page
-eqsl_handler::response_t eqsl_handler::adif_filename(string& filename) {
+eqsl_handler::response_t eqsl_handler::adif_filename(std::string& filename) {
 	// Get login details
-	string username;
-	string password;
-	string last_access;
+	std::string username;
+	std::string password;
+	std::string last_access;
 	bool confirmed;
 	char message[256];
 	if (!user_details(&username, &password, &last_access, nullptr, nullptr, &confirmed)) {
@@ -597,43 +597,43 @@ eqsl_handler::response_t eqsl_handler::adif_filename(string& filename) {
 	char url_format[] = "http://www.eqsl.cc/qslcard/DownloadInBox.cfm?Username=%s&Password=%s&RcvdSince=%s%s";
 	char url[2048];
 	// Get default callsign
-	string station = qso_manager_->get_default(qso_manager::CALLSIGN);
+	std::string station = qso_manager_->get_default(qso_manager::CALLSIGN);
 	sprintf(url, url_format, station.c_str(), password.c_str(), last_access.c_str(),
 		confirmed ? "" : "&UnconfirmedOnly=1");
 	response_t result = ER_OK;
-	stringstream eqsl_ss;
+	std::stringstream eqsl_ss;
 	snprintf(message, sizeof(message), "EQSL: Queryimg in-box for %s", station.c_str());
 	status_->misc_status(ST_NOTE, message);
 	// Fetch first page to get URL of ADIF file with update
 	if (url_handler_->read_url(url, &eqsl_ss)) {
-		string text_line;
+		std::string text_line;
 		bool ack_seen = false;
 		bool nak_seen = false;
 		bool error_seen = false;
 		bool tag_seen = false;
 		// Signature strings
-		string ack_signature = "Your ADIF log file has been built";
-		string nak_signature = "You have no log entries";
-		string error_signature = "Error: ";
+		std::string ack_signature = "Your ADIF log file has been built";
+		std::string nak_signature = "You have no log entries";
+		std::string error_signature = "Error: ";
 		// ADIF file name tag
-		string tag_signature = "HREF=\"";
-		string error_message;
+		std::string tag_signature = "HREF=\"";
+		std::string error_message;
 		// Read each line in turn until we find ADIF tag, NAK, error or reach the end of the page
 		while (getline(eqsl_ss, text_line) && !(ack_seen && tag_seen) && !nak_seen && !error_seen) {
 			if (!ack_seen) {
 				// Look for ACK signature 
 				size_t pos = text_line.find(ack_signature);
-				if (pos != string::npos) {
+				if (pos != std::string::npos) {
 					ack_seen = true;
 				}
 				// Look for NAK signature
 				pos = text_line.find(nak_signature);
-				if (pos != string::npos) {
+				if (pos != std::string::npos) {
 					nak_seen = true;
 				}
 				// Look for error signature and save error message
 				pos = text_line.find(error_signature);
-				if (pos != string::npos) {
+				if (pos != std::string::npos) {
 					// Ignore any end header tag - if it's there
 					int pos2 = text_line.find("</H");
 					error_seen = true;
@@ -648,7 +648,7 @@ eqsl_handler::response_t eqsl_handler::adif_filename(string& filename) {
 			else {
 				// Only get here if ACKed - look for HREF=
 				int pos_start = text_line.find(tag_signature);
-				if (pos_start != string::npos) {
+				if (pos_start != std::string::npos) {
 					tag_seen = true;
 					// Get the file name - skip the HREF="
 					pos_start += 6;
@@ -693,13 +693,13 @@ eqsl_handler::response_t eqsl_handler::adif_filename(string& filename) {
 }
 
 // Download the eQSL inbox
-eqsl_handler::response_t eqsl_handler::download_adif(string& filename, stringstream* adif) {
+eqsl_handler::response_t eqsl_handler::download_adif(std::string& filename, std::stringstream* adif) {
 	// Tell user
 	char message[512];
 	sprintf(message, "EQSL: Download %s...", filename.c_str());
 	status_->misc_status(ST_NOTE, message);
 	// Fetch the ADIF file 
-	string url = "http://www.eqsl.cc/qslcard/" + filename;
+	std::string url = "http://www.eqsl.cc/qslcard/" + filename;
 	if (url_handler_->read_url(url, adif)) {
 		// Successful
 		strcpy(message, "EQSL: log download done!");
@@ -726,7 +726,7 @@ void eqsl_handler::enable_fetch(queue_control_t control) {
 	case EQ_PAUSE:
 		break;
 	case EQ_ABANDON:
-		// remove timer and empty queue
+		// remove timer and empty std::queue
 		while (!request_queue_.empty()) request_queue_.pop();
 		download_count_ = 0;
 		tick_count_ = 0;
@@ -735,7 +735,7 @@ void eqsl_handler::enable_fetch(queue_control_t control) {
 	}
 }
 
-// Request queue is not empty
+// Request std::queue is not empty
 bool eqsl_handler::requests_queued() {
 	return !request_queue_.empty();
 }
@@ -744,9 +744,9 @@ bool eqsl_handler::requests_queued() {
 bool eqsl_handler::upload_eqsl_log(book* book) {
 	// Clear existing help dialog
 	// Get login details
-	string qsl_message;
-	string swl_message;
-	string error_message;
+	std::string qsl_message;
+	std::string swl_message;
+	std::string error_message;
 	response_t status = ER_OK;
 	if (!user_details(&username_, &password_, nullptr, &qsl_message, &swl_message, nullptr)) {
 		// User details in settings are not all present
@@ -760,7 +760,7 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 	fl_cursor(FL_CURSOR_WAIT);
 	// For book - use STATION_CALLSIGN of first QSO
 	record* this_record = book->get_record(0, false);
-	string station = this_record->item("STATION_CALLSIGN", true);
+	std::string station = this_record->item("STATION_CALLSIGN", true);
 	if (station.length() && station != to_upper(username_)) {
 		char message[100];
 		snprintf(message, 100, "EQSL: Uploading %s instead of username %s", station.c_str(), username_.c_str());
@@ -779,7 +779,7 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 		// Merge info from record into QSL message
 		record* record = book->get_record(pos, false);
 		// Add QSL_MSG field depending on QSO or SWL report
-		string this_message;
+		std::string this_message;
 		if (record->item("SWL") == "Y") {
 			this_message = record->item_merge(swl_message);
 		}
@@ -787,25 +787,25 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 			this_message = record->item_merge(qsl_message);
 		}
 	}
-	// Create an internal stringstream to accept the ADIF data
-	stringstream ss;
+	// Create an internal std::stringstream to accept the ADIF data
+	std::stringstream ss;
 	adi_writer* writer = new adi_writer;
 	writer->store_book(book, ss, false, &adif_fields_);
 	// Revert to start of stream
 	ss.seekg(ss.beg);
 	// Get the HTTP POST FORM fields
-	vector<url_handler::field_pair> f_fields;
+	std::vector<url_handler::field_pair> f_fields;
 	form_fields(f_fields);
-	stringstream response;
+	std::stringstream response;
 	// Post the form to eQSL.cc with the stream data attached. WE'll get a response to indicate success or not
 	if (url_handler_->post_form("https://www.eqsl.cc/qslcard/ImportADIF.cfm", f_fields, &ss, &response)) {
 		// Successfully uploaded
-		string warning_text = "";
-		string text_line;
+		std::string warning_text = "";
+		std::string text_line;
 		bool valid_response = false;
 		int num_errors = 0;
 		int num_warnings = 0;
-		set<map<string, string>> bad_records;
+		std::set<std::map<std::string, std::string>> bad_records;
 		bad_records.clear();
 		// Get to the start of the response 
 		response.seekg(response.beg);
@@ -819,9 +819,9 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 				size_t pos = 0;
 				while (!finished) {
 					// We have seen the signature comment so can start interpreting text
-					string ack_signature = "Information: From:";
-					string error_signature = "Error:";
-					string warning_signature = "Warning:";
+					std::string ack_signature = "Information: From:";
+					std::string error_signature = "Error:";
+					std::string warning_signature = "Warning:";
 					// Note there may be more than signature per line. - we looke for the first info, error and warning
 					size_t pos_i = text_line.find(ack_signature, pos);
 					size_t pos_e = text_line.find(error_signature, pos);
@@ -834,7 +834,7 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 					// Error: - a fatal error in the sURL sent, e.g. User wrong
 					else if (pos_e < pos_i && pos_e < pos_w) {
 						pos = text_line.find("<BR>", pos_e);
-						if (pos == string::npos) {
+						if (pos == std::string::npos) {
 							error_message = text_line.substr(pos_e);
 						}
 						else {
@@ -848,7 +848,7 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 					//     Warning: Y=2020 M=05 D=31 LA6MNA 10M FT8 Bad record: Duplicate<BR>Warning: Y=2020 M=05 D=31 PD2DVB 10M FT8 Bad record: Duplicate<BR>\r\n
 					else if (pos_w < pos_i && pos_w < pos_e) {
 						pos = text_line.find("<BR>", pos_w);
-						if (pos == string::npos) {
+						if (pos == std::string::npos) {
 							error_message = text_line.substr(pos_w);
 						}
 						else {
@@ -869,8 +869,8 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 				}
 			}
 			// Signature comment for successful access
-			string valid_signature = "<!-- Reply form eQSL.cc ADIF Real-time Interface -->";
-			if (text_line.find(valid_signature) != string::npos) {
+			std::string valid_signature = "<!-- Reply form eQSL.cc ADIF Real-time Interface -->";
+			if (text_line.find(valid_signature) != std::string::npos) {
 				valid_response = true;
 			}
 			if (error || warning) {
@@ -909,7 +909,7 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 			}
 			if (!dont_update) {
 				record->item("EQSL_QSLSDATE", now(false, "%Y%m%d"));
-				record->item("EQSL_QSL_SENT", string("Y"));
+				record->item("EQSL_QSL_SENT", std::string("Y"));
 			}
 		}
 		book_->enable_save(true, "Updated eQSL upload status");
@@ -930,13 +930,13 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 void eqsl_handler::set_adif_fields() {
 	// Ser default values if necessary
 	(void)fields_->collection("Upload/eQSL", EQSL_FIELDS);
-	// Now copy to the set 
+	// Now copy to the std::set 
 	adif_fields_ = fields_->field_names("Upload/eQSL");
 	// And write the settings back
 }
 
 // Specify the fields required by eQSL.cc in the HTTP POST FORM
-void eqsl_handler::form_fields(vector<url_handler::field_pair>& fields) {
+void eqsl_handler::form_fields(std::vector<url_handler::field_pair>& fields) {
 	fields.clear();
 	fields.push_back({ "Filename", "", "eqsl.adi", "application/octet.stream" });
 	fields.push_back({ "EQSL_USER", username_, "", "" });
@@ -944,11 +944,11 @@ void eqsl_handler::form_fields(vector<url_handler::field_pair>& fields) {
 }
 
 // parse bad record
-map<string, string> eqsl_handler::parse_warning(string text) {
+std::map<std::string, std::string> eqsl_handler::parse_warning(std::string text) {
 	// Warning: Y=2020 M=05 D=31 LA6MNA 10M FT8 Bad record : Duplicate
-	vector<string> words;
+	std::vector<std::string> words;
 	split_line(text, words, ' ');
-	map<string, string> result;
+	std::map<std::string, std::string> result;
 	result["QSO_DATE"] = words[1].substr(2) + words[2].substr(2) + words[3].substr(2);
 	result["CALL"] = words[4];
 	result["BAND"] = words[5];
@@ -981,11 +981,11 @@ bool eqsl_handler::upload_single_qso(qso_num_t record_num) {
 	}
 	if (upload_qso) {
 		// Get login details
-		string username;
-		string password;
-		string qsl_message;
-		string swl_message;
-		string error_message;
+		std::string username;
+		std::string password;
+		std::string qsl_message;
+		std::string swl_message;
+		std::string error_message;
 		if (!user_details(&username, &password, nullptr, &qsl_message, &swl_message, nullptr)) {
 			char* message = new char[50 + username.length() + password.length()];
 			sprintf(message, "EQSL: User or password is missing: U=%s, P=%s", username.c_str(), password.c_str());
@@ -994,7 +994,7 @@ bool eqsl_handler::upload_single_qso(qso_num_t record_num) {
 			return false;
 		}
 		// For single QSO - use STATION_CALLSIGN
-		string station = this_record->item("STATION_CALLSIGN", true);
+		std::string station = this_record->item("STATION_CALLSIGN", true);
 		if (station.length() && station != to_upper(username)) {
 			char message[200];
 			snprintf(message, 200, "EQSL: %s:%s %s: Station call %s differs from username %s",
@@ -1007,7 +1007,7 @@ bool eqsl_handler::upload_single_qso(qso_num_t record_num) {
 		}
 		// Merge info from record into QSL message
 		// Add QSL_MSG field depending on QSO or SWL report
-		string this_message;
+		std::string this_message;
 		if (this_record->item("SWL") == "Y") {
 			this_message = this_record->item_merge(swl_message);
 		}
@@ -1018,7 +1018,7 @@ bool eqsl_handler::upload_single_qso(qso_num_t record_num) {
 		// Only upload valid records or reply to SWL reports
 		if (this_record->is_valid() || this_record->item("SWL") == "Y") {
 			book_->enable_save(false, "Uploading to eQSL");
-			// Now send to upload thread to process
+			// Now send to upload std::thread to process
 			upload_lock_.lock();
 			if (DEBUG_THREADS) printf("EQSL MAIN: Enqueueing eQSL request %s\n", this_record->item("CALL").c_str());
 			upload_queue_.push(this_record);
@@ -1028,7 +1028,7 @@ bool eqsl_handler::upload_single_qso(qso_num_t record_num) {
 	return upload_qso;
 }
 
-// Upload the QSO. This is running in a separate thread
+// Upload the QSO. This is running in a separate std::thread
 bool eqsl_handler::th_upload_qso(record* this_record) {
 	if (DEBUG_THREADS) printf("EQSL THREAD: Uploading eQSL %s\n", this_record->item("CALL").c_str());
 	// Generate URL parameters for QSL
@@ -1043,8 +1043,8 @@ bool eqsl_handler::th_upload_qso(record* this_record) {
 		adi_writer::item_to_adif(this_record, "QSLMSG").c_str()
 	);
 	// Get login details
-	string username;
-	string password;
+	std::string username;
+	std::string password;
 	upload_response_t* response = new upload_response_t;
 	response->status = ER_OK;
 	response->error_message = "";
@@ -1083,14 +1083,14 @@ bool eqsl_handler::th_upload_qso(record* this_record) {
 	}
 	bool upload_failed = false;
 	// Concatenate components of full URL
-	string full_url = url + escape_url(string(header_data) + string(qsl_data));
-	stringstream resp;
+	std::string full_url = url + escape_url(std::string(header_data) + std::string(qsl_data));
+	std::stringstream resp;
 	// Send URL with QSO details and download response
-	if (url_handler_->read_url(full_url, (ostream*)&resp)) {
+	if (url_handler_->read_url(full_url, (std::ostream*)&resp)) {
 		// Successfully downloaded
 		printf("THREAD: eQSL responded with response - started parsing\n");
-		string warning_text = "";
-		string text_line;
+		std::string warning_text = "";
+		std::string text_line;
 		bool valid_response = false;
 		bool uploaded = false;
 		// Get to the start of the response 
@@ -1100,28 +1100,28 @@ bool eqsl_handler::th_upload_qso(record* this_record) {
 			getline(resp, text_line);
 			if (valid_response) {
 				// We have seen the signature comment so can start interpreting text
-				string ack_signature = "Information: From:";
-				string error_signature = "Error:";
-				string warning_signature = "Warning";
+				std::string ack_signature = "Information: From:";
+				std::string error_signature = "Error:";
+				std::string warning_signature = "Warning";
 				// Information: From: - indicates the QSO was uploaded OK.
-				if (text_line.find(ack_signature) != string::npos) {
+				if (text_line.find(ack_signature) != std::string::npos) {
 					uploaded = true;
 				}
 				// Error: - a fatal error in the sURL sent, e.g. User wrong
-				else if (text_line.find(error_signature) != string::npos) {
+				else if (text_line.find(error_signature) != std::string::npos) {
 					response->error_message = text_line;
 					response->status = ER_FAILED;
 				}
 				// Warning: The sURL was OK, but the QSO was not updated - e.g. duplicate
-				else if (text_line.find(warning_signature) != string::npos) {
+				else if (text_line.find(warning_signature) != std::string::npos) {
 					warning_text = text_line;
 					response->error_message = text_line;
 					response->status = ER_SKIPPED;
 				}
 			}
 			// Signature comment for successful access
-			string valid_signature = "<!-- Reply form eQSL.cc ADIF Real-time Interface -->";
-			if (text_line.find(valid_signature) != string::npos) {
+			std::string valid_signature = "<!-- Reply form eQSL.cc ADIF Real-time Interface -->";
+			if (text_line.find(valid_signature) != std::string::npos) {
 				valid_response = true;
 			}
 		};
@@ -1156,16 +1156,16 @@ bool eqsl_handler::th_upload_qso(record* this_record) {
 	response->html = resp.str();
 	// Send response back to 
 	upload_response_ = response;
-	if (DEBUG_THREADS) printf("EQSL THREAD: Calling thread callback\n");
+	if (DEBUG_THREADS) printf("EQSL THREAD: Calling std::thread callback\n");
 	Fl::awake(cb_upload_done, (void*)this);
 	this_thread::yield();
 
 	return true;
 }
 
-// Handle call back from upload thread
+// Handle call back from upload std::thread
 void eqsl_handler::cb_upload_done(void* v) {
-	if (DEBUG_THREADS) printf("EQSL MAIN: Entered thread callback handler\n");
+	if (DEBUG_THREADS) printf("EQSL MAIN: Entered std::thread callback handler\n");
 	eqsl_handler* that = (eqsl_handler*)v;
 	that->upload_done(that->upload_response_);
 }
@@ -1179,7 +1179,7 @@ bool eqsl_handler::upload_done(upload_response_t* response) {
 	case ER_OK:
 		// If uploaded OK, Update QSO with EQSL sent information
 		response->qso->item("EQSL_QSLSDATE", now(false, "%Y%m%d"));
-		response->qso->item("EQSL_QSL_SENT", string("Y"));
+		response->qso->item("EQSL_QSL_SENT", std::string("Y"));
 		passed = true;
 		break;
 	case ER_DUPLICATE:
@@ -1188,7 +1188,7 @@ bool eqsl_handler::upload_done(upload_response_t* response) {
 			response->qso->item("EQSL_QSLSDATE", now(false, "%Y%m%d"));
 		}
 		if (response->qso->item("EQSL_QSL_SENT") != "Y") {
-			response->qso->item("EQSL_QSL_SENT", string("Y"));
+			response->qso->item("EQSL_QSL_SENT", std::string("Y"));
 		}
 		passed = true;
 		break;
@@ -1219,18 +1219,18 @@ bool eqsl_handler::upload_done(upload_response_t* response) {
 }
 
 // Display the received message in a Help Viewer
-void eqsl_handler::display_response(string response) {
+void eqsl_handler::display_response(std::string response) {
 	help_viewer_->value(response.c_str());
 	help_window_->show();
 }
 
-// Run the thread to handle eQSL interface
+// Run the std::thread to handle eQSL interface
 void eqsl_handler::thread_run(eqsl_handler* that) {
 	if (DEBUG_THREADS) printf("EQSL THREAD: Thread started\n");
 	while (that->run_threads_) {
 		// Wait until qso placed on interface
 		while (that->run_threads_ && that->upload_queue_.empty()) {
-			this_thread::sleep_for(chrono::milliseconds(1000));
+			this_thread::sleep_for(std::chrono::milliseconds(1000));
 		}
 		// Process it
 		that->upload_lock_.lock();

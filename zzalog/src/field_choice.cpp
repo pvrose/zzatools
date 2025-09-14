@@ -32,7 +32,7 @@ field_choice::~field_choice()
 }
 
 // Set dataset
-void field_choice::set_dataset(string dataset_name, string default_field /* = "" */) {
+void field_choice::set_dataset(std::string dataset_name, std::string default_field /* = "" */) {
 	// Get the dataset
 	dataset_ = spec_data_->dataset(dataset_name);
 	// Initialsie
@@ -44,7 +44,7 @@ void field_choice::set_dataset(string dataset_name, string default_field /* = ""
 	if (dataset_->data.size() > HIERARCHIC_LIMIT) {
 		hierarchic_ = true;
 		for (int i = 1; it != dataset_->data.end(); i++) {
-			string text = escape_menu(it->first);
+			std::string text = escape_menu(it->first);
 			char curr = text[0];
 			// generate tree A/ADDRESS etc
 			char entry[128];
@@ -63,7 +63,7 @@ void field_choice::set_dataset(string dataset_name, string default_field /* = ""
 	value(default_field.c_str());
 }
 
-// Get the character string at the selected item
+// Get the character std::string at the selected item
 const char* field_choice::value() {
 	char* result = new char[128];
 	char temp[128];
@@ -156,7 +156,7 @@ int field_input::handle(int event) {
 		switch (Fl::event_button()) {
 		case FL_RIGHT_MOUSE: {
 			if (qso_ && field_name_.length()) {
-				string tip;
+				std::string tip;
 				if (field_name_ == "CALL") {
 					tip = cty_data_->get_tip(qso_);
 				}
@@ -257,8 +257,8 @@ void field_input::qso(record* q) {
 void field_input::field_name(const char* field_name, record* qso /*= nullptr*/) {
 	field_name_ = field_name;
 	qso_ = qso;
-	string enum_name;
-	// Note MODE is a special case as the enumeration list is that of MODE and SUBMODE combined
+	std::string enum_name;
+	// Note MODE is a special case as the enumeration std::list is that of MODE and SUBMODE combined
 	if (field_name_ == "MODE") enum_name = "Combined";
 	else enum_name= spec_data_->enumeration_name(field_name_, qso);
 	if (enum_name.length()) {
@@ -284,7 +284,7 @@ const char* field_input::field_name() {
 }
 
 // Populate the choice with enumeration values
-void field_input::populate_choice(string name) {
+void field_input::populate_choice(std::string name) {
 	// Get the dataset
 	spec_dataset* dataset = spec_data_->dataset(name);
 	// Initialsie
@@ -299,15 +299,15 @@ void field_input::populate_choice(string name) {
 	auto it = dataset->data.begin();
 	Fl_Menu_Button* menu = menubutton();
 	for (int i = 1; it != dataset->data.end(); i++) {
-		string menu_entry = escape_menu(it->first);
-		string summary = spec_data_->summarise_enumaration(name, menu_entry);
-		string temp = menu_entry;
+		std::string menu_entry = escape_menu(it->first);
+		std::string summary = spec_data_->summarise_enumaration(name, menu_entry);
+		std::string temp = menu_entry;
 		if (hierarchic == 1 || hierarchic == 2 && temp.length() == 1) {
 			menu_entry = temp.substr(0, 1) + "/" + temp;
 		} else if (hierarchic == 2) {
 			menu_entry = temp.substr(0, 1) + "/" + temp.substr(0, 2) + "/" + temp;
 		}
-		string value = menu_entry;
+		std::string value = menu_entry;
 		if (summary.length()) {
 			menu_entry += comment_marker_ + escape_menu(summary);
 		}
@@ -396,9 +396,9 @@ void field_input::reload_choice(record* qso /* = nullptr */) {
 	qso_ = qso;
 }
 
-// Field is a string type - allow case choice
-bool field_input::is_string(string field) {
-	// Special case where a string is a suggested enumeation
+// Field is a std::string type - allow case choice
+bool field_input::is_string(std::string field) {
+	// Special case where a std::string is a suggested enumeation
 	if (spec_data_->enumeration_name(field_name_, nullptr).length()) return false;
 	char c = spec_data_->datatype_indicator(field);
 	switch (c) {

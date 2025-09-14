@@ -8,12 +8,12 @@
 #include <FL/fl_utf8.h>
 
 extern status* status_;
-extern string PROGRAM_ID;
-extern string VENDOR;
-extern string default_data_directory_;
+extern std::string PROGRAM_ID;
+extern std::string VENDOR;
+extern std::string default_data_directory_;
 extern Fl_Preferences::Root prefs_mode_;
 
-using namespace std;
+
 
 // Constructor
 fields::fields() {
@@ -28,7 +28,7 @@ fields::~fields() {
 // Get the collection for the application
 collection_t* fields::collection(field_app_t app) {
     if (app_map_.find(app) != app_map_.end()) {
-        string coll = app_map_.at(app);
+        std::string coll = app_map_.at(app);
         return collection(coll);
     } else {
         app_map_[app] = "Default";
@@ -37,7 +37,7 @@ collection_t* fields::collection(field_app_t app) {
 }
 
 // Get the collection named.. and if necessary copy the collection
-collection_t* fields::collection(string name, string source, bool* copied) {
+collection_t* fields::collection(std::string name, std::string source, bool* copied) {
     if (coll_map_.find(name) != coll_map_.end()) {
         // Return the named collection
         if (copied) *copied = false;
@@ -57,7 +57,7 @@ collection_t* fields::collection(string name, string source, bool* copied) {
 }
 
 // Get the collection named .. and if necessary pre-populate it
-collection_t* fields::collection(string name, field_list values) {
+collection_t* fields::collection(std::string name, field_list values) {
     if (coll_map_.find(name) != coll_map_.end()) {
         // Return the named collection
         return coll_map_.at(name);
@@ -75,7 +75,7 @@ collection_t* fields::collection(string name, field_list values) {
 }
 
 // Get the field names in the collection
-field_list fields::field_names(string name) {
+field_list fields::field_names(std::string name) {
     field_list result;
     result.clear();
     collection_t* coll = collection(name);
@@ -101,7 +101,7 @@ void fields::load_data() {
     if (coll_map_.find("Default") == coll_map_.end()) {
         // Create the default collection
         collection_t* coll = new collection_t;
-        // For all fields in default field set add it to the new field set
+        // For all fields in default field std::set add it to the new field std::set
         for (unsigned int i = 0; DEFAULT_FIELDS[i].field.size() > 0; i++) {
             coll->push_back(DEFAULT_FIELDS[i]);
         }
@@ -114,7 +114,7 @@ bool fields::load_collections() {
     filename_ = default_data_directory_ + "fields.tsv";
     fl_make_path_for_file(filename_.c_str());
     ifstream ip;
-    ip.open(filename_.c_str(), ios_base::in);
+    ip.open(filename_.c_str(), std::ios_base::in);
     if (!ip.good()) {
         char msg[128];
         snprintf(msg, sizeof(msg), 
@@ -123,10 +123,10 @@ bool fields::load_collections() {
         status_->misc_status(ST_WARNING, msg);
         return false;
     }
-    string line;
+    std::string line;
     while(ip.good()) {
         getline(ip, line);
-        vector<string> words;
+        std::vector<std::string> words;
         split_line(line, words, '\t');
         if (words.size() == 5) {
             collection_t* coll;
@@ -138,8 +138,8 @@ bool fields::load_collections() {
             } else {
                 coll = coll_map_.at(words[0]);
             }
-            int ix = stoi(words[1]);
-            field_info_t info(words[2], words[4], stoi(words[3]));
+            int ix = std::stoi(words[1]);
+            field_info_t info(words[2], words[4], std::stoi(words[3]));
             coll->resize(max((int)coll->size(), ix + 1));
             (*coll)[ix] = info;
         }
@@ -155,15 +155,15 @@ void fields::store_data() {
          filename_ = default_data_directory_ + "fields.tsv";
         fl_make_path_for_file(filename_.c_str());
     }
-    ofstream op;
-    op.open(filename_.c_str(), ios_base::out);
+    std::ofstream op;
+    op.open(filename_.c_str(), std::ios_base::out);
     if (op.good()) {
         // Then get the field sets for the applications
-        // For each field set
+        // For each field std::set
         auto it = coll_map_.begin();
         for (int i = 0; it != coll_map_.end(); i++, it++) {
             int num_fields = it->second->size();
-            // For each field in the set
+            // For each field in the std::set
             for (int j = 0; j < num_fields; j++) {
                 field_info_t field = (it->second)->at(j);
                 op << it->first << '\t';
@@ -177,9 +177,9 @@ void fields::store_data() {
     op.close();
 }
 
-// Get the list of collection names
-set<string> fields::coll_names() {
-    set<string> result;
+// Get the std::list of collection names
+std::set<std::string> fields::coll_names() {
+    std::set<std::string> result;
     result.clear();
     for (auto it = coll_map_.begin(); it != coll_map_.end(); it++) {
         result.insert((*it).first);
@@ -188,7 +188,7 @@ set<string> fields::coll_names() {
 }
 
 // Get the collection name for the app
-string fields::coll_name(field_app_t app) {
+std::string fields::coll_name(field_app_t app) {
     if (app_map_.find(app) == app_map_.end()) {
         return "";
     } else {
@@ -197,19 +197,19 @@ string fields::coll_name(field_app_t app) {
 }
 
 // Link the application and collection
-void fields::link_app(field_app_t app, string coll) {
+void fields::link_app(field_app_t app, std::string coll) {
     app_map_[app] = coll;
 }
 
 // Delete the named configuration
-bool fields::delete_coll(string name) {
+bool fields::delete_coll(std::string name) {
     if (name == "Default") return false;
     else {
         // get the entry
         auto it = coll_map_.find(name);
         if (it == coll_map_.end()) return false;
         else {
-            // Delete the entry and remove it from the map
+            // Delete the entry and remove it from the std::map
             delete (*it).second;
             coll_map_.erase(it);
             // Check if any app uses it and replace with Default

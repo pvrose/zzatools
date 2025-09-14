@@ -29,8 +29,8 @@ int main_window::handle(int event) {
 		break;
 	case FL_PASTE:
 		// Get data from paste
-		string data = Fl::event_text();
-		stringstream adif;
+		std::string data = Fl::event_text();
+		std::stringstream adif;
 		adif.str(data);
 		// Stop any extant update and wait for it to complete
 		import_data_->stop_update(false);

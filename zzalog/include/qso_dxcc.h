@@ -12,7 +12,7 @@
 #include <FL/Fl_Scroll.H>
 #include <FL/Fl_Table.H>
 
-using namespace std;
+
 
 class band_set;
 class book;
@@ -56,13 +56,13 @@ class qso_dxcc :
 
         //! The data for one line of the "worked before" table.
         struct wkd_line {
-            string text;     //!< The name of the tested item.
+            std::string text;     //!< The name of the tested item.
             bool any;        //!< true: worked on any band or mode.
             bool band;       //!< true: worked on the same band as current QSO.
             bool mode;       //!< true: worked on the same mode as current QSO.
         };
         //! The data for the table mapped by "worked before" item against status.
-        map < worked_t, wkd_line > wkd_matrix_;
+        std::map < worked_t, wkd_line > wkd_matrix_;
      };
 
 public:
@@ -114,11 +114,11 @@ protected:
     Fl_Button* bn_check_age_;    //!< Button "Check Data".
 
     //! Current callsign.
-    string callsign_;
+    std::string callsign_;
     //! DXCC nickname - eg GM for Scotland.
-    string nickname_;
+    std::string nickname_;
     //! DXCC full name.
-    string name_;
+    std::string name_;
     //! The CQ zone.
     int cq_zone_;
     //! The ITU Zone.
@@ -134,20 +134,20 @@ protected:
     //! How has the callsign been parsed to get the DXCC - decoded or exception
     cty_data::parse_source_t source_;
     //! Current geographic subdivision.
-    string geography_;
+    std::string geography_;
     //! Current usage
-    string usage_;
+    std::string usage_;
     //! Current record
     record* qso_;
     //! Current continent
-    string continent_;
+    std::string continent_;
     //! Station callsign
-    string station_;
+    std::string station_;
 
-    //! The set of bands worked.
+    //! The std::set of bands worked.
     band_set* bands_worked_;
-    //! The set of modes worked.
-    set<string>* modes_worked_;
+    //! The std::set of modes worked.
+    std::set<std::string>* modes_worked_;
 
 };
 

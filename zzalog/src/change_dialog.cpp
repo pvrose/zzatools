@@ -13,7 +13,7 @@
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Preferences.H>
 
-using namespace std;
+
 
 
 
@@ -134,7 +134,7 @@ void change_dialog::create_form() {
 	ch22->set_dataset("Fields");
 	ch22->value(0);
 	new_field_name_ = ch22->value();
-	ch22->callback(cb_value<field_choice, string>, (void*)&new_field_name_);
+	ch22->callback(cb_value<field_choice, std::string>, (void*)&new_field_name_);
 	ch22->when(FL_WHEN_RELEASE);
 	ch22->tooltip("Select the name to change it to");
 	w_field_name_ = ch22;
@@ -142,7 +142,7 @@ void change_dialog::create_form() {
 	// New text input
 	intl_input* ip42 = new intl_input(C2, R4, W2, H4, "Value");
 	ip42->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ip42->callback(cb_value<intl_input, string>, (void*)&new_text_);
+	ip42->callback(cb_value<intl_input, std::string>, (void*)&new_text_);
 	ip42->when(FL_WHEN_CHANGED);
 	ip42->tooltip("Enter the value to apply");
 	w_text_ = ip42;
@@ -150,7 +150,7 @@ void change_dialog::create_form() {
 	// Alternate enumeration vale
 	field_input* ch52 = new field_input(C2, R5, W2, H5, "Enum. Value");
 	ch52->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ch52->callback(cb_value<field_input, string>, (void*)&new_text_);
+	ch52->callback(cb_value<field_input, std::string>, (void*)&new_text_);
 	ch52->when(FL_WHEN_CHANGED | FL_WHEN_NOT_CHANGED);
 	ch52->tooltip("Select the enumerated value to apply");
 	w_enum_ = ch52;
@@ -213,7 +213,7 @@ int change_dialog::handle(int event) {
 
 
 // Get the data entered by the user.
-void change_dialog::get_data(change_action_t& action, string& old_field_name, string& new_field_name, string& new_text) {
+void change_dialog::get_data(change_action_t& action, std::string& old_field_name, std::string& new_field_name, std::string& new_text) {
 	action = action_;
 	old_field_name = old_field_name_;
 	new_field_name = new_field_name_;
@@ -248,7 +248,7 @@ void change_dialog::cb_radio_action(Fl_Widget* w, void* v) {
 // callback - old field name choice
 void change_dialog::cb_ch_old_field(Fl_Widget* w, void* v) {
 	change_dialog* that = ancestor_view<change_dialog>(w);
-	cb_value<field_choice, string>(w, v);
+	cb_value<field_choice, std::string>(w, v);
 	that->enable_widgets();
 }
 
@@ -268,7 +268,7 @@ void change_dialog::enable_widgets() {
 	case ADD_FIELD:
 	case CHANGE_FIELD:
 		w_field_name_->deactivate();
-		string enumeration = spec_data_->enumeration_name(old_field_name_, nullptr);
+		std::string enumeration = spec_data_->enumeration_name(old_field_name_, nullptr);
 		if (enumeration.length()) {
 			// populate the enum choice with values of the enumeration
 			populate_enum(enumeration);
@@ -285,7 +285,7 @@ void change_dialog::enable_widgets() {
 }
 
 // Populate enumeration choice
-void change_dialog::populate_enum(string name) {
+void change_dialog::populate_enum(std::string name) {
 	field_input* ch = (field_input*)w_enum_;
 	ch->field_name(old_field_name_.c_str());
 }

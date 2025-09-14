@@ -4,7 +4,7 @@
 
 #include <FL/Fl_Group.H>
 
-using namespace std;
+
 
 class record;
 class qsl_widget;
@@ -101,10 +101,10 @@ protected:
 	record* current_qso_;
 	//! Current QSO index
 	qso_num_t current_qso_num_;
-	//! QSL card Directory string
-	string qsl_directory_;
+	//! QSL card Directory std::string
+	std::string qsl_directory_;
 	//! Full filanem of the QSL card image.
-	string full_name_;
+	std::string full_name_;
 	//! Flag is true if selected QSO is true.
 	bool qso_changed_;
 

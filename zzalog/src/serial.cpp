@@ -23,8 +23,8 @@ serial::~serial() {
 }
 
 // Find all existing COM ports - upto COM255
-// Returns true if the string array was large enough for all ports.
-bool serial::available_ports(int num_ports, string* ports, bool all_ports, int& actual_ports) {
+// Returns true if the std::string array was large enough for all ports.
+bool serial::available_ports(int num_ports, std::string* ports, bool all_ports, int& actual_ports) {
 	const unsigned int MAX_TTY = 255;
 	const unsigned int PATH_MAX = 255;
 	actual_ports = 0;
@@ -50,7 +50,7 @@ bool serial::available_ports(int num_ports, string* ports, bool all_ports, int& 
 				use_port = true;
 			}
 		}
-		// Add it to the list of 
+		// Add it to the std::list of 
 		if (use_port) {
 			if (actual_ports < num_ports) {
 				char port[16];

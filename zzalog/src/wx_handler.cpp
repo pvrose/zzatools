@@ -12,7 +12,7 @@
 #include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_PNG_Image.H>
 
-using namespace std;
+
 
 extern status* status_;
 extern url_handler* url_handler_;
@@ -35,10 +35,10 @@ wx_handler::wx_handler() :
 {
     report_.icon = nullptr;
     elements_.clear();
-    // Start thread
+    // Start std::thread
     wx_fetch_.store(false);
     wx_valid_.store(false);
-    wx_thread_ = new thread(do_thread, this);
+    wx_thread_ = new std::thread(do_thread, this);
     wx_fetch_.store(true);
     // Start ticker - 30 minutes
     ticker_->add_ticker(this, cb_ticker, DEBUG_QUICK ? SHORT_DELAY : LONG_DELAY);
@@ -48,11 +48,11 @@ wx_handler::wx_handler() :
 // Destructor   
 wx_handler::~wx_handler() {
     ticker_->remove_ticker(this);
-    // Close the thread down cleanly
+    // Close the std::thread down cleanly
     if (wx_thread_) wx_thread_->join();
 };
 
-// Do thread - when told to by wx_fetch_ fetch the WX data.
+// Do std::thread - when told to by wx_fetch_ fetch the WX data.
 // Abandon when run_thread_ is deasserted
 void wx_handler::do_thread(wx_handler* that) {
     while(!that->wx_fetch_.load());
@@ -67,8 +67,8 @@ void wx_handler::do_thread(wx_handler* that) {
 // XML reader overloads
 // Overloadable XML handlers
 // Start 
-bool wx_handler::start_element(string name, map<string, string>* attributes) {
- 	string element_name = to_upper(name);
+bool wx_handler::start_element(std::string name, std::map<std::string, std::string>* attributes) {
+ 	std::string element_name = to_upper(name);
 	bool result = true;
 
    	// Check in order of the most comment element type - call appropriate start method
@@ -111,8 +111,8 @@ bool wx_handler::start_element(string name, map<string, string>* attributes) {
 }
 
 // End
-bool wx_handler::end_element(string name) {
-    string element_name = to_upper(name);
+bool wx_handler::end_element(std::string name) {
+    std::string element_name = to_upper(name);
 	wxe_element_t element = elements_.back();
 	elements_.pop_back();
 	// Go to the specific end_... method
@@ -149,18 +149,18 @@ bool wx_handler::end_element(string name) {
 }
 
 // Special element
-bool wx_handler::declaration(xml_element::element_t element_type, string name, string content) {
+bool wx_handler::declaration(xml_element::element_t element_type, std::string name, std::string content) {
 	// ignored
 	return true;
 };
 
 // Processing instruction
-bool wx_handler::processing_instr(string name, string content) {
+bool wx_handler::processing_instr(std::string name, std::string content) {
     return true;
 };
 
 // characters
-bool wx_handler::characters(string content){
+bool wx_handler::characters(std::string content){
 	if (elements_.size()) {
 		switch (elements_.back()) {
 		case WXE_COUNTRY:
@@ -180,7 +180,7 @@ bool wx_handler::characters(string content){
 void wx_handler::update() {
     // Create a dummy record to get own location
     record* dummy = qso_manager_->dummy_qso();
-    string qth_id = qso_manager_->get_default(qso_manager::QTH);
+    std::string qth_id = qso_manager_->get_default(qso_manager::QTH);
     lat_long_t location = { nan(""), nan("") };
     if (qth_id.length()) {
         const qth_info_t* info = stn_data_->get_qth(qth_id);
@@ -195,13 +195,13 @@ void wx_handler::update() {
         return;
     }
     char url[1024];
-    stringstream ss;
+    std::stringstream ss;
     snprintf(url, sizeof(url), "https://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f&appid=%s&mode=xml",
         location.latitude,
         location.longitude,
         key_);
-    if (url_handler_->read_url(string(url), &ss)) {
-        ss.seekg(ios::beg);
+    if (url_handler_->read_url(std::string(url), &ss)) {
+        ss.seekg(std::ios::beg);
         parse(ss);
      } else {
         report_ = wx_report();
@@ -250,7 +250,7 @@ Fl_Image* wx_handler::icon() {
 }
 
 // Description
-string wx_handler::description() {
+std::string wx_handler::description() {
     return report_.description;
 }
 
@@ -265,12 +265,12 @@ float wx_handler::wind_speed() {
 }
 
 // Wind-speed name
-string wx_handler::wind_name() {
+std::string wx_handler::wind_name() {
     return report_.wind_name;
 }
 
 // Wind direction (16th cardinals)
-string wx_handler::wind_direction() {
+std::string wx_handler::wind_direction() {
     if (report_.wind_cardinal == "") return "---";
     else return report_.wind_cardinal;
 }
@@ -287,7 +287,7 @@ float wx_handler::cloud() {
 }
 
 // Cloud description
-string wx_handler::cloud_name() {
+std::string wx_handler::cloud_name() {
     return report_.cloud_name;
 }
 
@@ -296,7 +296,7 @@ time_t wx_handler::sun_rise() {
     return report_.sunrise;
 }
 
-// Sun set
+// Sun std::set
 time_t wx_handler::sun_set() { 
     return report_.sunset;
 }
@@ -307,13 +307,13 @@ time_t wx_handler::last_updated() {
 }
 
 // Location
-string wx_handler::location() {
+std::string wx_handler::location() {
     return report_.city_name;
 }
 
 // Latlong location
-string wx_handler::latlong() {
-    string result = degrees_to_dms(report_.city_location.latitude, true);
+std::string wx_handler::latlong() {
+    std::string result = degrees_to_dms(report_.city_location.latitude, true);
     result += " ";
     result += degrees_to_dms(report_.city_location.longitude, false);
     return result;
@@ -348,12 +348,12 @@ bool wx_handler::end_current() {
 }
 
 // Start CITY element
-bool wx_handler::start_city(map<string, string>* attributes) {
+bool wx_handler::start_city(std::map<std::string, std::string>* attributes) {
     elements_.push_back(WXE_CITY);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
-        string att_name = to_upper(it->first);
+        std::string att_name = to_upper(it->first);
         if (att_name == "ID") {
-            report_.city_id = stoi(it->second);
+            report_.city_id = std::stoi(it->second);
         }
         else if (att_name == "NAME") {
             report_.city_name = it->second;
@@ -368,11 +368,11 @@ bool wx_handler::end_city() {
 }
 
 // City coordinates - start COORD element
-bool wx_handler::start_coord(map<string, string>* attributes) {
+bool wx_handler::start_coord(std::map<std::string, std::string>* attributes) {
     elements_.push_back(WXE_COORD);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
-        string att_name = to_upper(it->first);
-        double value = stod(it->second);
+        std::string att_name = to_upper(it->first);
+        double value = std::stod(it->second);
         if (att_name == "LON") {
             report_.city_location.longitude = value;
         }
@@ -415,10 +415,10 @@ bool wx_handler::end_timezone() {
 }
 
 // Start SUN element - sunrise and sunset times
-bool wx_handler::start_sun(map<string, string>* attributes) {
+bool wx_handler::start_sun(std::map<std::string, std::string>* attributes) {
     elements_.push_back(WXE_SUN);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
-        string att_name = to_upper(it->first);
+        std::string att_name = to_upper(it->first);
         time_t value = convert_xml_datetime(it->second);
         if (att_name == "RISE") {
             report_.sunrise = value;
@@ -436,10 +436,10 @@ bool wx_handler::end_sun() {
 }
 
 // Start TEMPERATURE element
-bool wx_handler::start_temperature(map<string, string>* attributes) {
+bool wx_handler::start_temperature(std::map<std::string, std::string>* attributes) {
     elements_.push_back(WXE_TEMPERATURE);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
-        string att_name = to_upper(it->first);
+        std::string att_name = to_upper(it->first);
         if (att_name == "VALUE") {
             float value = stof(it->second);
             report_.temperature_K = value;
@@ -465,10 +465,10 @@ bool wx_handler::end_temperature() {
 }
 
 // Start SUBJECTIVE element - 
-bool wx_handler::start_subjective(map<string, string>* attributes) {
+bool wx_handler::start_subjective(std::map<std::string, std::string>* attributes) {
     elements_.push_back(WXE_FEELS_LIKE);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
-        string att_name = to_upper(it->first);
+        std::string att_name = to_upper(it->first);
         if (att_name == "VALUE") {
             float value = stof(it->second);
             report_.subjective_K = value;
@@ -494,12 +494,12 @@ bool wx_handler::end_subjective() {
 }
 
 // Start HUMIDITY element
-bool wx_handler::start_humidity(map<string, string>* attributes) {
+bool wx_handler::start_humidity(std::map<std::string, std::string>* attributes) {
     elements_.push_back(WXE_HUMIDITY);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
-        string att_name = to_upper(it->first);
+        std::string att_name = to_upper(it->first);
         if (att_name == "VALUE") {
-           int value = stoi(it->second);
+           int value = std::stoi(it->second);
            report_.humidity_pc = value;
         } else if (att_name == "UNIT") {
             unit_ = it->second;
@@ -515,12 +515,12 @@ bool wx_handler::end_humidity() {
 }
 
 // Start PRESSURE element
-bool wx_handler::start_pressure(map<string, string>* attributes) {
+bool wx_handler::start_pressure(std::map<std::string, std::string>* attributes) {
     elements_.push_back(WXE_PRESSURE);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
-        string att_name = to_upper(it->first);
+        std::string att_name = to_upper(it->first);
         if (att_name == "VALUE") {
-            int value = stoi(it->second);
+            int value = std::stoi(it->second);
             report_.pressure_hPa = value;
         } else if (att_name == "UNIT") {
             unit_ = it->second;
@@ -548,11 +548,11 @@ bool wx_handler::end_wind() {
 }
 
 // Start SPEED elements - for wind speed
-bool wx_handler::start_wind_speed(map<string, string>* attributes) {
+bool wx_handler::start_wind_speed(std::map<std::string, std::string>* attributes) {
     elements_.push_back(WXE_SPEED);
     float value = 0.0F;
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
-        string att_name = to_upper(it->first);
+        std::string att_name = to_upper(it->first);
         if (att_name == "VALUE") {
             value = stof(it->second);
         } else if (att_name == "UNIT") {
@@ -574,12 +574,12 @@ bool wx_handler::end_wind_speed() {
 }
 
 // Start DIRECTION element - for wind direction
-bool wx_handler::start_wind_dirn(map<string, string>* attributes) {
+bool wx_handler::start_wind_dirn(std::map<std::string, std::string>* attributes) {
        elements_.push_back(WXE_DIRECTION);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
-        string att_name = to_upper(it->first);
+        std::string att_name = to_upper(it->first);
         if (att_name == "VALUE") {
-            int value = stoi(it->second);
+            int value = std::stoi(it->second);
             report_.wind_dirn = value;
         } else if (att_name == "CODE") {
             report_.wind_cardinal = it->second;
@@ -594,10 +594,10 @@ bool wx_handler::end_wind_dirn() {
 }
 
 // Start GUSTS element - with gusts up to...
-bool wx_handler::start_gusts(map<string, string>* attributes) {
+bool wx_handler::start_gusts(std::map<std::string, std::string>* attributes) {
       elements_.push_back(WXE_GUSTS);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
-        string att_name = to_upper(it->first);
+        std::string att_name = to_upper(it->first);
         if (att_name == "VALUE") {
             float value = stof(it->second);
             report_.gusting_ms = value;
@@ -620,12 +620,12 @@ bool wx_handler::end_gusts() {
 }
 
 // Start CLOUDS element - for cloud cover
-bool wx_handler::start_clouds(map<string, string>* attributes) {
+bool wx_handler::start_clouds(std::map<std::string, std::string>* attributes) {
     elements_.push_back(WXE_CLOUDS);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
-        string att_name = to_upper(it->first);
+        std::string att_name = to_upper(it->first);
         if (att_name == "VALUE") {
-            int value = stoi(it->second);
+            int value = std::stoi(it->second);
             report_.cloud_cover = value;
         } else if (att_name == "NAME") {
             report_.cloud_name = it->second;
@@ -640,12 +640,12 @@ bool wx_handler::end_clouds() {
 }
 
 // Start VISIBILITY eleemnt
-bool wx_handler::start_visibility(map<string, string>* attributes) {
+bool wx_handler::start_visibility(std::map<std::string, std::string>* attributes) {
     elements_.push_back(WXE_VISIBILITY);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
-        string att_name = to_upper(it->first);
+        std::string att_name = to_upper(it->first);
         if (att_name == "VALUE") {
-            int value = stoi(it->second);
+            int value = std::stoi(it->second);
             report_.visibility_m = value;
         }
     }
@@ -658,10 +658,10 @@ bool wx_handler::end_visibility() {
 }
 
 // Start PRECIPITATION element
-bool wx_handler::start_precipitation(map<string, string>* attributes) {
+bool wx_handler::start_precipitation(std::map<std::string, std::string>* attributes) {
     elements_.push_back(WXE_PRECIPITATION);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
-        string att_name = to_upper(it->first);
+        std::string att_name = to_upper(it->first);
         if (att_name == "VALUE") {
             int value = stof(it->second);
             report_.precip_mm = value;
@@ -681,10 +681,10 @@ bool wx_handler::end_precipitation() {
 }
 
 // Start WEATHER element - overall description and icon reference
-bool wx_handler::start_weather(map<string, string>* attributes) {
+bool wx_handler::start_weather(std::map<std::string, std::string>* attributes) {
     elements_.push_back(WXE_WEATHER);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
-        string att_name = to_upper(it->first);
+        std::string att_name = to_upper(it->first);
         if (att_name == "VALUE") {
             report_.description = it->second;
         } else if (att_name == "ICON") {
@@ -700,10 +700,10 @@ bool wx_handler::end_weather() {
 }
 
 // Start LASTUPDATE element
-bool wx_handler::start_updated(map<string, string>* attributes) {
+bool wx_handler::start_updated(std::map<std::string, std::string>* attributes) {
     elements_.push_back(WXE_LASTUPDATE);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
-        string att_name = to_upper(it->first);
+        std::string att_name = to_upper(it->first);
         if (att_name == "VALUE") {
             time_t value = convert_xml_datetime(it->second);
             report_.updated = value;
@@ -739,7 +739,7 @@ bool wx_handler::start_cod() {
 
 // End COD element
 bool wx_handler::end_cod() {
-    error_code_ = stoi(element_data_);
+    error_code_ = std::stoi(element_data_);
     return true;
 }
 
@@ -756,12 +756,12 @@ bool wx_handler::end_message() {
 }
 
 // Fetch icon
-Fl_Image* wx_handler::fetch_icon(string name) {
+Fl_Image* wx_handler::fetch_icon(std::string name) {
     char url[1024];
     snprintf(url, sizeof(url), "https://openweathermap.org/img/wn/%s.png", name.c_str());
-    stringstream ss;
-    if (url_handler_->read_url(string(url), &ss)) {
-        ss.seekg(ios::beg);
+    std::stringstream ss;
+    if (url_handler_->read_url(std::string(url), &ss)) {
+        ss.seekg(std::ios::beg);
         Fl_PNG_Image* result = new Fl_PNG_Image(nullptr, (unsigned char*)ss.str().c_str(), ss.str().length());
         return result;
     } else {

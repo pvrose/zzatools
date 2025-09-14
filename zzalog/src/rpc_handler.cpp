@@ -15,17 +15,17 @@
 
 #include <FL/fl_ask.H>
 
-using namespace std;
+
 
 
 extern url_handler* url_handler_;
 extern status* status_;
 rpc_handler* rpc_handler::that_ = nullptr;
-extern string PROGRAM_VERSION;
-extern string PROGRAM_ID;
+extern std::string PROGRAM_VERSION;
+extern std::string PROGRAM_ID;
 
 // Constructor
-rpc_handler::rpc_handler(string address, int port_number, string resource_name)
+rpc_handler::rpc_handler(std::string address, int port_number, std::string resource_name)
 {
 	host_name_ = address;
 	server_port_ = port_number;
@@ -57,20 +57,20 @@ void rpc_handler::close_server() {
 
 // Do request - response = method_name(params)
 bool rpc_handler::do_request(
-	string method_name,
+	std::string method_name,
 	rpc_data_item::rpc_list* params,
 	rpc_data_item* response
 ) {
 	// The stream for sending the request
-	stringstream put_request;
+	std::stringstream put_request;
 	// The stream for receiving the response
-	stringstream put_response;
+	std::stringstream put_response;
 	// Generate XML for the request
 	generate_request(method_name, params, put_request);
 	// Post the request and get the response
 	if (url_handler_->post_url(host_name_, resource_, &put_request, &put_response)) {
 		// Successful - process response
-		put_response.seekg(0, ios::beg);
+		put_response.seekg(0, std::ios::beg);
 		bool rpc_fault;
 		decode_response(put_response, response, rpc_fault);
 		if (rpc_fault) {
@@ -87,9 +87,9 @@ bool rpc_handler::do_request(
 
 // Generate XML for the request onto the selected output stream
 bool rpc_handler::generate_request(
-	string method_name,
+	std::string method_name,
 	rpc_data_item::rpc_list* params,
-	ostream& request_xml
+	std::ostream& request_xml
 ) {
 	// The XML writer to generate XML
 	xml_writer* writer = new xml_writer;
@@ -135,7 +135,7 @@ bool rpc_handler::generate_request(
 bool rpc_handler::generate_response(
 	bool rpc_fault,
 	rpc_data_item* response,
-	ostream& response_xml) {
+	std::ostream& response_xml) {
 
 	xml_writer* writer = new xml_writer;
 
@@ -171,7 +171,7 @@ bool rpc_handler::generate_response(
 // Create XML for an individual item
 bool rpc_handler::write_item(xml_writer* writer, rpc_data_item* item) {
 	rpc_data_t element_type = item->type();
-	string text;
+	std::string text;
 
 	// <value>
 	bool xml_ok = writer->start_element("value", nullptr);
@@ -200,10 +200,10 @@ bool rpc_handler::write_item(xml_writer* writer, rpc_data_item* item) {
 		break;
 	case XRT_STRING:
 		text = item->get_string();
-		// <string>text</string>
-		xml_ok &= writer->start_element("string", nullptr);
+		// <std::string>text</std::string>
+		xml_ok &= writer->start_element("std::string", nullptr);
 		xml_ok &= writer->characters(text);
-		xml_ok &= writer->end_element("string");
+		xml_ok &= writer->end_element("std::string");
 		break;
 	case XRT_DATETIME:
 		text = item->get_string();
@@ -253,7 +253,7 @@ bool rpc_handler::write_item(xml_writer* writer, rpc_data_item* item) {
 }
 
 // Decode the response on the input stream
-bool rpc_handler::decode_response(istream& response_xml, rpc_data_item* response, bool& rpc_fault) {
+bool rpc_handler::decode_response(std::istream& response_xml, rpc_data_item* response, bool& rpc_fault) {
 	xml_reader* reader = new xml_reader;
 	// Send the input stream to the XML parser
 	reader->parse(response_xml);
@@ -280,7 +280,7 @@ bool rpc_handler::decode_response(istream& response_xml, rpc_data_item* response
 }
 
 // Decode the RPC Request XML on the input stream
-bool rpc_handler::decode_request(istream& request_xml, string& method_name, rpc_data_item::rpc_list* params) {
+bool rpc_handler::decode_request(std::istream& request_xml, std::string& method_name, rpc_data_item::rpc_list* params) {
 	xml_reader* reader = new xml_reader;
 	// Send the input stream to the XML parser
 	reader->parse(request_xml);
@@ -301,11 +301,11 @@ bool rpc_handler::decode_request(istream& request_xml, string& method_name, rpc_
 }
 
 // Decode the individual XML element for more than element expected
-bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* element, string& method_name, rpc_data_item::rpc_list* items) {
+bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* element, std::string& method_name, rpc_data_item::rpc_list* items) {
 	xml_element* child_element;
-	string child_name;
+	std::string child_name;
 	bool xml_ok = true;
-	string error_message = "";
+	std::string error_message = "";
 	bool dummy = false;
 	switch (element_type) {
 	case XRP_METHODCALL:
@@ -322,7 +322,7 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 				}
 				else if (child_name == "params") {
 					// Get the element
-					string dummy_string;
+					std::string dummy_string;
 					xml_ok = decode_xml_element(XRP_PARAMS, child_element, dummy_string, items);
 				}
 				else {
@@ -371,9 +371,9 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 // Decode the individual XML element - contains a single element 
 bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* element, rpc_data_item* item, bool& rpc_fault) {
 	xml_element* child_element;
-	string child_name;
+	std::string child_name;
 	bool xml_ok = true;
-	string error_message = "";
+	std::string error_message = "";
 	bool dummy;
 	switch (element_type) {
 	case XRP_METHODRESPONSE:
@@ -420,7 +420,7 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 		}
 		break;
 	case XRP_FAULT:
-		// Only 1 item expected - a struct containg an int faultCode and a string faultString
+		// Only 1 item expected - a struct containg an int faultCode and a std::string faultString
 		if (element->count() == 1) {
 			child_element = element->child(0);
 			child_name = child_element->name();
@@ -431,7 +431,7 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 				// Display reeceived response
 				rpc_data_item::rpc_struct* fault = item->get_struct();
 				int fault_code = fault->at("faultCode")->get_int();
-				string fault_string = fault->at("faultString")->get_string();
+				std::string fault_string = fault->at("faultString")->get_string();
 				fl_alert("RPC FAULT: %d: %s", fault_code, fault_string.c_str());
 			}
 			else {
@@ -468,7 +468,7 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 		if (element->count() == 0) {
 			// Use special DEFAULT data type to cope with lazy servers that use it 
 			// for numerical data-types as well.
-			string content = element->content();
+			std::string content = element->content();
 			item->set(content, XRT_DEFAULT);
 		}
 		else if (element->count() == 1) {
@@ -483,7 +483,7 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 			else if (child_name == "double") {
 				xml_ok = decode_xml_element(XRP_DOUBLE, child_element, item, dummy);
 			}
-			else if (child_name == "string") {
+			else if (child_name == "std::string") {
 				xml_ok = decode_xml_element(XRP_STRING, child_element, item, dummy);
 			}
 			else if (child_name == "dateTime.iso8601") {
@@ -511,7 +511,7 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 	case XRP_BOOLEAN:
 		// expect only character data "0" or "1"
 		if (element->count() == 0) {
-			string content = element->content();
+			std::string content = element->content();
 			bool value;
 			if (content == "0") {
 				value = false;
@@ -535,10 +535,10 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 	case XRP_INT:
 		// expect only character data
 		if (element->count() == 0) {
-			string content = element->content();
+			std::string content = element->content();
 			int value = 0;
 			try {
-				value = stoi(content);
+				value = std::stoi(content);
 			}
 			catch (invalid_argument&) {
 				xml_ok = false;
@@ -556,10 +556,10 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 	case XRP_DOUBLE:
 		// expect only character data
 		if (element->count() == 0) {
-			string content = element->content();
+			std::string content = element->content();
 			double double_value;
 			try {
-				double_value = stod(content);
+				double_value = std::stod(content);
 			}
 			catch( exception&) {
 				xml_ok = false;
@@ -577,7 +577,7 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 	case XRP_STRING:
 		// Expect only character data
 		if (element->count() == 0) {
-			string content = element->content();
+			std::string content = element->content();
 			item->set(content, XRT_STRING);
 		}
 		else {
@@ -588,7 +588,7 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 	case XRP_DATETIME:
 		// Expect only character data
 		if (element->count() == 0) {
-			string content = element->content();
+			std::string content = element->content();
 			// Check it a valid ISO date/time yyyymmddThh:mm:ss
 			if (regex_match<char>(content.c_str(), REGEX_ISO_DATETIME)) {
 				item->set(content, XRT_DATETIME);
@@ -607,7 +607,7 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 		// Expect only character data
 		if (element->count() == 0) {
 			// Convert it to UTF-8
-			string content = decode_base_64(element->content());
+			std::string content = decode_base_64(element->content());
 			item->set(content, XRT_BYTES);
 		}
 		else {
@@ -698,7 +698,7 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 		if (element->count() == 0) {
 			// Use special DEFAULT data type to cope with lazy servers that use it 
 			// for numerical data-types as well.
-			string content = element->content();
+			std::string content = element->content();
 			item->set(content, XRT_STRING);
 		}
 		else {
@@ -732,16 +732,16 @@ void rpc_handler::run_server() {
 }
 
 // Static callback - calls the one in this class
-int rpc_handler::rcv_request(stringstream& ss) { 
+int rpc_handler::rcv_request(std::stringstream& ss) { 
 	return that_->handle_request(ss);
 }
 
 // Handle request - decode it, action it and send response
-int rpc_handler::handle_request(stringstream& ss) {
-	stringstream payload;
+int rpc_handler::handle_request(std::stringstream& ss) {
+	std::stringstream payload;
 	if (strip_header(ss, payload)) {
 		// Decode request
-		string method_name = "";
+		std::string method_name = "";
 		rpc_data_item::rpc_list params;
 		rpc_data_item response;
 		decode_request(payload, method_name, &params);
@@ -755,18 +755,18 @@ int rpc_handler::handle_request(stringstream& ss) {
 			error = method_list_.at(method_name).callback(params, response);
 		}
 		// Convert to XML
-		stringstream xml;
+		std::stringstream xml;
 		generate_response(error, &response, xml);
 		// Add header
-		stringstream resp;
+		std::stringstream resp;
 		add_header(OK, xml, resp);
 		// Send to server
 		return server_->send_response(resp);
 	}
 	else {
 		// Not a post or not to the RPC server supported - send "bad request" back to client
-		stringstream error_response;
-		stringstream dummy;
+		std::stringstream error_response;
+		std::stringstream dummy;
 		dummy.str("");
 		add_header(BAD_REQUEST, dummy, error_response);
 		return server_->send_response(error_response);
@@ -774,13 +774,13 @@ int rpc_handler::handle_request(stringstream& ss) {
 }
 
 // Check and parse HTML header - returns start of payload
-bool rpc_handler::strip_header(stringstream& message, stringstream& payload) {
-	message.seekg(0, ios::beg);
-	streampos start = message.tellg();
-	string line;
+bool rpc_handler::strip_header(std::stringstream& message, std::stringstream& payload) {
+	message.seekg(0, std::ios::beg);
+	std::streampos start = message.tellg();
+	std::string line;
 	// First line - e.g. POST <resource>....
 	getline(message, line);
-	vector<string> words;
+	std::vector<std::string> words;
 	split_line(line, words, ' ');
 	if (words[0] != "POST" || words[1] != resource_) {
 		return false;
@@ -796,16 +796,16 @@ bool rpc_handler::strip_header(stringstream& message, stringstream& payload) {
 			getline(message, line);
 		}
 		// Now copy payload to output stream
-		streampos pos_pl = message.tellg();
-		string s = message.str();
+		std::streampos pos_pl = message.tellg();
+		std::string s = message.str();
 		payload.str(s.substr((size_t)(pos_pl - start)));
 		return true;
 	}
 }
 
 // Add the apropriate header
-bool rpc_handler::add_header(http_code code, stringstream& payload, stringstream& resp) {
-	string pl = payload.str();
+bool rpc_handler::add_header(http_code code, std::stringstream& payload, std::stringstream& resp) {
+	std::string pl = payload.str();
 	int len_pl = pl.length();
 	switch (code) {
 	case OK:
@@ -855,9 +855,9 @@ int rpc_handler::list_methods(rpc_data_item::rpc_list& params, rpc_data_item& re
 int rpc_handler::method_help(rpc_data_item::rpc_list& params, rpc_data_item& response) {
 	if (params.size() == 1) {
 		rpc_data_item* item_0 = params.front();
-		string method_name = item_0->get_string();
+		std::string method_name = item_0->get_string();
 		if (that_->method_list_.find(method_name) != that_->method_list_.end()) {
-			string help_text = that_->method_list_.at(method_name).help_text;
+			std::string help_text = that_->method_list_.at(method_name).help_text;
 			response.set(help_text, XRT_STRING);
 			return 0;
 		}
@@ -869,7 +869,7 @@ int rpc_handler::method_help(rpc_data_item::rpc_list& params, rpc_data_item& res
 }
 
 // Generate an error item for RPC response
-void rpc_handler::generate_error(int code, string message, rpc_data_item & response) {
+void rpc_handler::generate_error(int code, std::string message, rpc_data_item & response) {
 	rpc_data_item error_code;
 	error_code.set(-2, XRT_INT);
 	rpc_data_item error_msg;

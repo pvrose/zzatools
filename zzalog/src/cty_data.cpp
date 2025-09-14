@@ -11,7 +11,7 @@
 
 #include <cctype>
 #include <chrono>
-#include <ostream>
+#include<ostream>
 #include <fstream>
 #include <string>
 #ifdef _WIN32
@@ -22,20 +22,20 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-using namespace std;
+
 
 extern club_handler* club_handler_;
 extern spec_data* spec_data_;
 extern status* status_;
-extern string default_data_directory_;
+extern std::string default_data_directory_;
 extern bool DEBUG_PARSE;
 
 cty_data::cty_data() {
 	data_ = new all_data;
 	import_ = new all_data;
-	now_ = chrono::system_clock::now();
+	now_ = std::chrono::system_clock::now();
 	bool loaded;
-	string rep_fn = default_data_directory_ + "cty_load.rpt";
+	std::string rep_fn = default_data_directory_ + "cty_load.rpt";
 	os_.open(rep_fn);
 	os_ << "Loading from ADIF\n";
 	// Load all the daat
@@ -46,13 +46,13 @@ cty_data::cty_data() {
 	delete_data(import_);
 	os_ << "Loading from Clublog.org\n";
 	type_ = CLUBLOG;
-	string filename = get_filename();
+	std::string filename = get_filename();
 	loaded = load_data(filename);
 	merge_data();
 	dump_database();
 	delete_data(import_);
 	if (loaded) timestamps_[type_] = get_timestamp(filename, 7);
-	else timestamps_[type_] = chrono::system_clock::from_time_t(-1);
+	else timestamps_[type_] = std::chrono::system_clock::from_time_t(-1);
 	os_ << "Loading from Country-files.com\n";
 	type_ = COUNTRY_FILES;
 	filename = get_filename();
@@ -61,7 +61,7 @@ cty_data::cty_data() {
 	dump_database();
 	delete_data(import_);
 	if (loaded) timestamps_[type_] = get_timestamp(filename, 7);
-	else timestamps_[type_] = chrono::system_clock::from_time_t(-1);
+	else timestamps_[type_] = std::chrono::system_clock::from_time_t(-1);
 	os_ << "Loading from DxAtlas\n";
 	type_ = DXATLAS;
 	filename = get_filename();
@@ -70,7 +70,7 @@ cty_data::cty_data() {
 	dump_database();
 	delete_data(import_);
 	if (loaded) timestamps_[type_] = get_timestamp(filename, 365);
-	else timestamps_[type_] = chrono::system_clock::from_time_t(-1);
+	else timestamps_[type_] = std::chrono::system_clock::from_time_t(-1);
 	os_.close();
 
 }
@@ -126,19 +126,19 @@ cty_prefix* cty_data::prefix() {
 }
 
 // Return various fields of entity
-string cty_data::nickname(record* qso) {
+std::string cty_data::nickname(record* qso) {
 	parse(qso);
 	if (parse_result_.entity) return parse_result_.entity->nickname_;
 	return "";
 }
 
-string cty_data::name(record* qso) {
+std::string cty_data::name(record* qso) {
 	parse(qso);
 	if (parse_result_.entity) return parse_result_.entity->name_;
 	else return "";
 }
 
-string cty_data::continent(record* qso) {
+std::string cty_data::continent(record* qso) {
 	parse(qso);
 	if (parse_result_.entity) return parse_result_.entity->continent_;
 	else return "";
@@ -151,7 +151,7 @@ int cty_data::cq_zone(record* qso) {
 	if (except && except->cq_zone_ >= 0) return except->cq_zone_;
 	// Check if any geographic sub-entity has CQ Zone 
 	cty_prefix* pfx = prefix();
-	string call = qso->item("CALL");
+	std::string call = qso->item("CALL");
 	if (pfx && parse_result_.geography) {
 		if (parse_result_.geography->cq_zone_ >= 0) return parse_result_.geography->cq_zone_;
 	}
@@ -169,7 +169,7 @@ int cty_data::itu_zone(record* qso) {
 	if (except && except->itu_zone_ >= 0) return except->itu_zone_;
 	// Check if any geographic sub-entity has CQ Zone 
 	cty_prefix* pfx = prefix();
-	string call = qso->item("CALL");
+	std::string call = qso->item("CALL");
 	if (pfx && parse_result_.geography) {
 		if (parse_result_.geography->itu_zone_ >= 0) return parse_result_.geography->itu_zone_;
 	}
@@ -190,8 +190,8 @@ lat_long_t cty_data::location(record* qso) {
 }
 
 // Get geography
-string cty_data::geography(record* qso) {
-	string result;
+std::string cty_data::geography(record* qso) {
+	std::string result;
 	parse(qso);
 	if (parse_result_.geography) {
 		result = parse_result_.geography->nickname_ + ": " + parse_result_.geography->name_;
@@ -203,8 +203,8 @@ string cty_data::geography(record* qso) {
 }
 
 // Get usage
-string cty_data::usage(record* qso) {
-	string result;
+std::string cty_data::usage(record* qso) {
+	std::string result;
 	parse(qso);
 	if (parse_result_.usage) {
 		result = parse_result_.usage->nickname_ + ": " + parse_result_.usage->name_;
@@ -239,9 +239,9 @@ bool cty_data::update_qso(record* qso, bool my_call) {
 }
 
 // Get location details
-string cty_data::get_tip(record* qso) {
+std::string cty_data::get_tip(record* qso) {
 	parse(qso);
-	string message;
+	std::string message;
 	char text[160];
 	snprintf(text, sizeof(text), "%s: %s", nickname(qso).c_str(), name(qso).c_str());
 	switch (get_source(qso)) {
@@ -255,11 +255,11 @@ string cty_data::get_tip(record* qso) {
 		message = "Unable to decode callsign";
 		break;
 	case EXCEPTION:
-		message = "Details from exception list\n" + string(text);
+		message = "Details from exception std::list\n" + std::string(text);
 		break;
 	case ZONE_EXCEPTION:
 	case DEFAULT:
-		message = "Details from prefix list\n" + string(text);
+		message = "Details from prefix std::list\n" + std::string(text);
 		break;
 	}
 	return message;
@@ -277,7 +277,7 @@ cty_data::parse_source_t cty_data::get_source(record* qso) {
 		( except->itu_zone_ >= 0 && except->itu_zone_ != parse_result_.entity->itu_zone_))) return ZONE_EXCEPTION;
 	if (except) return EXCEPTION;
 	cty_prefix* pfx = prefix();
-	string call = qso->item("CALL");
+	std::string call = qso->item("CALL");
 	if (pfx && parse_result_.geography) {
 		cty_geography* it = parse_result_.geography;
 		if ((it->cq_zone_ >= 0 && it->cq_zone_ != parse_result_.entity->cq_zone_) ||
@@ -300,7 +300,7 @@ int cty_data::entity(record* qso) {
 }
 
 // Get entity for nickname and vice-versa
-int cty_data::entity(string nickname) {
+int cty_data::entity(std::string nickname) {
 	if (data_) {
 		for (auto it : data_->entities) {
 			if (it.second->nickname_ == nickname) {
@@ -311,7 +311,7 @@ int cty_data::entity(string nickname) {
 	return -1;
 }
 
-string cty_data::nickname(int adif_id) {
+std::string cty_data::nickname(int adif_id) {
 	if (data_) {
 		if (data_->entities.find(adif_id) == data_->entities.end()) {
 			return data_->entities.at(adif_id)->nickname_;
@@ -321,15 +321,15 @@ string cty_data::nickname(int adif_id) {
 }
 
 // Load the data 
-bool cty_data::load_data(string filename) {
+bool cty_data::load_data(std::string filename) {
 	if (type_ == ADIF) {
 		load_adif_data();
 		return true;
 	}
 	// else
 	char msg[128];
-	ifstream in(filename.c_str(), ios_base::in);
-	string version;
+	ifstream in(filename.c_str(), std::ios_base::in);
+	std::string version;
 	bool ok;
 	switch (type_) {
 	case CLUBLOG: {
@@ -377,7 +377,7 @@ bool cty_data::load_data(string filename) {
 }
 
 // Get the filename
-string cty_data::get_filename() {
+std::string cty_data::get_filename() {
 	switch (type_) {
 	case COUNTRY_FILES:
 		return default_data_directory_ + "cty.csv";
@@ -399,11 +399,11 @@ void cty_data::parse(record* qso) {
 		// else 
 		current_qso_ = qso;
 		current_call_ = qso->item("CALL");
-		string when = qso->item("QSO_DATE") + qso->item("TIME_ON").substr(0,4);
+		std::string when = qso->item("QSO_DATE") + qso->item("TIME_ON").substr(0,4);
 		int dxcc_id;
 		qso->item("DXCC", dxcc_id);
 		if (DEBUG_PARSE) printf("%s: QSO has DXCC %d\n", current_call_.c_str(), dxcc_id);
-		string matched_call;
+		std::string matched_call;
 		parse_result_.decode_element = match_pattern(current_call_, when, matched_call);
 		
 		if (parse_result_.decode_element) {
@@ -435,10 +435,10 @@ void cty_data::parse(record* qso) {
 	}
 }
 
-cty_element* cty_data::match_pattern(string call, string when, string& matched_call) {
+cty_element* cty_data::match_pattern(std::string call, std::string when, std::string& matched_call) {
 	// Look in exceptions
 	if (data_->exceptions.find(call) != data_->exceptions.end()) {
-		list<cty_exception*>& exceptions = data_->exceptions.at(call);
+		std::list<cty_exception*>& exceptions = data_->exceptions.at(call);
 		for (auto it : exceptions) {
 			if (it->time_contains(when)) {
 				if (DEBUG_PARSE) {
@@ -449,8 +449,8 @@ cty_element* cty_data::match_pattern(string call, string when, string& matched_c
 		}
 	}
 	// Otherwise start looking in prefixes
-	string alt;
-	string body;
+	std::string alt;
+	std::string body;
 	// Split call accoridng to slashes in it. 
 	split_call(call, alt, body);
 	if (alt.length()) {
@@ -462,12 +462,12 @@ cty_element* cty_data::match_pattern(string call, string when, string& matched_c
 	return match_prefix(body, when);
 }
 
-cty_element* cty_data::match_prefix(string call, string when) {
+cty_element* cty_data::match_prefix(std::string call, std::string when) {
 	// Start matching prefixes - from full length of call down
-	string test = call;
+	std::string test = call;
 	while (test.length() > 0) {
 		if (data_->prefixes.find(test) != data_->prefixes.end()) {
-			list<cty_prefix*>& prefixes = data_->prefixes.at(test);
+			std::list<cty_prefix*>& prefixes = data_->prefixes.at(test);
 			for (auto it : prefixes) {
 				if (it->time_contains(when)) {
 					// Prefix has a match
@@ -480,7 +480,7 @@ cty_element* cty_data::match_prefix(string call, string when) {
 	return nullptr;
 }
 
-cty_filter* cty_data::match_filter(cty_element* element, cty_filter::filter_t type, string call, string when) {
+cty_filter* cty_data::match_filter(cty_element* element, cty_filter::filter_t type, std::string call, std::string when) {
 	if (DEBUG_PARSE) printf("DEBUG: Match call %s: \n", call.c_str());
 	for (auto it : element->filters_) {
 		// Check filter type
@@ -595,11 +595,11 @@ cty_filter* cty_data::match_filter(cty_element* element, cty_filter::filter_t ty
 	return nullptr;
 }
 
-void cty_data::split_call(string call, string& alt, string& body) {
+void cty_data::split_call(std::string call, std::string& alt, std::string& body) {
 	// Split the callsign into its various components
-	vector<string> words;
+	std::vector<std::string> words;
 	split_line(call, words, '/');
-	string suffix = words.back();
+	std::string suffix = words.back();
 	// Try and work out which bit of the call is which
 	switch (words.size()) {
 	case 1:
@@ -656,7 +656,7 @@ void cty_data::split_call(string call, string& alt, string& body) {
 }
 
 // Change the last number of the prefix (if suffix is numeric) or first letter of infix
-void cty_data::mutate_call(string& call, char suffix) {
+void cty_data::mutate_call(std::string& call, char suffix) {
 	auto pos = call.length();
 	while (isalpha(call[--pos]));
 	if (isalpha(suffix)) pos++;
@@ -678,7 +678,7 @@ void cty_data::add_entity(cty_entity* entry) {
 }
 
 // Add a prefix
-void cty_data::add_prefix(string pattern, cty_prefix* entry) {
+void cty_data::add_prefix(std::string pattern, cty_prefix* entry) {
 	if (import_->prefixes.find(pattern) == import_->prefixes.end()) {
 		import_->prefixes[pattern] = { entry };
 	}
@@ -701,7 +701,7 @@ void cty_data::add_prefix(string pattern, cty_prefix* entry) {
 }
 
 // Add an exception
-void cty_data::add_exception(string pattern, cty_exception* entry) {
+void cty_data::add_exception(std::string pattern, cty_exception* entry) {
 	if (import_->exceptions.find(pattern) == import_->exceptions.end()) {
 		import_->exceptions[pattern] = { entry };
 	}
@@ -732,8 +732,8 @@ void cty_data::add_filter(cty_element* element, cty_filter* entry) {
 void cty_data::load_adif_data() {
 	spec_dataset* dxccs = spec_data_->dataset("DXCC_Entity_Code");
 	for (auto it : dxccs->data) {
-		int dxcc = stod(it.first);
-		string name = it.second->at("Entity Name");
+		int dxcc = std::stod(it.first);
+		std::string name = it.second->at("Entity Name");
 		cty_entity* entry = new cty_entity;
 		entry->dxcc_id_ = dxcc;
 		entry->name_ = name;
@@ -877,7 +877,7 @@ void cty_data::merge_data() {
 	}
 }
 
-chrono::system_clock::time_point cty_data::get_timestamp(string filename, int old_age) {
+std::chrono::system_clock::time_point cty_data::get_timestamp(std::string filename, int old_age) {
 #ifdef _WIN32
 	int fd = _sopen(filename.c_str(), _O_RDONLY, _SH_DENYNO);
 #else
@@ -885,7 +885,7 @@ chrono::system_clock::time_point cty_data::get_timestamp(string filename, int ol
 #endif
 	if (fd == -1) {
 		// File doesn't exist
-		return chrono::system_clock::from_time_t(-1);
+		return std::chrono::system_clock::from_time_t(-1);
 	}
 	// Get file status
 #ifdef _WIN32
@@ -897,8 +897,8 @@ chrono::system_clock::time_point cty_data::get_timestamp(string filename, int ol
 	fstat(fd, &status);
 	close(fd);
 #endif
-	chrono::system_clock::time_point ts = chrono::system_clock::from_time_t(status.st_mtime);
-	if ((now_ - ts) > chrono::hours(old_age * 24)) {
+	std::chrono::system_clock::time_point ts = std::chrono::system_clock::from_time_t(status.st_mtime);
+	if ((now_ - ts) > std::chrono::hours(old_age * 24)) {
 		char msg[128];
 		snprintf(msg, sizeof(msg), "CTY DATA: Data file %s is > %d days old", filename.c_str(), old_age);
 		status_->misc_status(ST_WARNING, msg);
@@ -907,19 +907,19 @@ chrono::system_clock::time_point cty_data::get_timestamp(string filename, int ol
 }
 
 // Return the recorded timestamp
-chrono::system_clock::time_point cty_data::timestamp(cty_type_t type) {
+std::chrono::system_clock::time_point cty_data::timestamp(cty_type_t type) {
 	if (timestamps_.find(type) != timestamps_.end()) {
 		return timestamps_[type];
 	}
 	else {
-		return chrono::system_clock::from_time_t(-1);
+		return std::chrono::system_clock::from_time_t(-1);
 	}
 }
 
 // Fetch the appropriate data
 bool cty_data::fetch_data(cty_type_t type) {
 	type_ = type;
-	string filename = get_filename();
+	std::string filename = get_filename();
 	switch (type) {
 	case CLUBLOG:
 		return club_handler_->download_exception(filename);
@@ -935,6 +935,6 @@ bool cty_data::fetch_data(cty_type_t type) {
 }
 
 // Return the version
-string cty_data::version(cty_type_t type) {
+std::string cty_data::version(cty_type_t type) {
 	return versions_.at(type);
 }

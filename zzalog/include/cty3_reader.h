@@ -7,7 +7,7 @@
 #include <list>
 #include <string>
 
-using namespace std;
+
 
 //! Class to read prefix.lst from dxatlas.com into country data database.
 class cty3_reader
@@ -26,7 +26,7 @@ class cty3_reader
 		CTY_CITY = 9              //!< Special geographic subdivision.
 	};
 
-	//! Each record has these fields in a comma-separated list.
+	//! Each record has these fields in a comma-separated std::list.
 	enum field_type_t : uint8_t {
 		FT_TYPE = 0,          //!< Record type.
 		FT_LONGITUDE = 1,     //!< Longitude in an integer number of 1/180th degree (+ve east).
@@ -58,16 +58,16 @@ public:
 	//! \param in input stream.
 	//! \param version Returns any version information in the file.
 	//! \return true if successful, false if not.
-	bool load_data(cty_data* data, istream& in, string& version);
+	bool load_data(cty_data* data, std::istream& in, std::string& version);
 
 protected:
 
 	//! Decode entity record from \p line.
-	cty_element* load_entity(string line, bool deleted);
+	cty_element* load_entity(std::string line, bool deleted);
 	//! Decode geography record from \p line.
-	cty_element* load_geography(string line, bool deleted);
+	cty_element* load_geography(std::string line, bool deleted);
 	//! Decode usage record from \p line.
-	cty_element* load_usage(string line);
+	cty_element* load_usage(std::string line);
 	//! Load element part of above
 	
 	//! \param type Type of element.
@@ -75,9 +75,9 @@ protected:
 	//! \param nickname Returns the nickname.
 	//! \param patterns Returns the pattern text.
 	//! \return cty_element record representing the line.
-	cty_element* load_element(cty_element::type_t type, string line, string& nickname, string& patterns);
-	//! Convert prefix mask to list of prefixes
-	list<string> expand_mask(string patterns);
+	cty_element* load_element(cty_element::type_t type, std::string line, std::string& nickname, std::string& patterns);
+	//! Convert prefix mask to std::list of prefixes
+	std::list<std::string> expand_mask(std::string patterns);
 
 	//! Internal import database.
 	cty_data* data_ = nullptr;
@@ -85,7 +85,7 @@ protected:
 	//! The most recent element at each level.
 	
 	//! level 0 will be an entity, other levels will be filters.
-	vector<cty_element*> current_elements_;
+	std::vector<cty_element*> current_elements_;
 
 
 };

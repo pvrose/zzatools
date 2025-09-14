@@ -45,7 +45,7 @@ public:
 
 	//! Inherited from Fl_Group - to be overridden by inheritee.
 	
-	//! The default is to set the callback of the Fl_Input to the specified callback.
+	//! The default is to std::set the callback of the Fl_Input to the specified callback.
 	virtual void callback(Fl_Callback* cb, void* v) { ip_->callback(cb, v); }
 	//! \see callback
 	virtual void callback(Fl_Callback* cb) { ip_->callback(cb); }

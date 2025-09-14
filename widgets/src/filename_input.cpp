@@ -30,7 +30,7 @@ void filename_input::type(filename_input::type_t value) {
 
 void filename_input::cb_button(Fl_Widget* w, void* v) {
     filename_input* that = ancestor_view<filename_input>(w);
-    string filename = that->ip_->value();
+    std::string filename = that->ip_->value();
     Fl_Native_File_Chooser::Type fb_type = Fl_Native_File_Chooser::BROWSE_FILE;
     switch(that->type_) {
         case FILE:

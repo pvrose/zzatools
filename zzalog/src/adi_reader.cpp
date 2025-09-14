@@ -6,7 +6,7 @@
 #include "spec_data.h"
 #include "utils.h"
 
-#include <istream>
+#include<istream>
 #include <fstream>
 #include <string>
 #include <cstdio>
@@ -17,7 +17,7 @@
 
 
 
-using namespace std;
+
 
 extern status* status_;
 extern spec_data* spec_data_;
@@ -41,17 +41,17 @@ adi_reader::~adi_reader()
 
 // Load Record.
 // Data is read off the input stream (in) and stored as an array of ADIF items in the record.
-istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& result) {
+std::istream& adi_reader::load_record(record* in_record, std::istream& in, load_result_t& result) {
 
 	// Read the first character
 	char c;
 	in.get(c);
 
 	// Initialise header 
-	string header = "";
+	std::string header = "";
 	bool eor = false;
 	result = LR_GOOD;
-	string bad_field = "";
+	std::string bad_field = "";
 
 	// Only the header won't not start with a < character
 	// Read upto the next < character or EOF
@@ -72,11 +72,11 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 
 	// now turn off header checking
 	expecting_header_ = false;
-	string field;
+	std::string field;
 	field.reserve(20);
-	string value;
+	std::string value;
 	value.reserve(50);
-	string old_value;
+	std::string old_value;
 	old_value.reserve(50);
 
 	// Until the end of record indicated by <EOR> or <EOH> - note in.good() is continually 
@@ -155,15 +155,15 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 							DUPLICATE
 						} validity = NO_ERROR;
 						// Add User defined fields to the reference data base if found in a header
-						// <USERDEFn:sz:ty>name[,{list or range}]
+						// <USERDEFn:sz:ty>name[,{std::list or range}]
 						if (in_record->is_header() && field.length() > 7 && field.substr(0, 7) == "USERDEF") {
-							string list_range = "";
+							std::string list_range = "";
 							int pos_comma = value.find(',');
 							if (pos_comma != -1) {
 								list_range = value.substr(pos_comma + 2, value.length() - pos_comma - 3);
 								value = value.substr(0, pos_comma);
 							}
-							int id_userdef = stoi(field.substr(7));
+							int id_userdef = std::stoi(field.substr(7));
 							if (!spec_data_->add_userdef(id_userdef, value, type_indicator, list_range)) {
 								validity = INVALID_USERDEF;
 							}
@@ -173,7 +173,7 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 						if (field.length() > 3 && field.substr(0, 3) == "APP") {
 							// Convert any legacy APP_ZZALOG_... to APP_ZZA_.... Set modified to save the book at the end of load
 							if (field.length() > 11 && field.substr(0, 11) == "APP_ZZALOG_") {
-								string part2 = field.substr(11);
+								std::string part2 = field.substr(11);
 								field = "APP_ZZA_" + part2;
 							}
 							// Ignore all non-ZZALOG app specific fields (except APP_EQSL_SWL and any in the header.
@@ -257,7 +257,7 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 
 // load data to book
 // Data is read off the input stream (in) and records generated and added to book
-bool adi_reader::load_book(book* book, istream& in) {
+bool adi_reader::load_book(book* book, std::istream& in) {
 	// Start off eith good status
 	load_result_t result = LR_GOOD;
 	// Expect a header as the first record

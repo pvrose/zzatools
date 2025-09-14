@@ -19,7 +19,7 @@
 
 
 // Constuctor - dialog constructor called with place holder size
-corr_dialog::corr_dialog(record* record, const string& field, const string& message) :
+corr_dialog::corr_dialog(record* record, const std::string& field, const std::string& message) :
 	win_dialog(10, 10, "Correct invalid ADIF item")
 	, change_value_(false)
 	, change_field_(false)
@@ -87,7 +87,7 @@ corr_dialog::corr_dialog(record* record, const string& field, const string& mess
 	cb1->tooltip("Change the data in the field");
 	// Input - the new value wanted
 	intl_input* ip1 = new intl_input(COL3, ROW2, WEDIT, HTEXT);
-	ip1->callback(cb_value<intl_input, string>, (void*)&change_value_data_);
+	ip1->callback(cb_value<intl_input, std::string>, (void*)&change_value_data_);
 	ip1->value(op2->value());
 	ip1->when(FL_WHEN_CHANGED);
 	ip1->tooltip("Value to change data to");
@@ -99,7 +99,7 @@ corr_dialog::corr_dialog(record* record, const string& field, const string& mess
 	cb2->tooltip("Change the field name");
 	// Drop-down choice provides all possible field names
 	field_choice* ch1 = new field_choice(COL2, ROW3, WEDIT, HTEXT);
-	ch1->callback(cb_value<field_choice, string>, (void*)&change_field_name_);
+	ch1->callback(cb_value<field_choice, std::string>, (void*)&change_field_name_);
 	ch1->when(FL_WHEN_CHANGED);
 	ch1->tooltip("Name to change field to");
 	// Action choice - add another field
@@ -110,13 +110,13 @@ corr_dialog::corr_dialog(record* record, const string& field, const string& mess
 	cb3->tooltip("Add another field");
 	// Drop-down choice provides all possible field names
 	field_choice* ch2 = new field_choice(COL2, ROW4, WEDIT, HTEXT);
-	ch2->callback(cb_value<field_choice, string>, (void*)&add_field_name_);
+	ch2->callback(cb_value<field_choice, std::string>, (void*)&add_field_name_);
 	ch2->when(FL_WHEN_CHANGED);
 	ch2->tooltip("Field to add");
 	// Input - data to use in the additional field
 	intl_input* ip2 = new intl_input(COL3, ROW4, WEDIT, HTEXT);
 	ip2->value(op2->value());
-	ip2->callback(cb_value<intl_input, string>, (void*)&add_value_data_);
+	ip2->callback(cb_value<intl_input, std::string>, (void*)&add_value_data_);
 	ip2->when(FL_WHEN_CHANGED);
 	ip2->tooltip("Data to use in added field");
 	// Output to display the reason for the validation error.
@@ -169,9 +169,9 @@ corr_dialog::~corr_dialog()
 // OK button - obey choices made
 void corr_dialog::cb_bn_ok(Fl_Widget* w, void* v) {
 	corr_dialog* that = ancestor_view<corr_dialog>(w);
-	string new_value;
-	string new_field;
-	string old_value = that->record_->item(that->query_field_);
+	std::string new_value;
+	std::string new_field;
+	std::string old_value = that->record_->item(that->query_field_);
 	// Look at requested actions - note more than one can be selected
 	if (that->change_value_) {
 		// Change the fields value - Set the value to the data entered
@@ -184,7 +184,7 @@ void corr_dialog::cb_bn_ok(Fl_Widget* w, void* v) {
 	if (that->change_field_) {
 		// Change the field's name - Set the name to the new one selected, delete the old item
 		new_field = that->change_field_name_;
-		that->record_->item(that->query_field_, string(""));
+		that->record_->item(that->query_field_, std::string(""));
 	}
 	else {
 		// Else keep the existing name
@@ -225,7 +225,7 @@ void corr_dialog::cb_bn_quit(Fl_Widget* w, void* v) {
 	that->do_button(BN_SPARE);
 }
 
-// Returns correction message - set in OK button
-string corr_dialog::correction_message() {
+// Returns correction message - std::set in OK button
+std::string corr_dialog::correction_message() {
 	return correction_message_;
 }

@@ -16,8 +16,8 @@
 extern book* book_;
 extern qso_manager* qso_manager_;
 extern tabbed_forms* tabbed_forms_;
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
 extern void open_html(const char*);
 
@@ -259,7 +259,7 @@ void user_dialog::cb_br_size(Fl_Widget* w, void* v) {
 	Fl_Hold_Browser* size_br = (Fl_Hold_Browser*)w;
 	int line = size_br->value();
 	if (isdigit(size_br->text(line)[0])) {
-		*(Fl_Fontsize*)v = stoi(size_br->text(line));
+		*(Fl_Fontsize*)v = std::stoi(size_br->text(line));
 	}
 }
 
@@ -314,7 +314,7 @@ void user_dialog::populate_size(Fl_Hold_Browser* br, const Fl_Font* font, const 
 			br->value(*size);
 		}
 		else {
-			// Only list available sizes
+			// Only std::list available sizes
 			int select = 0;
 			for (int i = 0; i < num_sizes; i++) {
 				// while the current value is less than required up the selected value

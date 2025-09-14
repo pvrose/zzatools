@@ -9,7 +9,7 @@
 #include "fields.h"
 
 #include <fstream>
-#include <ostream>
+#include<ostream>
 #include <cmath>
 
 #include <FL/Fl.H>
@@ -20,8 +20,8 @@
 
 extern status* status_;
 extern spec_data* spec_data_;
-extern string DATA_COPYRIGHT;
-extern string PROGRAM_ID;
+extern std::string DATA_COPYRIGHT;
+extern std::string PROGRAM_ID;
 
 // Default constructor
 adi_writer::adi_writer()
@@ -37,7 +37,7 @@ adi_writer::~adi_writer()
 }
 
 // write book to output stream. If fields is not null then only the specified fields
-bool adi_writer::store_book(book* out_book, ostream& out, bool clean, field_list* fields /* = nullptr */) {
+bool adi_writer::store_book(book* out_book, std::ostream& out, bool clean, field_list* fields /* = nullptr */) {
 	// Takes a finite time so put the timer cursor up.
 	fl_cursor(FL_CURSOR_WAIT);
 	load_result_t result = LR_GOOD;
@@ -85,7 +85,7 @@ bool adi_writer::store_book(book* out_book, ostream& out, bool clean, field_list
 }
 
 // write record to output stream. If fields is not null, then only these fields. Output result not used
-ostream& adi_writer::store_record(record* record, ostream& out, load_result_t& result, field_list* fields /* = nullptr */) {
+std::ostream& adi_writer::store_record(record* record, std::ostream& out, load_result_t& result, field_list* fields /* = nullptr */) {
 	// convert to text
 	to_adif(record, out, fields);
 	if (clean_records_) out_book_->delete_dirty_record(record);
@@ -93,9 +93,9 @@ ostream& adi_writer::store_record(record* record, ostream& out, load_result_t& r
 }
 
 // Convert item to ADIF format text and send to the output stream
-string adi_writer::item_to_adif(record* record, string field) {
-	string value;
-	string adif_text = "";
+std::string adi_writer::item_to_adif(record* record, std::string field) {
+	std::string value;
+	std::string adif_text = "";
 	unsigned int len_value;
 	//  <KEYWORD:length[:type]>VALUE
 	value = record->item(field);
@@ -104,7 +104,7 @@ string adi_writer::item_to_adif(record* record, string field) {
 	int out_size = len_value + field.length() + (int)log10(len_value) + 6;
 	// Get the type indicator from the ADIF spec database
 	char type_indicator = spec_data_->datatype_indicator(field);
-	// Don't write out any items that are an empty string.
+	// Don't write out any items that are an empty std::string.
 	if (len_value > 0) {
 		char* temp = nullptr;
 		if (field.length() > 3 && field.substr(0, 3) == "APP") {
@@ -121,8 +121,8 @@ string adi_writer::item_to_adif(record* record, string field) {
 			}
 		}
 		else if (field.length() > 7 && field.substr(0, 7) == "USERDEF") {
-			// user defined fields require type and optional list or range of values
-			string list_range = spec_data_->userdef_values(field);
+			// user defined fields require type and optional std::list or range of values
+			std::string list_range = spec_data_->userdef_values(field);
 			if (list_range.length() > 0) {
 				// Add enough bytes to cover the type indicator and the userdef range length
 				len_value += 3 + list_range.length();
@@ -141,15 +141,15 @@ string adi_writer::item_to_adif(record* record, string field) {
 			sprintf(temp, "<%s:%d>%s ", field.c_str(), len_value, value.c_str());
 		}
 		// output the ADIF format text to the stream
-		return string(temp);
+		return std::string(temp);
 		delete[] temp;
 	}
 	return "";
 }
 
 // Convert record to ADIF format text
-void adi_writer::to_adif(record* record, ostream& out, field_list* fields /* = nullptr */) {
-	string temp;
+void adi_writer::to_adif(record* record, std::ostream& out, field_list* fields /* = nullptr */) {
+	std::string temp;
 
 	// Header - write out any comment first - 
 	if (record->is_header()) {
@@ -157,8 +157,8 @@ void adi_writer::to_adif(record* record, ostream& out, field_list* fields /* = n
 	}
 	// Write out each ADIF field
 	for (auto it = record->begin(); it != record->end(); it++) {
-		string field = it->first;
-		string value = it->second;
+		std::string field = it->first;
+		std::string value = it->second;
 		bool in_filter = false;
 		if (fields) {
 			for (auto it = fields->begin(); it != fields->end() && !in_filter; it++) {
@@ -171,7 +171,7 @@ void adi_writer::to_adif(record* record, ostream& out, field_list* fields /* = n
 		if (field != "" && (record->is_header() || fields == nullptr || in_filter)) {
 			// Test whether field name end in _INTL
 			if (field.length() > 5 && field.substr(field.length() - 5) == "_INTL") {
-				string non_intl_field = field.substr(0, field.length() - 5);
+				std::string non_intl_field = field.substr(0, field.length() - 5);
 				if (!record->item_exists(non_intl_field)) {
 					// ..._INTL exists and other doesn't - output it as non_intl
 					record->change_field_name(field, non_intl_field);
@@ -185,7 +185,7 @@ void adi_writer::to_adif(record* record, ostream& out, field_list* fields /* = n
 		}
 	}
 	if (record->is_header()) {
-		string year = now(false, "%Y");
+		std::string year = now(false, "%Y");
 		char copyright[128];
 		snprintf(copyright, sizeof(copyright), DATA_COPYRIGHT.c_str(), year.c_str());
 		// Add red-tape after header fields
@@ -228,7 +228,7 @@ unsigned char adi_writer::adif_compliance(book* b, field_list* fields) {
 	for (auto qso : *b) {
 		if (fields) {
 			for (auto field : *fields) {
-				string item = qso->item(field);
+				std::string item = qso->item(field);
 				const char* pos = item.c_str();
 				const char* pend = pos + item.length();
 				int len;

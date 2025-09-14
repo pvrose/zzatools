@@ -43,8 +43,8 @@ extern double prev_freq_;
 extern bool DARK;
 extern fields* fields_;
 extern config* config_;
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
 
 // qso_group_
 qso_data::qso_data(int X, int Y, int W, int H, const char* l) :
@@ -204,10 +204,10 @@ void qso_data::enable_widgets() {
 			if (config_) config_->update();
 		}
 
-		string call;
+		std::string call;
 		if (current_qso()) call = current_qso()->item("CALL");
 		else call = "N/A";
-		string query_call;
+		std::string query_call;
 		if (g_query_->query_qso()) query_call = g_query_->query_qso()->item("CALL");
 		else query_call = "N/A";
 		// Enable station details
@@ -597,7 +597,7 @@ void qso_data::update_query(logging_state_t query, qso_num_t match_num, qso_num_
 }
 
 // Update modem QSO
-record* qso_data::start_modem_qso(string call, qso_init_t source) {
+record* qso_data::start_modem_qso(std::string call, qso_init_t source) {
 	bool allow_modem = true;
 	bool cancelled = false;
 	switch (logging_state_) {
@@ -701,7 +701,7 @@ void qso_data::enter_modem_qso(record* qso) {
 	}
 }
 
-string qso_data::get_defined_fields() {
+std::string qso_data::get_defined_fields() {
 	return g_entry_->get_defined_fields();
 }
 
@@ -877,36 +877,36 @@ bool qso_data::action_save(bool continuing) {
 	// On-air logging add date/time off
 	switch (previous_mode_) {
 	case QSO_ON_AIR:
-		// All on-air modes - set cime-off to now
+		// All on-air modes - std::set cime-off to now
 		if (qso->item("TIME_OFF") == "") {
 			// Add end date/time - current time of interactive entering
 			// Get current date and time in UTC
-			string timestamp = now(false, "%Y%m%d%H%M%S");
+			std::string timestamp = now(false, "%Y%m%d%H%M%S");
 			qso->item("QSO_DATE_OFF", timestamp.substr(0, 8));
 			// Time as HHMMSS - always log seconds.
 			qso->item("TIME_OFF", timestamp.substr(8));
 		}
-		qso->item("QSO_COMPLETE", string(""));
+		qso->item("QSO_COMPLETE", std::string(""));
 		break;
 	case QSO_COPY_CALL:
 	case QSO_COPY_CONDX:
 	case QSO_COPY_FOR_NET:
-		// All on-air modes - set cime-off to now
+		// All on-air modes - std::set cime-off to now
 		if (qso->item("TIME_OFF") == "") {
 			// Add end date/time - current time of interactive entering
 			// Get current date and time in UTC
-			string timestamp = now(false, "%Y%m%d%H%M%S");
+			std::string timestamp = now(false, "%Y%m%d%H%M%S");
 			qso->item("QSO_DATE_OFF", timestamp.substr(0, 8));
 			// Time as HHMMSS - always log seconds.
 			qso->item("TIME_OFF", timestamp.substr(8));
 		}
-		qso->item("QSO_COMPLETE", string(""));
+		qso->item("QSO_COMPLETE", std::string(""));
 		// Put the record in its correct position and save that position
 		item_number = book_->correct_record_position(item_number);
 		qso_number = book_->record_number(item_number);
 		break;
 	case QSO_NONE:
-		qso->item("QSO_COMPLETE", string(""));
+		qso->item("QSO_COMPLETE", std::string(""));
 		// Deliberately drop through
 	case QSO_COPY_WSJTX:
 	case QSO_COPY_FLDIGI:
@@ -1410,7 +1410,7 @@ void qso_data::action_look_all_txt() {
 void qso_data::action_create_net() {
 	qso_num_t qso_number = g_entry_->qso_number();
 	record* qso = g_entry_->qso();
-	string call = get_call();
+	std::string call = get_call();
 	char msg[128];
 	g_net_entry_->set_qso(qso_number);
 	qso_entry* w = g_net_entry_->entry();
@@ -1775,27 +1775,27 @@ void qso_data::action_parse_qso() {
 // Dummy QSO
 record* qso_data::dummy_qso() {
 	record* dummy = new record;
-	string timestamp = now(false, "%Y%m%d%H%M%S");
+	std::string timestamp = now(false, "%Y%m%d%H%M%S");
 	// Get current date and time in UTC
 	dummy->item("QSO_DATE", timestamp.substr(0, 8));
 	// Time as HHMMSS - always log seconds.
 	dummy->item("TIME_ON", timestamp.substr(8));
-	dummy->item("QSO_DATE_OFF", string(""));
-	dummy->item("TIME_OFF", string(""));
-	dummy->item("CALL", string(""));
+	dummy->item("QSO_DATE_OFF", std::string(""));
+	dummy->item("TIME_OFF", std::string(""));
+	dummy->item("CALL", std::string(""));
 	// otherwise leave blank so that we enter it manually later.
-	dummy->item("FREQ", string(""));
-	dummy->item("FREQ_RX", string(""));
-	dummy->item("MODE", string(""));
-	dummy->item("SUBMODE", string(""));
-	dummy->item("TX_PWR", string(""));
+	dummy->item("FREQ", std::string(""));
+	dummy->item("FREQ_RX", std::string(""));
+	dummy->item("MODE", std::string(""));
+	dummy->item("SUBMODE", std::string(""));
+	dummy->item("TX_PWR", std::string(""));
 	// initialise fields
-	dummy->item("RX_PWR", string(""));
-	dummy->item("RST_SENT", string(""));
-	dummy->item("RST_RCVD", string(""));
-	dummy->item("NAME", string(""));
-	dummy->item("QTH", string(""));
-	dummy->item("GRIDSQUARE", string(""));
+	dummy->item("RX_PWR", std::string(""));
+	dummy->item("RST_SENT", std::string(""));
+	dummy->item("RST_RCVD", std::string(""));
+	dummy->item("NAME", std::string(""));
+	dummy->item("QTH", std::string(""));
+	dummy->item("GRIDSQUARE", std::string(""));
 
 	return dummy;
 }
@@ -1985,7 +1985,7 @@ qso_num_t qso_data::current_number() {
 }
 
 // Call in editor
-string qso_data::get_call() {
+std::string qso_data::get_call() {
 	record* qso = current_qso();
 	if (qso) {
 		return qso->item("CALL");
@@ -2089,7 +2089,7 @@ bool qso_data::can_navigate(navigate_t target) {
 }
 
 // Get default station information
-string qso_data::get_default_station(char item) {
+std::string qso_data::get_default_station(char item) {
 	switch ((qso_manager::stn_item_t)item) {
 	case qso_manager::CALLSIGN:
 		return g_station_->current_call();

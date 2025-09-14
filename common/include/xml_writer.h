@@ -4,13 +4,13 @@
 #include "xml_reader.h"
 
 #include <string>
-#include <ostream>
+#include<ostream>
 
-using namespace std;
+
 
 class xml_element;
 
-	//! This class provides the means to write out the XML prolog and element to an output string. 
+	//! This class provides the means to write out the XML prolog and element to an output std::string. 
 	 
 	//! It derives from xml_reader as this provides the base API that the
 	//! application specific code uses to generate the XML element structure
@@ -35,23 +35,23 @@ class xml_element;
 		void indent(format_style_t output_style, int depth);
 
 		//! Output the data to the output stream \p os
-		bool data(ostream& os);
+		bool data(std::ostream& os);
 
 		//! Present progress
 		virtual void progress(int count, int total = -1) {};
 
-		//! Returns time \p t as a string in the XML standard date and time format. 
-		static string convert_xml_datetime(time_t t);
+		//! Returns time \p t as a std::string in the XML standard date and time format. 
+		static std::string convert_xml_datetime(time_t t);
 
 	protected:
 		//! Output an \p element to stream \p os at indentation \p level
-		bool write_element(xml_element* element, ostream& os, int level);
+		bool write_element(xml_element* element, std::ostream& os, int level);
 		//! Output the \p prolog to stream \p os
-		bool write_prolog(xml_element* prolog, ostream& os);
+		bool write_prolog(xml_element* prolog, std::ostream& os);
 		//! Write indentation at \p level.
-		bool write_indent(ostream& os, int level);
+		bool write_indent(std::ostream& os, int level);
 		//! Returns \p source with special characters escaped.
-		string escape_string(string source);
+		std::string escape_string(std::string source);
 
 		//! The style to generate output
 		format_style_t style_;

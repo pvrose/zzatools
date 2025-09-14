@@ -12,7 +12,7 @@
 #include <FL/Fl_Tree.H>
 #include <FL/Enumerations.H>
 
-using namespace std;
+
 
 template <class T> class band_map;
 
@@ -83,13 +83,13 @@ template <class T> class band_map;
 		void delete_all();
 		//! Delete the tree
 		void delete_tree();
-		//! Basic record list - list of record numbers
-		typedef list<qso_num_t> record_list_t;
-		//! Basic entry for a map
+		//! Basic record std::list - std::list of record numbers
+		typedef std::list<qso_num_t> record_list_t;
+		//! Basic entry for a std::map
 		struct report_map_entry_t {
 			//! Depth of entry
 			int entry_type;
-			//! list of records in this entry
+			//! std::list of records in this entry
 			record_list_t* record_list;
 			//! This will either be as above, or: base_map<report_map_entry_t*>* depending on the context.
 			void* next_entry;
@@ -101,23 +101,23 @@ template <class T> class band_map;
 				next_entry = nullptr;
 			}
 		};
-		//! The map of entries
-		typedef map<string, report_map_entry_t*> report_map_t;
-		//! The map of entries if first level is a band.
+		//! The std::map of entries
+		typedef std::map<std::string, report_map_entry_t*> report_map_t;
+		//! The std::map of entries if first level is a band.
 		typedef band_map<report_map_entry_t*> report_band_map_t;
 		// methods
-		//! Add record details to a specific map entry
+		//! Add record details to a specific std::map entry
 		
 		//! \param iRecord index of QSO record.
 		//! \param entry Entry to add record to.
 		void add_record(qso_num_t iRecord, report_map_entry_t* entry);
-		//! Copy the map to the tree control: \p type indicates level, \p item indicates item to hang, remainder of parameters receive record counts.
+		//! Copy the std::map to the tree control: \p type indicates level, \p item indicates item to hang, remainder of parameters receive record counts.
 		void copy_map_to_tree(int type, void* pMap, Fl_Tree_Item* item, int& num_records, int& num_eqsl, int& num_lotw, int& num_card, int& num_qrz, int& num_dxcc, int &num_any);
-		//! Copy the list of records at a map entry to the tree control
+		//! Copy the std::list of records at a std::map entry to the tree control
 		void copy_records_to_tree(record_list_t* pRecords, Fl_Tree_Item* item, int& num_records, int& num_eqsl, int& num_lotw, int& num_card, int& num_qrz, int& num_dxcc, int& num_any);
-		//! Create the map top-down
+		//! Create the std::map top-down
 		void create_map();
-		//! Delete the map in a specific map entry
+		//! Delete the std::map in a specific std::map entry
 		void delete_map(report_map_entry_t* entry);
 		//! redraw the tree control
 		void populate_tree(bool activate);
@@ -126,7 +126,7 @@ template <class T> class band_map;
 		//! Select records
 		void add_filter(report_filter_t filter);
 		//! Add Type
-		void add_category(int level, report_cat_t category, string custom_field);
+		void add_category(int level, report_cat_t category, std::string custom_field);
 		//! Change font
 		void set_font(Fl_Font font, Fl_Fontsize size);
 
@@ -135,12 +135,12 @@ template <class T> class band_map;
 
 		// attributes
 	protected:
-		//! Top-level entry containing a map of all first-level entries
+		//! Top-level entry containing a std::map of all first-level entries
 		report_map_entry_t map_;
-		//! map order - e.g. "DXCC","Band","Mode"
-		vector<report_cat_t> map_order_;
-		//! Adjusted map order (including state)
-		vector<report_cat_t> adj_order_;
+		//! std::map order - e.g. "DXCC","Band","Mode"
+		std::vector<report_cat_t> map_order_;
+		//! Adjusted std::map order (including state)
+		std::vector<report_cat_t> adj_order_;
 		//! Report type
 		report_filter_t filter_;
 		//! number of current selected record
@@ -160,9 +160,9 @@ template <class T> class band_map;
 		int entities_qrz_;     //!< Number of entities confirmed on QRZ.com
 		int entities_any_;     //!< Number of entities confirmed on any
 		//! Custom field name
-		string custom_field_;
+		std::string custom_field_;
 		//! Station callsign used
-		string station_call_;
+		std::string station_call_;
 
 	};
 #endif

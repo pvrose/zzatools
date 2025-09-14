@@ -32,16 +32,16 @@
 
 
 
-using namespace std;
+
 
 extern status* status_;
 extern menu* menu_;
 extern toolbar* toolbar_;
 extern qso_manager* qso_manager_;
 extern spec_data* spec_data_;
-extern string PROGRAM_ID;
-extern string PROGRAM_VERSION;
-extern string VENDOR;
+extern std::string PROGRAM_ID;
+extern std::string PROGRAM_VERSION;
+extern std::string VENDOR;
 extern ticker* ticker_;
 extern Fl_Preferences::Root prefs_mode_;
 
@@ -71,12 +71,12 @@ wsjtx_handler::~wsjtx_handler() {
 };
 
 // This callback must be static
-int wsjtx_handler::rcv_request(stringstream& ss) {
+int wsjtx_handler::rcv_request(std::stringstream& ss) {
 	return that_->rcv_dgram(ss);
 }
 
 // Receive the datagram. Decide which one an go to the individual decode methods
-int wsjtx_handler::rcv_dgram(stringstream & ss) {
+int wsjtx_handler::rcv_dgram(std::stringstream & ss) {
 	// The first few objects are fixed for all datagrams
 	magic_number_ = get_uint32(ss);
 	schema_ = get_uint32(ss);
@@ -118,7 +118,7 @@ int wsjtx_handler::rcv_dgram(stringstream & ss) {
 }
 
 // Ignore the datagrams that do not interest us
-int wsjtx_handler::handle_default(stringstream& ss, uint32_t type) {
+int wsjtx_handler::handle_default(std::stringstream& ss, uint32_t type) {
 	char message[128];
 	snprintf(message, 128, "WSJT-X: Ignored type %d datagram", type);
 	status_->misc_status(ST_LOG, message);
@@ -126,7 +126,7 @@ int wsjtx_handler::handle_default(stringstream& ss, uint32_t type) {
 }
 
 // Handle the heartbeat - send one back
-int wsjtx_handler::handle_hbeat(stringstream& ss) {
+int wsjtx_handler::handle_hbeat(std::stringstream& ss) {
 	check_beats_ = true;
 	received_beats_.insert(id_);
 	return 0;
@@ -134,7 +134,7 @@ int wsjtx_handler::handle_hbeat(stringstream& ss) {
 
 // Send a heartbeat
 int wsjtx_handler::send_hbeat() {
-	stringstream ss;
+	std::stringstream ss;
 	// Add the magic number, schema and function number
 	put_uint32(ss, magic_number_);
 	put_uint32(ss, schema_);
@@ -150,12 +150,12 @@ int wsjtx_handler::send_hbeat() {
 	put_uint32(ss, (uint32_t)(~0));
 	
 	// Now go back to the start of the stream to send it
-	ss.seekg(0, ios::beg);
+	ss.seekg(0, std::ios::beg);
 	return server_->send_response(ss);
 }
 
 // Close datagram: shut the server down 
-int wsjtx_handler::handle_close(stringstream& ss) {
+int wsjtx_handler::handle_close(std::stringstream& ss) {
 	status_->misc_status(ST_NOTE, "WSJT-X: Received Closing down");
 	connected_ = false;
 	qso_manager_->cancel_modem_qso();
@@ -165,12 +165,12 @@ int wsjtx_handler::handle_close(stringstream& ss) {
 }
 
 // Handle the logged ADIF datagram. Send it to the logger
-int wsjtx_handler::handle_log(stringstream& ss) {
+int wsjtx_handler::handle_log(std::stringstream& ss) {
 	status_->misc_status(ST_LOG, "WSJT-X: Received Log ADIF datagram");
-	// Get ADIF string
-	string utf8 = get_utf8(ss);
+	// Get ADIF std::string
+	std::string utf8 = get_utf8(ss);
 	// Convert it to a record
-	stringstream adif;
+	std::stringstream adif;
 	adif.str(utf8);
 	adi_reader* reader = new adi_reader;
 	// The stream received from WSJT-X is header and record so create a book from it
@@ -179,7 +179,7 @@ int wsjtx_handler::handle_log(stringstream& ss) {
 	record* log_qso = rcvd_book->get_record(0, false);
 	record* qso = qso_call(log_qso->item("CALL"), true);
 	qso->merge_records(log_qso);
-	qso->item("QSO_COMPLETE", string(""));
+	qso->item("QSO_COMPLETE", std::string(""));
 	qso_manager_->update_modem_qso(true);
 	status_->misc_status(ST_NOTE, "WSJT-X: Logged QSO");
 	delete rcvd_book;
@@ -187,7 +187,7 @@ int wsjtx_handler::handle_log(stringstream& ss) {
 }
 
 // handle decode - display and beep if it contains the user's callsign
-int wsjtx_handler::handle_decode(stringstream& ss) {
+int wsjtx_handler::handle_decode(std::stringstream& ss) {
 	decode_dg decode;
 	decode.id = id_;
 	decode.new_decode = get_bool(ss);
@@ -207,13 +207,13 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 	minutes = minutes - (hours * 60);
 	char t[20];
 	snprintf(t, sizeof(t), "%02d%02d%02.0f", hours, minutes, seconds);
-	record* qso = update_qso(false, string(t), (double)decode.d_freq, decode.message);
+	record* qso = update_qso(false, std::string(t), (double)decode.d_freq, decode.message);
 	if (qso) qso_manager_->update_modem_qso(false);
 	return 0;
 }
 
 // handle decode - display and beep if it contains the user's callsign
-int wsjtx_handler::handle_reply(stringstream& ss) {
+int wsjtx_handler::handle_reply(std::stringstream& ss) {
 	decode_dg decode;
 	decode.id = id_;
 	decode.new_decode = get_bool(ss);
@@ -233,16 +233,16 @@ int wsjtx_handler::handle_reply(stringstream& ss) {
 	minutes = minutes - (hours * 60);
 	char t[20];
 	snprintf(t, sizeof(t), "%02d%02d%02.0f", hours, minutes, seconds);
-	record* qso = update_qso(false, string(t), (double)decode.d_freq, decode.message);
+	record* qso = update_qso(false, std::string(t), (double)decode.d_freq, decode.message);
 	if (qso) qso_manager_->update_modem_qso(false);
 	return 0;
 }
 
 // handle status - display it if the DX Call has changed - indicates that user
 // has called a new station
-int wsjtx_handler::handle_status(stringstream& ss) {
+int wsjtx_handler::handle_status(std::stringstream& ss) {
 	// Debug code
-	string datagram = ss.str();
+	std::string datagram = ss.str();
 
 	status_dg status;
 	// ID
@@ -307,7 +307,7 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 }
 
 // Get an bool from the next byte of datagram 
-bool wsjtx_handler::get_bool(stringstream& ss) {
+bool wsjtx_handler::get_bool(std::stringstream& ss) {
 	unsigned char c;
 	ss.get((char&)c);
 	bool b = c ? true : false;
@@ -315,7 +315,7 @@ bool wsjtx_handler::get_bool(stringstream& ss) {
 }
 
 // Get an unsigned integer from the next byte of datagram 
-uint8_t wsjtx_handler::get_uint8(stringstream& ss) {
+uint8_t wsjtx_handler::get_uint8(std::stringstream& ss) {
 	unsigned char c;
 	ss.get((char&)c);
 	uint8_t i = c;
@@ -323,7 +323,7 @@ uint8_t wsjtx_handler::get_uint8(stringstream& ss) {
 }
 
 // Get an unsigned integer from the next 4 bytes of dgram 
-uint32_t wsjtx_handler::get_uint32(stringstream& ss) {
+uint32_t wsjtx_handler::get_uint32(std::stringstream& ss) {
 	unsigned char c = 0;
 	uint32_t i = 0;
 	for (int ix = 0; ix < 4; ix++) {
@@ -334,7 +334,7 @@ uint32_t wsjtx_handler::get_uint32(stringstream& ss) {
 }
 
 // Get 64-bit unsigned integer from the next 8 bytes of datagram 
-uint64_t wsjtx_handler::get_uint64(stringstream& ss) {
+uint64_t wsjtx_handler::get_uint64(std::stringstream& ss) {
 	unsigned char c = 0;
 	uint64_t i = 0LL;
 	for (int ix = 0; ix < 8; ix++) {
@@ -345,27 +345,27 @@ uint64_t wsjtx_handler::get_uint64(stringstream& ss) {
 }
 
 // Get double from the next 8-bytes of datagram
-double wsjtx_handler::get_double(stringstream& ss) {
+double wsjtx_handler::get_double(std::stringstream& ss) {
 	// I'm making the assumption that the double has been directly serialised in its bit pattern
 	uint64_t uv = get_uint64(ss);
 	double* d = reinterpret_cast<double*>(&uv);
 	return *d;
 }
 
-// Get a string from the QByteArray (4 byte length + that number of bytes)
-string wsjtx_handler::get_utf8(stringstream& ss) {
+// Get a std::string from the QByteArray (4 byte length + that number of bytes)
+std::string wsjtx_handler::get_utf8(std::stringstream& ss) {
 	// Get 4-byte length
 	uint32_t len = get_uint32(ss);
 	if (len == ~(0)) {
-		// Length is all 1's - represents a null string
+		// Length is all 1's - represents a null std::string
 		return "";
 	}
 	else {
-		// Create a string long enough to receive the data
-		string s = "";
+		// Create a std::string long enough to receive the data
+		std::string s = "";
 		s.reserve(len + 1);
 		for (uint32_t i = 0; i < len; i++) {
-			// Copy the string 1 byte at a timme
+			// Copy the std::string 1 byte at a timme
 			char c;
 			ss.get(c);
 			s += c;
@@ -375,15 +375,15 @@ string wsjtx_handler::get_utf8(stringstream& ss) {
 }
 
 // Put an integer as 4 bytes in the next 4 bytes of dgram
-void wsjtx_handler::put_uint32(stringstream& ss, uint32_t i) {
+void wsjtx_handler::put_uint32(std::stringstream& ss, uint32_t i) {
 	for (int ix = 24; ix >= 0; ix-=8) {
 		unsigned char c = (i >> ix) & 0xFF;
 		ss.put(c);
 	}
 }
 
-// Put a string as QByteArray (see above) into the dgram
-void wsjtx_handler::put_utf8(stringstream& ss, string s) {
+// Put a std::string as QByteArray (see above) into the dgram
+void wsjtx_handler::put_utf8(std::stringstream& ss, std::string s) {
 	put_uint32(ss, s.length());
 	for (unsigned int ix = 0; ix < s.length(); ix++) {
 		ss.put(s[ix]);
@@ -398,7 +398,7 @@ bool wsjtx_handler::has_server() {
 // Start the server
 void wsjtx_handler::run_server() {
 	if (!server_) {
-		string address = qso_manager_->apps()->network_address(WSJTX);
+		std::string address = qso_manager_->apps()->network_address(WSJTX);
 		int udp_port = qso_manager_->apps()->network_port(WSJTX);
 		if (address.length()) {
 			server_ = new socket_server(socket_server::UDP, address, udp_port);
@@ -423,17 +423,17 @@ void wsjtx_handler::close_server() {
 	}
 }
 
-wsjtx_handler::decoded_msg wsjtx_handler::decode_message(string message) {
+wsjtx_handler::decoded_msg wsjtx_handler::decode_message(std::string message) {
 	// TODO: Currently assuming non F/H exchange
 	decoded_msg decode;
-	vector<string> words;
+	std::vector<std::string> words;
 	// Prune the trailing spaces from message
 	size_t ix = message.length();
 	while(message[--ix] == ' ');
-	string pruned = message.substr(0, ix+1);
+	std::string pruned = message.substr(0, ix+1);
 	split_line(pruned, words, ' ');
 
-	string test_exch = words.back();
+	std::string test_exch = words.back();
 	const char* test = test_exch.c_str();
 	if (strcmp(test, "RR73") == 0) {
 		// TX4A
@@ -511,13 +511,13 @@ wsjtx_handler::decoded_msg wsjtx_handler::decode_message(string message) {
 }
 
 // Update QSO - returns true if updated and let qso_manager know
-record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, string message, record* match, double dial, string mode) {
+record* wsjtx_handler::update_qso(bool tx, std::string time, double audio_freq, std::string message, record* match, double dial, std::string mode) {
 	decoded_msg decode = decode_message(message);
-	string sender = decode.sender[0] == '<' ? decode.sender.substr(1, decode.sender.length() - 2) : decode.sender;
-	string target = decode.target[0] == '<' ? decode.target.substr(1, decode.target.length() - 2) : decode.target;
-	string today = now(false, "%Y%m%d");
+	std::string sender = decode.sender[0] == '<' ? decode.sender.substr(1, decode.sender.length() - 2) : decode.sender;
+	std::string target = decode.target[0] == '<' ? decode.target.substr(1, decode.target.length() - 2) : decode.target;
+	std::string today = now(false, "%Y%m%d");
 	double df = dial == 0.0 ? dial_frequency_ : dial;
-	string m = mode == "" ? mode_ : mode;
+	std::string m = mode == "" ? mode_ : mode;
 	char msg[100];
 	if (tx) {
 		if (sender == "TUNE") {
@@ -540,7 +540,7 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 				}
 				default: {
 					qso = match != nullptr ? match : qso_call(target, true);
-					qso->item("QSO_COMPLETE", string("N"));
+					qso->item("QSO_COMPLETE", std::string("N"));
 					break;
 				}
 			}
@@ -550,13 +550,13 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 			case TX1A:
 				// <THEM> <ME> 
 			{
-				// I am starting a new call - set date/ time/freq/mode
+				// I am starting a new call - std::set date/ time/freq/mode
 				if (qso->item("QSO_DATE") == "") qso->item("QSO_DATE", today);
 				qso->item("TIME_ON", time);
 				char f[20];
 				double freq = df + (audio_freq / 1000000.0);
 				snprintf(f, sizeof(f), "%0.6f", freq);
-				qso->item("FREQ", string(f));
+				qso->item("FREQ", std::string(f));
 				qso->item("MODE", m);
 				if (grid_cache_.find(target) != grid_cache_.end()) {
 					qso->item("GRIDSQUARE", grid_cache_.at(target));
@@ -572,14 +572,14 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 				char f[20];
 				double freq = df + (audio_freq / 1000000.0);
 				snprintf(f, sizeof(f), "%0.6f", freq);
-				qso->item("FREQ", string(f));
+				qso->item("FREQ", std::string(f));
 				qso->item("MODE", m);
 				// Set grid square: from cache or no value
 				if (grid_cache_.find(target) != grid_cache_.end()) {
 					qso->item("GRIDSQUARE", grid_cache_.at(target));
 				}
 				else {
-					qso->item("GRIDSQUARE", string(""));
+					qso->item("GRIDSQUARE", std::string(""));
 				}
 				// Add report to existing QSO
 				qso->item("RST_SENT", decode.exchange);
@@ -592,17 +592,17 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 				char f[20];
 				double freq = df + (audio_freq / 1000000.0);
 				snprintf(f, sizeof(f), "%0.6f", freq);
-				qso->item("FREQ", string(f));
+				qso->item("FREQ", std::string(f));
 				return qso;
 			}
 			case TX4:
 			{
 				// <THEM> <ME> RRR
-				qso->item("QSO_COMPLETE", string("?"));
+				qso->item("QSO_COMPLETE", std::string("?"));
 				char f[20];
 				double freq = df + (audio_freq / 1000000.0);
 				snprintf(f, sizeof(f), "%0.6f", freq);
-				qso->item("FREQ", string(f));
+				qso->item("FREQ", std::string(f));
 				return qso;
 			}
 			case TX4A:
@@ -613,9 +613,9 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 				char f[20];
 				double freq = df + (audio_freq / 1000000.0);
 				snprintf(f, sizeof(f), "%0.6f", freq);
-				qso->item("FREQ", string(f));
+				qso->item("FREQ", std::string(f));
 				if(qso->item("QSO_COMPLETE") == "N" || qso->item("QSO_COMPLETE") == "?")
-					qso->item("QSO_COMPLETE", string("Y"));
+					qso->item("QSO_COMPLETE", std::string("Y"));
 				qso->item("TIME_OFF", time);
 				return qso;
 			}
@@ -653,7 +653,7 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 		else {
 			record* qso = match != nullptr ? match : qso_call(sender, false);
 			if (qso) {
-				qso->item("QSO_COMPLETE", string("N"));
+				qso->item("QSO_COMPLETE", std::string("N"));
 				switch (decode.type) {
 				case TX1:
 					// <ME> <CALL> <GRID>
@@ -670,7 +670,7 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 							qso->item("GRIDSQUARE", grid_cache_.at(target));
 						}
 						else {
-							qso->item("GRIDSQUARE", string(""));
+							qso->item("GRIDSQUARE", std::string(""));
 						}
 					}
 					qso->item("RST_RCVD", decode.exchange);
@@ -681,16 +681,16 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 					return qso;
 				case TX4:
 					// <ME> <THEM> RRR
-					qso->item("QSO_COMPLETE", string("?"));
+					qso->item("QSO_COMPLETE", std::string("?"));
 					return qso;
 				case TX4A:
 					// <ME> <THEM> RR73
-					qso->item("QSO_COMPLETE", string("?"));
+					qso->item("QSO_COMPLETE", std::string("?"));
 					// And drop through
 				case TX5:
 					// <ME> <THEM> 73
 					if (qso->item("QSO_COMPLETE") == "N" || qso->item("QSO_COMPLETE") == "?") {
-						qso->item("QSO_COMPLETE", string("Y"));
+						qso->item("QSO_COMPLETE", std::string("Y"));
 					}
 					qso->item("TIME_OFF", time);
 					return qso;
@@ -708,20 +708,20 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 }
 
 // Create a new record to hold data received from WSJT-X
-record* wsjtx_handler::new_qso(string call) {
+record* wsjtx_handler::new_qso(std::string call) {
 	qsos_[call] = nullptr;
 	record * qso = qso_manager_->start_modem_qso(call, qso_data::QSO_COPY_WSJTX);
 	qso->item("CALL", call);
 	qso->item("BAND", spec_data_->band_for_freq(dial_frequency_));
 	qso->item("MODE", mode_);
-	qso->item("QSO_COMPLETE", string("N"));
+	qso->item("QSO_COMPLETE", std::string("N"));
 	qsos_[call] = qso;
 	qso_manager_->update_modem_qso(false);
 	return qso;
 }
 
 // Get a QSO record for this callsign
-record* wsjtx_handler::qso_call(string call, bool create) {
+record* wsjtx_handler::qso_call(std::string call, bool create) {
 	record* qso = nullptr;
 	if (qsos_.find(call) == qsos_.end()) {
 		if (create) {
@@ -730,7 +730,7 @@ record* wsjtx_handler::qso_call(string call, bool create) {
 	}
 	else {
 		qso = qsos_.at(call);
-		string band = spec_data_->band_for_freq(dial_frequency_);
+		std::string band = spec_data_->band_for_freq(dial_frequency_);
 		if (qso->item("MODE") == mode_ && qso->item("BAND") == band) {
 			if (qso->item("TIME_OFF") != "") {
 				time_t now = time(nullptr);
@@ -758,14 +758,14 @@ record* wsjtx_handler::qso_call(string call, bool create) {
 }
 
 // Parse a record in the "ALL.TXT" file
-bool wsjtx_handler::parse_all_txt(record* qso, string line) {
+bool wsjtx_handler::parse_all_txt(record* qso, std::string line) {
 	bool tx_record;
 	double dial_frequency = 0.0;
 	double audio_frequency = 0.0;
-	string time_on = "";
-	// After this initial processing pos will point to the start og the QSO decode string - look for old-style transmit record
+	std::string time_on = "";
+	// After this initial processing pos will point to the start og the QSO decode std::string - look for old-style transmit record
 	size_t pos = line.find("Transmitting");
-	if (pos != string::npos) {
+	if (pos != std::string::npos) {
 		pos = line.find(qso->item("MODE"));
 		pos += qso->item("MODE").length() + 3;
 		tx_record = true;
@@ -775,20 +775,20 @@ bool wsjtx_handler::parse_all_txt(record* qso, string line) {
 	else {
 		// Now see if it's a new-style Tx record
 		pos = line.find("Tx");
-		if (pos != string::npos) {
+		if (pos != std::string::npos) {
 			// Get frequency of transmission - including audio offset
-			string freq = line.substr(14, 9);
+			std::string freq = line.substr(14, 9);
 			// Replace leading spaces with zeroes
 			for (size_t i = 0; freq[i] == ' '; i++) {
 				freq[i] = '0';
 			}
-			dial_frequency = stod(freq);
-			string freq_offset = line.substr(43, 4);
+			dial_frequency = std::stod(freq);
+			std::string freq_offset = line.substr(43, 4);
 			// Replace leading spaces with zeroes
 			for (size_t i = 0; freq_offset[i] == ' '; i++) {
 				freq_offset[i] = '0';
 			}
-			audio_frequency = stod(freq_offset);
+			audio_frequency = std::stod(freq_offset);
 			pos = 48;
 			tx_record = true;
 			time_on = line.substr(7,6);
@@ -796,7 +796,7 @@ bool wsjtx_handler::parse_all_txt(record* qso, string line) {
 		else {
 			// Look for a new-style Rx record
 			pos = line.find("Rx");
-			if (pos != string::npos) {
+			if (pos != std::string::npos) {
 				pos = 48;
 				tx_record = false;
 				time_on = line.substr(7,6);
@@ -822,7 +822,7 @@ bool wsjtx_handler::match_all_txt(record* qso, bool update_qso) {
 	Fl_Preferences datapath_settings(settings, "Datapath");
 	char* temp;
 	datapath_settings.get("WSJT-X", temp, "");
-	string filename = string(temp) + "/ALL.TXT";
+	std::string filename = std::string(temp) + "/ALL.TXT";
 	ifstream* all_file = new ifstream(filename.c_str());
 	if (!all_file->good()) {
 		char msg[100];
@@ -832,22 +832,22 @@ bool wsjtx_handler::match_all_txt(record* qso, bool update_qso) {
 	// This will take a while so display the timer cursor
 	fl_cursor(FL_CURSOR_WAIT);
 	// calculate the file size and initialise the progress bar
-	streampos startpos = all_file->tellg();
-	all_file->seekg(0, ios::end);
-	streampos endpos = all_file->tellg();
+	std::streampos startpos = all_file->tellg();
+	all_file->seekg(0, std::ios::end);
+	std::streampos endpos = all_file->tellg();
 	long file_size = (long)(endpos - startpos);
 	status_->misc_status(ST_NOTE, "WSJTX: Starting to parse ALL.TXT");
 	status_->progress(file_size, OT_RECORD, "Looking for queried call in ALL.TXT", "bytes");
 	// reposition back to beginning
-	all_file->seekg(0, ios::beg);
+	all_file->seekg(0, std::ios::beg);
 	enum {SEARCHING, FOUND, COPYING, COPIED} copy_status = SEARCHING;
-	string s_status[] = {"SEARCHING", "FOUND    ", "COPYING  ", "COPIED   "};
+	std::string s_status[] = {"SEARCHING", "FOUND    ", "COPYING  ", "COPIED   "};
 	// Get user callsign from settings
 	// Get search items from record
-	string their_call = qso->item("CALL");
-	string datestamp = qso->item("QSO_DATE");
-	string timestamp = qso->item("TIME_ON");
-	string mode = qso->item("MODE");
+	std::string their_call = qso->item("CALL");
+	std::string datestamp = qso->item("QSO_DATE");
+	std::string timestamp = qso->item("TIME_ON");
+	std::string mode = qso->item("MODE");
 	if (their_call.length() == 0 || datestamp.length() != 8 || 
 		timestamp.length() < 4 || mode.length() == 0) {
 		status_->misc_status(ST_ERROR, "WSJTX: Searching ALL.TXT requires, call, date/time and mode");
@@ -861,7 +861,7 @@ bool wsjtx_handler::match_all_txt(record* qso, bool update_qso) {
 	int count = 0;
 	// Now read the file - search for the QSO start time
 	while (all_file->good() && copy_status != COPIED) {
-		string line;
+		std::string line;
 		getline(*all_file, line);
 		count += line.length() + 1;
 		if (count <= file_size) status_->progress(count, OT_RECORD);
@@ -870,9 +870,9 @@ bool wsjtx_handler::match_all_txt(record* qso, bool update_qso) {
 		if (line.substr(0,6) == datestamp) {
 			if (line.substr(7,4) == timestamp.substr(0,4) || 
 				copy_status != SEARCHING) {
-				if (line.find(my_call_) != string::npos &&
-					line.find(their_call) != string::npos &&
-					line.find(mode) != string::npos) {
+				if (line.find(my_call_) != std::string::npos &&
+					line.find(their_call) != std::string::npos &&
+					line.find(mode) != std::string::npos) {
 					if (copy_status == SEARCHING) {
 						snprintf(msg, 256, "WSJTX: %s %s %s %s %s Found possible match",
 							datestamp.c_str(),
@@ -889,9 +889,9 @@ bool wsjtx_handler::match_all_txt(record* qso, bool update_qso) {
 			}
 		}
 		if (copy_status != SEARCHING) {
-			if (line.find(my_call_) != string::npos &&
-				line.find(their_call) != string::npos &&
-				line.find(mode) != string::npos) {
+			if (line.find(my_call_) != std::string::npos &&
+				line.find(their_call) != std::string::npos &&
+				line.find(mode) != std::string::npos) {
 				if (update_qso) parse_all_txt(qso, line);
 				if (qso->item("QSO_COMPLETE") == "N" || !update_qso) copy_status = COPYING;
 				else if (copy_status == COPYING && 
@@ -947,7 +947,7 @@ void wsjtx_handler::cb_ticker(void* v) {
 }
 
 // Erase cache entry for callsign
-void wsjtx_handler::delete_qso(string call) {
+void wsjtx_handler::delete_qso(std::string call) {
 	if (qsos_.find(call) != qsos_.end()) {
 		qsos_.erase(call);
 	} else {

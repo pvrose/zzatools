@@ -13,14 +13,14 @@
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Radio_Round_Button.H>
 
-using namespace std;
+
 
 // basic tick is 200 ms 
 extern status* status_;
 extern wsjtx_handler* wsjtx_handler_;
 extern bool closing_;
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
 extern void open_html(const char*);
 

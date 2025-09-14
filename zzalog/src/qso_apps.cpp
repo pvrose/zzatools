@@ -17,17 +17,17 @@
 #include <FL/Fl_Tabs.H>
 #include <FL/Fl_Radio_Light_Button.H>
 
-using namespace std;
+
 
 extern fllog_emul* fllog_emul_;
 extern wsjtx_handler* wsjtx_handler_;
 extern status* status_;
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
 extern void open_html(const char*);
 
-// Constructor for one set of modem controls
+// Constructor for one std::set of modem controls
 app_grp::app_grp(int X, int Y, int W, int H, const char* L) :
     Fl_Group(X, Y, W, H, L)
 {
@@ -216,7 +216,7 @@ void app_grp::enable_widgets() {
     }
     bn_rig_->copy_label(rig_name);
     if (app_data_->commands.find(rig_name) != app_data_->commands.end()) {
-        ip_app_name_->value(app_data_->commands.at(string(rig_name)).c_str());
+        ip_app_name_->value(app_data_->commands.at(std::string(rig_name)).c_str());
         bn_show_script_->activate();
     } else {
         ip_app_name_->value("");
@@ -288,7 +288,7 @@ void app_grp::set_data(app_data_t* data) {
 // v is not used
 void app_grp::cb_bn_listen(Fl_Widget* w, void* v) {
     app_grp* that = ancestor_view<app_grp>(w);
-    string server = that->label();
+    std::string server = that->label();
     if (server == FLDIGI) {
         if (fllog_emul_->has_server()) {
             fllog_emul_->close_server();
@@ -319,12 +319,12 @@ void app_grp::cb_bn_connect(Fl_Widget* w, void* v) {
             that->app_data_->name.c_str(), rig_name);
         status_->misc_status(ST_ERROR, msg);
     } else {
-        string app = that->app_data_->commands.at(rig_name);
+        std::string app = that->app_data_->commands.at(rig_name);
         char msg[128];
         snprintf(msg, sizeof(msg), "DASH: Starting app: %s", app.c_str());
         status_->misc_status(ST_NOTE, msg);
 #ifdef _WIN32
-        string cmd = "start /min " + app;
+        std::string cmd = "start /min " + app;
         system(cmd.c_str());
 #else
         if (that->app_data_->admin) {
@@ -344,8 +344,8 @@ void app_grp::cb_bn_connect(Fl_Widget* w, void* v) {
 // App typed in
 void app_grp::cb_ip_app(Fl_Widget* w, void* v) {
     app_grp* that = ancestor_view<app_grp>(w);
-    string value;
-    cb_value<Fl_Input, string>(w, &value);
+    std::string value;
+    cb_value<Fl_Input, std::string>(w, &value);
     const char* rig_name = that->rig_id();
     that->app_data_->commands[rig_name] = value; 
     that->enable_widgets();
@@ -369,7 +369,7 @@ void app_grp::cb_bn_server(Fl_Widget* w, void* v) {
 // Network address
 void app_grp::cb_ip_nwaddr(Fl_Widget* w, void* v) {
     app_grp* that = ancestor_view<app_grp>(w);
-    cb_value<Fl_Input, string>(w, &that->app_data_->address);
+    cb_value<Fl_Input, std::string>(w, &that->app_data_->address);
     that->enable_widgets();
 }
 
@@ -394,7 +394,7 @@ void app_grp::cb_bn_delete(Fl_Widget* w, void* v) {
     apps->delete_app(that);
 }
 
-// Callback to set can_disable
+// Callback to std::set can_disable
 void app_grp::cb_bn_disable(Fl_Widget* w, void* v) {
     app_grp* that = ancestor_view<app_grp>(w);
     cb_value<Fl_Check_Button, bool>(w, &that->app_data_->can_disable);
@@ -404,8 +404,8 @@ void app_grp::cb_bn_disable(Fl_Widget* w, void* v) {
 // Callback to read disable command
 void app_grp::cb_ip_disable(Fl_Widget* w, void* v) {
     app_grp* that = ancestor_view<app_grp>(w);
-    string value;
-    cb_value<Fl_Input, string>(w, &value);
+    std::string value;
+    cb_value<Fl_Input, std::string>(w, &value);
     that->app_data_->commands["NONE"] = value; 
 }
 
@@ -419,7 +419,7 @@ void app_grp::cb_ip_passw(Fl_Widget* w, void* v) {
 void app_grp::cb_show_script(Fl_Widget* w, void* v) {
     app_grp* that = ancestor_view<app_grp>(w);
     filename_input* ip = *(filename_input**)v;
-    string fn = ip->value();
+    std::string fn = ip->value();
     qso_apps* qa = ancestor_view<qso_apps>(that);
     file_viewer* fwin = qa->viewer();
     if (fwin->file() == fn && fwin->visible() && !fwin->is_dirty()) {
@@ -517,14 +517,14 @@ void qso_apps::load_values() {
         data->rig_class = (app_rig_class_t)tempi;
         app_settings.get("Server", tempi, (int)false);
         data->server = tempi;
-        if (string(app) == FLDIGI) {
+        if (std::string(app) == FLDIGI) {
             app_settings.get("Address", temps, "127.0.0.1");
             data->address = temps;
             free(temps);
             app_settings.get("Port Number", tempi, 8421);
             data->port_num = tempi;
         }
-        else if (string(app) == WSJTX) {
+        else if (std::string(app) == WSJTX) {
             app_settings.get("Address", temps, "127.0.0.1");
             data->address = temps;
             free(temps);
@@ -543,7 +543,7 @@ void qso_apps::load_values() {
             const char* rig = rigs_settings.entry(iy);
             char* temp;
             rigs_settings.get(rig, temp, app);
-            data->commands[string(rig)] = temp;
+            data->commands[std::string(rig)] = temp;
         }
         if (data->rig_class == ALL_RIGS && !data->can_disable && data->commands.size() > 1) {
             char msg[128];
@@ -558,7 +558,7 @@ void qso_apps::load_values() {
 }
 
 // Create the tabs
-void qso_apps::create_tabs(string name) {
+void qso_apps::create_tabs(std::string name) {
     Fl_Group* save = Fl_Group::current();
     Fl_Group::current(tabs_);
 
@@ -590,7 +590,7 @@ void qso_apps::create_tabs(string name) {
 
     for (auto ix = 0; ix < tabs_->children(); ix++) {
         tabs_->child(ix)->size(rw, rh);
-        if (string(tabs_->child(ix)->label()) == name) {
+        if (std::string(tabs_->child(ix)->label()) == name) {
             tabs_->value(tabs_->child(ix));
         }
     }
@@ -733,7 +733,7 @@ void qso_apps::cb_bn_new(Fl_Widget* w, void* v) {
 // Input new app nae
 void qso_apps::cb_ip_new(Fl_Widget* w, void* v) {
     qso_apps* that = ancestor_view<qso_apps>(w);
-    cb_value<Fl_Input, string>(w, v);
+    cb_value<Fl_Input, std::string>(w, v);
     that->enable_widgets(); 
 }
 
@@ -768,7 +768,7 @@ void qso_apps::add_servers(app_data_t* data) {
 
 // Delete the application
 void qso_apps::delete_app(app_grp* w) {
-    apps_data_.erase(string(w->label()));
+    apps_data_.erase(std::string(w->label()));
     int ch = tabs_->find(w);
     tabs_->delete_child(ch);
     enable_widgets();
@@ -778,7 +778,7 @@ file_viewer* qso_apps::viewer() {
     return viewer_;
 }
 
-string qso_apps::network_address(string app) {
+std::string qso_apps::network_address(std::string app) {
     if (apps_data_.find(app) != apps_data_.end()) {
         return apps_data_[app]->address;
     }
@@ -787,7 +787,7 @@ string qso_apps::network_address(string app) {
     }
 }
 
-int qso_apps::network_port(string app) {
+int qso_apps::network_port(std::string app) {
     if (apps_data_.find(app) != apps_data_.end()) {
         return apps_data_[app]->port_num;
     }

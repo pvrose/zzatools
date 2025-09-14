@@ -6,7 +6,7 @@
 #include <vector>
 #include <list>
 
-using namespace std;
+
 
 
 
@@ -28,21 +28,21 @@ using namespace std;
 		XRP_INT,                //!<  int  or  i4  - 32-bit integer item
 		XRP_BOOLEAN,            //!<  Boolean  - 1 or 0
 		XRP_DOUBLE,             //!<  double  - 64-bit floating point
-		XRP_STRING,             //!<  string>
+		XRP_STRING,             //!<  std::string>
 		XRP_DATETIME,           //!<  dateTime.iso8601  - Dates in ISO8601 format: YYYYMMDDTHH:MM:SS
 		XRP_BASE64,             //!<  base64  - Binary information encoded as Base 64, as defined in RFC 2045
 	};
 
 	//! XML-RPC data types
 	enum rpc_data_t {
-		XRT_EMPTY,              //!< Empty data set
+		XRT_EMPTY,              //!< Empty data std::set
 		XRT_INT,                //!< I4
 		XRT_BOOLEAN,            //!< Y/N
 		XRT_DOUBLE,             //!< double
 		XRT_STRING,             //!< String (ASCII)
 		XRT_DEFAULT,            //!< String (ASCII) by default of no type
-		XRT_BYTES,              //!< store as string after compacting the data
-		XRT_DATETIME,           //!< Date/time - store as string
+		XRT_BYTES,              //!< store as std::string after compacting the data
+		XRT_DATETIME,           //!< Date/time - store as std::string
 		XRT_ARRAY,              //!< Array of data types
 		XRT_STRUCT              //!< Struct
 	};
@@ -53,11 +53,11 @@ using namespace std;
 	public:
 		// Compound RPC data-types
 		//! RPC Array of data items
-		typedef vector<rpc_data_item*> rpc_array;
+		typedef std::vector<rpc_data_item*> rpc_array;
 		//! RPC Structure
-		typedef map<string, rpc_data_item*> rpc_struct;
+		typedef std::map<std::string, rpc_data_item*> rpc_struct;
 		//! RPC List
-		typedef list<rpc_data_item*> rpc_list;
+		typedef std::list<rpc_data_item*> rpc_list;
 
 	public:
 		//! Constructor.
@@ -69,23 +69,23 @@ using namespace std;
 		rpc_data_t type();
 		// Get the data as specific type - returms true if is the correct type
 		bool get(int32_t& i);        //!< Receives item as a 32-bit integer, returns false if not integer
-		bool get(string& s);         //!< Receives item as a string, returns false if not a string
+		bool get(std::string& s);         //!< Receives item as a std::string, returns false if not a std::string
 		bool get(double& d);         //!< Receives item as a double, returns false if not floating point
 		bool get(rpc_array*& ap);    //!< Receives iten as an array, returns false if not an array.
 		bool get(rpc_struct*& mp);   //!< Receives item as a structure, returns false if not a structure.
 		// Returns the data as specific type
 		int32_t get_int();           //!< Returns item as a 32-bit integer
-		string get_string();         //!< Returns item as a string
+		std::string get_string();         //!< Returns item as a std::string
 		double get_double();         //!< Returns item as a double-precision value
 		rpc_array* get_array();      //!< Returns item as an array
 		rpc_struct* get_struct();    //!< Returns item as a structure
 
 		//! Convert the item to a textual format
-		string print_item();
+		std::string print_item();
 		//! Set the data as int or bool
 		void set(int32_t i, rpc_data_t Type);
-		//! Set the data as a string or byte encoded string or a date/time
-		void set(string s, rpc_data_t Type);
+		//! Set the data as a std::string or byte encoded std::string or a date/time
+		void set(std::string s, rpc_data_t Type);
 		void set(double d);          //!< Set the item as a double-precision value.
 		void set(rpc_array* ap);     //!< Set the item as an array
 		void set(rpc_struct* mp);    //!< Set the item as a structure.
@@ -95,8 +95,8 @@ using namespace std;
 		rpc_data_t type_;
 		//! Its representation as a 32-bit integer
 		int32_t i_;
-		//! Its representation as a string
-		string s_;
+		//! Its representation as a std::string
+		std::string s_;
 		//! Its representation as a double-precison value
 		double d_;
 		//! Its representation as an array

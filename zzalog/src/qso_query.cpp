@@ -101,7 +101,7 @@ void qso_query::enable_widgets() {
 }
 
 // Return query message
-string qso_query::query_message() {
+std::string qso_query::query_message() {
 	return query_message_;
 }
 
@@ -114,7 +114,7 @@ void qso_query::cb_tab_qso(Fl_Widget* w, void* v) {
 	int col = table->callback_col();
 	int button = Fl::event_button();
 	bool double_click = Fl::event_clicks();
-	string field = table->field(row);
+	std::string field = table->field(row);
 	// Handle double left click in both the row header and each column 
 	switch (table->callback_context()) {
 	case Fl_Table::CONTEXT_ROW_HEADER:
@@ -133,7 +133,7 @@ void qso_query::cb_tab_qso(Fl_Widget* w, void* v) {
 }
 
 //Set QSOs into query
-void qso_query::set_query(string message, qso_num_t log_number, record* query_qso, bool save_original) {
+void qso_query::set_query(std::string message, qso_num_t log_number, record* query_qso, bool save_original) {
 	query_message_ = message;
 	log_number_ = log_number;
 	if (log_number != -1) {
@@ -152,7 +152,7 @@ void qso_query::set_query(string message, qso_num_t log_number, record* query_qs
 }
 
 //Set QSOs into query
-void qso_query::set_query(string message, record* new_qso, record* query_qso, bool save_original) {
+void qso_query::set_query(std::string message, record* new_qso, record* query_qso, bool save_original) {
 	query_message_ = message;
 	log_number_ = -1;
 	log_qso_ = new_qso;
@@ -190,7 +190,7 @@ void qso_query::clear_query() {
 }
 
 // Action table double click
-void qso_query::action_handle_dclick(int col, string field) {
+void qso_query::action_handle_dclick(int col, std::string field) {
 	switch (qso_data_->logging_state()) {
 	case qso_data::QUERY_MATCH:
 	case qso_data::QUERY_DUPE:

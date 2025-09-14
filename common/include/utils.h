@@ -15,7 +15,7 @@ utils.h - various utility methods
 
 #include <FL/Fl_Widget.H>
 
-using namespace std;
+
 
 
 
@@ -47,17 +47,17 @@ using namespace std;
 	const double EARTH_RADIUS = 6371.0088;
 
 	//! Split a text \p line into separate \p words on \p separator
-	void split_line(const string& line, vector<string>& words, const char separator);
-	//! Recombine separate \p words into a string with \p separator and return the result.
-	string join_line(vector<string> words, const char separator);
+	void split_line(const std::string& line, std::vector<std::string>& words, const char separator);
+	//! Recombine separate \p words into a std::string with \p separator and return the result.
+	std::string join_line(std::vector<std::string> words, const char separator);
 	//! Converts display format text to a tm object for reformatting
-	bool string_to_tm(string text, tm& time, string format);
-	//! Convert a string e.g. 00-06:08 to an array of UINTs {0,1,2,3,4,5,6,8}
-	void string_to_ints(string& text, vector<unsigned int>& ints);
+	bool string_to_tm(std::string text, tm& time, std::string format);
+	//! Convert a std::string e.g. 00-06:08 to an array of UINTs {0,1,2,3,4,5,6,8}
+	void string_to_ints(std::string& text, std::vector<unsigned int>& ints);
 	//! Returns the current time in specific fomat
-	string now(bool local, const char* format, bool add_ms = false);
+	std::string now(bool local, const char* format, bool add_ms = false);
 	//! Returns the current time to milliseconds
-	string now_ms();
+	std::string now_ms();
 	//! Returns true if the /p date is a leap year
 	bool is_leap(tm* date);
 	//! refresh the tm struct after modifying it
@@ -65,41 +65,41 @@ using namespace std;
 	//! Retunrs the number of days in the month
 	int days_in_month(tm* date);
 	//! Create a tip window - data \p tip, position(\p root_x, \p root_y)
-	Fl_Window* tip_window(const string& tip, int x_root, int y_root);
+	Fl_Window* tip_window(const std::string& tip, int x_root, int y_root);
 	//! Returns \p data in upper case
-	string to_upper(const string& data);
+	std::string to_upper(const std::string& data);
 	//! Returns \p data in lower case
-	string to_lower(const string& data);
-	//! Returns true if the whole string is an integer
-	bool is_integer(const string& data);
+	std::string to_lower(const std::string& data);
+	//! Returns true if the whole std::string is an integer
+	bool is_integer(const std::string& data);
 	//! Returns the position of any characters in \p match in \p data (\p length): returns \p length if not found. 
 	size_t find(const char* data, size_t length, const char* match);
 	//! Returns the position of \p match in \p data (\p length): returns \p length if not found. 
 	size_t find(const char* data, size_t length, const char match);
-	//! Returns the position of string \p match (\p len_substr) in \p data (\p length): returns \p length if not found. 
+	//! Returns the position of std::string \p match (\p len_substr) in \p data (\p length): returns \p length if not found. 
 	size_t find_substr(const char* data, size_t length, const char* match, size_t len_substr);
 	//! Returns the position of any characters not in \p match in \p data (\p length): returns \p length if not found. 
 	size_t find_not(const char* data, size_t length, const char* match);
 	//! \brief Returns \p text with any character in \p chars (\p allow = false) or
 	//! not in \p chars (\p allow = true) replaced with hex representation. 
-	string escape_hex(string text, bool allow, const char* chars);
+	std::string escape_hex(std::string text, bool allow, const char* chars);
 	//! Returns \p text with any non-alphanumeric characters replaced with hex representation 
-	string escape_url(string text);
+	std::string escape_url(std::string text);
 	//! Returns \p text with && and %% characters escaped for menu items.
-	string escape_menu(string text);
+	std::string escape_menu(std::string text);
 	//! Returns \p text with hex characters (%%nnx) replaced by 8-bit character.
-	string unescape_hex(string text);
+	std::string unescape_hex(std::string text);
 	//! Escape characters - Returns \p text adding a '\' before any characters in \p escapees.
-	string escape_string(const string text, const string escapees);
+	std::string escape_string(const std::string text, const std::string escapees);
 	//! Unescape characters - Returns .p with '\' removed.
-	string unescape_string(const string text);
+	std::string unescape_string(const std::string text);
 	//! \brief Returns \p value expressed as degrees, minutes and seconds: 
 	//! if \p is_lat is true treat as latitude, otherwise as longitude.
-	string degrees_to_dms(float value, bool is_lat);
+	std::string degrees_to_dms(float value, bool is_lat);
 	//! Returns coordinate pair as gridsquare equivalent with \p num_chars characters.
-	string latlong_to_grid(lat_long_t location, int num_chars);
+	std::string latlong_to_grid(lat_long_t location, int num_chars);
 	//! Returns coordinate pair for \p gridsquare.
-	lat_long_t grid_to_latlong(string gridsquare);
+	lat_long_t grid_to_latlong(std::string gridsquare);
 	//! Returns character equivalent of base64 encoded character \p c
 	
 	/*! \code
@@ -112,8 +112,8 @@ using namespace std;
 	\endcode
 	*/
 	unsigned char decode_base_64(unsigned char c);
-	//! Returns decoded base64 string \p s.
-	string decode_base_64(string s);
+	//! Returns decoded base64 std::string \p s.
+	std::string decode_base_64(std::string s);
 	//! Returns base64 encoding of 6-bit character \p c
 
 	/*! \code
@@ -126,36 +126,36 @@ using namespace std;
 	\endcode
 	*/
 	unsigned char encode_base_64(unsigned char c);
-	//! Returns base64 encoding of string \p s.
-	string encode_base_64(string s);
-	//! Returns \p data as hex encoded string.
-	string to_hex(string data);
-	//! Returns hex-encoded string \p data as string of 8-bit characters.
-	string to_ascii(string data);
-	//! Returns string representing hex encode of \p data: a string is added in \p add_space is true.
-	string to_hex(unsigned char data, bool add_space = true);
-	//! \brief Returns the single 8-bit byte from hex-encoded string \p data at position \p ix, which then
+	//! Returns base64 encoding of std::string \p s.
+	std::string encode_base_64(std::string s);
+	//! Returns \p data as hex encoded std::string.
+	std::string to_hex(std::string data);
+	//! Returns hex-encoded std::string \p data as std::string of 8-bit characters.
+	std::string to_ascii(std::string data);
+	//! Returns std::string representing hex encode of \p data: a std::string is added in \p add_space is true.
+	std::string to_hex(unsigned char data, bool add_space = true);
+	//! \brief Returns the single 8-bit byte from hex-encoded std::string \p data at position \p ix, which then
 	//! points to the position after the decoded characters. 
-	unsigned char to_ascii(string data, int& ix);
+	unsigned char to_ascii(std::string data, int& ix);
 	//! Returns value in BCD format.
 	
 	//! \param value Integer to encode.
-	//! \param size umber of bytes in encoded string.
+	//! \param size umber of bytes in encoded std::string.
 	//! \param least_first Data returned least signficant byte first.
-	string int_to_bcd(int value, int size, bool least_first);
+	std::string int_to_bcd(int value, int size, bool least_first);
 	//! Returns BCD value as an integer
 	
 	//! \param least_first First byte of data is least significant.
-	int bcd_to_int(string, bool least_first);
+	int bcd_to_int(std::string, bool least_first);
 	//! Returns BCD value as a double-precision value
 
 	//! \param decimals Number of characters after the decimal point.
 	//! \param least_first First byte of data is least significant.
-	double bcd_to_double(string, int decimals, bool least_first);
-	//! Convert string to hex
-	string string_to_hex(string, bool escape = false);
-	//! Convert string to hex
-	string hex_to_string(string);
+	double bcd_to_double(std::string, int decimals, bool least_first);
+	//! Convert std::string to hex
+	std::string string_to_hex(std::string, bool escape = false);
+	//! Convert std::string to hex
+	std::string hex_to_string(std::string);
 	//! Calculate the great circle bearing and distance between two locations on the Earth's surface
 	
 	//! \param source Coordinates of location measuring from.
@@ -164,29 +164,29 @@ using namespace std;
 	//! \param distance Receives the distance from \p sourec to \p destination (in kilometres). 
 	void great_circle(lat_long_t source, lat_long_t destination, double& bearing, double& distance);
 	//! Replace '/' with '_' throughout \p data.
-	void de_slash(string& data);
+	void de_slash(std::string& data);
 	//! Replace '_' with '/' throughout \p data.
-	void re_slash(string& data);
+	void re_slash(std::string& data);
 	//! Replace '\\' (single backslass character) with '/'
-	void forward_slash(string& data);
+	void forward_slash(std::string& data);
 	//! Returns the directroy part of a a filename
-	string directory(string filename);
+	std::string directory(std::string filename);
 	//! Returns the terminal part of a filename.
-	string terminal(string filename);
+	std::string terminal(std::string filename);
 	//! Returns a simple 8-bit hash of \p src (zero-terminated)
 	uchar hash8(const char* src);
 	//! Performs "XOR" encrypt/decrypt
 	 
-	//! \param str string of chaarcters to encrypt/decrypt in-place.
-	//! \param len length of string \p str. Zero-termination cannot be used 
+	//! \param str std::string of chaarcters to encrypt/decrypt in-place.
+	//! \param len length of std::string \p str. Zero-termination cannot be used 
 	//! as an encrypted value may contain them.
 	//! \param seed Seed to generate a pseudo-random sequence of characters to use as an encryption key.
 	//! \param offset Offset into generated pseudo-random sequence to start process.
 	void xor_crypt(char* str, int len, uint32_t seed, uchar offset);
-	//! Performs "XOR" encrypt/decrypt using string data and returns encrypted string.
+	//! Performs "XOR" encrypt/decrypt using std::string data and returns encrypted std::string.
 	
 	//! \see xor_crypt.
-	string xor_crypt(string, uint32_t seed, uchar offset);
+	std::string xor_crypt(std::string, uint32_t seed, uchar offset);
 
 	//! Returns the widget of class WIDGET that encloses \p w.
 	template <class WIDGET>

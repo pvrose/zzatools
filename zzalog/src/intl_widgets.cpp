@@ -26,7 +26,7 @@ intl_editor::~intl_editor() {
 	}
 }
 
-// Event handler - handle event as normal then set the cursor depending on current insert mode
+// Event handler - handle event as normal then std::set the cursor depending on current insert mode
 int intl_editor::handle(int event) {
 	// Tell international character dialog to paste to this widget as this is the most recent one to get focus
 	switch (event) {

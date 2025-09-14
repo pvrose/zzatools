@@ -35,16 +35,16 @@ specx_reader::~specx_reader()
 }
 
 // Load the specification data from the suppled stream - return the ADIF version skimmed from data in version
-bool specx_reader::load_data(spec_data* data, istream& in, string& version) {
+bool specx_reader::load_data(spec_data* data, std::istream& in, std::string& version) {
 	data_ = data;
 	in_file_ = &in;
 	// calculate the file size and initialise the progress bar
-	streampos startpos = in.tellg();
-	in.seekg(0, ios::end);
-	streampos endpos = in.tellg();
+	std::streampos startpos = in.tellg();
+	in.seekg(0, std::ios::end);
+	std::streampos endpos = in.tellg();
 	long file_size = (long)(endpos - startpos);
 	// reposition back to beginning
-	in.seekg(0, ios::beg);
+	in.seekg(0, std::ios::beg);
 	// Initialsie the progress
 	status_->misc_status(ST_NOTE, "ADIF SPEC: Started");
 	fl_cursor(FL_CURSOR_WAIT);
@@ -75,8 +75,8 @@ bool specx_reader::load_data(spec_data* data, istream& in, string& version) {
 }
 
 // Start an XML element
-bool specx_reader::start_element(string name, map<string, string>* attributes) {
-	string element_name = to_upper(name);
+bool specx_reader::start_element(std::string name, std::map<std::string, std::string>* attributes) {
+	std::string element_name = to_upper(name);
 	bool result = true;
 
 	// Check in order of the most comment element type - call appropriate start method
@@ -106,21 +106,21 @@ bool specx_reader::start_element(string name, map<string, string>* attributes) {
 }
 
 // Special element
-bool specx_reader::declaration(xml_element::element_t element_type, string name, string content) {
+bool specx_reader::declaration(xml_element::element_t element_type, std::string name, std::string content) {
 	// ignored
 	num_ignored_++;
 	return true;
 }
 
 // Processing instruction
-bool specx_reader::processing_instr(string name, string content) {
+bool specx_reader::processing_instr(std::string name, std::string content) {
 	// ignored 
 	num_ignored_++;
 	return true;
 }
 
 // characters - save the element data
-bool specx_reader::characters(string content) {
+bool specx_reader::characters(std::string content) {
 	if (elements_.size()) {
 		switch (elements_.back()) {
 		case SXE_VALUEH:
@@ -135,7 +135,7 @@ bool specx_reader::characters(string content) {
 }
 
 // Start <adif vesrion="ADIF Version" status="Released" created="ISO Date">
-bool specx_reader::start_adif(map<string, string>* attributes) {
+bool specx_reader::start_adif(std::map<std::string, std::string>* attributes) {
 	if (elements_.size()) {
 		status_->misc_status(ST_ERROR, "ADIF SPEC: Incorrect XML - unexpected adif element");
 		return false;
@@ -145,7 +145,7 @@ bool specx_reader::start_adif(map<string, string>* attributes) {
 		// Process the attributes
 		for (auto it = attributes->begin(); it != attributes->end(); it++) {
 			// Remember all the attributes
-			string name = to_upper(it->first);
+			std::string name = to_upper(it->first);
 			if (name == "VERSION") {
 				adif_version_ = it->second;
 			}
@@ -202,7 +202,7 @@ bool specx_reader::start_header() {
 }
 
 // Start header or record value
-bool specx_reader::start_value(map<string, string>* attributes) {
+bool specx_reader::start_value(std::map<std::string, std::string>* attributes) {
 	switch (elements_.back()) {
 	case SXE_HEADER:
 		elements_.push_back(SXE_VALUEH);
@@ -211,7 +211,7 @@ bool specx_reader::start_value(map<string, string>* attributes) {
 	case SXE_RECORD:
 		elements_.push_back(SXE_VALUER);
 		for (auto it = attributes->begin(); it != attributes->end(); it++) {
-			string att_name = to_upper(it->first);
+			std::string att_name = to_upper(it->first);
 			if (att_name == "NAME") {
 				// Remember item name
 				item_name_ = it->second;
@@ -239,8 +239,8 @@ bool specx_reader::start_record() {
 	}
 	else {
 		elements_.push_back(SXE_RECORD);
-		// Create a new set of record items
-		record_data_ = new map<string, string>;
+		// Create a new std::set of record items
+		record_data_ = new std::map<std::string, std::string>;
 		return true;
 	}
 }
@@ -260,7 +260,7 @@ bool specx_reader::start_enumerations() {
 }
 
 // Start enumeration
-bool specx_reader::start_enumeration(map<string, string>* attributes) {
+bool specx_reader::start_enumeration(std::map<std::string, std::string>* attributes) {
 	if (elements_.back() != SXE_ENUMS) {
 		status_->misc_status(ST_ERROR, "ADIF SPEC: Incorrect XML - unexpected dataTypes element");
 		return false;
@@ -269,7 +269,7 @@ bool specx_reader::start_enumeration(map<string, string>* attributes) {
 		elements_.push_back(SXE_ENUM);
 		column_headers_.clear();
 		for (auto it = attributes->begin(); it != attributes->end(); it++) {
-			string att_name = to_upper(it->first);
+			std::string att_name = to_upper(it->first);
 			if (att_name == "NAME") {
 				dataset_name_ = it->second;
 				char message[120];
@@ -305,8 +305,8 @@ bool specx_reader::start_fields() {
 }
 
 // End element - call the appropriate handler for the element type
-bool specx_reader::end_element(string name) {
-	string element_name = to_upper(name);
+bool specx_reader::end_element(std::string name) {
+	std::string element_name = to_upper(name);
 	specx_element_t element = elements_.back();
 	elements_.pop_back();
 	// Go to the specific end_... method
@@ -384,11 +384,11 @@ bool specx_reader::end_record() {
 	// Add the record to the dataset
 	// For PAS and SAS need to check DXCC entity code is the same - if not create a new dataset
 	if (dataset_name_.length() >= 34 && dataset_name_.substr(0, 34) == "Primary_Administrative_Subdivision") {
-		string this_code = record_data_->at("DXCC Entity Code");
+		std::string this_code = record_data_->at("DXCC Entity Code");
 		dataset_name_ = "Primary_Administrative_Subdivision[" + this_code + "]";
 	}
 	else if (dataset_name_.length() >= 36 && dataset_name_.substr(0, 36) == "Secondary_Administrative_Subdivision") {
-		string this_code = record_data_->at("DXCC Entity Code");
+		std::string this_code = record_data_->at("DXCC Entity Code");
 		dataset_name_ = "Secondary_Administrative_Subdivision[" + this_code + "]";
 	}
 	spec_dataset* dataset = (*data_)[dataset_name_];

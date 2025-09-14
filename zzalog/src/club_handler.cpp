@@ -18,7 +18,7 @@
 
 
 
-using namespace std;
+
 
 extern url_handler* url_handler_;
 extern status* status_;
@@ -28,9 +28,9 @@ extern bool DEBUG_THREADS;
 extern fields* fields_;
 extern qsl_dataset* qsl_dataset_;
 // extern uint32_t seed_;
-extern string VENDOR;
-extern string PROGRAM_ID;
-extern string default_data_directory_;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
+extern std::string default_data_directory_;
 extern Fl_Preferences::Root prefs_mode_;
 extern void open_html(const char*);
 
@@ -38,11 +38,11 @@ extern void open_html(const char*);
 club_handler::club_handler() {
 	// Create the URL handler if it hasn't already been done
 	if (!url_handler_) url_handler_ = new url_handler;
-	// Initialise thread interface
+	// Initialise std::thread interface
 	run_threads_ = true;
 	upload_response_ = 0;
-	if (DEBUG_THREADS) printf("CLUBLOG MAIN: Starting thread\n");
-	th_upload_ = new thread(thread_run, this);
+	if (DEBUG_THREADS) printf("CLUBLOG MAIN: Starting std::thread\n");
+	th_upload_ = new std::thread(thread_run, this);
 
 	set_adif_fields();
 
@@ -61,16 +61,16 @@ bool club_handler::upload_log(book* book) {
 		fl_cursor(FL_CURSOR_WAIT);
 		status_->misc_status(ST_NOTE, "CLUBLOG: Starting upload");
 		// Get the book data and write it to the stream
-		stringstream ss;
+		std::stringstream ss;
 		adi_writer* writer = new adi_writer;
-		set<string> adif_fields;
+		std::set<std::string> adif_fields;
 		writer->store_book(book, ss, false, &adif_fields_);
 		// Get back to start of stream
 		ss.seekg(ss.beg);
 		// Get the parameters and make available for the HTTP POST FORM
-		vector<url_handler::field_pair> fields;
+		std::vector<url_handler::field_pair> fields;
 		generate_form(fields, nullptr);
-		stringstream resp;
+		std::stringstream resp;
 		// Post the form
 		bool ok;
 		if (!url_handler_->post_form("https://clublog.org/putlogs.php", fields, &ss, &resp)) {
@@ -85,10 +85,10 @@ bool club_handler::upload_log(book* book) {
 			status_->misc_status(ST_OK, "CLUBLOG: Upload successful");
 			book_->enable_save(false, "Updating Clublog status");
 			ok = true;
-			string today = now(false, "%Y%m%d");
+			std::string today = now(false, "%Y%m%d");
 			for (auto it = book->begin(); it != book->end(); it++) {
 				(*it)->item("CLUBLOG_QSO_UPLOAD_DATE", today);
-				(*it)->item("CLUBLOG_QSO_UPLOAD_STATUS", string("Y"));
+				(*it)->item("CLUBLOG_QSO_UPLOAD_STATUS", std::string("Y"));
 			}
 			// Go back to last entry in book.
 			book_->selection(book_->size() - 1, HT_SELECTED);
@@ -104,25 +104,25 @@ bool club_handler::upload_log(book* book) {
 }
 
 // Generate the fields in the form
-void club_handler::generate_form(vector<url_handler::field_pair>& fields, record* the_qso) {
+void club_handler::generate_form(std::vector<url_handler::field_pair>& fields, record* the_qso) {
 	// Read the settings that define user's access 
 	server_data_t* club_data = qsl_dataset_->get_server_data("Club");
-	string email = club_data->user;
+	std::string email = club_data->user;
 	fields.push_back({"email", email, "", ""});
-	string password = club_data->password;
+	std::string password = club_data->password;
 	fields.push_back({ "password", password, "", "" });
 	if (the_qso != nullptr) {
 		// get logging callsign from QSO record
-		string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
+		std::string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
 		fields.push_back({ "callsign", callsign.c_str(), "", "" });
-		// Get string ADIF
+		// Get std::string ADIF
 		fields.push_back({ "adif", single_qso_, "", "" });
 	}
 	else {
 		// Get callsign from settings
-		string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
+		std::string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
 		fields.push_back({ "callsign", callsign.c_str(), "", ""});
-		// Set file to empty string to use the supplied data stream
+		// Set file to empty std::string to use the supplied data stream
 		fields.push_back({ "file", "", "clublog.adi", "application/octet-stream" });
 	}
 	// Hard-coded API Key for this application
@@ -130,12 +130,12 @@ void club_handler::generate_form(vector<url_handler::field_pair>& fields, record
 }
 
 // Download the exception file
-bool club_handler::download_exception(string filename) {
+bool club_handler::download_exception(std::string filename) {
 	// Start downloading exception file
 	status_->misc_status(ST_NOTE, "CLUBLOG: Starting to download exception file");
-	string zip_filename = filename + ".gz";
-	ofstream os(zip_filename, ios::trunc | ios::out | ios::binary);
-	string url = "https://cdn.clublog.org/cty.php?api=" + string(api_key_);
+	std::string zip_filename = filename + ".gz";
+	std::ofstream os(zip_filename, std::ios::trunc | std::ios::out | std::ios::binary);
+	std::string url = "https://cdn.clublog.org/cty.php?api=" + std::string(api_key_);
 	if (url_handler_->read_url(url, &os)) {
 		os.close();
 		status_->misc_status(ST_NOTE, "CLUBLOG: Exception file downloaded successfully - unzipping it");
@@ -148,9 +148,9 @@ bool club_handler::download_exception(string filename) {
 }
 
 // Unzip the downloaded  exceptions file
-bool club_handler::unzip_exception(string filename) {
+bool club_handler::unzip_exception(std::string filename) {
 	// Read the settings that define user's access 
-	string ref_dir;
+	std::string ref_dir;
 	get_reference(ref_dir);
 	char cmd[256];
 #ifdef _WIN32
@@ -202,7 +202,7 @@ bool club_handler::unzip_exception(string filename) {
 }
 
 // Get reference directory
-void club_handler::get_reference(string& dir_name) {
+void club_handler::get_reference(std::string& dir_name) {
 	dir_name = default_data_directory_;
 }
 
@@ -230,17 +230,17 @@ bool club_handler::upload_single_qso(qso_num_t record_num) {
 	return false;
 }
 
-// Upload QSO to clublog (in thread)
+// Upload QSO to clublog (in std::thread)
 void club_handler::th_upload(record* this_record) {
-	set<string> adif_fields;
+	std::set<std::string> adif_fields;
 	single_qso_ = to_adif(this_record, adif_fields_);
 	// Get the parameters and make available for the HTTP POST FORM
-	vector<url_handler::field_pair> fields;
+	std::vector<url_handler::field_pair> fields;
 	generate_form(fields, this_record);
-	stringstream resp;
+	std::stringstream resp;
 	// Post the form
 	bool ok;
-	if (!url_handler_->post_form("https://clublog.org/realtime.php", fields, nullptr, (ostream*)&resp)) {
+	if (!url_handler_->post_form("https://clublog.org/realtime.php", fields, nullptr, (std::ostream*)&resp)) {
 		ok = false;
 		upload_error_ = resp.str();
 	}
@@ -250,14 +250,14 @@ void club_handler::th_upload(record* this_record) {
 
 	}
 	upload_response_ = ok;
-	if (DEBUG_THREADS) printf("CLUBLOG THREAD: Calling thread callback result = %d(%s)\n",
+	if (DEBUG_THREADS) printf("CLUBLOG THREAD: Calling std::thread callback result = %d(%s)\n",
 	    ok, upload_error_.c_str());
 	Fl::awake(cb_upload_done, (void*)this);
 	this_thread::yield();
 }
 
-// Method in the main thread that is 
-// called when the thread handling upload has finished
+// Method in the main std::thread that is 
+// called when the std::thread handling upload has finished
 // Updates the QSO recotrd that the update has been completed
 bool club_handler::upload_done(bool response) {
 	char message[200];
@@ -270,7 +270,7 @@ bool club_handler::upload_done(bool response) {
 			this_record->item("CALL").c_str());
 		status_->misc_status(ST_ERROR, message);
 		if (fl_choice("Upload failed - Do you want to allow it to try again or be ignored?", "Try later", "Ignore", nullptr) == 1) {
-			this_record->item("CLUBLOG_QSO_UPLOAD_STATUS", string("N"));
+			this_record->item("CLUBLOG_QSO_UPLOAD_STATUS", std::string("N"));
 			book_->enable_save(true, "Not uploaded to Clublog");
 		}
 	}
@@ -281,29 +281,29 @@ bool club_handler::upload_done(bool response) {
 			this_record->item("TIME_ON").c_str(),
 			this_record->item("CALL").c_str());
 		status_->misc_status(ST_OK, message);
-		string today = now(false, "%Y%m%d");
+		std::string today = now(false, "%Y%m%d");
 		this_record->item("CLUBLOG_QSO_UPLOAD_DATE", today);
-		this_record->item("CLUBLOG_QSO_UPLOAD_STATUS", string("Y"));
+		this_record->item("CLUBLOG_QSO_UPLOAD_STATUS", std::string("Y"));
 		book_->enable_save(true, "Uploaded to Clublog");
 	}
 	upload_done_queue_.pop();
 	return response;
 }
 
-// Static interface between upload thread and main thread to handle upload complete
+// Static interface between upload std::thread and main std::thread to handle upload complete
 void club_handler::cb_upload_done(void* v) {
-	if (DEBUG_THREADS) printf("CLUBLOG MAIN: Entered thread callback handler\n");
+	if (DEBUG_THREADS) printf("CLUBLOG MAIN: Entered std::thread callback handler\n");
 	club_handler* that = (club_handler*)v;
 	that->upload_done(that->upload_response_);
 }
 
-// Start and progress the thread that handles uploads without stalling main thread
+// Start and progress the std::thread that handles uploads without stalling main std::thread
 void club_handler::thread_run(club_handler* that) {
 	if (DEBUG_THREADS) printf("CLUBLOG THREAD: Thread started\n");
 	while (that->run_threads_) {
 		// Wait until qso placed on interface
 		while (that->run_threads_ && that->upload_queue_.empty()) {
-			this_thread::sleep_for(chrono::milliseconds(1000));
+			this_thread::sleep_for(std::chrono::milliseconds(1000));
 		}
 		// Process it
 		that->upload_lock_.lock();
@@ -322,8 +322,8 @@ void club_handler::thread_run(club_handler* that) {
 }
 
 // Convert this record to ADIF: uses adi_writer
-string club_handler::to_adif(record* this_record, field_list &fields) {
-	string result = "";
+std::string club_handler::to_adif(record* this_record, field_list &fields) {
+	std::string result = "";
 	for (auto it = fields.begin(); it != fields.end(); it++) {
 		result += adi_writer::item_to_adif(this_record, *it) + " ";
 	}
@@ -335,15 +335,15 @@ string club_handler::to_adif(record* this_record, field_list &fields) {
 void club_handler::set_adif_fields() {
 	// Ser default values if necessary
 	(void)fields_->collection("Upload/ClubLog", CLUBLOG_FIELDS);
-	// Now copy to the set 
+	// Now copy to the std::set 
 	adif_fields_ = fields_->field_names("Upload/ClubLog");
 }
 
-// Download the OQRS list of QSL requests
-bool club_handler::download_oqrs(stringstream* adif) {
+// Download the OQRS std::list of QSL requests
+bool club_handler::download_oqrs(std::stringstream* adif) {
 	fl_cursor(FL_CURSOR_WAIT);
 	status_->misc_status(ST_NOTE, "CLUBLOG: Starting download OQRS");
-	stringstream request;
+	std::stringstream request;
 	generate_oqrs(request);
 	if (!url_handler_->post_url("https://clublog.org/getadif.php", "", &request, adif)) {
 		status_->misc_status(ST_ERROR, "CLUBLOG: Download OQRS failed");
@@ -353,14 +353,14 @@ bool club_handler::download_oqrs(stringstream* adif) {
 }
 
 // Generate the HTTP POST reqyest to download OQRS
-void club_handler::generate_oqrs(ostream& request) {
+void club_handler::generate_oqrs(std::ostream& request) {
 	// Read the settings that define user's access 
 	server_data_t* club_data = qsl_dataset_->get_server_data("Club");
-	string email = club_data->user;
+	std::string email = club_data->user;
 	request << "email=" << email << "&";
-	string password = club_data->password;
+	std::string password = club_data->password;
 	request << "password=" << password << "&";
-	string my_call = qso_manager_->get_default(qso_manager::CALLSIGN);
+	std::string my_call = qso_manager_->get_default(qso_manager::CALLSIGN);
 	request << "call=" << my_call << "&type=dxqsl";
 }
 

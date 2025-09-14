@@ -118,7 +118,7 @@ void font_dialog::cb_size(Fl_Widget* w, void* v) {
     Fl_Hold_Browser* br = (Fl_Hold_Browser*)w;
     font_dialog* that = ancestor_view<font_dialog>(w);
     int line = br->value();
-    *(Fl_Fontsize*)v = stoi(br->text(line));
+    *(Fl_Fontsize*)v = std::stoi(br->text(line));
 	that->set_sample();
 }
 

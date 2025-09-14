@@ -6,7 +6,7 @@
 #include <string>
 #include <set>
 
-using namespace std;
+
 
 class record;
 class Fl_Widget;
@@ -21,12 +21,12 @@ class Fl_Widget;
 		//! \param record QSO record being validated.
 		//! \param field The field of the QSO record - rewriteable.
 		//! \param message The reason for the correcton request.
-		corr_dialog(record* record, const string& field, const string& message);
+		corr_dialog(record* record, const std::string& field, const std::string& message);
 		//! Destructor.
 		virtual ~corr_dialog();
 
 		//! Returns the correction message
-		string correction_message();
+		std::string correction_message();
 
 	protected:
 		//! Callback on clicking the OK button.
@@ -51,27 +51,27 @@ class Fl_Widget;
 		//! Add a field.
 		bool add_field_;
 		//! Name to change field to.
-		string change_field_name_;
+		std::string change_field_name_;
 		//! Name of field to add.
-		string add_field_name_;
+		std::string add_field_name_;
 		//! New data for field.
-		string change_value_data_;
+		std::string change_value_data_;
 		//! Data for an added field.
-		string add_value_data_;
+		std::string add_value_data_;
 
 		//! The QSO record to be updated
 		record* record_;
 		//! The name if the field being queried
-		string query_field_;
+		std::string query_field_;
 		//! Waiting for OK or CANCEL to be clicked.
 		bool pending_button_;
 		//! Button clicked.
 		button_t button_;
 		//! Message describing validation query.
-		string correction_message_;
+		std::string correction_message_;
 
 		//! widgets that need to be cleared.
-		set<Fl_Widget*> field_choices_;
+		std::set<Fl_Widget*> field_choices_;
 
 	};
 #endif

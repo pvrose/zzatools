@@ -20,7 +20,7 @@
 #define SOCKADDR_IN sockaddr_in
 #endif
 
-using namespace std;
+
 
 //! This class provides an interface to use a generic socket as a server.
 	class socket_server
@@ -38,7 +38,7 @@ using namespace std;
 		//! \param protocol Create serverfor this protocol.
 		//! \param address Network address for other end of socket.
 		//! \param port_num Port number for other end of socket.
-		socket_server(protocol_t protocol, string address, int port_num);
+		socket_server(protocol_t protocol, std::string address, int port_num);
 		//! Destructor.
 		~socket_server();
 
@@ -51,9 +51,9 @@ using namespace std;
 		//! Returns true if this server is listening
 		bool has_server();
 		//! Set callback to handle requests. 
-		void callback(int(*do_request)(stringstream&));
+		void callback(int(*do_request)(std::stringstream&));
 		//! Send response
-		int send_response(istream& response);
+		int send_response(std::istream& response);
 
 	protected:
 
@@ -70,16 +70,16 @@ using namespace std;
 		client_status accept_client();
 		//! Error handler - \p phase indicates the peocess that errored.
 		void handle_error(const char* phase);
-		//! Send request - set by call-back
-		int (*do_request)(stringstream& request);
+		//! Send request - std::set by call-back
+		int (*do_request)(std::stringstream& request);
 
 		//! Open socket and create server
 		int create_server();
 		//! Print diagnostic data
-		void dump(string line);
-		//! Callback from server thread to handle packet.
+		void dump(std::string line);
+		//! Callback from server std::thread to handle packet.
 		static void cb_th_packet(void* v);
-		//! Start the server thread.
+		//! Start the server std::thread.
 		static void thread_run(socket_server* that);
 
 		//! Server socket
@@ -89,27 +89,27 @@ using namespace std;
 		//! Current client address
 		SOCKADDR_IN client_addr_;
 		//! Previous client address
-		string prev_addr_;
+		std::string prev_addr_;
 		//! Previous client port number
 		int prev_port_;
 		//! Host IP address e.g. 127.0.0.1
-		string host_id_;
+		std::string host_id_;
 		//! port number
 		int port_num_;
 		//! Server address
-		string address_;
+		std::string address_;
 		//! protocol
 		protocol_t protocol_;
 		//! Socket is closing
-		atomic<bool> closing_;
+		std::atomic<bool> closing_;
 		//! Socket has closed.
-		atomic<bool> closed_;
-		//! Separate thread to handle socket transfers.
-		thread* th_socket_;
-		//! Packet queue
-		queue<string> q_packet_;
-		//! Lock to avoid pushing into the packet queue and pulling from it at the same time.
-		mutex mu_packet_;
+		std::atomic<bool> closed_;
+		//! Separate std::thread to handle socket transfers.
+		std::thread* th_socket_;
+		//! Packet std::queue
+		std::queue<std::string> q_packet_;
+		//! Lock to avoid pushing into the packet std::queue and pulling from it at the same time.
+		std::mutex mu_packet_;
 
 	};
 

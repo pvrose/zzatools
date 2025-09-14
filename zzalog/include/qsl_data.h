@@ -5,7 +5,7 @@
 
 #include <FL/Fl.H>
 
-using namespace std;
+
 
 //! QSL Card definition data
 struct qsl_data {
@@ -28,8 +28,8 @@ struct qsl_data {
 
     //! Structure describing the parameters of a field and its label.
     struct field_def {
-        string field{ "" };        //!< Field name.
-        string label{ "" };        //!< The label on the QSL (e.g. "To:" for CALL).
+        std::string field{ "" };        //!< Field name.
+        std::string label{ "" };        //!< The label on the QSL (e.g. "To:" for CALL).
         style_def l_style;         //!< Style of the label.
         style_def t_style;         //!< Style of the field value.
         int dx{ 0 };               //!< X Position of the field value within the QSL card (-1 = juxtaposed the previous)
@@ -43,7 +43,7 @@ struct qsl_data {
 
     //! Structure describing the paarmeters of a text item.
     struct text_def {
-        string text{ "Text" };     //!< Text value.
+        std::string text{ "Text" };     //!< Text value.
         style_def t_style;         //!< Style of the text.
         int dx{ 0 };               //!< X position within QSL card image.
         int dy{ 0 };               //!< Y position within QSL card image.
@@ -53,7 +53,7 @@ struct qsl_data {
 
     //! Structure describing the paarmeters of an image item
     struct image_def {
-        string filename{ "" };     //!< Filename of the image to be displayed.
+        std::string filename{ "" };     //!< Filename of the image to be displayed.
         int dx{ 0 };               //!< X position within the QSL card image.
         int dy{ 0 };               //!< Y position within the QSL card image.
     };
@@ -112,11 +112,11 @@ struct qsl_data {
     int max_qsos{ 1 };                //!< maximum number of QSOs per label
     date_format f_date{ FMT_Y4MD_ADIF };   //!< Format for date to be printed
     time_format f_time{ FMT_HMS_ADIF };    //!< Format for time to be printed
-    vector<item_def*> items;          //!< layout items read in from file 
+    std::vector<item_def*> items;          //!< layout items read in from file 
 };
 
 //! Initialise the text used to describe the card types. 
-const string QSL_TYPES[qsl_data::MAX_TYPE] = {"Label", "File"};
+const std::string QSL_TYPES[qsl_data::MAX_TYPE] = {"Label", "File"};
 
 
 

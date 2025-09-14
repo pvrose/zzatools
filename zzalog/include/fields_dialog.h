@@ -9,7 +9,7 @@
 
 #include <FL/Fl_Table_Row.H>
 
-using namespace std;
+
 
 class field_choice;
 class intl_input;
@@ -128,7 +128,7 @@ protected:
     //! Current usage.
     field_app_t application_;
     //! Current collection name.
-    string collection_;
+    std::string collection_;
     //! Usage and collection are linked
     bool linked_;
     //! The usage choice widget

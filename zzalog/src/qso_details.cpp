@@ -13,7 +13,7 @@
 
 #include <FL/Fl_Output.H>
 
-using namespace std;
+
 
 extern book* book_;
 extern status* status_;
@@ -92,7 +92,7 @@ void qso_details::create_form() {
 // Update and configure widgets
 void qso_details::enable_widgets() {
 	if (qso_) {
-		string call = qso_->item("CALL");
+		std::string call = qso_->item("CALL");
 		if (call.length() == 0) call = "No contact";
 		op_call_->value(call.c_str());
 		get_qsos();
@@ -105,24 +105,24 @@ void qso_details::enable_widgets() {
 
 // Get the previous QSOs with this callsign
 void qso_details::get_qsos() {
-	set<string> names;
-	set<string> qths;
-	set<string> locators;
-	set<string> states;
-	set<qso_num_t> items;
-	set<qso_num_t> possibles;
-	set<qso_num_t> exacts;
-	string call = qso_ ? qso_->item("CALL") : "";
-	string band = qso_ ? qso_->item("BAND") : "";
-	string mode = qso_ ? qso_->item("MODE") : "";
-	string my_call = qso_ ? qso_->item("STATION_CALLSIGN") : "";
-	vector<basic_regex<char> > body_matches;
+	std::set<std::string> names;
+	std::set<std::string> qths;
+	std::set<std::string> locators;
+	std::set<std::string> states;
+	std::set<qso_num_t> items;
+	std::set<qso_num_t> possibles;
+	std::set<qso_num_t> exacts;
+	std::string call = qso_ ? qso_->item("CALL") : "";
+	std::string band = qso_ ? qso_->item("BAND") : "";
+	std::string mode = qso_ ? qso_->item("MODE") : "";
+	std::string my_call = qso_ ? qso_->item("STATION_CALLSIGN") : "";
+	std::vector<std::basic_regex<char> > body_matches;
 	smatch m;
 	bool match_possible = true;
-	vector < string > parts;
+	std::vector < std::string > parts;
 	// Split the call up into potential prefix, body and suffix
 	split_line(call, parts, '/');
-	string call_body = "";
+	std::string call_body = "";
 	if (parts.size() == 1) {
 		call_body = parts[0];
 	}
@@ -144,7 +144,7 @@ void qso_details::get_qsos() {
 	}
 	else {
 		// Basic callsign body match - [PFX/]CALL[/SFX]
-		body_matches.push_back(basic_regex<char>("^(.*/)?" + call_body + "(/.*)?$"));
+		body_matches.push_back(std::basic_regex<char>("^(.*/)?" + call_body + "(/.*)?$"));
 		// Now DXCC specific
 		switch (call_body[0]) {
 		case '2':
@@ -152,7 +152,7 @@ void qso_details::get_qsos() {
 		case 'G':
 		{ // UK & CD
 			regex_search(call_body, m, REGEX_CALL_BODY);
-			body_matches.push_back(basic_regex<char>("^(.*/)?" + m[1].str() + ".?" + m[2].str() + "(/.*)?$"));
+			body_matches.push_back(std::basic_regex<char>("^(.*/)?" + m[1].str() + ".?" + m[2].str() + "(/.*)?$"));
 			break;
 		}
 		}
@@ -163,22 +163,22 @@ void qso_details::get_qsos() {
 		record* it = book_->get_record(ix, false);
 		if (it->item("CALL") == call) {
 			// Get all NAME fields
-			string name = it->item("NAME");
+			std::string name = it->item("NAME");
 			if (name.length()) {
 				names.insert(name);
 			}
 			// Get all QTH fields
-			string qth = it->item("QTH");
+			std::string qth = it->item("QTH");
 			if (qth.length()) {
 				qths.insert(qth);
 			}
 			// Get all GRIDSQUARE fields
-			string locator = it->item("GRIDSQUARE");
+			std::string locator = it->item("GRIDSQUARE");
 			if (locator.length()) {
 				locators.insert(locator);
 			}
 			// Get all STATE fields
-			string state = it->item("STATE");
+			std::string state = it->item("STATE");
 			if (state.length()) {
 				states.insert(state);
 			}
@@ -241,7 +241,7 @@ qso_details::table_d::~table_d() {
 // Draw the cells of the table of details
 void qso_details::table_d::draw_cell(TableContext context, int R, int C, int X, int Y, int W, int H)
 {
-	string text;
+	std::string text;
 
 	switch (context) {
 
@@ -275,8 +275,8 @@ void qso_details::table_d::draw_cell(TableContext context, int R, int C, int X, 
 		{
 			// Get the details of the item
 			record* qso = ((qso_details*)parent())->qso_;
-			string s_value = "";
-			string field = name_map_.at(items_[R].type).field;
+			std::string s_value = "";
+			std::string field = name_map_.at(items_[R].type).field;
 			text = items_[R].value;
 			bool used = false;
 			if (qso) {
@@ -309,10 +309,10 @@ void qso_details::table_d::draw_cell(TableContext context, int R, int C, int X, 
 
 // Concatenate NAME, QTH and GRIDSQUARE lists into a single dataset for the table
 void qso_details::table_d::set_data(
-	set<string>names, 
-	set < string>qths, 
-	set<string> locators,
-	set<string> states) {
+	std::set<std::string>names, 
+	std::set < std::string>qths, 
+	std::set<std::string> locators,
+	std::set<std::string> states) {
 	items_.clear();
 	for (auto it = names.begin(); it != names.end(); it++) {
 		items_.push_back({ NAME, (*it) });
@@ -342,8 +342,8 @@ void qso_details::table_d::cb_table(Fl_Widget* w, void* v) {
 	table_d* that = ancestor_view<table_d>(w);
 	if (that->callback_context() & CONTEXT_CELL) {
 		int row = that->callback_row();
-		string field = that->name_map_.at(that->items_[row].type).field;
-		string value = that->items_[row].value;
+		std::string field = that->name_map_.at(that->items_[row].type).field;
+		std::string value = that->items_[row].value;
 		record* qso = ((qso_details*)that->parent())->qso_;
 		qso->item(field, value);
 		book_->selection(-1, HT_CHANGED);
@@ -374,7 +374,7 @@ qso_details::table_q::~table_q() {
 // Draw the previous QSOs tale
 void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, int Y, int W, int H)
 {
-	string text;
+	std::string text;
 	Fl_Font sv_font = fl_font();
 	Fl_Fontsize sv_size = fl_size();
 
@@ -433,8 +433,8 @@ void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, 
 			// Get the details of the item
 			record* qso = ((qso_details*)parent())->qso_;
 			record* it = book_->get_record(items_[R], false);
-			string s_value = "";
-			string field;
+			std::string s_value = "";
+			std::string field;
 			switch (C) {
 			case 0:
 				field = "QSO_DATE";
@@ -510,9 +510,9 @@ void qso_details::table_q::cb_table(Fl_Widget* w, void* v) {
 }
 
 // Set the table items
-void qso_details::table_q::set_data(set<qso_num_t> items, set<qso_num_t> possibles) {
+void qso_details::table_q::set_data(std::set<qso_num_t> items, std::set<qso_num_t> possibles) {
 	items_.clear();
-	// The vector is built up from the end - put the possibles at the end
+	// The std::vector is built up from the end - put the possibles at the end
 	for (auto it = possibles.begin(); it != possibles.end(); it++) {
 		items_.insert(items_.begin(), (*it));
 	}

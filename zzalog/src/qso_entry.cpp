@@ -54,7 +54,7 @@ qso_entry::qso_entry(int X, int Y, int W, int H, const char* L) :
 		ch_field_[ix] = nullptr;
 	}
 
-	// Initialise field input map
+	// Initialise field input std::map
 	field_ip_map_.clear();
 	tooltip("Allows the display and editing of QSO record fields");
 	create_form(X, Y);
@@ -69,7 +69,7 @@ qso_entry::~qso_entry() {
 	ticker_->remove_ticker(this);
 }
 
-// When shown set the focus to the most likely input widgsets
+// When shown std::set the focus to the most likely input widgsets
 int qso_entry::handle(int event) {
 	int result = Fl_Group::handle(event);
 	switch (event) {
@@ -135,7 +135,7 @@ void qso_entry::create_form(int X, int Y) {
 		if (ix < NUMBER_FIXED) {
 			// For a fixed field add the name of the field as a label where
 			// the field choice would have been
-			string name = STN_FIELDS[ix];
+			std::string name = STN_FIELDS[ix];
 			ip_field_[ix]->field_name(name.c_str(), qso_);
 			field_ip_map_[name] = ix;
 			ip_field_[ix]->copy_label(name.c_str());
@@ -293,7 +293,7 @@ void qso_entry::copy_qso_to_display(int flags) {
 		qso_->update_band();
 		// For each field input
 		for (int i = 0; i < NUMBER_TOTAL; i++) {
-			string field;
+			std::string field;
 			if (i < NUMBER_FIXED) field = STN_FIELDS[i];
 			else field = ch_field_[i]->value();
 			if (field.length()) {
@@ -323,7 +323,7 @@ void qso_entry::copy_qso_to_display(int flags) {
 	else {
 		// Clear all fields
 		for (int i = 0; i < NUMBER_TOTAL; i++) {
-			string field;
+			std::string field;
 			if (i < NUMBER_FIXED) field = STN_FIELDS[i];
 			else field = ch_field_[i]->value();
 			if (field.length()) {
@@ -335,7 +335,7 @@ void qso_entry::copy_qso_to_display(int flags) {
 	redraw();
 }
 
-// Copy from an existing record: fields depend on flags set
+// Copy from an existing record: fields depend on flags std::set
 void qso_entry::copy_qso_to_qso(record* old_record, int flags) {
 	// Create a new record
 	qso(-1);
@@ -345,12 +345,12 @@ void qso_entry::copy_qso_to_qso(record* old_record, int flags) {
 			copy_flags f = (*sf);
 			for (auto fx = COPY_FIELDS.at(f).begin(); fx != COPY_FIELDS.at(f).end(); fx++) {
 				if (flags & f) {
-					// If it's set copy it
+					// If it's std::set copy it
 					qso_->item((*fx), old_record->item((*fx)));
 				}
 				else {
 					// else clear it
-					qso_->item(string(""));
+					qso_->item(std::string(""));
 				}
 			}
 		}
@@ -358,7 +358,7 @@ void qso_entry::copy_qso_to_qso(record* old_record, int flags) {
 	if (flags & CF_RIG_ETC) {
 		qso_data_->update_station_fields(qso_);
 	}
-	qso_->item("QSO_COMPLETE", string("N"));
+	qso_->item("QSO_COMPLETE", std::string("N"));
 	copy_qso_to_display(CF_ALL_FLAGS);
 }
 
@@ -366,7 +366,7 @@ void qso_entry::copy_qso_to_qso(record* old_record, int flags) {
 void qso_entry::update_rig() {
 	qso_rig* rig_control = ((qso_manager*)qso_data_->parent())->rig_control();
 	if (rig_control && qso_) {
-		qso_->item("MY_RIG", string(rig_control->label()));
+		qso_->item("MY_RIG", std::string(rig_control->label()));
 		qso_->item("MY_ANTENNA", rig_control->antenna());
 		copy_qso_to_display(CF_RIG_ETC);
 	}
@@ -379,16 +379,16 @@ void qso_entry::copy_cat_to_qso(bool clear) {
 		rig_if* rig = rig_control->rig();
 		// Clear values before reloading them - called when switching rigs
 		if (clear && qso_ != nullptr) {
-			qso_->item("FREQ", string(""));
-			qso_->item("MODE", string(""));
-			qso_->item("SUBMODE", string(""));
-			qso_->item("TX_PWR", string(""));
+			qso_->item("FREQ", std::string(""));
+			qso_->item("MODE", std::string(""));
+			qso_->item("SUBMODE", std::string(""));
+			qso_->item("TX_PWR", std::string(""));
 		}
 		// Rig can be temporarily missing q
 		if (rig && rig->is_good() && qso_ != nullptr) {
-			string freqy = rig->get_frequency(true);
-			string mode;
-			string submode;
+			std::string freqy = rig->get_frequency(true);
+			std::string mode;
+			std::string submode;
 			char message[128];
 			rig->get_string_mode(mode, submode);
 			// Get the maximum power over course of QSO.
@@ -407,12 +407,12 @@ void qso_entry::copy_cat_to_qso(bool clear) {
 					qso_->item("SUBMODE", submode);
 				}
 				else {
-					qso_->item("MODE", string(""));
-					qso_->item("SUBMODE", string(""));
+					qso_->item("MODE", std::string(""));
+					qso_->item("SUBMODE", std::string(""));
 				}
 				tx_power = rig->get_dpower(true);
 				snprintf(txp, sizeof(txp), "%0.0f", tx_power);
-				qso_->item("TX_PWR", string(txp));
+				qso_->item("TX_PWR", std::string(txp));
 				copy_qso_to_display(CF_CAT);
 				break;
 			}
@@ -439,7 +439,7 @@ void qso_entry::copy_cat_to_qso(bool clear) {
 				if (isnan(tx_power)) tx_power = 0.0;
 				tx_power = max(tx_power, rig->get_dpower(true));
 				snprintf(txp, sizeof(txp), "%0.0f", tx_power);
-				qso_->item("TX_PWR", string(txp));
+				qso_->item("TX_PWR", std::string(txp));
 				copy_qso_to_display(CF_CAT);
 				break;
 			}
@@ -460,12 +460,12 @@ void qso_entry::copy_cat_to_qso(bool clear) {
 					status_->misc_status(ST_WARNING, message);
 					qso_->item("SUBMODE", submode);
 				}
-				string old_txp = qso_->item("TX_POWER");
+				std::string old_txp = qso_->item("TX_POWER");
 				qso_->item("TX_PWR", tx_power);
 				if (isnan(tx_power)) tx_power = 0.0;
 				tx_power = max(tx_power, rig->get_dpower(true));
 				snprintf(txp, sizeof(txp), "%0.0f", tx_power);
-				qso_->item("TX_PWR", string(txp));
+				qso_->item("TX_PWR", std::string(txp));
 				snprintf(message, sizeof(message), "DASH: TX_power changed from '%s' to '%s'", old_txp.c_str(), txp);
 				status_->misc_status(ST_WARNING, message);
 				copy_qso_to_display(CF_CAT);
@@ -494,12 +494,12 @@ void qso_entry::copy_clock_to_qso() {
 			char result[100];
 			// convert date
 			strftime(result, 99, "%Y%m%d", value);
-			qso_->item("QSO_DATE", string(result));
+			qso_->item("QSO_DATE", std::string(result));
 			// convert time
 			strftime(result, 99, "%H%M%S", value);
-			qso_->item("TIME_ON", string(result));
-			qso_->item("QSO_DATE_OFF", string(""));
-			qso_->item("TIME_OFF", string(""));
+			qso_->item("TIME_ON", std::string(result));
+			qso_->item("QSO_DATE_OFF", std::string(""));
+			qso_->item("TIME_OFF", std::string(""));
 			copy_qso_to_display(CF_TIME | CF_DATE);
 			break;
 		}
@@ -544,7 +544,7 @@ void qso_entry::clear_qso() {
 	copy_qso_to_display(CF_QSO);
 }
 
-// Initialise field map
+// Initialise field std::map
 void qso_entry::initialise_field_map() {
 	field_ip_map_.clear();
 	for (int ix = 0; ix < NUMBER_FIXED; ix++) {
@@ -557,7 +557,7 @@ void qso_entry::initialise_field_map() {
 void qso_entry::initialise_fields() {
 	if (field_map_) delete field_map_;
 	field_map_ = new field_list;
-	// Now set fields
+	// Now std::set fields
 	// TODO: this is where we configure for context
 	switch (qso_data_->logging_state()) {
 	case qso_data::TEST_ACTIVE:
@@ -586,14 +586,14 @@ void qso_entry::initialise_fields() {
 		field_map_->resize(NUMBER_TOTAL - NUMBER_FIXED);
 	}
 	fields_in_use_.resize(field_map_->size() + NUMBER_FIXED);
-	// Clear field map
+	// Clear field std::map
 	initialise_field_map();
 	size_t ix = 0;
 	int iy;
-	// For non-fixed fields - set field name into field choice and populate
+	// For non-fixed fields - std::set field name into field choice and populate
 	// drop-down menu into field input with permitted values
 	for (ix = 0, iy = NUMBER_FIXED; ix < field_map_->size(); ix++, iy++) {
-		string name = (*field_map_)[ix];
+		std::string name = (*field_map_)[ix];
 		ch_field_[iy]->value(name.c_str());
 		ip_field_[iy]->field_name(name.c_str(), qso_);
 		field_ip_map_[name] = iy;
@@ -608,9 +608,9 @@ void qso_entry::initialise_fields() {
 	set_focus_call();
 }
 
-// Return fields that have been defines as comma seperated list
-string qso_entry::get_defined_fields() {
-	string defn = "";
+// Return fields that have been defines as comma seperated std::list
+std::string qso_entry::get_defined_fields() {
+	std::string defn = "";
 	for (int i = NUMBER_FIXED; i < NUMBER_TOTAL; i++) {
 		const char* field = ch_field_[i]->value();
 		if (strlen(field)) {
@@ -623,8 +623,8 @@ string qso_entry::get_defined_fields() {
 	return defn;
 }
 
-// Action add field - add the selected field to the set of entries
-void qso_entry::action_add_field(int ix, string field) {
+// Action add field - add the selected field to the std::set of entries
+void qso_entry::action_add_field(int ix, std::string field) {
 	if (ix == -1 && fields_in_use_.size() == NUMBER_TOTAL) {
 		char msg[128];
 		snprintf(msg, 128, "DASH: Cannot add any more fields to edit - %s ignored", field.c_str());
@@ -667,12 +667,12 @@ void qso_entry::action_add_field(int ix, string field) {
 // Delete a field
 void qso_entry::action_del_field(int ix) {
 	int iy = ix - NUMBER_FIXED;
-	string& old_field = (*field_map_)[iy];
+	std::string& old_field = (*field_map_)[iy];
 	field_ip_map_.erase(old_field);
 	int pos = ix;
 	for (; pos < fields_in_use_.size() - 1; pos++) {
 		int posy = pos - NUMBER_FIXED;
-		string& field = (*field_map_)[posy + 1];
+		std::string& field = (*field_map_)[posy + 1];
 		(*field_map_)[posy] = field;
 		ch_field_[pos]->value(field.c_str());
 		ip_field_[pos]->field_name(field.c_str(), qso_);
@@ -696,11 +696,11 @@ void qso_entry::cb_ch_field(Fl_Widget* w, void* v) {
 	const char* field = ch->value();
 	int ix = (int)(intptr_t)v;
 	if (strlen(field)) {
-		// Add a field to the list if its not null
+		// Add a field to the std::list if its not null
 		that->action_add_field(ix, field);
 	}
 	else {
-		// Delete it if the name is null string
+		// Delete it if the name is null std::string
 		that->action_del_field(ix);
 	}
 }
@@ -713,9 +713,9 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 	field_input* ip = (field_input*)w;
 	field_input::exit_reason_t reason = ip->reason();
 	// Index number of field_input
-	string field = ip->field_name();
-	string value = ip->value();
-	string old_value = that->qso_->item(field);
+	std::string field = ip->field_name();
+	std::string value = ip->value();
+	std::string old_value = that->qso_->item(field);
 	// Save cursor position
 	int pos = ip->input()->insert_position();
 	if (old_value != value) {
@@ -734,7 +734,7 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 			}
 			else {
 				that->qso_->item("MODE", value);
-				that->qso_->item("SUBMODE", string(""));
+				that->qso_->item("SUBMODE", std::string(""));
 			}
 		}
 		else if (field == "MY_RIG") {
@@ -755,7 +755,7 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 				{
 					// Copy matching antenna
 					qso_rig* rig_control = mgr->rig_control();
-					string antenna;
+					std::string antenna;
 					if (rig_control) {
 						antenna = rig_control->antenna();
 						that->qso_->item("MY_ANTENNA", antenna);
@@ -848,8 +848,8 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 // v - not used
 void qso_entry::cb_ip_notes(Fl_Widget* w, void* v) {
 	qso_entry* that = ancestor_view<qso_entry>(w);
-	string notes;
-	cb_value<intl_input, string>(w, &notes);
+	std::string notes;
+	cb_value<intl_input, std::string>(w, &notes);
 	if (that->qso_) {
 		that->qso_->item("NOTES", notes);
 		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, that->qso_number_);
@@ -961,7 +961,7 @@ void qso_entry::set_focus_call() {
 	if (!visible_r()) return;
 	int call_ix = 0;
 	bool found = false;
-	// Find the ip_field_ widget that holds CALL and set focus to it. 
+	// Find the ip_field_ widget that holds CALL and std::set focus to it. 
 	while (!found && call_ix < fields_in_use_.size()) {
 		if (fields_in_use_[call_ix] == "CALL") {
 			found = true; 

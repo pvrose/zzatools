@@ -9,7 +9,7 @@ class Fl_RGB_Image;
 class book;
 class record;
 
-using namespace std;
+
 
 //! Class that outputs the image for an e-mail QSL card.
 
@@ -23,12 +23,12 @@ public:
 	~png_writer();
 
 	//! Get the PNG filename for the \p qso.
-	static string png_filename(record* qso);
+	static std::string png_filename(record* qso);
 	//! Generate files for the \p qsos specified.
 	bool write_book(book* qsos);
 
 	//! Write the RGB \p image out to a .png file \p filename.
-	bool write_image(Fl_RGB_Image* image, string filename);
+	bool write_image(Fl_RGB_Image* image, std::string filename);
 
 protected:
 

@@ -20,9 +20,9 @@ extern config* config_;
 extern qso_manager* qso_manager_;
 extern stn_data* stn_data_;
 extern bool new_installation_;
-extern string default_station_;
-extern string PROGRAM_ID;
-extern string VENDOR;
+extern std::string default_station_;
+extern std::string PROGRAM_ID;
+extern std::string VENDOR;
 extern Fl_Preferences::Root prefs_mode_;
 
 club_stn_dlg::club_stn_dlg() :
@@ -44,19 +44,19 @@ void club_stn_dlg::create_form() {
 	curr_x += WLABEL;
 	w_club_name_ = new Fl_Input(curr_x, curr_y, WEDIT, HBUTTON, "Club name");
 	w_club_name_->value(club_name_.c_str());
-	w_club_name_->callback(cb_value<Fl_Input, string>, &club_name_);
+	w_club_name_->callback(cb_value<Fl_Input, std::string>, &club_name_);
 	w_club_name_->tooltip("Please enter the name of the club");
 
 	curr_y += HBUTTON;
 	w_club_call_ = new Fl_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Callsign");
 	w_club_call_->value(club_call_.c_str());
-	w_club_call_->callback(cb_value<Fl_Input, string>, &club_call_);
+	w_club_call_->callback(cb_value<Fl_Input, std::string>, &club_call_);
 	w_club_call_->tooltip("Please enter the club callsign");
 
 	curr_y += HBUTTON;
 	w_club_location_ = new Fl_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Location");
 	w_club_location_->value(club_location_.c_str());
-	w_club_location_->callback(cb_value<Fl_Input, string>, &club_location_);
+	w_club_location_->callback(cb_value<Fl_Input, std::string>, &club_location_);
 	w_club_location_->tooltip("Please enter the club location");
 
 	int save_x = curr_x;
@@ -69,7 +69,7 @@ void club_stn_dlg::create_form() {
 	curr_y += HBUTTON + GAP;
 	w_operator_ = new Fl_Input_Choice(curr_x, curr_y, WSMEDIT, HBUTTON, "Operator");
 	w_operator_->callback(cb_operator);
-	w_operator_->tooltip("Select your callsign from the drop-down list (or type in new");
+	w_operator_->tooltip("Select your callsign from the drop-down std::list (or type in new");
 	populate_login();
 
 	curr_y += HBUTTON;
@@ -106,7 +106,7 @@ void club_stn_dlg::load_data() {
 	club_name_ = temp;
 	free(temp);
 	station_settings.get("Callsign", temp, "");
-	club_call_ = to_upper(string(temp));
+	club_call_ = to_upper(std::string(temp));
 	free(temp);
 	if (club_call_.length() == 0) {
 		// No call in seettings - use default from log
@@ -166,8 +166,8 @@ void club_stn_dlg::add_login() {
 		oper_info_t* info = new oper_info_t;
 		stn_data_->add_oper(nickname_, info);
 	}
-	stn_data_->add_oper_item(nickname_, NAME, string(w_name_->value()));
-	stn_data_->add_oper_item(nickname_, CALLSIGN, string(w_call_->value()));
+	stn_data_->add_oper_item(nickname_, NAME, std::string(w_name_->value()));
+	stn_data_->add_oper_item(nickname_, CALLSIGN, std::string(w_call_->value()));
 }
 
 void club_stn_dlg::add_callsign() {
@@ -198,7 +198,7 @@ void club_stn_dlg::cb_bn_login(Fl_Widget* w, void* v) {
 
 void club_stn_dlg::cb_operator(Fl_Widget* w, void* v) {
 	club_stn_dlg* that = ancestor_view<club_stn_dlg>(w);
-	that->nickname_ = string((char*)((Fl_Input_Choice*)w)->value());
+	that->nickname_ = std::string((char*)((Fl_Input_Choice*)w)->value());
 	that->enable_widgets();
 }
 
@@ -210,7 +210,7 @@ void club_stn_dlg::cb_edit_qth(Fl_Widget* w, void* v) {
 }
 
 void club_stn_dlg::populate_login() {
-	const map<string, oper_info_t*>* opers = stn_data_->get_opers();
+	const std::map<std::string, oper_info_t*>* opers = stn_data_->get_opers();
 	w_operator_->add("");
 	for (auto it : *opers)
 	{

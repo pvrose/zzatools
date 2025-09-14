@@ -146,7 +146,7 @@ void import_data::update_book() {
 		// Clear flags
 		update_in_progress_ = false;
 		update_is_new_ = false;
-		string update_source;
+		std::string update_source;
 		// Keep track on number left to import
 		int number_update_records = size();
 		// Initialise flags
@@ -161,13 +161,13 @@ void import_data::update_book() {
 		// Process the records - always process the zeroth one as it gets deleted
 		// update_in_progress_ indicates we want to drop out to present user with a 
 		// choice.
-		// If we have killed an update by another means, update_mode_ will be set to NONE
+		// If we have killed an update by another means, update_mode_ will be std::set to NONE
 		for (int ix = 0; ix < number_update_records && !update_in_progress_ && update_mode_ != NONE; ix++) {
 			// Get first QSO in update log
 			record* import_record = at(0);
 			// Skip records prior to last in log if we are automatically merging from e.g. fldigi
 			// NB. Assumes that the modem program logs TIME_OFF. Using tIME_ON can introduce a race condition
-			string qso_timestamp = import_record->item("QSO_DATE_OFF") +
+			std::string qso_timestamp = import_record->item("QSO_DATE_OFF") +
 				import_record->item("TIME_OFF");
 			// If we have no seconds - force it to the last second of the minute so that it will be checked
 			if (qso_timestamp.length() == 12) {
@@ -190,17 +190,17 @@ void import_data::update_book() {
 				// Start looking for an exact match only from 2 before until no longer overlap
 
 				// Start N minutes before the time 
-				const chrono::seconds MINUTES_30(1800);
-				chrono::system_clock::time_point datum = import_record->ctimestamp();
+				const std::chrono::seconds MINUTES_30(1800);
+				std::chrono::system_clock::time_point datum = import_record->ctimestamp();
 				item_num_t start_pos = datum_pos;
-				chrono::system_clock::time_point start = book_->get_record(start_pos, false)->ctimestamp();
+				std::chrono::system_clock::time_point start = book_->get_record(start_pos, false)->ctimestamp();
 				while (datum - start < MINUTES_30 && start_pos > 0) {
 					start_pos--;
 					start = book_->get_record(start_pos, false)->ctimestamp();
 				}
 				item_num_t end_pos = datum_pos;
 				datum = import_record->ctimestamp(true);
-				chrono::system_clock::time_point end_pt = book_->get_record(end_pos, false)->ctimestamp(true);
+				std::chrono::system_clock::time_point end_pt = book_->get_record(end_pos, false)->ctimestamp(true);
 				while (end_pt - datum < MINUTES_30 && end_pos < book_->size() - 1) {
 					end_pos++;
 					end_pt = book_->get_record(end_pos, false)->ctimestamp();
@@ -327,7 +327,7 @@ void import_data::update_book() {
 			}
 			if (had_swl_match) {
 				// get the possible values for STATION_CALLSIGN
-				string stn1 = book_->get_record(datum_pos, false)->item("STATION_CALLSIGN");
+				std::string stn1 = book_->get_record(datum_pos, false)->item("STATION_CALLSIGN");
 				import_record->item("STATION_CALLSIGN", stn1);
 				// ASk if valid SWL report
 				update_in_progress_ = true;
@@ -336,7 +336,7 @@ void import_data::update_book() {
 				number_swl_++;
 				had_swl_match = false;
 			}
-			// Unexpected new record (update from log) - set flags to display new record - 
+			// Unexpected new record (update from log) - std::set flags to display new record - 
 			// user will either accept, reject or search for match
 			if (!found_match && !cancel_update && update_mode_ != FILE_IMPORT && 
 				update_mode_ != DATAGRAM && update_mode_ != CLIPBOARD) {
@@ -421,7 +421,7 @@ void import_data::finish_update(bool merged /*= true*/) {
 				number_to_import_, number_checked_, number_modified_, number_matched_, number_added_, number_swl_, number_rejected_, number_clublog_);
 		}
 		else {
-			string source;
+			std::string source;
 			switch (update_mode_) {
 			case EQSL_UPDATE:
 				source = "EQSL";
@@ -466,7 +466,7 @@ void import_data::finish_update(bool merged /*= true*/) {
 			}
 		}
 	}
-	// If we are merging eQSL, release the card queue
+	// If we are merging eQSL, release the card std::queue
 	if (update_mode_ == EQSL_UPDATE) {
 		eqsl_handler_->enable_fetch(eqsl_handler::EQ_START);
 	}
@@ -482,14 +482,14 @@ void import_data::finish_update(bool merged /*= true*/) {
 // log not the server
 void import_data::convert_update(record* qso) {
 	// For each field in the record
-	// Get the list of fields because we may end up erasing some
-	set<string> field_names;
+	// Get the std::list of fields because we may end up erasing some
+	std::set<std::string> field_names;
 	for (auto it : *qso) {
 		field_names.insert(it.first);
 	}
-	for (string field_name : field_names) {
-		string update_name;
-		string value = qso->item(field_name);
+	for (std::string field_name : field_names) {
+		std::string update_name;
+		std::string value = qso->item(field_name);
 		bool ignore = false;
 		// Sometimes need to compare different fields - RST_SENT vs RST_RCVD
 		// To avoid the name being switched back, a '!' is prepended to the field name in some cases
@@ -584,7 +584,7 @@ void import_data::convert_update(record* qso) {
 			break;
 		}
 		if (ignore) {
-			qso->item(field_name, string(""));
+			qso->item(field_name, std::string(""));
 		}
 		else {
 			// If field name changed move from one to the other
@@ -596,13 +596,13 @@ void import_data::convert_update(record* qso) {
 	// Set EQSL_QSLRDATE to todays date 
 	if (update_mode_ == EQSL_UPDATE) {
 		// Rename !RST_RCVD etc back again
-		set<string> erasees;
-		map<string, string> new_fields;
+		std::set<std::string> erasees;
+		std::map<std::string, std::string> new_fields;
 		erasees.clear();
 		// For each field in the record
 		for (auto it = qso->begin(); it != qso->end(); it++) {
-			string field_name = it->first;
-			string value = it->second;
+			std::string field_name = it->first;
+			std::string value = it->second;
 			// If the field name starts with a bang
 			if (field_name[0] == '!') {
 				// Change it back to without
@@ -619,11 +619,11 @@ void import_data::convert_update(record* qso) {
 			qso->erase(*it);
 		}
 		// Add EQSL_QSLRDATE - date eQSL received and the eQSL timestamp
-		string qsl_rdate = now(false, "%Y%m%d");
+		std::string qsl_rdate = now(false, "%Y%m%d");
 		qso->item("EQSL_QSLRDATE", qsl_rdate);
 
 		// Delete QSLMSG
-		qso->item("QSLMSG", string(""));
+		qso->item("QSLMSG", std::string(""));
 	}
 }
 
@@ -639,7 +639,7 @@ bool import_data::update_complete() {
 
 // Get the data from the QSL server
 bool import_data::download_data(import_data::update_mode_t server) {
-	stringstream adif;
+	std::stringstream adif;
 	bool result = true;
 	// Tidy up import book - complete any existing update
 	stop_update(false);
@@ -665,7 +665,7 @@ bool import_data::download_data(import_data::update_mode_t server) {
 		result = qrz_handler_->download_qrzlog_log(&adif);
 		break;
 	case OQRS:
-		// Fetch QSL request list from Clublog.org
+		// Fetch QSL request std::list from Clublog.org
 		update_mode_ = server;
 		status_->misc_status(ST_NOTE, "IMPORT: Downloading OQRS from Cliublog.org");
 		result = club_handler_->download_oqrs(&adif);
@@ -687,7 +687,7 @@ bool import_data::download_data(import_data::update_mode_t server) {
 }
 
 // Load from a data stream
-void import_data::load_stream(stringstream& adif, import_data::update_mode_t server) {
+void import_data::load_stream(std::stringstream& adif, import_data::update_mode_t server) {
 	if (server == DATAGRAM || server == CLIPBOARD) {
 		update_mode_ = server;
 	}
@@ -729,7 +729,7 @@ void import_data::merge_data(import_data::update_mode_t mode) {
 }
 
 // overload of book::load_data, sets the update mode and if successful switches view to import view
-bool import_data::load_data(string filename, update_mode_t mode) {
+bool import_data::load_data(std::string filename, update_mode_t mode) {
 	// This breaks auto-update
 	update_mode_ = mode;
 	bool result = book::load_data(filename);

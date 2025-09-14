@@ -9,7 +9,7 @@
 #include <set>
 #include <map>
 
-using namespace std;
+
 
 class Fl_Widget;
 class Fl_Group;
@@ -63,7 +63,7 @@ struct server_data_t;
 		void create_email(int rx, int ry, int rw, int rh);
 
 		//! Returns the server data
-		server_data_t* get_server(string name);
+		server_data_t* get_server(std::string name);
 		
 
 		// Widgets for eQSL
@@ -83,9 +83,9 @@ struct server_data_t;
 		Fl_Group* grp_email_;           //!< e-Mail widget group/#
 
 		//! Mapping of callsign to widget groups per QRZ.com logbook
-		map<string, Fl_Group*> grp_api_books_;
+		std::map<std::string, Fl_Group*> grp_api_books_;
 		//! Mapping of callsign to eQSL last download date widgets.
-		map<string, Fl_Widget*> w_eqsl_lupds_;
+		std::map<std::string, Fl_Widget*> w_eqsl_lupds_;
 
 		server_data_t* eqsl_data_;       //! eQSL.cc configuration data
 		server_data_t* lotw_data_;       //! LotW configuration data

@@ -24,25 +24,25 @@ namespace contests {
         
         //! The supplied \a text is parsed as "[RST_RCVD] [SRX]" and
         //! written into \a qso fields of these names.
-        virtual void parse_exchange(record* qso, string text);
+        virtual void parse_exchange(record* qso, std::string text);
 
         //! Algorithm specific method to generate text from a number of fields.
         
         //! The default RS(T) is written into the RST_SENT field of \a qso.
         //! The fields RST_SENT and STX are concatenated and returned from
         //! the method.
-        virtual string generate_exchange(record* qso);
+        virtual std::string generate_exchange(record* qso);
 
         //! Algorithm specific method to score an individual QSO.
         
         //! The fields DXCC and BAND are concatenated to create a 
         //! multiplier. If this multiplier is not present in \a multipliers
-        //! it is added and the value 1 is set in the multiplier attribute
+        //! it is added and the value 1 is std::set in the multiplier attribute
         //! of the return value.
         //! If the DXCC entity of \a qso is not the same as the user's
         //! DXCC entity a value of 1 is returned in the qso_points 
         //! attribute of the return value.
-        virtual score_result score_qso(record* qso, set<string>& multipliers);
+        virtual score_result score_qso(record* qso, std::set<std::string>& multipliers);
 
         //! The algorithm uses serial numbers.
         

@@ -8,7 +8,7 @@
 
 #include <FL/Fl_Group.H>
 
-using namespace std;
+
 
 class field_input;
 class rig_if;
@@ -33,7 +33,7 @@ class Fl_Preferences;
 //! Number of supported rig access apps.
 const int NUMBER_RIG_APPS = 2;
 //! The supported rig access apps.
-const string RIG_APP_NAMES[NUMBER_RIG_APPS] = { "FLRig", "WFView" };
+const std::string RIG_APP_NAMES[NUMBER_RIG_APPS] = { "FLRig", "WFView" };
 //! Bit-wise flags for redrawing qso_rig
 const uchar DAMAGE_STATUS = 1;     //!< Update status
 const uchar DAMAGE_VALUES = 2;     //!< Update values read from the rig.
@@ -82,7 +82,7 @@ public:
 	//! Retunrs the rig connection interface rig_if.
 	rig_if* rig();
 	//! Returns preferred antenna for this rig.
-	string antenna();
+	std::string antenna();
 	//! Disconnect rig
 	void disconnect();
 	//! Returns the nickname of the CAT interface used.
@@ -217,9 +217,9 @@ protected:
 	Fl_Group* serial_grp_;           //!< Serial port configuration
 
 	Fl_Choice* ch_port_name_;        //!< Menu: "Port" shows available serial ports
-	Fl_Check_Button* bn_all_ports_;  //!< Check: "All" if set all ports available or not.
+	Fl_Check_Button* bn_all_ports_;  //!< Check: "All" if std::set all ports available or not.
 	Fl_Choice* ch_baud_rate_;        //!< Menu: "Baud rate" shows available data speeds.
-	Fl_Check_Button* bn_all_rates_;  //!< Check: "All" if set all data speeds.
+	Fl_Check_Button* bn_all_rates_;  //!< Check: "All" if std::set all data speeds.
 
 	Fl_Group* network_grp_;          //!< Network port configuration
 	Fl_Light_Button* bn_use_app_;    //!< Light: "Use" use an application to connect.
@@ -271,10 +271,10 @@ protected:
 	bool rig_ok_;
 	//! Current rig state.
 	rig_state_t rig_state_;
-	//! Flag set when start button pressed and cleared on connect button
+	//! Flag std::set when start button pressed and cleared on connect button
 	bool rig_starting_;
 
 	//! Map the hamlib model_id to position in rig choice menu.
-	map<int, int> rig_choice_pos_;
+	std::map<int, int> rig_choice_pos_;
 };
 

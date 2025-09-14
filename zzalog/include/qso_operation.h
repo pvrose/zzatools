@@ -7,7 +7,7 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Input_Choice.H>
 
-using namespace std;
+
 
 class qso_data;
 class record;
@@ -101,15 +101,15 @@ public:
     //! Callback from the "Show" buttons: \p v specifes the specific button.
     static void cb_show(Fl_Widget*w, void* v);
 
-    //! set the QSO record \p qso.
+    //! std::set the QSO record \p qso.
     void qso(record* qso);
 
     //! Returns the current QTH. 
-    string current_qth();
+    std::string current_qth();
     //! Returns the current operator.
-    string current_oper();
+    std::string current_oper();
     //! Returns the current station callsign.
-    string current_call();
+    std::string current_call();
 
     //! Update QSO record \p qso from current selected values.
     void update_qso(record* qso);
@@ -132,9 +132,9 @@ protected:
     Fl_Input_Choice* ch_call_;     //!< Input for specifying station callsign.
 
     // Attributes
-    string current_qth_;      //!< Current station location.
-    string current_oper_;     //!< Current station operator.
-    string current_call_;     //!< Current station callsign.
+    std::string current_qth_;      //!< Current station location.
+    std::string current_oper_;     //!< Current station operator.
+    std::string current_call_;     //!< Current station callsign.
     record* current_qso_;     //!< Current QSO record.
 
 

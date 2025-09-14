@@ -23,8 +23,8 @@ extern wsjtx_handler* wsjtx_handler_;
 extern fllog_emul* fllog_emul_;
 extern spec_data* spec_data_;
 extern uint32_t seed_;
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
 extern qsl_dataset* qsl_dataset_;
 extern Fl_Preferences::Root prefs_mode_;
 extern void open_html(const char*);
@@ -89,7 +89,7 @@ void web_dialog::load_values() {
 	spec_dataset* call_set = spec_data_->dataset("Dynamic STATION_CALLSIGN");
 	if (call_set) {
 		for (auto it : call_set->data) {
-			string call = it.first;
+			std::string call = it.first;
 			if (qrz_data_->call_data.find(call) == qrz_data_->call_data.end()) {
 				qrz_data_->call_data[call] = new qsl_call_data;
 			}
@@ -102,7 +102,7 @@ void web_dialog::load_values() {
 }
 
 // Get the existing server data or create a new one.
-server_data_t* web_dialog::get_server(string name) {
+server_data_t* web_dialog::get_server(std::string name) {
 	server_data_t* result = qsl_dataset_->get_server_data(name);
 	if (!result) {
 		if (qsl_dataset_->new_server(name)) {
@@ -187,7 +187,7 @@ void web_dialog::create_eqsl(int rx, int ry, int rw, int rh) {
 	//calendar_input* in1_1_2 = new calendar_input(C2, R1_1, W2 + H1_1, H1_1, "Last accessed");
 	//in1_1_2->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	//in1_1_2->value(eqsl_data_->last_downloaded.c_str());
-	//in1_1_2->callback(cb_value<intl_input, string>, &eqsl_data_->last_downloaded);
+	//in1_1_2->callback(cb_value<intl_input, std::string>, &eqsl_data_->last_downloaded);
 	//in1_1_2->when(FL_WHEN_CHANGED);
 	//in1_1_2->tooltip("Last time eQSL.cc accessed");
 
@@ -199,7 +199,7 @@ void web_dialog::create_eqsl(int rx, int ry, int rw, int rh) {
 	intl_input* in1_1_4 = new intl_input(curr_x, curr_y, WSMEDIT, HBUTTON, "User");
 	in1_1_4->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in1_1_4->value(eqsl_data_->user.c_str());
-	in1_1_4->callback(cb_value<intl_input, string>, &eqsl_data_->user);
+	in1_1_4->callback(cb_value<intl_input, std::string>, &eqsl_data_->user);
 	in1_1_4->when(FL_WHEN_CHANGED);
 	in1_1_4->tooltip("Enter user name for eQSL.cc");
 
@@ -208,7 +208,7 @@ void web_dialog::create_eqsl(int rx, int ry, int rw, int rh) {
 	password_input* in1_1_5 = new password_input(curr_x, curr_y, WSMEDIT + HBUTTON, HBUTTON, "Password");
 	in1_1_5->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in1_1_5->value(eqsl_data_->password.c_str());
-	in1_1_5->callback(cb_value<Fl_Input, string>, &eqsl_data_->password);
+	in1_1_5->callback(cb_value<Fl_Input, std::string>, &eqsl_data_->password);
 	in1_1_5->when(FL_WHEN_CHANGED);
 	in1_1_5->tooltip("Enter password for eQSL.cc");
 
@@ -267,7 +267,7 @@ void web_dialog::create_eqsl(int rx, int ry, int rw, int rh) {
 		curr_x += HBUTTON + GAP;
 		calendar_input* ip_lastdl = new calendar_input(curr_x, curr_y, WSMEDIT + HBUTTON, HBUTTON);
 		ip_lastdl->value(it->second->last_download.c_str());
-		ip_lastdl->callback(cb_value<intl_input, string>, &it->second->last_download);
+		ip_lastdl->callback(cb_value<intl_input, std::string>, &it->second->last_download);
 		ip_lastdl->tooltip("The date of the last download");
 
 		w_eqsl_lupds_[it->first] = ip_lastdl;
@@ -284,7 +284,7 @@ void web_dialog::create_eqsl(int rx, int ry, int rw, int rh) {
 	intl_input* in1_2_2 = new intl_input(curr_x, curr_y, WEDIT, HBUTTON, "QSL Message (QSO)");
 	in1_2_2->align(FL_ALIGN_LEFT);
 	in1_2_2->value(eqsl_data_->qso_message.c_str());
-	in1_2_2->callback(cb_value<intl_input, string>, &eqsl_data_->qso_message);
+	in1_2_2->callback(cb_value<intl_input, std::string>, &eqsl_data_->qso_message);
 	in1_2_2->when(FL_WHEN_CHANGED);
 	in1_2_2->tooltip("Message to send to eQSL.cc or print on cards for QSOs");
 
@@ -293,11 +293,11 @@ void web_dialog::create_eqsl(int rx, int ry, int rw, int rh) {
 	intl_input* in1_3_2 = new intl_input(curr_x, curr_y, WEDIT, HBUTTON, "QSL Message (SWL)");
 	in1_3_2->align(FL_ALIGN_LEFT);
 	in1_3_2->value(eqsl_data_->swl_message.c_str());
-	in1_3_2->callback(cb_value<intl_input, string>, &eqsl_data_->swl_message);
+	in1_3_2->callback(cb_value<intl_input, std::string>, &eqsl_data_->swl_message);
 	in1_3_2->when(FL_WHEN_CHANGED);
 	in1_3_2->tooltip("Message to send to eQSL.cc or print on cards for SWL reports");
 
-	// Create the list of widgets to be disabled when eQSL disabled
+	// Create the std::list of widgets to be disabled when eQSL disabled
 	grp_eqsl_ = gp1;
 
 	gp1->end();
@@ -351,7 +351,7 @@ void web_dialog::create_lotw(int rx, int ry, int rw, int rh) {
 	calendar_input* in2_1_2 = new calendar_input(C2, R2_1, W2, H2_1, "Last accessed");
 	in2_1_2->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in2_1_2->value(lotw_data_->last_downloaded.c_str());
-	in2_1_2->callback(cb_value<intl_input, string>, &lotw_data_->last_downloaded);
+	in2_1_2->callback(cb_value<intl_input, std::string>, &lotw_data_->last_downloaded);
 	in2_1_2->when(FL_WHEN_CHANGED);
 	in2_1_2->tooltip("Last time Logbook of the World accessed");
 
@@ -359,7 +359,7 @@ void web_dialog::create_lotw(int rx, int ry, int rw, int rh) {
 	intl_input* in2_1_4 = new intl_input(C4, R2_1, W4, H2_1, "User");
 	in2_1_4->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in2_1_4->value(lotw_data_->user.c_str());
-	in2_1_4->callback(cb_value<intl_input, string>, &lotw_data_->user);
+	in2_1_4->callback(cb_value<intl_input, std::string>, &lotw_data_->user);
 	in2_1_4->when(FL_WHEN_CHANGED);
 	in2_1_4->tooltip("Enter user name for Logbook of the World");
 
@@ -367,7 +367,7 @@ void web_dialog::create_lotw(int rx, int ry, int rw, int rh) {
 	password_input* in2_1_5 = new password_input(C5, R2_1, W5 + W6, H2_1, "Password");
 	in2_1_5->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in2_1_5->value(lotw_data_->password.c_str());
-	in2_1_5->callback(cb_value<Fl_Input, string>, &lotw_data_->password);
+	in2_1_5->callback(cb_value<Fl_Input, std::string>, &lotw_data_->password);
 	in2_1_5->when(FL_WHEN_CHANGED);
 	in2_1_5->tooltip("Enter password for Logbook of the World");
 
@@ -379,7 +379,7 @@ void web_dialog::create_lotw(int rx, int ry, int rw, int rh) {
 	bn2_1A_1->when(FL_WHEN_CHANGED);
 	bn2_1A_1->tooltip("Upload each QSO as it is logged");
 
-	// Create the list of widgets to be disabled when eQSL disabled
+	// Create the std::list of widgets to be disabled when eQSL disabled
 	grp_lotw_ = gp2;
 
 	gp2->end();
@@ -427,7 +427,7 @@ void web_dialog::create_qrz(int rx, int ry, int rw, int rh) {
 	intl_input* in3_1_4 = new intl_input(curr_x, curr_y, WSMEDIT, HBUTTON, "User");
 	in3_1_4->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in3_1_4->value(qrz_data_->user.c_str());
-	in3_1_4->callback(cb_value<intl_input, string>, &qrz_data_->user);
+	in3_1_4->callback(cb_value<intl_input, std::string>, &qrz_data_->user);
 	in3_1_4->when(FL_WHEN_CHANGED);
 	in3_1_4->tooltip("Enter user name for QRZ.com");
 
@@ -437,7 +437,7 @@ void web_dialog::create_qrz(int rx, int ry, int rw, int rh) {
 	password_input* in3_1_5 = new password_input(curr_x, curr_y, WSMEDIT, HBUTTON, "Password");
 	in3_1_5->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in3_1_5->value(qrz_data_->password.c_str());
-	in3_1_5->callback(cb_value<Fl_Input, string>, &qrz_data_->password);
+	in3_1_5->callback(cb_value<Fl_Input, std::string>, &qrz_data_->password);
 	in3_1_5->when(FL_WHEN_CHANGED);
 	in3_1_5->tooltip("Enter password for QRZ.com");
 
@@ -510,12 +510,12 @@ void web_dialog::create_qrz(int rx, int ry, int rw, int rh) {
 
 		password_input* ip_key = new password_input(XKEY, curr_y, WKEY, HBUTTON);
 		ip_key->value(it->second->key.c_str());
-		ip_key->callback(cb_value<Fl_Input, string>, &it->second->key);
+		ip_key->callback(cb_value<Fl_Input, std::string>, &it->second->key);
 		ip_key->tooltip("Enter the QRZ.com API key for logbook");
 
 		calendar_input* ip_lastdl = new calendar_input(XLASTDL, curr_y, WLASTDL, HBUTTON);
 		ip_lastdl->value(it->second->last_download.c_str());
-		ip_lastdl->callback(cb_value<intl_input, string>, &it->second->last_download);
+		ip_lastdl->callback(cb_value<intl_input, std::string>, &it->second->last_download);
 		ip_lastdl->tooltip("The date of the last download");
 
 		grp_api->end();
@@ -526,7 +526,7 @@ void web_dialog::create_qrz(int rx, int ry, int rw, int rh) {
 
 	grp_qrz_api_->end();
 
-	// Create the list of widgets to be disabled when eQSL disabled
+	// Create the std::list of widgets to be disabled when eQSL disabled
 	grp_qrz_ = gp3;
 
 	gp3->end();
@@ -570,7 +570,7 @@ void web_dialog::create_club(int rx, int ry, int rw, int rh) {
 	intl_input* in4_1_4 = new intl_input(C3, R4_1, W34, H4_1, "User (e-mail)");
 	in4_1_4->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in4_1_4->value(club_data_->user.c_str());
-	in4_1_4->callback(cb_value<intl_input, string>, &club_data_->user);
+	in4_1_4->callback(cb_value<intl_input, std::string>, &club_data_->user);
 	in4_1_4->when(FL_WHEN_CHANGED);
 	in4_1_4->tooltip("Enter e-mail address for ClubLog");
 
@@ -578,7 +578,7 @@ void web_dialog::create_club(int rx, int ry, int rw, int rh) {
 	password_input* in4_1_5 = new password_input(C5, R4_1, W5, H4_1, "Password");
 	in4_1_5->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in4_1_5->value(club_data_->password.c_str());
-	in4_1_5->callback(cb_value<Fl_Input, string>, &club_data_->password);
+	in4_1_5->callback(cb_value<Fl_Input, std::string>, &club_data_->password);
 	in4_1_5->when(FL_WHEN_CHANGED);
 	in4_1_5->tooltip("Enter password for ClubLog");
 
@@ -624,7 +624,7 @@ void web_dialog::create_email(int rx, int ry, int rw, int rh) {
 	Fl_Input* ip61 = new Fl_Input(curr_x, curr_y, WSMEDIT, HBUTTON, "Server");
 	ip61->align(FL_ALIGN_LEFT);
 	ip61->value(email_data_->mail_server.c_str());
-	ip61->callback(cb_value< Fl_Input, string >, &email_data_->mail_server);
+	ip61->callback(cb_value< Fl_Input, std::string >, &email_data_->mail_server);
 	ip61->when(FL_WHEN_CHANGED);
 	ip61->tooltip("Please enter the address of the SMTP server");
 
@@ -632,7 +632,7 @@ void web_dialog::create_email(int rx, int ry, int rw, int rh) {
 	Fl_Input* ip62 = new Fl_Input(curr_x, curr_y, WSMEDIT, HBUTTON, "User");
 	ip62->align(FL_ALIGN_LEFT);
 	ip62->value(email_data_->user.c_str());
-	ip62->callback(cb_value< Fl_Input, string >, &email_data_->user);
+	ip62->callback(cb_value< Fl_Input, std::string >, &email_data_->user);
 	ip62->when(FL_WHEN_CHANGED);
 	ip62->tooltip("Please enter the account for the SMTP server (usually an e-mail address)");
 	
@@ -640,7 +640,7 @@ void web_dialog::create_email(int rx, int ry, int rw, int rh) {
 	password_input* ip63 = new password_input(curr_x, curr_y, WSMEDIT, HBUTTON, "Password");
 	ip63->align(FL_ALIGN_LEFT);
 	ip63->value(email_data_->password.c_str());
-	ip63->callback(cb_value< Fl_Input, string >, &email_data_->password);
+	ip63->callback(cb_value< Fl_Input, std::string >, &email_data_->password);
 	ip63->when(FL_WHEN_CHANGED);
 	ip63->tooltip("Please enter the password for the above account");
 
@@ -648,7 +648,7 @@ void web_dialog::create_email(int rx, int ry, int rw, int rh) {
 	Fl_Input* ip64 = new Fl_Input(curr_x, curr_y, WSMEDIT, HBUTTON, "CC");
 	ip64->align(FL_ALIGN_LEFT);
 	ip64->value(email_data_->cc_address.c_str());
-	ip64->callback(cb_value< Fl_Input, string >, &email_data_->cc_address);
+	ip64->callback(cb_value< Fl_Input, std::string >, &email_data_->cc_address);
 	ip64->when(FL_WHEN_CHANGED);
 	ip64->tooltip("Please enter an e-mail address to receive copy of e-mail sent");
 

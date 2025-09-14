@@ -14,9 +14,9 @@ using json = nlohmann::json;
 
 extern status* status_;
 extern spec_data* spec_data_;
-extern string VENDOR;
-extern string PROGRAM_ID;
-extern string default_data_directory_;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
+extern std::string default_data_directory_;
 
 void to_json(json& j, const range_t& r) {
 	j = json {
@@ -71,7 +71,7 @@ band_data::~band_data()
 bool band_data::load_json() {
 	json j;
 	// Wrte JSON out to band_plan.json
-	string filename = get_path() + "band_plan.json";
+	std::string filename = get_path() + "band_plan.json";
 	status_->misc_status(ST_NOTE, ("BAND: Loading band-plan data"));
 	ifstream i(filename);
 	if (i.good()) {
@@ -102,36 +102,36 @@ void band_data::save_json() {
 	json jout;
 	jout["band plan"] = j;
 	// Wrte JSON out to band_plan.json
-	string filename = get_path() + "band_plan.json";
-	ofstream o(filename);
+	std::string filename = get_path() + "band_plan.json";
+	std::ofstream o(filename);
 	o << std::setw(4) << jout << '\n';
 	o.close();
 }
 // Decode an entry
-band_data::band_entry_t* band_data::get_entry(string line) {
-	vector<string> words;
+band_data::band_entry_t* band_data::get_entry(std::string line) {
+	std::vector<std::string> words;
 	split_line(line, words, '\t');
 	// Create the entry
 	band_entry_t* result = new band_entry_t;
 	// Lower->Upper->Bandwidth->Mode->Notes
 	// First entry lower bound or spot entry
-	result->range.lower = stod(words[0]) / 1000.0;
+	result->range.lower = std::stod(words[0]) / 1000.0;
 	// Second entry upper bound - if no entry then it's a spot frequency entry
 	try {
-		result->range.upper = stod(words[1]) / 1000.0;
+		result->range.upper = std::stod(words[1]) / 1000.0;
 	}
 	catch (exception&) {
 		result->range.upper = result->range.lower;
 	}
 	// Third entry is bandwidth
 	try {
-		result->bandwidth = stod(words[2]);
+		result->bandwidth = std::stod(words[2]);
 	}
 	catch (exception&) {
 		result->bandwidth = 0.0;
 	}
 	// Fourth is mode
-	vector<string> modes;
+	std::vector<std::string> modes;
 	split_line(words[3], modes, ',');
 	for (auto ix = modes.begin(); ix != modes.end(); ix++) {
 		if (ix->length()) {
@@ -144,7 +144,7 @@ band_data::band_entry_t* band_data::get_entry(string line) {
 }
 
 // Get the directory of the reference files
-string band_data::get_path() {
+std::string band_data::get_path() {
 	return default_data_directory_;
 }
 
@@ -159,8 +159,8 @@ band_data::band_entry_t* band_data::get_entry(double frequency) {
 }
 
 // Get the band plan data entries for the frequency range
-set<band_data::band_entry_t*> band_data::get_entries() {
-	set<band_entry_t*> result;
+std::set<band_data::band_entry_t*> band_data::get_entries() {
+	std::set<band_entry_t*> result;
 	for (unsigned int ix = 0; ix < entries_.size(); ix++) {
 		result.insert(entries_[ix]);
 	}
@@ -177,18 +177,18 @@ bool band_data::in_band(double frequency) {
 	}
 }
 
-// Return the band list
-band_map<set<range_t >>& band_data::bands() {
+// Return the band std::list
+band_map<std::set<range_t >>& band_data::bands() {
 	return bands_;
 }
 
-// Generate the band list
+// Generate the band std::list
 void band_data::create_bands() {
 	range_t current_range = { 0.0, 0.0 };
-	string current_band = ""; 
+	std::string current_band = ""; 
 	for (auto it = entries_.begin(); it != entries_.end(); it++) {
 		if ((*it)->range.lower > current_range.upper) {
-			string band = spec_data_->band_for_freq((*it)->range.lower);
+			std::string band = spec_data_->band_for_freq((*it)->range.lower);
 			// New range - add the previous range
 			if (current_band.length()) {
 				if (bands_.at(current_band).size() == 1) {
@@ -200,7 +200,7 @@ void band_data::create_bands() {
 				bands_.at(current_band).insert(current_range); 
 			}
 			if (band != current_band) {
-				// Create new band with an empty set of ranges
+				// Create new band with an empty std::set of ranges
 				current_band = band;
 				bands_[current_band] = {};
 			}
@@ -213,7 +213,7 @@ void band_data::create_bands() {
 
 // Locate the all.xml file and copy to default data directory
 bool band_data::find_and_copy_data() {
-	string source;
+	std::string source;
 	Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
 	chooser->title("Select Band plan file band_plan.tsv");
 	chooser->filter("TSV File\t*.tsv");
@@ -221,7 +221,7 @@ bool band_data::find_and_copy_data() {
 		source = chooser->filename();
 	}
 	delete chooser;
-	string target = get_path() + "band_plan.tsv";
+	std::string target = get_path() + "band_plan.tsv";
 	char msg[128];
 	snprintf(msg, sizeof(msg), "BAND: Copying %s", source.c_str());
 	status_->misc_status(ST_NOTE, msg);
@@ -232,7 +232,7 @@ bool band_data::find_and_copy_data() {
 	const int increment = 8000;
 	in.seekg(0, in.beg);
 	status_->progress(length, OT_BAND, "Copying data to backup", "bytes");
-	ofstream out(target);
+	std::ofstream out(target);
 	bool ok = in.good() && out.good();
 	char buffer[increment];
 	int count = 0;

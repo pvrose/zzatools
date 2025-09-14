@@ -24,8 +24,8 @@ extern extract_data* extract_records_;
 extern book* book_;
 extern spec_data* spec_data_;
 extern qso_manager* qso_manager_;
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
 
 // Static - only one instance of this class supported
@@ -50,7 +50,7 @@ fllog_emul::~fllog_emul() {
 void fllog_emul::run_server() {
 	status_->misc_status(ST_NOTE, "FLLOG: Creating new socket");
 	if (!rpc_handler_) {
-		string address = qso_manager_->apps()->network_address(FLDIGI);
+		std::string address = qso_manager_->apps()->network_address(FLDIGI);
 		int port_num = qso_manager_->apps()->network_port(FLDIGI);
 		if (address.length()) {
 			rpc_handler_ = new rpc_handler(address, port_num, "/RPC2");
@@ -68,7 +68,7 @@ void fllog_emul::run_server() {
 	rpc_handler_->add_method(method_list_.back(), update_record);
 	method_list_.push_back({ "log.check_dup",     "s:s", "return true/false/possible for ADIF record" });
 	rpc_handler_->add_method(method_list_.back(), check_dup);
-	method_list_.push_back({ "log.list_methods",  "s:s", "return this list" });
+	method_list_.push_back({ "log.list_methods",  "s:s", "return this std::list" });
 	rpc_handler_->add_method(method_list_.back(), list_methods);
 
 	rpc_handler_->run_server();
@@ -85,7 +85,7 @@ void fllog_emul::close_server() {
 }
 
 // Generate an XML-RPC error response
-void fllog_emul::generate_error(int code, string message, rpc_data_item& response) {
+void fllog_emul::generate_error(int code, std::string message, rpc_data_item& response) {
 	rpc_data_item error_code;
 	error_code.set(code, XRT_INT);
 	rpc_data_item error_msg;
@@ -94,12 +94,12 @@ void fllog_emul::generate_error(int code, string message, rpc_data_item& respons
 	response.set(&fault_resp);
 }
 
-// Get ADIF string for first record with callsign - also displays all matching records in extract window
+// Get ADIF std::string for first record with callsign - also displays all matching records in extract window
 int fllog_emul::get_record(rpc_data_item::rpc_list& params, rpc_data_item& response) {
 	that_->check_connected();
 	if (params.size() == 1) {
 		rpc_data_item* item_0 = params.front();
-		string callsign = item_0->get_string();
+		std::string callsign = item_0->get_string();
 		record* qso = nullptr;
 		if (that_->current_qso_ && that_->current_qso_->item("CALL") == callsign) {
 			// Use this 
@@ -115,7 +115,7 @@ int fllog_emul::get_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 		}
 		if (qso) {
 			adi_writer* writer = new adi_writer;
-			stringstream ss;
+			std::stringstream ss;
 			writer->to_adif(qso, ss);
 			response.set(ss.str(), XRT_STRING);
 			delete writer;
@@ -141,10 +141,10 @@ int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& respon
 	if (params.size() == 6) {
 		// Get parametrs
 		rpc_data_item* i_call = params.front();
-		string callsign = i_call->get_string();
+		std::string callsign = i_call->get_string();
 		params.pop_front();
 		rpc_data_item* i_mode = params.front();
-		string mode = i_mode->get_string();
+		std::string mode = i_mode->get_string();
 		params.pop_front();
 		rpc_data_item* i_span = params.front();
 		long span = atol(i_span->get_string().c_str());
@@ -155,10 +155,10 @@ int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& respon
 		double freq_MHz = (double)freq_kHz / 1000.0;
 		params.pop_front();
 		rpc_data_item* i_state = params.front();
-		string state = i_state->get_string();
+		std::string state = i_state->get_string();
 		params.pop_front();
 		rpc_data_item* i_rst_in = params.front();
-		string rst_in = i_rst_in->get_string();
+		std::string rst_in = i_rst_in->get_string();
 		// Get all possible matches
 		if (extract_records_->size() == 0 || extract_records_->get_record(0, true)->item("CALL") != callsign) 
 			extract_records_->extract_call(callsign);
@@ -182,7 +182,7 @@ int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& respon
 				}
 				else if (freq_MHz > 0) {
 					// Different frequency - need to check if this is exact frequency
-					string band = qso->item("BAND");
+					std::string band = qso->item("BAND");
 					if (spec_data_->band_for_freq(freq_MHz) != band) {
 						found = false;
 					}
@@ -197,7 +197,7 @@ int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& respon
 				}
 			}
 			if (found) {
-				// Exact match - set selection
+				// Exact match - std::set selection
 				printf(" Exact match\n");
 				extract_records_->selection(found_item, HT_SELECTED);
 				response.set("true", XRT_STRING);
@@ -230,14 +230,14 @@ int fllog_emul::add_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 		extract_records_->clear_criteria();
 		// Convert the adif data into a new record - use existing code from adi_reader
 		rpc_data_item* item = params.front();
-		stringstream ss;
+		std::stringstream ss;
 		ss.str(item->get_string());
 		adi_reader* reader = new adi_reader();
 		load_result_t dummy;
 		record* qso = that_->putative_qso_;
 		reader->load_record(qso, ss, dummy);
 		// Frig - fldigi sets MY_STATE incorrectly, and only uses MODE
-		qso->item("MY_STATE", string(""));
+		qso->item("MY_STATE", std::string(""));
 		qso->item("MODE", qso->item("MODE"), true);
 		qso_manager_->update_modem_qso(true);
 		status_->misc_status(ST_NOTE, "FLLOG: Logged QSO");
@@ -255,7 +255,7 @@ int fllog_emul::update_record(rpc_data_item::rpc_list& params, rpc_data_item& re
 	if (params.size() == 1) {
 		// Convert the adif data into a new record - use existing code from adi_reader
 		rpc_data_item* item = params.front();
-		stringstream ss;
+		std::stringstream ss;
 		ss.str(item->get_string());
 		adi_reader* reader = new adi_reader();
 		load_result_t dummy;
@@ -271,7 +271,7 @@ int fllog_emul::update_record(rpc_data_item::rpc_list& params, rpc_data_item& re
 
 }
 
-// List methods - string returns list of methods suppported
+// List methods - std::string returns std::list of methods suppported
 int fllog_emul::list_methods(rpc_data_item::rpc_list& params, rpc_data_item& response) {
 	that_->check_connected();
 	if (params.size() == 0) {

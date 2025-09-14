@@ -2,7 +2,7 @@
 
 #include <string>
 
-using namespace std;
+
 
 class record;
 
@@ -29,21 +29,21 @@ protected:
 	record* qso_;
 
 	//! e-mail server
-	string email_url_;
+	std::string email_url_;
 	//! user account
-	string email_user_;
+	std::string email_user_;
 	//! password
-	string email_password_;
+	std::string email_password_;
 	//! To address
-	string to_address_;
+	std::string to_address_;
 	//! Cc address
-	string cc_address_;
+	std::string cc_address_;
 	//! Subject
-	string subject_;
+	std::string subject_;
 	//! QSL card attachment - filename.
-	string qsl_filename_;
+	std::string qsl_filename_;
 	//! e-mail text body
-	string text_body_;
+	std::string text_body_;
 
 };
 

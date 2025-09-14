@@ -6,7 +6,7 @@
 
 #include <FL/Fl_Window.H>
 
-using namespace std;
+
 
 class Fl_Widget;
 class Fl_Tabs;
@@ -71,7 +71,7 @@ const int HCONFIG = 500;
 	protected:
 		//! Set the window label to reflect the selected tab
 		
-		//! \param active identifier (cfg_dialog_t) of the tab whose description to set as the window label.
+		//! \param active identifier (cfg_dialog_t) of the tab whose description to std::set as the window label.
 		void set_label(cfg_dialog_t active);
 		//! Format the tabs according to selection. 
 		 
@@ -86,9 +86,9 @@ const int HCONFIG = 500;
 		//! The currently active dialog
 		Fl_Widget * settings_view_;
 		//! Any widgets that need updating on record selection
-		set<page_dialog*> updatable_views_;
+		std::set<page_dialog*> updatable_views_;
 		//! List of the intantiated tabs.
-		vector<cfg_dialog_t> children_ids_;
+		std::vector<cfg_dialog_t> children_ids_;
 
 
 	};

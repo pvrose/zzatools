@@ -29,11 +29,11 @@ extern qsl_dataset* qsl_dataset_;
 // Constructor
 lotw_handler::lotw_handler()
 {
-	// Initialise thread interface
+	// Initialise std::thread interface
 	run_threads_ = true;
 	upload_response_ = 0;	
-	if (DEBUG_THREADS) printf("LOTW MAIN: Starting thread\n");
-	th_upload_ = new thread(thread_run, this);
+	if (DEBUG_THREADS) printf("LOTW MAIN: Starting std::thread\n");
+	th_upload_ = new std::thread(thread_run, this);
 
 	set_adif_fields();
 
@@ -42,7 +42,7 @@ lotw_handler::lotw_handler()
 // Destructor
 lotw_handler::~lotw_handler()
 {
-	// Close down upload thread
+	// Close down upload std::thread
 	run_threads_ = false;
 	th_upload_->join();
 	delete th_upload_;
@@ -54,8 +54,8 @@ bool lotw_handler::upload_lotw_log(book* book, bool mine) {
 	fl_cursor(FL_CURSOR_WAIT);
 	// Get LotW settings
 	server_data_t* lotw_data = qsl_dataset_->get_server_data("LotW");
-	string filename = lotw_data->export_file;
-	string new_filename = "";
+	std::string filename = lotw_data->export_file;
+	std::string new_filename = "";
 	bool ok = true;
 	// lotw_settings.get("Export File", filename, "");
 	// Open a file chooser to get file to export to - allows user to cancel upload
@@ -86,17 +86,17 @@ bool lotw_handler::upload_lotw_log(book* book, bool mine) {
 		// lotw_settings.set("Export File", new_filename.c_str());
 		// Set the fields to export 
 		// Write the book (only the above fields)
-		if (book->size() && book->store_data(string(new_filename), true, &adif_fields_)) {
+		if (book->size() && book->store_data(std::string(new_filename), true, &adif_fields_)) {
 #ifdef WIN32
 			// Get the TQSL (an app that signs the upload) executable
-			string tqsl_executable = "tqsl";
+			std::string tqsl_executable = "tqsl";
 #else
-			string tqsl_executable = "tqsl";
+			std::string tqsl_executable = "tqsl";
 #endif			
 			if (ok) {
 				// Get Callsign from first (maybe only) record in book
 				record* record_0 = book->get_record(0, false);
-				string callsign = record_0->item("STATION_CALLSIGN");
+				std::string callsign = record_0->item("STATION_CALLSIGN");
 				// Generate TQSL command line - note the executable may have spaces in its filename
 				char* command = new char[256];
 				snprintf(command, 256, "\"%s\" -x -u -d %s -c %s", tqsl_executable.c_str(), new_filename.c_str(), callsign.c_str());
@@ -135,11 +135,11 @@ bool lotw_handler::upload_lotw_log(book* book, bool mine) {
 }
 
 // Download the data from LotW
-bool lotw_handler::download_lotw_log(stringstream* adif) {
+bool lotw_handler::download_lotw_log(std::stringstream* adif) {
 	// Get user details from the settings
-	string username;
-	string password;
-	string last_done;
+	std::string username;
+	std::string password;
+	std::string last_done;
 	bool ok = false;
 	fl_cursor(FL_CURSOR_WAIT);
 	if (!user_details(&username, &password, &last_done)) {
@@ -147,7 +147,7 @@ bool lotw_handler::download_lotw_log(stringstream* adif) {
 		return false;
 	}
 	// Set URL to get LotW in-box
-	string url_format = "https://lotw.arrl.org/lotwuser/lotwreport.adi?login=%s&password=%s&qso_query=1&qso_qsl=yes&qso_qslsince=%s-%s-%s&qso_qsldetail=yes";
+	std::string url_format = "https://lotw.arrl.org/lotwuser/lotwreport.adi?login=%s&password=%s&qso_query=1&qso_qsl=yes&qso_qslsince=%s-%s-%s&qso_qsldetail=yes";
 	char * url = new char[url_format.length() + username.length() + password.length() + last_done.length()];
 	sprintf(url, 
 		url_format.c_str(), 
@@ -166,7 +166,7 @@ bool lotw_handler::download_lotw_log(stringstream* adif) {
 			status_->misc_status(ST_WARNING, "LOTW: data is HTML not ADIF - opening browser");
 			adif->seekg(adif->beg);
 			Fl_Help_Dialog* help_dlg = new Fl_Help_Dialog;
-			// stringstream needs converting to a C++ string then a C-string
+			// std::stringstream needs converting to a C++ std::string then a C-std::string
 			help_dlg->value(adif->str().c_str());
 			help_dlg->show();
 			ok = false;
@@ -198,8 +198,8 @@ bool lotw_handler::download_lotw_log(stringstream* adif) {
 	return ok;
 }
 
-// get user details - set any parameter to nullptr to skip setting it
-bool lotw_handler::user_details(string* username, string* password, string* last_access) {
+// get user details - std::set any parameter to nullptr to skip setting it
+bool lotw_handler::user_details(std::string* username, std::string* password, std::string* last_access) {
 	server_data_t* lotw_data = qsl_dataset_->get_server_data("LotW");
 	if (username != nullptr) {
 		*username = lotw_data->user;
@@ -221,7 +221,7 @@ bool lotw_handler::user_details(string* username, string* password, string* last
 }
 
 // Download the data at URL into streaming data
-bool lotw_handler::download_adif(const char* url, stringstream* adif) {
+bool lotw_handler::download_adif(const char* url, std::stringstream* adif) {
 	status_->misc_status(ST_NOTE, "LOTW: Downloading log...");
 	// Fetch the ADIF file
 	if (url_handler_->read_url(url, adif)) {
@@ -235,13 +235,13 @@ bool lotw_handler::download_adif(const char* url, stringstream* adif) {
 }
 
 // Validate the data
-bool lotw_handler::validate_adif(stringstream* adif) {
+bool lotw_handler::validate_adif(std::stringstream* adif) {
 	// see if the returned data is HTML or ADIF
 	// Go back tothe beginning of the stream
 	adif->seekg(adif->beg);
-	string line;
+	std::string line;
 	getline(*adif, line);
-	if (line.find("<!DOCTYPE HTML") != string::npos) {
+	if (line.find("<!DOCTYPE HTML") != std::string::npos) {
 		// It's HTML - indicates an error happened
 		return false;
 	}
@@ -361,7 +361,7 @@ bool lotw_handler::upload_done(int result) {
 				qso->item("LOTW_QSLSDATE", now(false, "%Y%m%d"));
 			}
 			if (qso->item("LOTW_QSL_SENT") != "Y") {
-				qso->item("LOTW_QSL_SENT", string("Y"));
+				qso->item("LOTW_QSL_SENT", std::string("Y"));
 			}
 		}
 	}
@@ -369,13 +369,13 @@ bool lotw_handler::upload_done(int result) {
 	return ok;
 }
 
-// Run tne thread to handle the LotW interface
+// Run tne std::thread to handle the LotW interface
 void lotw_handler::thread_run(lotw_handler* that) {
 	if (DEBUG_THREADS) printf("LOTW THREAD: Thread started\n");
 	while (that->run_threads_) {
 		// Wait until qso placed on interface
 		while (that->run_threads_ && that->upload_queue_.empty()) {
-			this_thread::sleep_for(chrono::milliseconds(1000));
+			this_thread::sleep_for(std::chrono::milliseconds(1000));
 		}
 		// Process it
 		that->upload_lock_.lock();
@@ -393,20 +393,20 @@ void lotw_handler::thread_run(lotw_handler* that) {
 	}
 }
 
-// Run TQSL and wait for response - runs in separate thread
+// Run TQSL and wait for response - runs in separate std::thread
 void lotw_handler::th_upload(const char* command) {
 	// Blocking system request
 	int result = system(command);
 	// 
 	upload_response_ = result;
-	if (DEBUG_THREADS) printf("LOTW THREAD: Calling thread callback result = %d\n", result);
+	if (DEBUG_THREADS) printf("LOTW THREAD: Calling std::thread callback result = %d\n", result);
 	Fl::awake(cb_upload_done, (void*)this);
 	this_thread::yield();
 }
 
-// Callback in main thread after upload complete
+// Callback in main std::thread after upload complete
 void lotw_handler::cb_upload_done(void* v) {
-	if (DEBUG_THREADS) printf("LOTW MAIN: Entered thread callback handler\n");
+	if (DEBUG_THREADS) printf("LOTW MAIN: Entered std::thread callback handler\n");
 	lotw_handler* that = (lotw_handler*)v;
 	that->upload_done(that->upload_response_);
 }
@@ -415,7 +415,7 @@ void lotw_handler::cb_upload_done(void* v) {
 void lotw_handler::set_adif_fields() {
 	// Ser default values if necessary
 	(void)fields_->collection("Upload/LotW", LOTW_FIELDS);
-	// Now copy to the set 
+	// Now copy to the std::set 
 	adif_fields_ = fields_->field_names("Upload/LotW");
 }
 

@@ -24,29 +24,29 @@ void rpc_data_item::set(int i, rpc_data_t type) {
 	}
 }
 
-// Set the data to a string type
-void rpc_data_item::set(string s, rpc_data_t type) {
+// Set the data to a std::string type
+void rpc_data_item::set(std::string s, rpc_data_t type) {
 	if (type == XRT_BYTES || type == XRT_DATETIME || type == XRT_STRING) {
 		type_ = type;
 		s_ = s;
 	}
 	else if (type == XRT_DEFAULT) {
 		// Some servers send bad RPC with integers and doubles supplied as default 
-		// type which is string
+		// type which is std::string
 		type_ = type;
 		s_ = s;
 		// Try it as integer
 		try {
-			i_ = stoi(s_.c_str());
+			i_ = std::stoi(s_.c_str());
 		}
-		catch (invalid_argument&) {
+		catch (std::invalid_argument&) {
 			i_ = 0;
 		}
 		// Try it as double
 		try {
-			d_ = stod(s_.c_str());
+			d_ = std::stod(s_.c_str());
 		}
-		catch (invalid_argument&) {
+		catch (std::invalid_argument&) {
 			d_ = nan("");
 		}
 	}
@@ -120,20 +120,20 @@ int rpc_data_item::get_int() {
 	return i_;
 }
 
-// Get the string
-bool rpc_data_item::get(string& s) {
+// Get the std::string
+bool rpc_data_item::get(std::string& s) {
 	if (type_ == XRT_STRING || type_ == XRT_BYTES || type_ == XRT_DATETIME) {
 		s = s_;
 		return true;
 	}
 	else {
-		// Not a string type
+		// Not a std::string type
 		return false;
 	}
 }
 
-// return string
-string rpc_data_item::get_string() {
+// return std::string
+std::string rpc_data_item::get_string() {
 	return s_;
 }
 
@@ -189,9 +189,9 @@ rpc_data_item::rpc_struct* rpc_data_item::get_struct() {
 }
 
 // Convert the item to text for display
-string rpc_data_item::print_item() {
+std::string rpc_data_item::print_item() {
 	char temp[1024];
-	string result = "";
+	std::string result = "";
 	switch (type_) {
 	case XRT_BOOLEAN:
 		// Display 0 or 1
@@ -214,12 +214,12 @@ string rpc_data_item::print_item() {
 		result = temp;
 		break;
 	case XRT_DATETIME:
-		// Date/Time as string
+		// Date/Time as std::string
 		snprintf(temp, 1024, "Date/Time: %s\n", s_.c_str());
 		result = temp;
 		break;
 	case XRT_BYTES:
-		// Base64 encoding as string
+		// Base64 encoding as std::string
 		snprintf(temp, 1024, "Base64: %s\n", encode_base_64(s_).c_str());
 		result = temp;
 		break;
@@ -236,7 +236,7 @@ string rpc_data_item::print_item() {
 		result = "rpc_struct:\n";
 		// For each element in the structure - appends its nae and text
 		for (auto it = struct_->begin(); it != struct_->end(); it++) {
-			string key = it->first;
+			std::string key = it->first;
 			rpc_data_item* item = it->second;
 			snprintf(temp, 1024, "Name: %s\nValue: ", key.c_str());
 			result += temp;

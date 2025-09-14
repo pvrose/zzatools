@@ -7,7 +7,7 @@
 
 #include <FL/Fl_Group.H>
 
-using namespace std;
+
 
 class Fl_Widget;
 
@@ -48,13 +48,13 @@ typedef size_t qso_num_t;
 		//! Add selected callsign as default input
 		void search_text(int record_num);
 		//! Set search text to a specific calllsign
-		void search_text(string callsign);
+		void search_text(std::string callsign);
 		//! Update button status
 		void update_items();
 
 	protected:
 		//! text to search for
-		string search_text_;
+		std::string search_text_;
 		//! Index of QSO record when stepping the search through the log
 		qso_num_t record_num_;
 		//! The search input

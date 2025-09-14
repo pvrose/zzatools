@@ -7,7 +7,7 @@
 
 #include <string>
 
-using namespace std;
+
 
 class book;
 class record;
@@ -28,7 +28,7 @@ typedef size_t item_num_t;
 		//! \param os output stream.
 		//! \param clean mark records as clean after writing.
 		//! \return true if successful, false if not.
-		bool store_book(book* book, ostream& os, bool clean);
+		bool store_book(book* book, std::ostream& os, bool clean);
 		//! Generate an individual element of the type given
 		//! \param element type.
 		//! \return true if successful, false if not.
@@ -44,12 +44,12 @@ typedef size_t item_num_t;
 		//! The data being processed.
 		book* my_book_;
 		//! The name of the field being processed.
-		string field_name_;
+		std::string field_name_;
 		//! The value of the field being processed.
-		string value_;
+		std::string value_;
 		//! The data type of the field being procesed - per ADIF specification.
 		char type_indicator_;
-		//! Flag set, indicating that records will be marked clean.
+		//! Flag std::set, indicating that records will be marked clean.
 		bool clean_records_;
 		//! The index of the current QSO record within the data being written.
 		item_num_t current_;

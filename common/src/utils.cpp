@@ -25,16 +25,14 @@ utils.h - Utility methods
 #include <set>
 #include <random>
 
-using namespace std;
-using namespace std::chrono;
 
 // Split the line into its separate words with specified separator
-void split_line(const string& line, vector<string>& words, const char separator) {
+void split_line(const std::string& line, std::vector<std::string>& words, const char separator) {
 	// Quotes will escape separator
 	bool in_quotes = false;
 	words.clear();
 	// Name is a_word using indefinite arcticle as word is reserved
-	string a_word = "";
+	std::string a_word = "";
 	// For the length of the line
 	for (size_t i1 = 0; i1 < line.length(); i1++) {
 		// Look at every character in the line
@@ -66,8 +64,8 @@ void split_line(const string& line, vector<string>& words, const char separator)
 }
 
 // Join line
-string join_line(vector<string> words, const char separator) {
-	string result = "";
+std::string join_line(std::vector<std::string> words, const char separator) {
+	std::string result = "";
 	for (auto it = words.begin(); it != words.end(); it++) {
 		if (result.length()) {
 			result += separator + *it;
@@ -80,7 +78,7 @@ string join_line(vector<string> words, const char separator) {
 }
 
 // Converts display format text to a tm object for reformatting
-bool string_to_tm(string source, tm& time, string format) {
+bool string_to_tm(std::string source, tm& time, std::string format) {
 	bool escaped = false;
 	// Default YMD to 19700101 to avoid assertion when only setting time
 	time.tm_year = 70;
@@ -94,7 +92,7 @@ bool string_to_tm(string source, tm& time, string format) {
 	int parse_point = 0;
 	// "" regarded as an unspecified date. This will be interpreted by use.
 	if (source != "") {
-		// while there is format string and date string to process
+		// while there is format std::string and date std::string to process
 		for (size_t ix = 0; ix < format.length() && ix < source.length(); ix++) {
 			// Get format character
 			char format_char = format[ix];
@@ -105,12 +103,12 @@ bool string_to_tm(string source, tm& time, string format) {
 					switch (format_char) {
 					case 'Y':
 						// %Y: 4 digit year
-						time.tm_year = stoi(source.substr(parse_point, 4)) - 1900;
+						time.tm_year = std::stoi(source.substr(parse_point, 4)) - 1900;
 						parse_point += 4;
 						break;
 					case 'y':
 						// %y: 2 digit year (1970-2069)
-						time.tm_year = stoi(source.substr(parse_point, 2));
+						time.tm_year = std::stoi(source.substr(parse_point, 2));
 						if (time.tm_year < 70) {
 							time.tm_year += 100;
 						}
@@ -118,13 +116,13 @@ bool string_to_tm(string source, tm& time, string format) {
 						break;
 					case 'm':
 						// %m: 2 digit month
-						time.tm_mon = stoi(source.substr(parse_point, 2)) - 1;
+						time.tm_mon = std::stoi(source.substr(parse_point, 2)) - 1;
 						parse_point += 2;
 						break;
 					case 'b': {
 						// %b: 3 letter month
 						// Get the locale's month names by generating twelve dates and seeing what %b returns
-						map<string, int> month_map;
+						std::map<std::string, int> month_map;
 						tm date;
 						date.tm_year = 70;
 						date.tm_mday = 1;
@@ -136,7 +134,7 @@ bool string_to_tm(string source, tm& time, string format) {
 							date.tm_mon = i;
 							char name[4];
 							strftime(name, 4, "%b", &date);
-							month_map[string(name)] = i;
+							month_map[std::string(name)] = i;
 						}
 						// Now look the month up - use .at() to deliverately force an exception
 						time.tm_mon = month_map.at(source.substr(parse_point, 3));
@@ -145,22 +143,22 @@ bool string_to_tm(string source, tm& time, string format) {
 					}
 					case 'd':
 						// %d: 2 digit day
-						time.tm_mday = stoi(source.substr(parse_point, 2));
+						time.tm_mday = std::stoi(source.substr(parse_point, 2));
 						parse_point += 2;
 						break;
 					case 'H':
 						// %H: 2 digit hour (24-hour)
-						time.tm_hour = stoi(source.substr(parse_point, 2));
+						time.tm_hour = std::stoi(source.substr(parse_point, 2));
 						parse_point += 2;
 						break;
 					case 'M':
 						// %M: 2 digit minute
-						time.tm_min = stoi(source.substr(parse_point, 2));
+						time.tm_min = std::stoi(source.substr(parse_point, 2));
 						parse_point += 2;
 						break;
 					case 'S':
 						// %S: 2 digit second
-						time.tm_sec = stoi(source.substr(parse_point, 2));
+						time.tm_sec = std::stoi(source.substr(parse_point, 2));
 						parse_point += 2;
 						break;
 					default:
@@ -182,7 +180,7 @@ bool string_to_tm(string source, tm& time, string format) {
 					escaped = true;
 					break;
 				default:
-					// Set bad data if the date string does not match the format string
+					// Set bad data if the date std::string does not match the format std::string
 					if (source[parse_point++] != format_char) bad_value = true;
 					escaped = false;
 					break;
@@ -194,25 +192,25 @@ bool string_to_tm(string source, tm& time, string format) {
 	return true;
 }
 
-// Convert a string e.g. 00-06:08 to an array of UINTs {0,1,2,3,4,5,6,8}
-void string_to_ints(string& text, vector<unsigned int>& ints) {
+// Convert a std::string e.g. 00-06:08 to an array of UINTs {0,1,2,3,4,5,6,8}
+void string_to_ints(std::string& text, std::vector<unsigned int>& ints) {
 	int current = 0;
 	int start = 0;
 	size_t index = 0;
-	string temp = text;
+	std::string temp = text;
 	ints.clear();
 	bool invalid = false;
 	while (temp.length() > 0 && !invalid) {
-		// Inspect the whole string - look for first likely separator
+		// Inspect the whole std::string - look for first likely separator
 		index = temp.find_first_of(";,-");
 		try {
 			if (index >= 0) {
 				// One found - remeber the number
-				current = stoi(temp.substr(0, index), 0, 10);
+				current = std::stoi(temp.substr(0, index), 0, 10);
 			}
 			else {
 				// One not found - remember the number - it's the only one remaining
-				current = stoi(temp, 0, 10);
+				current = std::stoi(temp, 0, 10);
 			}
 		}
 		catch (invalid_argument&) {
@@ -225,7 +223,7 @@ void string_to_ints(string& text, vector<unsigned int>& ints) {
 				if (start == 0) {
 					start = current;
 				}
-				// Expand nn-mm as a list of integeres from nn  to mm inclusive
+				// Expand nn-mm as a std::list of integeres from nn  to mm inclusive
 				for (int i = start; i <= current; i++) {
 					ints.push_back(i);
 				}
@@ -261,12 +259,12 @@ void string_to_ints(string& text, vector<unsigned int>& ints) {
 }
 
 // returns the current time in supplied format
-string now(bool local, const char* format, bool add_ms) {
-	system_clock::time_point p = system_clock::now();
+std::string now(bool local, const char* format, bool add_ms) {
+	std::chrono::system_clock::time_point p = std::chrono::system_clock::now();
 
-	milliseconds ms = duration_cast<milliseconds>(p.time_since_epoch());
+	std::chrono::milliseconds ms = duration_cast<std::chrono::milliseconds>(p.time_since_epoch());
 
-	seconds s = duration_cast<seconds>(ms);
+	std::chrono::seconds s = duration_cast<std::chrono::seconds>(ms);
 	time_t t = s.count();
 	tm* now = local ? localtime(&t) : gmtime(&t);
 	size_t fractional_seconds = ms.count() % 1000;
@@ -279,11 +277,11 @@ string now(bool local, const char* format, bool add_ms) {
 		strcat(result, ms);
 	}
 
-	return string(result);
+	return std::string(result);
 }
 
 // Print current time to the millisecond
-string now_ms() {
+std::string now_ms() {
 	return now(false, "%H:%M:%S", true);
 }
 
@@ -351,8 +349,8 @@ bool is_leap(tm* date) {
 }
 
 // Create a tip window - tip text, position(root_x, root_y)
-Fl_Window* tip_window(const string& tip, int x_root, int y_root) {
-	// get the size of the text, set the font, default width
+Fl_Window* tip_window(const std::string& tip, int x_root, int y_root) {
+	// get the size of the text, std::set the font, default width
 	fl_font(Fl_Tooltip::font(), Fl_Tooltip::size());
 	int width = Fl_Tooltip::wrap_width();
 	int height = 0;
@@ -377,7 +375,7 @@ Fl_Window* tip_window(const string& tip, int x_root, int y_root) {
 	op->value(tip.c_str());
 	win->add(op);
 	win->end();
-	// set the window parameters: always on top, tooltip
+	// std::set the window parameters: always on top, tooltip
 	win->set_non_modal();
 	win->set_tooltip_window();
 	// Must be after set_tooltip_window.
@@ -386,30 +384,30 @@ Fl_Window* tip_window(const string& tip, int x_root, int y_root) {
 	return win;
 }
 
-// Create an upper-case version of a string
-string to_upper(const string& data) {
+// Create an upper-case version of a std::string
+std::string to_upper(const std::string& data) {
 	size_t len = data.length();
 	char* result = new char[3 * len + 1];
 	memset(result, 0, 3 * len + 1);
 	fl_utf_toupper((unsigned char*)data.c_str(), (int)len, result);
-	string ret_value(result);
+	std::string ret_value(result);
 	delete[] result;
 	return ret_value;
 }
 
-// Create an lower-case version of a string
-string to_lower(const string& data) {
+// Create an lower-case version of a std::string
+std::string to_lower(const std::string& data) {
 	size_t len = data.length();
 	char* result = new char[3 * len + 1];
 	memset(result, 0, 3 * len + 1);
 	fl_utf_tolower((unsigned char*)data.c_str(), (int)len, result);
-	string ret_value(result);
+	std::string ret_value(result);
 	delete[] result;
 	return ret_value;
 }
 
-// Check a while string is an integer
-bool is_integer(const string& data) {
+// Check a while std::string is an integer
+bool is_integer(const std::string& data) {
 	bool result = true;
 	const char* src = data.c_str();
 	// Ignore initial +/- sign
@@ -425,7 +423,7 @@ size_t find(const char* data, size_t length, const char* match) {
 	size_t pos = length;
 	bool found = false;
 	// Compare each char in data with each char in find
-	// pos should get set to the position that matches (or length) if none do
+	// pos should get std::set to the position that matches (or length) if none do
 	for (size_t i = 0; i < length && !found; i++) {
 		for (size_t j = 0; *(match + j) != '\0' && !found; j++) {
 			if (*(data + i) == *(match + j)) {
@@ -442,7 +440,7 @@ size_t find(const char* data, size_t length, const char match) {
 	size_t pos = length;
 	bool found = false;
 	// Compare each char in data with match
-	// pos should get set to the position that matches (or length if none do
+	// pos should get std::set to the position that matches (or length if none do
 	for (size_t i = 0; i < length && !found; i++) {
 		if (*(data + i) == match) {
 			found = true;
@@ -457,7 +455,7 @@ size_t find(const char* data, size_t length, const char match) {
 size_t find_substr(const char* data, size_t length, const char* match, size_t len_substr) {
 	// Possible start of match
 	size_t possible = 0;
-	// Length of string remaining to match
+	// Length of std::string remaining to match
 	size_t rem_length = length;
 	bool found = false;
 	while (!found && possible + len_substr < rem_length) {
@@ -478,7 +476,7 @@ size_t find_not(const char* data, size_t length, const char* match) {
 	size_t pos = 0;
 	bool matches = true;
 	// Compare each char in data with each char in find
-	// pos should get set to the position that mismatches (or length) if none do
+	// pos should get std::set to the position that mismatches (or length) if none do
 	for (pos = 0; pos < length && matches; pos++) {
 		bool found = false;
 		for (size_t j = 0; *(match + j) != '\0' && !found; j++) {
@@ -492,13 +490,13 @@ size_t find_not(const char* data, size_t length, const char* match) {
 }
 
 // Replace charatceters with %nnx if not in chars (allow) or in chars (~allow)
-string escape_hex(string text, bool allow, const char* chars)
+std::string escape_hex(std::string text, bool allow, const char* chars)
 {
-	string result = "";
-	// For the length of the string
+	std::string result = "";
+	// For the length of the std::string
 	for (size_t i = 0; i < text.length(); i++) {
 		char c = text[i];
-		// Is the character in the search string
+		// Is the character in the search std::string
 		const char* pos = strchr(chars, c);
 		if ((pos != nullptr && allow) || (pos == nullptr && !allow)) {
 			// Use it directly
@@ -515,14 +513,14 @@ string escape_hex(string text, bool allow, const char* chars)
 }
 
 // Escape the non-usable characters in a url - not alphanumeric replace with %nnx 
-string escape_url(string url) {
+std::string escape_url(std::string url) {
 	return escape_hex(url, true, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
 }
 
 // Escape / and & for menu items
-string escape_menu(string text) {
+std::string escape_menu(std::string text) {
 	size_t len = text.length() * 2 + 1;
-	string dest = "";
+	std::string dest = "";
 	dest.reserve(len);
 	const char* src = text.c_str();
 	while (*src) {
@@ -540,11 +538,11 @@ string escape_menu(string text) {
 }
 
 // Convert from %nn to ASCII character
-string unescape_hex(string text) {
-	string result = "";
+std::string unescape_hex(std::string text) {
+	std::string result = "";
 	result.reserve(text.length());
 	const char* src = text.c_str();
-	// For the length of the string
+	// For the length of the std::string
 	while (*src) {
 		if (*src == '%') {
 			unsigned char c = 0;
@@ -568,11 +566,11 @@ string unescape_hex(string text) {
 }
 
 // Escape characters - add a '\' before any characters in escapees
-string escape_string(const string text, const string escapees) {
-	// Create a string sufficiently long to escape all characters
-	string result = "";
+std::string escape_string(const std::string text, const std::string escapees) {
+	// Create a std::string sufficiently long to escape all characters
+	std::string result = "";
 	result.reserve(2 * text.length());
-	// For the length of the string
+	// For the length of the std::string
 	for (size_t i = 0; i < text.length(); i++) {
 		// If the character is in one of escapeed, add a '\'
 		if (strchr(escapees.c_str(), text[i]) != nullptr) {
@@ -584,11 +582,11 @@ string escape_string(const string text, const string escapees) {
 }
 
 // Unescape characters - remove the '\' before ant character
-string unescape_string(const string text) {
-	// Create a string at least as long as the supplied string
-	string result = "";
+std::string unescape_string(const std::string text) {
+	// Create a std::string at least as long as the supplied std::string
+	std::string result = "";
 	result.reserve(text.length());
-	// For the length of the string
+	// For the length of the std::string
 	for (size_t i = 0; i < text.length(); i++) {
 		// If the character is '\' do not copy it
 		if (text[i] != '\\') {
@@ -599,14 +597,14 @@ string unescape_string(const string text) {
 }
 
 // Convert a floating point degree value to � ' " N/E/S/W
-string degrees_to_dms(float value, bool is_latitude) {
+std::string degrees_to_dms(float value, bool is_latitude) {
 	if (isnan(value)) {
 		return "NAN";
 	}
 	int num_degrees;
 	int num_minutes;
 	int num_seconds;
-	string text;
+	std::string text;
 	// Strip sign off
 	num_seconds = (int)abs(round(value * 60.0 * 60.0));
 	// Divide by 60 to get number of whole minutes
@@ -625,8 +623,8 @@ string degrees_to_dms(float value, bool is_latitude) {
 }
 
 // Convert latitude and longitode to 2, 4, 6, 8, 10 or 12 character grid square
-string latlong_to_grid(lat_long_t location, int num_chars) {
-	string result;
+std::string latlong_to_grid(lat_long_t location, int num_chars) {
+	std::string result;
 	result.resize(num_chars, ' ');
 	// 'Normalise' location relative to 180W, 90S - i.e. AA00aa00aa00
 	double norm_lat = location.latitude + 90.0;
@@ -661,7 +659,7 @@ string latlong_to_grid(lat_long_t location, int num_chars) {
 }
 
 // Convert gridsquare to latitude and longitude - returns the centre of the square
-lat_long_t grid_to_latlong(string gridsquare) {
+lat_long_t grid_to_latlong(std::string gridsquare) {
 	double inc = 20.0;
 	double next_inc;
 	char cg;
@@ -726,16 +724,16 @@ unsigned char decode_base_64(unsigned char c) {
 	}
 }
 
-// Convert from base64 encoding for string
-string decode_base_64(string value) {
-	string result;
+// Convert from base64 encoding for std::string
+std::string decode_base_64(std::string value) {
+	std::string result;
 	unsigned char out = 0;
 	unsigned char in = 0;
-	// Each data byte provides 6 bits of the required string
+	// Each data byte provides 6 bits of the required std::string
 	for (size_t i = 0; i < value.length(); i++) {
 		// Get the base64 character
 		unsigned char base_64 = value[i];
-		// Convert to the next 6 bits of the string
+		// Convert to the next 6 bits of the std::string
 		in = decode_base_64(base_64);
 		// Is it a padding byte?
 		if (in != 0xFF) {
@@ -780,17 +778,17 @@ unsigned char encode_base_64(unsigned char c) {
 	// +   => 0x3E
 	// /   => 0x3F
 	// =   => 0xFF (padding byte)
-	const string look_up = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+	const std::string look_up = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 	if (c < 64)	return look_up[c];
 	else return '=';
 }
 
-// Encode the string to base64
-string encode_base_64(string value) {
-	string result;
+// Encode the std::string to base64
+std::string encode_base_64(std::string value) {
+	std::string result;
 	unsigned char out = 0;
 	unsigned char in = 0;
-	// Each 6 bits of the input string provides a byte of the output string
+	// Each 6 bits of the input std::string provides a byte of the output std::string
 	for (size_t i = 0; i < value.length(); i++) {
 		in = value[i];
 		// 3 bytes of input generate 4 bytes of output
@@ -819,7 +817,7 @@ string encode_base_64(string value) {
 			break;
 		}
 	}
-	// Pad the resulting string
+	// Pad the resulting std::string
 	while (result.length() % 4 != 0) {
 		result += '=';
 	}
@@ -827,8 +825,8 @@ string encode_base_64(string value) {
 }
 
 // Decode hex
-string to_hex(string data) {
-	string result = "";
+std::string to_hex(std::string data) {
+	std::string result = "";
 	for (size_t i = 0; i < data.length(); i++) {
 		result += to_hex(data[i]);
 	}
@@ -836,8 +834,8 @@ string to_hex(string data) {
 }
 
 // Encode hex
-string to_ascii(string data) {
-	string result = "";
+std::string to_ascii(std::string data) {
+	std::string result = "";
 	unsigned int ix = 0;
 	while (ix < data.length()) {
 		result += to_ascii(data, (signed int&)ix);
@@ -846,9 +844,9 @@ string to_ascii(string data) {
 }
 
 // Decode single character
-string to_hex(unsigned char data, bool add_space /* = true */) {
+std::string to_hex(unsigned char data, bool add_space /* = true */) {
 	const char lookup[] = "0123456789ABCDEF";
-	string result = "";
+	std::string result = "";
 	result += lookup[data / 16];
 	result += lookup[data % 16];
 	if (add_space) {
@@ -858,19 +856,19 @@ string to_hex(unsigned char data, bool add_space /* = true */) {
 }
 
 // Encode single character
-unsigned char to_ascii(string data, int&ix) {
+unsigned char to_ascii(std::string data, int&ix) {
 	// Skip non hex
 	while (!isxdigit(data[ix]) && ((unsigned)ix < data.length())) ix++;
 	if (ix == data.length()) return 0;
 	size_t next_ix;
-	int val = stoi(data.substr(ix, 2), &next_ix, 16);
+	int val = std::stoi(data.substr(ix, 2), &next_ix, 16);
 	ix += (int)next_ix;
 	return (unsigned char)val;
 }
 
 // Convert int to BCD
-string int_to_bcd(int value, int size, bool least_first) {
-	string result;
+std::string int_to_bcd(int value, int size, bool least_first) {
+	std::string result;
 	result.resize(size, ' ');
 
 	int value_left = value;
@@ -897,7 +895,7 @@ string int_to_bcd(int value, int size, bool least_first) {
 }
 
 // Convert BCD to int
-int bcd_to_int(string bcd, bool least_first) {
+int bcd_to_int(std::string bcd, bool least_first) {
 	int result = 0;
 	if (least_first) {
 		for (size_t i = bcd.length(); i > 0;) {
@@ -921,7 +919,7 @@ int bcd_to_int(string bcd, bool least_first) {
 }
 
 // Convert BCD to doble
-double bcd_to_double(string bcd, int decimals, bool least_first) {
+double bcd_to_double(std::string bcd, int decimals, bool least_first) {
 	double digit_value = 1.0;
 	for (int i = 0; i < decimals; i++) {
 		digit_value *= 0.1;
@@ -952,9 +950,9 @@ double bcd_to_double(string bcd, int decimals, bool least_first) {
 	return result;
 }
 
-// Convert string to hex
-string string_to_hex(string data, bool escape /*=true*/) {
-	string result;
+// Convert std::string to hex
+std::string string_to_hex(std::string data, bool escape /*=true*/) {
+	std::string result;
 	char hex_chars[] = "0123456789ABCDEF";
 	result.resize(data.length() * 4, ' ');
 	int ix = 0;
@@ -968,9 +966,9 @@ string string_to_hex(string data, bool escape /*=true*/) {
 	return result;
 }
 
-// Convert hex representation to string
-string hex_to_string(string data) {
-	string result;
+// Convert hex representation to std::string
+std::string hex_to_string(std::string data) {
+	std::string result;
 	int ix = 0;
 	// For the length of the source striing
 	while ((unsigned)ix < data.length()) {
@@ -1015,33 +1013,33 @@ void great_circle(lat_long_t source, lat_long_t destination, double& bearing, do
 	distance = EARTH_RADIUS * acos(cos_angle);
 }
 
-// Replace all / characters in a string with _ - used for callsigns as filenames 
+// Replace all / characters in a std::string with _ - used for callsigns as filenames 
 // menu items
-void de_slash(string& data) {
+void de_slash(std::string& data) {
 	for (size_t ix = 0; ix < data.length(); ix++) {
 		if (data[ix] == '/') data[ix] = '_';
 	}
 }
 
-// Replace all _ characters in a string with / - used for callsigns as filenames 
+// Replace all _ characters in a std::string with / - used for callsigns as filenames 
 // menu items
-void re_slash(string& data) {
+void re_slash(std::string& data) {
 	for (size_t ix = 0; ix < data.length(); ix++) {
 		if (data[ix] == '_') data[ix] = '/';
 	}
 }
 
 // Replace all backslash with foreslashes - filename portability
-void forward_slash(string& data) {
+void forward_slash(std::string& data) {
 	for (size_t ix = 0; ix < data.length(); ix++) {
 		if (data[ix] == '\\') data[ix] = '/';
 	}
 }
 
 // Return the directory part of the filenam
-string directory(string filename) {
+std::string directory(std::string filename) {
 	size_t pos = filename.find_last_of("/\\");
-	if (pos == string::npos) {
+	if (pos == std::string::npos) {
 		return "";
 	} else {
 		return filename.substr(0, pos);
@@ -1049,16 +1047,16 @@ string directory(string filename) {
 }
 
 // Return the filename part of the filenam
-string terminal(string filename) {
+std::string terminal(std::string filename) {
 	size_t pos = filename.find_last_of("/\\");
-	if (pos == string::npos) {
+	if (pos == std::string::npos) {
 		return filename;
 	} else {
 		return filename.substr(pos + 1);
 	}
 }
 
-// 8-bit hash - XOR all the characters in src string
+// 8-bit hash - XOR all the characters in src std::string
 uchar hash8(const char* src) {
 	uchar result = '\x00';
 	// Hash in the next character and increment the pointer
@@ -1072,7 +1070,7 @@ void xor_crypt(char* src, int len, uint32_t seed, uchar offset) {
 	minstd_rand key(seed);
 	// Now offset into the sequence
 	key.discard(offset);
-	// Now use the sequence to en/decrypt the string
+	// Now use the sequence to en/decrypt the std::string
 	for (int ix = 0; ix < len; ix++, src++) {
 		uchar key_byte = key() & 255;
 		*src ^= key_byte;
@@ -1080,14 +1078,14 @@ void xor_crypt(char* src, int len, uint32_t seed, uchar offset) {
 }
 
 // String version
-string xor_crypt(string src, uint32_t seed, uchar offset) {
-	string result;
+std::string xor_crypt(std::string src, uint32_t seed, uchar offset) {
+	std::string result;
 	result.resize(src.length());
 	// Seed a pseudo-random number sequence
 	minstd_rand key(seed);
 	// Now offset into the sequence
 	key.discard(offset);
-	// Now use the sequence to en/decrypt the string
+	// Now use the sequence to en/decrypt the std::string
 	for (int ix = 0; ix < src.length(); ix++) {
 		uchar key_byte = key() & 255;
 		result[ix]  = src[ix] ^ key_byte;

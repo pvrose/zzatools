@@ -30,7 +30,7 @@ void ticker::add_ticker(void* object, callback* cb, unsigned int interval) {
     ticker_entry* entry = new ticker_entry;
     entry->object = object;
     entry->tick = cb;
-    entry->period_ds = DEBUG_QUICK ? min(interval, 3000U) : interval;
+    entry->period_ds = DEBUG_QUICK ? std::min(interval, 3000U) : interval;
     entry->active = true;
     entry->not_ticked = true;
     tickers_.push_back(entry);

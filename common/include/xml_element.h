@@ -5,7 +5,7 @@
 #include <map>
 #include <vector>
 
-using namespace std;
+
 
 
 
@@ -36,16 +36,16 @@ using namespace std;
 		//! \param content content of the element
 		//! \param attributes attributes in the element start tag.
 		//! \param type Element type
-		xml_element(xml_element* parent, const string& name, const string& content, map<string, string>* attributes, element_t type = ELEMENT);
+		xml_element(xml_element* parent, const std::string& name, const std::string& content, std::map<std::string, std::string>* attributes, element_t type = ELEMENT);
 		//! Destructor
 		~xml_element();
 
 		//! Add a child element 
 		void element(xml_element* element);
 		//! Add an attributes
-		bool attribute(string& name, string& sValue);
+		bool attribute(std::string& name, std::string& sValue);
 		//! Add content to the element
-		bool content(string& content);
+		bool content(std::string& content);
 		//! Returns the number of child elements
 		int count();
 		//! Returns child element number n
@@ -53,11 +53,11 @@ using namespace std;
 		//! Returns the parent element
 		xml_element* parent();
 		//! Returns the name of the element
-		string name();
+		std::string name();
 		//! Returns the attributes of the element
-		map<string, string>* attributes();
+		std::map<std::string, std::string>* attributes();
 		//! Returns the content of the element
-		string content();
+		std::string content();
 		//! Returns the type of element
 		element_t type();
 		//! Returns the total number of descendant elements and self
@@ -67,13 +67,13 @@ using namespace std;
 		//! Element type
 		element_t type_;
 		//! The child elements
-		vector<xml_element*> children_;
+		std::vector<xml_element*> children_;
 		//! Name
-		string name_;
+		std::string name_;
 		//! Content
-		string content_;
+		std::string content_;
 		//! Attributes
-		map<string, string>* attributes_;
+		std::map<std::string, std::string>* attributes_;
 		//! The parent element
 		xml_element* parent_;
 	};

@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-using namespace std;
+
 
 class contest_algorithm;
 class contest_scorer;
@@ -13,7 +13,7 @@ class record;
 
 struct qth_info_t;
 // List of fields
-typedef vector <string> field_list;
+typedef std::vector <std::string> field_list;
 
 //!* Basic contest scoring element
 struct score_result {
@@ -51,12 +51,12 @@ public:
     //! supplied record with information.
     //! \param qso QSO record to update.
     //! \param text The received contest exchange.
-    virtual void parse_exchange(record* qso, string text) = 0;
+    virtual void parse_exchange(record* qso, std::string text) = 0;
     //! Algorithm specific method to generate text from a number of fields.
     //! This method generates the report to be sent from information in the QSO record
     //! \param qso QSO record to provide exchange.
     //! \result The exchange to be sent.
-    virtual string generate_exchange(record* qso) = 0;
+    virtual std::string generate_exchange(record* qso) = 0;
     //! Algorithm specific method to score an individual QSO
     //! This method calculates how many points the QSO scores and
     //! whether it provides a multiplier. 
@@ -64,13 +64,13 @@ public:
     //! \param multipliers Set of multipliers currently worked: the method should
     //! update this if this is a new multiplier.
     //! \result The points scored by the QSO and the number of multipliers added.
-    virtual score_result score_qso(record* qso, set<string> &multipliers) = 0;
+    virtual score_result score_qso(record* qso, std::set<std::string> &multipliers) = 0;
     //! Algorithm uses serial number
     //! \result Return true if the contest requires a serial number. Return false if it does not.
     virtual bool uses_serno() = 0;
 
     //! Return all fields used in algorithm.
-    //! \result This method should return a vector<string> comprising all the
+    //! \result This method should return a std::vector<std::string> comprising all the
     //! fields referenced by the algorithm.
     field_list fields();
 

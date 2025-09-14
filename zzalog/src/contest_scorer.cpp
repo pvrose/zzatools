@@ -26,9 +26,9 @@ extern book* book_;
 extern contest_data* contest_data_;
 extern cty_data* cty_data_;
 extern stn_data* stn_data_;
-extern string VENDOR;
-extern string PROGRAM_ID;
-extern map<string, contest_algorithm*>* algorithms_;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
+extern std::map<std::string, contest_algorithm*>* algorithms_;
 extern Fl_Preferences::Root prefs_mode_;
 extern void open_html(const char*);
 
@@ -413,7 +413,7 @@ void contest_scorer::change_contest() {
 	}
 	else {
 		char temp[25];
-		time_t t1 = chrono::system_clock::to_time_t(chrono::system_clock::now());
+		time_t t1 = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 		tm* t2 = gmtime(&t1);
 		strftime(temp, sizeof(temp), "%Y%m%d 0000", t2);
 		start_time_ = temp;
@@ -463,10 +463,10 @@ void contest_scorer::check_qso(record* qso, qso_num_t qso_number) {
 // Load QSOs - after restarting zzalog
 void contest_scorer::resume_contest() {
 	int ix = book_->size() - 1;
-	chrono::system_clock::time_point start = contest_->date.start;
-	chrono::system_clock::time_point finish = contest_->date.finish;
+	std::chrono::system_clock::time_point start = contest_->date.start;
+	std::chrono::system_clock::time_point finish = contest_->date.finish;
 	record* qso = book_->get_record(ix, false);
-	chrono::system_clock::time_point ts = qso->ctimestamp();
+	std::chrono::system_clock::time_point ts = qso->ctimestamp();
 	qsos_ = new extract_data();
 	while (ts > start) {
 		// Add all QSOs it this contest (ID equivalent and timestamp within timeframe
@@ -483,11 +483,11 @@ void contest_scorer::resume_contest() {
 void contest_scorer::populate_timeframe() {
 	if (contest_) {
 		char temp[25];
-		time_t t1 = chrono::system_clock::to_time_t(contest_->date.start);
+		time_t t1 = std::chrono::system_clock::to_time_t(contest_->date.start);
 		tm* t2 = gmtime(&t1);
 		strftime(temp, sizeof(temp), "%Y%m%d %H%M", t2);
 		start_time_ = temp;
-		t1 = chrono::system_clock::to_time_t(contest_->date.finish);
+		t1 = std::chrono::system_clock::to_time_t(contest_->date.finish);
 		t2 = gmtime(&t1);
 		strftime(temp, sizeof(temp), "%Y%m%d %H%M", t2);
 		finish_time_ = temp;
@@ -501,7 +501,7 @@ void contest_scorer::populate_timeframe() {
 // Copy contest to status
 void contest_scorer::populate_status() {
 	if (contest_) {
-		chrono::system_clock::time_point today = chrono::system_clock::now();
+		std::chrono::system_clock::time_point today = std::chrono::system_clock::now();
 		if (today < contest_->date.start) contest_status_ = FUTURE;
 		else if (today > contest_->date.finish) contest_status_ = PAST;
 		else {
@@ -520,7 +520,7 @@ void contest_scorer::populate_contest() {
 	w_contest_->add("", 0, nullptr, nullptr);
 	for (auto ix = 0; ix < count; ix++) {
 		ct_entry_t* info = contest_data_->get_contest_info(ix);
-		string text = info->id + ":" + info->index;
+		std::string text = info->id + ":" + info->index;
 		// Adding the pointer to the contest definition as user data
 		w_contest_->add(text.c_str(), 0, nullptr, (void*)(info));
 	}
@@ -556,7 +556,7 @@ bool contest_scorer::contest_active() {
 }
 
 // Returns value of ADIF.CONTEST_ID
-string contest_scorer::contest_id() {
+std::string contest_scorer::contest_id() {
 	return contest_id_;
 }
 
@@ -569,19 +569,19 @@ field_list contest_scorer::fields() {
 }
 
 // Returns the serial number
-string contest_scorer::serial() {
+std::string contest_scorer::serial() {
 	char text[10];
 	snprintf(text, sizeof(text), "%03d", next_serial_);
-	return string(text);
+	return std::string(text);
 }
 
 // Returns the created exchange
-string contest_scorer::generate_exchange(record* qso) {
+std::string contest_scorer::generate_exchange(record* qso) {
 	return algorithm_->generate_exchange(qso);
 }
 
 // Parse exchange
-void contest_scorer::parse_exchange(record* qso, string text) {
+void contest_scorer::parse_exchange(record* qso, std::string text) {
 	algorithm_->parse_exchange(qso, text);
 }
 

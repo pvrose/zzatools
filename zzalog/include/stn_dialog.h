@@ -18,7 +18,7 @@ class record;
 struct qth_info_t;
 struct oper_info_t;
 
-using namespace std;
+
  
 //! This class provides a dialog for manging station locations, operators and callsigns
 class stn_dialog :
@@ -60,8 +60,8 @@ public:
 		CALLSIGN       //!< Callsign data editor.
 	};
 
-	//! Set the active tab \p t and set its default value \p id.
-	void set_tab(tab_type t, string id);
+	//! Set the active tab \p t and std::set its default value \p id.
+	void set_tab(tab_type t, std::string id);
 
 protected:
 
@@ -99,9 +99,9 @@ protected:
 		virtual char type();
 
 		//! Returns the selected identifier.
-		string id();
+		std::string id();
 		//! Set the identifier to \p s.
-		void id(string s);
+		void id(std::string s);
 
 	protected:
 		//! Populate the choice
@@ -115,17 +115,17 @@ protected:
 		int num_inputs_;
 		
 		//! Array of labels for the widgets.
-		vector<string> labels_;
+		std::vector<std::string> labels_;
 
 		//! Location specific data
 		const qth_info_t* qth_;
 		//! Operator specific data.
 		const oper_info_t* oper_;
 		//! Callsign specific data.
-		string call_descr_;
+		std::string call_descr_;
 
 		//! Current data id
-		string current_id_;
+		std::string current_id_;
 
 		//! Update from call
 		bool update_from_call_;

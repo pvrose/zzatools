@@ -8,7 +8,7 @@
 
 class Fl_Output;
 
-using namespace std;
+
 
 //! Dialog to assist the user in updating the various country data files.
 class cty_dialog :
@@ -45,9 +45,9 @@ public:
 protected:
 
     //! Widgets displaying timestamps that can be updated.
-    map<cty_data::cty_type_t, Fl_Output*> w_timestamps_;
+    std::map<cty_data::cty_type_t, Fl_Output*> w_timestamps_;
     //! Widgets displaying data versions that can be updated.
-    map<cty_data::cty_type_t, Fl_Output*> w_versions_;
+    std::map<cty_data::cty_type_t, Fl_Output*> w_versions_;
     
 };
 

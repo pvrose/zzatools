@@ -6,7 +6,7 @@
 
 #include <FL/Fl_Table.H>
 
-using namespace std;
+
 
 //! Tabular display of DXCC worked status.
 class dxcc_table :
@@ -63,22 +63,22 @@ protected:
 
     // Main data structure
     //! Count QSOs per item
-    typedef map<string, int> count_t;
+    typedef std::map<std::string, int> count_t;
     //! Count QSOs by item and DXCC entity identification
-    map<int, count_t> data_;
+    std::map<int, count_t> data_;
     //! Total counts.
     count_t total_counts_;
     //! Count QSOs per DXCC.
-    map<int, int> qsos_dxcc_;
+    std::map<int, int> qsos_dxcc_;
     //! Count DXCC entities per band.
     count_t dxccs_band_;
     //! Total QSOs
     int total_qsos_;
 
-    //! Column header list, based on type of count.
-    vector<string> column_names_;
-    //! Row header list, uses DXCC entity identification.
-    vector<int> row_ids_;
+    //! Column header std::list, based on type of count.
+    std::vector<std::string> column_names_;
+    //! Row header std::list, uses DXCC entity identification.
+    std::vector<int> row_ids_;
 
     //! Current display type.
     display_t display_type_;

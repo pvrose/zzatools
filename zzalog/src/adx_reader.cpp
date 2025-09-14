@@ -51,18 +51,18 @@ adx_reader::~adx_reader()
 }
 
 // load data to book from the input stream
-bool adx_reader::load_book(book* book, istream& in) {
+bool adx_reader::load_book(book* book, std::istream& in) {
 	in_ = &in;
-	// Takes time so set the timer cursor
+	// Takes time so std::set the timer cursor
 	fl_cursor(FL_CURSOR_WAIT);
 	my_book_ = book;
 	// calculate the file size
-	streampos startpos = in.tellg();
-	in.seekg(0, ios::end);
-	streampos endpos = in.tellg();
+	std::streampos startpos = in.tellg();
+	in.seekg(0, std::ios::end);
+	std::streampos endpos = in.tellg();
 	file_size_ = (long)(endpos - startpos);
 	// reposition back to beginning
-	in.seekg(0, ios::beg);
+	in.seekg(0, std::ios::beg);
 	// Initialsie the progress
 	status_->misc_status(ST_NOTE, "LOG: Started reading ADX");
 	status_->progress(file_size_, book->book_type(), "Loading ADX", "bytes");
@@ -85,9 +85,9 @@ bool adx_reader::load_book(book* book, istream& in) {
 
 // Overloaded XML handlers
 // Start XML element <name [attributes]> 
-bool adx_reader::start_element(string name, map<string, string>* attributes) {
+bool adx_reader::start_element(std::string name, std::map<std::string, std::string>* attributes) {
 	// Default to upper case for all text comparisons
-	string element_name = to_upper(name);
+	std::string element_name = to_upper(name);
 	// decode OK
 	bool error = false;
 	// Initialise field and value data items
@@ -125,7 +125,7 @@ bool adx_reader::start_element(string name, map<string, string>* attributes) {
 		// Start element reported an error - report it to user
 		char message[128];
 		sprintf(message, "XML parsing incorrect for element type %s", element_name.c_str());
-		string temp = message;
+		std::string temp = message;
 		if (report_error(temp, true)) {
 			return true;
 		}
@@ -138,9 +138,9 @@ bool adx_reader::start_element(string name, map<string, string>* attributes) {
 }
 
 // End XML element detected
-bool adx_reader::end_element(string name) {
+bool adx_reader::end_element(std::string name) {
 	// Get the element name and convert it to upper case
-	string element_name = to_upper(name);
+	std::string element_name = to_upper(name);
 
 	adx_element_t element_type = elements_.back();
 	elements_.pop_back();
@@ -175,11 +175,11 @@ bool adx_reader::end_element(string name) {
 	}
 	else if (element_name == "USERDEF" && element_type == AET_USERDEFH) {
 		// USERDEF elment within a HEADER element
-		// Add to the local list of user defined fields
+		// Add to the local std::list of user defined fields
 		userdef_fields_.insert(value_);
 		// Get the ID number - assume it is integer
-		int id = stoi(field_name_.substr(7));
-		// Add to the user defined fields list in ADIF database
+		int id = std::stoi(field_name_.substr(7));
+		// Add to the user defined fields std::list in ADIF database
 		ok = spec_data_->add_userdef(id, value_, datatype_[0], available_values_);
 		// Copy the ADIF item to the current record (header)
 		record_->item(field_name_, value_, false, false);
@@ -210,7 +210,7 @@ bool adx_reader::end_element(string name) {
 			else {
 				// report to user that no QSO_DATE
 				sprintf(error_msg, "Record does not supply QSO_DATE. Continue will ignore record.");
-				string temp = error_msg;
+				std::string temp = error_msg;
 				if (report_error(temp, true)) {
 					return true;
 				}
@@ -260,7 +260,7 @@ bool adx_reader::end_element(string name) {
 	}
 	if (!ok) {
 		// Report error in end element
-		string temp = error_msg;
+		std::string temp = error_msg;
 		char message[100];
 		sprintf(message, "LOG: %s %s %s - Problem with record in XML",
 			record_->item("QSO_DATE").c_str(),
@@ -278,7 +278,7 @@ bool adx_reader::end_element(string name) {
 }
 
 // XML data characters received
-bool adx_reader::characters(string content) {
+bool adx_reader::characters(std::string content) {
 	if (!elements_.empty()) {
 		// We are processing elements - look at top of element stack
 		switch (elements_.back()) {
@@ -311,12 +311,12 @@ bool adx_reader::characters(string content) {
 }
 
 // Explicitly ignore declaration tags - except comments
-bool adx_reader::declaration(xml_element::element_t element_type, string name, string content) {
+bool adx_reader::declaration(xml_element::element_t element_type, std::string name, std::string content) {
 	switch (element_type) {
 	case xml_element::COMMENT:
 		// Add the content to the header comment if the comment is in the header
 		if (record_ != nullptr && record_->is_header()) {
-			string comment;
+			std::string comment;
 			if (record_->header().length()) {
 				comment = record_->header() + '\n' + content;
 			}
@@ -335,26 +335,26 @@ bool adx_reader::declaration(xml_element::element_t element_type, string name, s
 }
 
 // Explicitly ignore processing instructions
-bool adx_reader::process_instr(string name, string content) {
+bool adx_reader::process_instr(std::string name, std::string content) {
 	num_ignored_++;
 	return true;
 }
 
 // start APP element - using supplied attributes
 // <APP PROGRAMID="[id]" FIELDNAME="[fieldname]" TYPE="[datatype]">[data]</APP>
-bool adx_reader::start_app(map<string, string>* attributes) {
+bool adx_reader::start_app(std::map<std::string, std::string>* attributes) {
 	// Add element type to stack
 	elements_.push_back(AET_APP);
 	// Get the field name from the attributes
-	string id;
-	string field_name;
+	std::string id;
+	std::string field_name;
 	bool error = false;
 	// now read the attributes
 	for (auto it = attributes->begin(); it != attributes->end(); it++) 
 	{
 		// NAME="value"
-		string attr_name = to_upper(it->first);
-		string attr_value = it->second;
+		std::string attr_name = to_upper(it->first);
+		std::string attr_value = it->second;
 		// switch on name
 		if (attr_name == "PROGRAMID") {
 			// Program id.
@@ -405,7 +405,7 @@ bool adx_reader::start_app(map<string, string>* attributes) {
 		// Not currently processing a record - cannot have this element
 		char temp[128];
 		sprintf(temp, "Application specific field %s found out of context. ", field_name_.c_str());
-		string message = temp;
+		std::string message = temp;
 		if (!report_error(message, true)) {
 			return true;
 		}
@@ -418,7 +418,7 @@ bool adx_reader::start_app(map<string, string>* attributes) {
 bool adx_reader::start_record() {
 	if (record_ != nullptr) {
 		// We don't allow nested RECORD elements
-		string message = "RECORD element found out of context.";
+		std::string message = "RECORD element found out of context.";
 		if (!report_error(message, true)) {
 			return true;
 		}
@@ -435,7 +435,7 @@ bool adx_reader::start_record() {
 bool adx_reader::start_adx() {
 	if (!elements_.empty()) {
 		// This is the top element so the stack should be empty
-		string message = "ADX element found out of context.";
+		std::string message = "ADX element found out of context.";
 		if (!report_error(message, true)) {
 			return true;
 		}
@@ -451,7 +451,7 @@ bool adx_reader::start_adx() {
 bool adx_reader::start_header() {
 	if (my_book_->header() != nullptr || elements_.empty() || elements_.back() != AET_ADX) {
 		// We shouldn't have processed a HEADER, and top-of-stack should be ADX
-		string message = "HEADER element found out of context.";
+		std::string message = "HEADER element found out of context.";
 		if (!report_error(message, true)) {
 			return true;
 		}
@@ -469,7 +469,7 @@ bool adx_reader::start_header() {
 bool adx_reader::start_records() {
 	if (elements_.empty() || elements_.back() != AET_ADX) {
 		// Top-of-stack should be ADX
-		string message = "RECORDS element found out of context.";
+		std::string message = "RECORDS element found out of context.";
 		if (!report_error(message, true)) {
 			return true;
 		}
@@ -485,10 +485,10 @@ bool adx_reader::start_records() {
 // <USERDEF FIELDID="n" TYPE="DATATYPEINDICATOR" ENUM="{A,B, ... N}" RANGE="{LOWERBOUND:UPPERBOUND}">FIELDNAME</USERDEF>
 // in record element
 // <USERDEF FIELDNAME="FIELDNAME">DATA</USERDEF>
-bool adx_reader::start_userdef(map<string, string>* attributes) {
+bool adx_reader::start_userdef(std::map<std::string, std::string>* attributes) {
 	if (elements_.empty() || (elements_.back() != AET_HEADER) && (elements_.back() != AET_RECORD)) {
 		// In neither a header nor a record elemenmt
-		string message = "USERDEF element found out of context.";
+		std::string message = "USERDEF element found out of context.";
 		if (!report_error(message, true)) {
 			return true;
 		}
@@ -500,8 +500,8 @@ bool adx_reader::start_userdef(map<string, string>* attributes) {
 			// For each attribute
 			for (auto it = attributes->begin(); it != attributes->end(); it++) {
 				// name and value
-				string attr_name = to_upper(it->first);
-				string attr_value = it->second;
+				std::string attr_name = to_upper(it->first);
+				std::string attr_value = it->second;
 				// switch on name
 				if (attr_name == "FIELDID") {
 					// we are USERDEFn
@@ -524,8 +524,8 @@ bool adx_reader::start_userdef(map<string, string>* attributes) {
 			// For each attribute
 			for (auto it = attributes->begin(); it != attributes->end(); it++) {
 				// Name and value
-				string attr_name = to_upper(it->first);
-				string attr_value = it->second;
+				std::string attr_name = to_upper(it->first);
+				std::string attr_value = it->second;
 
 				if (attr_name == "FIELDNAME") {
 					field_name_ = to_upper(attr_value);
@@ -533,7 +533,7 @@ bool adx_reader::start_userdef(map<string, string>* attributes) {
 					if (userdef_fields_.find(field_name_) == userdef_fields_.end()) {
 						char temp[125];
 						sprintf(temp, "USERDEF %s not defined in header", field_name_.c_str());
-						string message = temp;
+						std::string message = temp;
 						if (report_error(message, true)) {
 							return true;
 						}
@@ -547,12 +547,12 @@ bool adx_reader::start_userdef(map<string, string>* attributes) {
 
 // Start field elemenet 
 // <FIELD-NAME>DATA</FIELD-NAME>
-bool adx_reader::start_field(string field_name) {
+bool adx_reader::start_field(std::string field_name) {
 	if (elements_.empty() || (elements_.back() != AET_HEADER && elements_.back() != AET_RECORD)) {
 		// We must be processing a HEADER or RECORD element
 		char temp[128];
 		sprintf(temp, "Field element %s found out of context.", field_name.c_str());
-		string message = temp;
+		std::string message = temp;
 		if (!report_error(message, true)) {
 			return true;
 		}

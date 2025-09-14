@@ -7,8 +7,6 @@
 #include <utility>
 #include <vector>
 
-using namespace std;
-using namespace std::chrono;
 
 class contest_reader;
 class contest_score;
@@ -16,31 +14,31 @@ class contest_write;
 
 //! Definition of contest timeframe
 struct ct_date_t {
-	system_clock::time_point start;     //!< Start of the contest period.
-	system_clock::time_point finish;    //!< End of the contest period.
+	std::chrono::system_clock::time_point start;     //!< Start of the contest period.
+	std::chrono::system_clock::time_point finish;    //!< End of the contest period.
 
 	//! Tests if the specified timepoint \p tp is within the contest period.
-	bool has_inside(system_clock::time_point tp) {
+	bool has_inside(std::chrono::system_clock::time_point tp) {
 		return (tp > start) && (tp < finish);
 	}
 
 	//! Constructor - defaults start and finish to a valid timepoint.
 	ct_date_t() {
-		start = system_clock::now();
-		finish = system_clock::now();
+		start = std::chrono::system_clock::now();
+		finish = std::chrono::system_clock::now();
 	}
 };
 
 //! Definition of the contest.
 struct ct_data_t {
-	string algorithm;        //!< Scoring and exchange algorithm.
+	std::string algorithm;        //!< Scoring and exchange algorithm.
 	ct_date_t date;          //!< Period of the contest.
 };
 
-//! Amalgamated contest list entry
+//! Amalgamated contest std::list entry
 struct ct_entry_t {
-	string id;               //!< Identifier for the contest.
-	string index;            //!< Speciifc instance of the contest (eg 2025)
+	std::string id;               //!< Identifier for the contest.
+	std::string index;            //!< Speciifc instance of the contest (eg 2025)
 	ct_data_t* definition;   //!< Contest definition.
 };
 
@@ -63,7 +61,7 @@ public:
 	//! \param ix Identfier of the specific instance.
 	//! \param create Create the entry in the database for later editing.
 	//! \return contest database entry for the specified contest.
-	ct_data_t* get_contest(string id, string ix, bool create = false);
+	ct_data_t* get_contest(std::string id, std::string ix, bool create = false);
 	//! Get the number of contests registered.
 
 	//! \return number of entries in the contest database.
@@ -75,8 +73,8 @@ public:
 	//! Get all the instance identifiers for specific contest
 	
 	//! \param id identifier of the contest.
-	//! \return the set of instances of this contest.
-	set<string>* get_contest_indices(string id);
+	//! \return the std::set of instances of this contest.
+	std::set<std::string>* get_contest_indices(std::string id);
 
 
 protected:
@@ -88,11 +86,11 @@ protected:
 	// The databases 
 	//! Individual contests mapped by ID and index (e.g. year)
 	
-	//! - <B>Outer map</B> Addressed by instance identifier.
-	//! - <B>Inner map</B> Addressed by contest identifier.
-	map<string, map<string, ct_data_t*> > contests_;
+	//! - <B>Outer std::map</B> Addressed by instance identifier.
+	//! - <B>Inner std::map</B> Addressed by contest identifier.
+	std::map<std::string, std::map<std::string, ct_data_t*> > contests_;
 	//! Consolidated database of all contest entries.
-	vector<ct_entry_t*> contest_infos_;
+	std::vector<ct_entry_t*> contest_infos_;
 
 };
 

@@ -6,7 +6,7 @@
 #include <string>
 #include <set>
 
-using namespace std;
+
 
 class Fl_Widget;
 class Fl_Group;
@@ -49,7 +49,7 @@ class Fl_Group;
 	protected:
 
 		//! Get the pathname to the file: intl_chars.txt.
-		string get_path();
+		std::string get_path();
 		//! Load data from \p filename_.
 		bool load_data();
 		//! Save data to \p filename_.
@@ -58,14 +58,14 @@ class Fl_Group;
 		void create_form();
 		//! Add all the "use character" button group.
 		void add_buttons(int width);
-		//! Transfer UTF-8 characters from text input to list of Unicode symbols.
-		void add_symbols(string text);
+		//! Transfer UTF-8 characters from text input to std::list of Unicode symbols.
+		void add_symbols(std::string text);
 		//! File name.
-		string filename_;
-		//! The set of Unicode symbols to draw buttons for.
-		set<unsigned int> symbols_;
+		std::string filename_;
+		//! The std::set of Unicode symbols to draw buttons for.
+		std::set<unsigned int> symbols_;
 		//! New character.
-		string new_char_;
+		std::string new_char_;
 		//! The button group.
 		Fl_Group* buttons_;
 		//! The edit widget.

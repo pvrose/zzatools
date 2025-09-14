@@ -22,13 +22,13 @@ extern spec_data* spec_data_;
 extern tabbed_forms* tabbed_forms_;
 extern status* status_;
 extern bool DARK;
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
 extern void open_html(const char*);
 
 
-using namespace std;
+
 
 // Constructor
 spec_tree::spec_tree(int X, int Y, int W, int H, const char* label, field_app_t app) :
@@ -155,7 +155,7 @@ void spec_tree::populate_tree(bool activate) {
 }
 
 // Add the ADIF spec dataset to the tree
-void spec_tree::insert_adif_spec(Fl_Tree_Item* parent, const spec_dataset& dataset, const string& name) {
+void spec_tree::insert_adif_spec(Fl_Tree_Item* parent, const spec_dataset& dataset, const std::string& name) {
 	bool subdivision = false;
 	bool submode = false;
 	// Hang item name.
@@ -182,13 +182,13 @@ void spec_tree::insert_adif_spec(Fl_Tree_Item* parent, const spec_dataset& datas
 			// Find the split between the subdivision name and DXCC code and get the DXCC code
 			size_t pos_open = name.find('[');
 			size_t pos_close = name.find(']');
-			string item = name.substr(pos_open + 1, pos_close - pos_open - 1);
+			std::string item = name.substr(pos_open + 1, pos_close - pos_open - 1);
 			if (subdivision) {
 				// Get the DXCC Entity dataset
 				spec_dataset* dxcc_dataset = spec_data_->dataset("DXCC_Entity_Code");
 				// Get the specific DXCC entry
 
-				map<string, string>* dxcc_data;
+				std::map<std::string, std::string>* dxcc_data;
 				if (dxcc_dataset->data.find(item) == dxcc_dataset->data.end()) {
 					item += " Deleted";
 					if (dxcc_dataset->data.find(item) != dxcc_dataset->data.end()) {
@@ -201,7 +201,7 @@ void spec_tree::insert_adif_spec(Fl_Tree_Item* parent, const spec_dataset& datas
 				else {
 					dxcc_data = dxcc_dataset->data.at(item);
 				}
-				string dxcc_name = (*dxcc_data)["Entity Name"];
+				std::string dxcc_name = (*dxcc_data)["Entity Name"];
 				// Make the tree label just the DXCC code in a dark grey
 				hang_item = hang_item->add(prefs(), dxcc_name.c_str());
 				hang_item->labelcolor(COLOUR_GREY);
@@ -220,9 +220,9 @@ void spec_tree::insert_adif_spec(Fl_Tree_Item* parent, const spec_dataset& datas
 	// For all entries in the dataset
 	for (auto it = dataset.data.begin(); it != dataset.data.end(); it++) {
 		// Entry name and data items for entry
-		string entry = it->first;
+		std::string entry = it->first;
 		if (name == "DXCC_Entity_Code") {
-			// Special case for DXCC - numerical order not string order 
+			// Special case for DXCC - numerical order not std::string order 
 			switch (entry.length()) {
 			case 1:
 				entry = "  " + entry;
@@ -232,18 +232,18 @@ void spec_tree::insert_adif_spec(Fl_Tree_Item* parent, const spec_dataset& datas
 				break;
 			}
 		}
-		map<string, string>* entry_data = it->second;
+		std::map<std::string, std::string>* entry_data = it->second;
 		// Hang the entry name at the hang point
 		Fl_Tree_Item* entry_item;
 		entry_item = hang_item->add(prefs(), entry.c_str());
 		// for each data item (indexed by column name)
 		for (size_t column_ix = 0; column_ix < dataset.column_names.size(); column_ix++) {
 			// Hang column name and data value as "Name: Value" in blue
-			string column = dataset.column_names[column_ix];
+			std::string column = dataset.column_names[column_ix];
 			if (entry_data->find(column) != entry_data->end()) {
-				string column_text = (*entry_data)[column];
+				std::string column_text = (*entry_data)[column];
 				if (column_text.length() > 0) {
-					// The data value is not an empty string
+					// The data value is not an empty std::string
 					char line[2048];
 					snprintf(line, 2048, "%s: %s", column.c_str(), column_text.c_str());
 					Fl_Tree_Item* column_item = entry_item->add(prefs(), line);
@@ -253,11 +253,11 @@ void spec_tree::insert_adif_spec(Fl_Tree_Item* parent, const spec_dataset& datas
 						spec_dataset* enum_dataset = spec_data_->dataset(column_text);
 						if (enum_dataset != nullptr) {
 							// If there is a dataset
-							string desc_title = enum_dataset->column_names[2];
+							std::string desc_title = enum_dataset->column_names[2];
 							// For all enumeration values
 							for (auto it = enum_dataset->data.begin(); it != enum_dataset->data.end(); it++) {
 								// Hang "Value: Description" under the column name
-								string enum_desc;
+								std::string enum_desc;
 								if ((*it->second).find(column_text) == (*it->second).end()) {
 									enum_desc = (*it->second)[desc_title];
 								}
@@ -292,17 +292,17 @@ void spec_tree::insert_adif_spec(Fl_Tree_Item* parent, const spec_dataset& datas
 						spec_dataset* type_dataset = spec_data_->dataset("Data Types");
 						if (type_dataset != nullptr) {
 							// If it exists - get the  data type name (may be > 1)
-							vector<string> type_names;
+							std::vector<std::string> type_names;
 							split_line(column_text, type_names, ',');
 							// For each data type name
 							for (size_t type_ix = 0; type_ix < type_names.size(); type_ix++) {
 								// Get the entry for the data type
-								map<string, string>* type_data = type_dataset->data[type_names[type_ix]];
+								std::map<std::string, std::string>* type_data = type_dataset->data[type_names[type_ix]];
 								// For each item in the data type entry
 								for (size_t type_col_ix = 0; type_col_ix < type_dataset->column_names.size(); type_col_ix++) {
 									// Hang "Column: value" for the data type entry item
-									string type_col_name = type_dataset->column_names[type_col_ix];
-									string type_col_text = (*type_data)[type_col_name];
+									std::string type_col_name = type_dataset->column_names[type_col_ix];
+									std::string type_col_text = (*type_data)[type_col_name];
 									if (type_col_text.length() > 0) {
 										sprintf(line, "%s: %s", type_col_name.c_str(), type_col_text.c_str());
 										Fl_Tree_Item* type_item = column_item->add(prefs(), line);

@@ -29,10 +29,10 @@ cty1_reader::~cty1_reader() {
 
 // Overloadable XML handlers
 // Start element
-bool cty1_reader::start_element(string name, map<string, string>* attributes) {
+bool cty1_reader::start_element(std::string name, std::map<std::string, std::string>* attributes) {
 	if (!ignore_processing_) {
 		if (elements_.size()) {
-			string enclosure = elements_.back();
+			std::string enclosure = elements_.back();
 			elements_.push_back(name);
 			if (enclosure == "entities" && name == "entity") {
 				current_entity_ = new cty_entity;
@@ -67,7 +67,7 @@ bool cty1_reader::start_element(string name, map<string, string>* attributes) {
 }
 
 // End element
-bool cty1_reader::end_element(string name) {
+bool cty1_reader::end_element(std::string name) {
 	if (ignore_processing_) {
 		// We stop ignoring
 		if (name == elements_.back()) {
@@ -77,24 +77,24 @@ bool cty1_reader::end_element(string name) {
 	}
 	else {
 		// Capture the exception or invalid record. Move the record to the database
-		string element = elements_.back();
+		std::string element = elements_.back();
 		elements_.pop_back();
-		string enclosure = elements_.size() ? elements_.back() : "";
+		std::string enclosure = elements_.size() ? elements_.back() : "";
 		if ((enclosure == "exceptions" && element == "exception") ||
 			(enclosure == "zone_exceptions" && element == "zone_exception") ) {
-			// Add it to the list, which if necessay create
+			// Add it to the std::list, which if necessay create
 			data_->add_exception(current_match_, current_exception_);
 			current_exception_ = nullptr;
 			current_match_ = "";
 		}
 		else if ((enclosure == "invalid_operations" && element == "invalid")) {
-			// Add it to the list, which if necessay create
+			// Add it to the std::list, which if necessay create
 			data_->add_exception(current_match_, current_exception_);
 			current_exception_ = nullptr;
 			current_match_ = "";
 		}
 		else if ((enclosure == "prefixes" && element == "prefix")) {
-			// Add it to the list, which if necessay create
+			// Add it to the std::list, which if necessay create
 			data_->add_prefix(current_match_, current_prefix_);
 			current_prefix_ = nullptr;
 			current_match_ = "";
@@ -105,13 +105,13 @@ bool cty1_reader::end_element(string name) {
 		}
 		else if (elements_.size() && elements_.back() == "entity") {
 			// Build up the exception record from the various child elements
-			if (element == "adif") current_entity_->dxcc_id_ = stoi(value_);
+			if (element == "adif") current_entity_->dxcc_id_ = std::stoi(value_);
 			else if (element == "name") current_entity_->name_ = value_;
 			else if (element == "prefix") current_entity_->nickname_ = value_;
-			else if (element == "cqz") current_entity_->cq_zone_ = stoi(value_);
+			else if (element == "cqz") current_entity_->cq_zone_ = std::stoi(value_);
 			else if (element == "cont") current_entity_->continent_ = value_;
-			else if (element == "long") current_entity_->coordinates_.longitude = stod(value_);
-			else if (element == "lat") current_entity_->coordinates_.latitude = stod(value_);
+			else if (element == "long") current_entity_->coordinates_.longitude = std::stod(value_);
+			else if (element == "lat") current_entity_->coordinates_.latitude = std::stod(value_);
 			else if (element == "deleted" && value_ == "true") current_entity_->deleted_ = true;
 			else if (element == "start") {
 				current_entity_->time_validity_.start = xmldt2date(value_);
@@ -123,12 +123,12 @@ bool cty1_reader::end_element(string name) {
 		else if (elements_.size() && elements_.back() == "prefix") {
 			// Build up the exception record from the various child elements
 			if (element == "call") current_match_ = value_;
-			else if (element == "adif") current_prefix_->dxcc_id_ = stoi(value_);
+			else if (element == "adif") current_prefix_->dxcc_id_ = std::stoi(value_);
 			else if (element == "entity") current_prefix_->name_ = value_;
-			else if (element == "cqz") current_prefix_->cq_zone_ = stoi(value_);
+			else if (element == "cqz") current_prefix_->cq_zone_ = std::stoi(value_);
 			else if (element == "cont") current_prefix_->continent_ = value_;
-			else if (element == "long") current_prefix_->coordinates_.longitude = stod(value_);
-			else if (element == "lat") current_prefix_->coordinates_.latitude = stod(value_);
+			else if (element == "long") current_prefix_->coordinates_.longitude = std::stod(value_);
+			else if (element == "lat") current_prefix_->coordinates_.latitude = std::stod(value_);
 			else if (element == "start") {
 				current_prefix_->time_validity_.start = xmldt2date(value_);
 			}
@@ -139,12 +139,12 @@ bool cty1_reader::end_element(string name) {
 		else if (elements_.size() && elements_.back() == "exception") {
 			// Build up the exception record from the various child elements
 			if (element == "call") current_match_ = value_;
-			else if (element == "adif") current_exception_->dxcc_id_ = stoi(value_);
+			else if (element == "adif") current_exception_->dxcc_id_ = std::stoi(value_);
 			else if (element == "entity") current_exception_->name_ = value_;
-			else if (element == "cqz") current_exception_->cq_zone_ = stoi(value_);
+			else if (element == "cqz") current_exception_->cq_zone_ = std::stoi(value_);
 			else if (element == "cont") current_exception_->continent_ = value_;
-			else if (element == "long") current_exception_->coordinates_.longitude = stod(value_);
-			else if (element == "lat") current_exception_->coordinates_.latitude = stod(value_);
+			else if (element == "long") current_exception_->coordinates_.longitude = std::stod(value_);
+			else if (element == "lat") current_exception_->coordinates_.latitude = std::stod(value_);
 			else if (element == "start") {
 				current_exception_->time_validity_.start = xmldt2date(value_);
 			}
@@ -165,7 +165,7 @@ bool cty1_reader::end_element(string name) {
 		else if (elements_.size() && elements_.back() == "zone_exception") {
 			// Build up the exception record from the various child elements
 			if (element == "call") current_match_ = value_;
-			else if (element == "cqz") current_exception_->cq_zone_ = stoi(value_);
+			else if (element == "cqz") current_exception_->cq_zone_ = std::stoi(value_);
 			else if (element == "start") {
 				current_exception_->time_validity_.start = xmldt2date(value_);
 			}
@@ -184,33 +184,33 @@ bool cty1_reader::end_element(string name) {
 }
 
 // Special element - not expected
-bool cty1_reader::declaration(xml_element::element_t element_type, string name, string content) {
+bool cty1_reader::declaration(xml_element::element_t element_type, std::string name, std::string content) {
 	return false;
 }
 
 // Processing instruction - ignored
-bool cty1_reader::process_instr(string name, string content) {
+bool cty1_reader::process_instr(std::string name, std::string content) {
 	return false;
 }
 
-// characters - set the element value
-bool cty1_reader::characters(string content) {
+// characters - std::set the element value
+bool cty1_reader::characters(std::string content) {
 	value_ = content;
 	return true;
 }
 
-// Load data from specified file into and add each record to the map
-bool cty1_reader::load_data(cty_data* data, istream& in, string& version) {
+// Load data from specified file into and add each record to the std::map
+bool cty1_reader::load_data(cty_data* data, std::istream& in, std::string& version) {
 	fl_cursor(FL_CURSOR_WAIT);
 	data_ = data;
 	file_ = &in;
 	// calculate the file size and initialise the progress bar
-	streampos startpos = in.tellg();
-	in.seekg(0, ios::end);
-	streampos endpos = in.tellg();
+	std::streampos startpos = in.tellg();
+	in.seekg(0, std::ios::end);
+	std::streampos endpos = in.tellg();
 	long file_size = (long)(endpos - startpos);
 	// reposition back to beginning
-	in.seekg(0, ios::beg);
+	in.seekg(0, std::ios::beg);
 	// Initialsie the progress
 	status_->misc_status(ST_NOTE, "CTY DATA: Started importing data");
 	status_->progress(file_size, OT_PREFIX, "Importing country data from clublog.org", "bytes");
@@ -239,8 +239,8 @@ bool cty1_reader::load_data(cty_data* data, istream& in, string& version) {
 }
 
 // Get date in format %Y%m%d from XML date time value.
-string cty1_reader::xmldt2date(string xml_date) {
-	string result = xml_date.substr(0, 4) + xml_date.substr(5, 2) + xml_date.substr(8, 2) +
+std::string cty1_reader::xmldt2date(std::string xml_date) {
+	std::string result = xml_date.substr(0, 4) + xml_date.substr(5, 2) + xml_date.substr(8, 2) +
 		xml_date.substr(11, 2) + xml_date.substr(14, 2);
 	return result;
 }

@@ -21,12 +21,12 @@
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Text_Display.H>
 
-using namespace std;
 
-extern string PROGRAM_ID;
-extern string PROGRAM_VERSION;
-extern string CONTACT;
-extern string COPYRIGHT;
+
+extern std::string PROGRAM_ID;
+extern std::string PROGRAM_VERSION;
+extern std::string CONTACT;
+extern std::string COPYRIGHT;
 extern Fl_PNG_Image main_icon_;
 extern status* status_;
 extern ticker* ticker_;
@@ -208,9 +208,9 @@ void banner::enable_widgets() {
 
 // Add a message to the banner
 void banner::add_message(status_t type, const char* msg) {
-	// Trap any call that is not from the main thread
+	// Trap any call that is not from the main std::thread
 	if (this_thread::get_id() != main_thread_id_) {
-		printf("Calling banner::add_message(%s) when not in the main thread\n", msg);
+		printf("Calling banner::add_message(%s) when not in the main std::thread\n", msg);
 		throw;
 	}
 	switch (type) {
@@ -249,9 +249,9 @@ void banner::add_message(status_t type, const char* msg) {
 
 // Add progress
 void banner::start_progress(uint64_t max_value, object_t object, const char* msg, const char* suffix) {
-	// Trap any call that is not from the main thread
+	// Trap any call that is not from the main std::thread
 	if (this_thread::get_id() != main_thread_id_) {
-		printf("Calling banner_start_progress(%s) when not in the main thread\n", msg);
+		printf("Calling banner_start_progress(%s) when not in the main std::thread\n", msg);
 		throw;
 	}
 	char text[128];
@@ -277,9 +277,9 @@ void banner::start_progress(uint64_t max_value, object_t object, const char* msg
 
 // Update progress dial and output
 void banner::add_progress(uint64_t value) {
-	// Trap any call that is not from the main thread
+	// Trap any call that is not from the main std::thread
 	if (this_thread::get_id() != main_thread_id_) {
-		printf("Calling banner::add_progress(%lld) when not in the main thread\n", value);
+		printf("Calling banner::add_progress(%lld) when not in the main std::thread\n", value);
 		throw;
 	}
 	char text[128];
@@ -302,9 +302,9 @@ void banner::add_progress(uint64_t value) {
 
 // Ending the progress - log message
 void banner::end_progress() {
-	// Trap any call that is not from the main thread
+	// Trap any call that is not from the main std::thread
 	if (this_thread::get_id() != main_thread_id_) {
-		printf("Calling banner::end_progress(%s) when not in the main thread\n", prg_msg_);
+		printf("Calling banner::end_progress(%s) when not in the main std::thread\n", prg_msg_);
 		throw;
 	}
 	char text[128];
@@ -319,9 +319,9 @@ void banner::end_progress() {
 
 // cancelling the progress - log message
 void banner::cancel_progress(const char* msg) {
-	// Trap any call that is not from the main thread
+	// Trap any call that is not from the main std::thread
 	if (this_thread::get_id() != main_thread_id_) {
-		printf("Calling banner::cancel_progress(%s) when not in the main thread\n", msg);
+		printf("Calling banner::cancel_progress(%s) when not in the main std::thread\n", msg);
 		throw;
 	}
 	char text[128];
@@ -351,8 +351,8 @@ void banner::copy_msg_display(status_t type, const char* msg) {
 	Fl_Text_Buffer* buffer = display_->buffer();
 	buffer->append(msg);
 	buffer->append("\n");
-	// Now set the style of the added characters
-	// Create a string of the required length and fill it with the style character
+	// Now std::set the style of the added characters
+	// Create a std::string of the required length and fill it with the style character
 	size_t len = strlen(msg) + 1;
 	char* style = new char[len + 1];
 	char s_char = (char)type + 'A';
@@ -365,7 +365,7 @@ void banner::copy_msg_display(status_t type, const char* msg) {
 
 }
 
-// set the can_close flag
+// std::set the can_close flag
 void banner::allow_close() {
 	can_close_ = true;
 }

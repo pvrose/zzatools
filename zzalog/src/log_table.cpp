@@ -39,8 +39,8 @@ extern toolbar* toolbar_;
 
 extern bool in_current_session(record*);
 extern bool DARK;
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
 extern void open_html(const char*);
 
 extern Fl_Preferences::Root prefs_mode_;
@@ -103,9 +103,9 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_app_t 
 	application_ = app;
 	// Get the fields to display
 	get_fields();
-	// set number of fields
+	// std::set number of fields
 	cols(log_fields_->size());
-	// For each field set the column width
+	// For each field std::set the column width
 	for (unsigned int i = 0; i < log_fields_->size(); i++) {
 		col_width(i, (*log_fields_)[i].width);
 	}
@@ -450,13 +450,13 @@ void log_table::update(hint_t hint, qso_num_t record_num_1, qso_num_t record_num
 		status_->misc_status(ST_WARNING, message);
 		edit_input_->hide();
 	}
-	// set the number of rows
+	// std::set the number of rows
 	rows(my_book_->get_count());
 	switch (hint) {
 	case HT_FORMAT:
 		// format has changed - it may be fields so update them
 		get_fields();
-		// set number of fields
+		// std::set number of fields
 		cols(log_fields_->size());
 		// and each one's width
 		for (unsigned int i = 0; i < log_fields_->size(); i++) {
@@ -498,9 +498,9 @@ void log_table::adjust_row_sizes() {
 	int sz = 1;
 	// Get the largest number record - and find its size
 	if (book_) sz = book_->size() + 1;
-	string max_number = to_string(sz) + ' ';
+	std::string max_number = to_string(sz) + ' ';
 	fl_measure(max_number.c_str(), w1, height);
-	// Get the size of the row header "column header" and set the width to the larger of the two
+	// Get the size of the row header "column header" and std::set the width to the larger of the two
 	fl_measure("QSO No.", w2, height);
 	row_header_width(max(w1, w2));
 }
@@ -509,11 +509,11 @@ void log_table::adjust_row_sizes() {
 void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int W, int H) {
 
 	Fl_Color line_colour = fl_color_average(FL_BACKGROUND_COLOR, selection_color(), 0.5);
-	string text;
+	std::string text;
 	switch (context) {
 
 	case CONTEXT_STARTPAGE:
-		// set the default font for the page
+		// std::set the default font for the page
 		fl_font(font_, fontsize_);
 		return;
 
@@ -620,7 +620,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 					fl_color(fl_contrast(FL_FOREGROUND_COLOR, bg_colour));
 				}
 				// get the formatted data from the field of the record
-				string direct = this_record->item((*log_fields_)[C].field, true);
+				std::string direct = this_record->item((*log_fields_)[C].field, true);
 				text = this_record->item((*log_fields_)[C].field, true);
 				Fl_Font font = font_;
 				if (direct == text) font = font;
@@ -655,12 +655,12 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 	}
 }
 
-// Get the appropriate field set for the application using this view
+// Get the appropriate field std::set for the application using this view
 void log_table::get_fields() {
 	log_fields_ = fields_->collection(application_);
 }
 
-// Returns the field set
+// Returns the field std::set
 collection_t& log_table::fields() {
 	return *log_fields_;
 }
@@ -671,7 +671,7 @@ void log_table::edit_cell(int row, int col) {
 	item_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - row : row;
 	record* record = my_book_->get_record(item_number, true);
 	field_info_t field_info = (*log_fields_)[col];
-	string text = record->item(field_info.field, true);
+	std::string text = record->item(field_info.field, true);
 	//intl_input* input = (intl_input*)edit_input_;
 	edit_row_ = row;
 	edit_col_ = col;
@@ -701,8 +701,8 @@ void log_table::done_edit(bool keep_row) {
 		item_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - edit_row_ : edit_row_;
 		record* record = my_book_->get_record(item_number, true);
 		field_info_t field_info = (*log_fields_)[edit_col_];
-		string old_text = record->item(field_info.field);
-		string text = edit_input_->value();
+		std::string old_text = record->item(field_info.field);
+		std::string text = edit_input_->value();
 		if (old_text != text) {
 			// Set the record item to the edit input value
 			record->item(field_info.field, text, true);
@@ -726,7 +726,7 @@ void log_table::done_edit(bool keep_row) {
 							edit_row_ = my_book_->size() - 1 - new_item_num;
 							break;
 						default:
-							// Do not set edit_row_
+							// Do not std::set edit_row_
 							break;
 						}
 					}
@@ -769,7 +769,7 @@ void log_table::done_edit(bool keep_row) {
 // Display a tooltip describing the field item and validating the value
 void log_table::describe_cell(int item, int col) {
 	int item_number = item;
-	string tip = "";
+	std::string tip = "";
 	switch (order_) {
 	case FIRST_TO_LAST:
 		item_number = item;
@@ -778,7 +778,7 @@ void log_table::describe_cell(int item, int col) {
 		item_number = my_book_->size() - 1 - item;
 		break;
 	default:
-		// NB. We do not map items numbers to record numbers for sorted displays
+		// NB. We do not std::map items numbers to record numbers for sorted displays
 		item_number = item;
 		break;
 	}

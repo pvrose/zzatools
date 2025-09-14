@@ -5,7 +5,7 @@
 #include <chrono>
 #include <string>
 
-using namespace std;
+
 
 enum ct_element_t : char;
 struct ct_data_t;
@@ -25,24 +25,24 @@ public:
     ~contest_writer();
 
     //! Write data \p d to output stream \p os.
-    bool store_data(contest_data* d, ostream& os);
+    bool store_data(contest_data* d, std::ostream& os);
     //! Write the single XML \p element.
     bool write_element(ct_element_t element);
 
 protected:
-    //! write an individual "<VALUE [nane]=[data]>" for string \p data. 
-    bool write_value(string name, string data);
+    //! write an individual "<VALUE [nane]=[data]>" for std::string \p data. 
+    bool write_value(std::string name, std::string data);
     //! Write an individual "<VALUE [name]=[data]>" for integer \p data.
-    bool write_value(string name, int data);
+    bool write_value(std::string name, int data);
 
     //! The contest database.
     contest_data* data_;
     //! The contest data being currently written.
     ct_data_t* contest_;
     //! The identifier of the contest being written.
-    string contest_id_;
+    std::string contest_id_;
     //! The instance identifier of the contest being written.
-    string contest_ix_;
+    std::string contest_ix_;
 
 };
 

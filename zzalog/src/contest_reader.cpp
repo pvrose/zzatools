@@ -26,16 +26,16 @@ contest_reader::~contest_reader() {
 }
 
 // Load data
-bool contest_reader::load_data(contest_data* d, istream& is) {
+bool contest_reader::load_data(contest_data* d, std::istream& is) {
 	the_data_ = d;
 	in_file_ = &is;
 	// calculate the file size and initialise the progress bar
-	streampos startpos = is.tellg();
-	is.seekg(0, ios::end);
-	streampos endpos = is.tellg();
+	std::streampos startpos = is.tellg();
+	is.seekg(0, std::ios::end);
+	std::streampos endpos = is.tellg();
 	long file_size = (long)(endpos - startpos);
 	// reposition back to beginning
-	is.seekg(0, ios::beg);
+	is.seekg(0, std::ios::beg);
 	// Initialsie the progress
 	status_->misc_status(ST_NOTE, "CONTEST: Started");
 	status_->progress(file_size, OT_CONTEST, "Converting XML into Rig CAT database", "bytes");
@@ -60,7 +60,7 @@ bool contest_reader::load_data(contest_data* d, istream& is) {
 }
 
 // Start <CONTESTS>
-bool contest_reader::start_contests(xml_wreader* that, map<string, string>* attributes) {
+bool contest_reader::start_contests(xml_wreader* that, std::map<std::string, std::string>* attributes) {
 	if (that->elements_.size()) {
 		status_->misc_status(ST_ERROR, "CONTEST: unexpected CONTESTS element");
 		return false;
@@ -75,7 +75,7 @@ bool contest_reader::start_contests(xml_wreader* that, map<string, string>* attr
 }
 
 // Start <CONTEST id= index=>
-bool contest_reader::start_contest(xml_wreader* wr, map<string, string>* attributes) {
+bool contest_reader::start_contest(xml_wreader* wr, std::map<std::string, std::string>* attributes) {
 	contest_reader* that = (contest_reader*)wr;
 	char msg[128];
 	if (that->elements_.back() != CT_CONTESTS) {
@@ -86,7 +86,7 @@ bool contest_reader::start_contest(xml_wreader* wr, map<string, string>* attribu
 	that->elements_.push_back(CT_CONTEST);
 	// get ID and Index
 	for (auto it : *attributes) {
-		string name = to_upper(it.first);
+		std::string name = to_upper(it.first);
 		if (name == "ID") {
 			that->contest_id_ = it.second;
 		}
@@ -100,11 +100,11 @@ bool contest_reader::start_contest(xml_wreader* wr, map<string, string>* attribu
 			return false;
 		}
 	}
-	map<string, map<string, ct_data_t*> >& contests = ((contest_reader*)that)->the_data_->contests_;
+	std::map<std::string, std::map<std::string, ct_data_t*> >& contests = ((contest_reader*)that)->the_data_->contests_;
 	if (contests.find(that->contest_id_) == contests.end()) {
 		contests[that->contest_id_] = {};
 	}
-	map<string, ct_data_t*>& ct_group = contests.at(that->contest_id_);
+	std::map<std::string, ct_data_t*>& ct_group = contests.at(that->contest_id_);
 	if (ct_group.find(that->contest_ix_) != ct_group.end()) {
 		snprintf(msg, sizeof(msg), "CONTEST: We have already read contest %s.%s", that->contest_id_.c_str(), that->contest_ix_.c_str());
 		status_->misc_status(ST_ERROR, msg);
@@ -116,7 +116,7 @@ bool contest_reader::start_contest(xml_wreader* wr, map<string, string>* attribu
 }
 
 // Start <TIMEFRAME start= finish=>
-bool contest_reader::start_timeframe(xml_wreader* wr, map<string, string>* attributes) {
+bool contest_reader::start_timeframe(xml_wreader* wr, std::map<std::string, std::string>* attributes) {
 	contest_reader* that = (contest_reader*)wr;
 	char msg[128];
 	if (that->elements_.back() != CT_CONTEST) {
@@ -127,12 +127,12 @@ bool contest_reader::start_timeframe(xml_wreader* wr, map<string, string>* attri
 	that->elements_.push_back(CT_TIMEFRAME);
 	// Get start and finish
 	for (auto it : *attributes) {
-		string name = to_upper(it.first);
+		std::string name = to_upper(it.first);
 		if (name == "START") {
-			that->contest_data_->date.start = chrono::system_clock::from_time_t(that->convert_xml_datetime(it.second));
+			that->contest_data_->date.start = std::chrono::system_clock::from_time_t(that->convert_xml_datetime(it.second));
 		}
 		else if (name == "FINISH") {
-			that->contest_data_->date.finish = chrono::system_clock::from_time_t(that->convert_xml_datetime(it.second));
+			that->contest_data_->date.finish = std::chrono::system_clock::from_time_t(that->convert_xml_datetime(it.second));
 		}
 		else {
 			snprintf(msg, sizeof(msg), "CONTEST: Unexpected attribute %s=%s in TIMEFRAME element",
@@ -145,14 +145,14 @@ bool contest_reader::start_timeframe(xml_wreader* wr, map<string, string>* attri
 }
 
 // Start <VALUE name=>
-bool contest_reader::start_algorithm(xml_wreader* wr, map<string, string>* attributes) {
+bool contest_reader::start_algorithm(xml_wreader* wr, std::map<std::string, std::string>* attributes) {
 	contest_reader* that = (contest_reader*)wr;
 	switch (that->elements_.back()) {
 	case CT_CONTEST:
 		that->elements_.push_back(CT_ALGORITHM);
 		// get the name
 		for (auto it : *attributes) {
-			string name = to_upper(it.first);
+			std::string name = to_upper(it.first);
 			if (name == "NAME") {
 				// Iyt might be an empty value
 				that->contest_data_->algorithm = it.second;

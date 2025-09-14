@@ -5,11 +5,11 @@
 
 #include "hamlib/rig.h"
 
-using namespace std;
+
 
 extern status* status_;
 extern bool closing_;
-extern string PROGRAM_VERSION;
+extern std::string PROGRAM_VERSION;
 
 // Consgructor
 rig_reader::rig_reader() :
@@ -30,16 +30,16 @@ rig_reader::~rig_reader() {
     elements_.clear();
 }
 
-bool rig_reader::load_data(map<string, rig_data_t*>* data, istream& in) {
+bool rig_reader::load_data(std::map<std::string, rig_data_t*>* data, std::istream& in) {
 	data_ = data;
 	in_file_ = &in;
 	// calculate the file size and initialise the progress bar
-	streampos startpos = in.tellg();
-	in.seekg(0, ios::end);
-	streampos endpos = in.tellg();
+	std::streampos startpos = in.tellg();
+	in.seekg(0, std::ios::end);
+	std::streampos endpos = in.tellg();
 	long file_size = (long)(endpos - startpos);
 	// reposition back to beginning
-	in.seekg(0, ios::beg);
+	in.seekg(0, std::ios::beg);
 	// Initialsie the progress
 	status_->misc_status(ST_NOTE, "RIG DATA: Started");
 	status_->progress(file_size, OT_RIGS, "Converting XML into Rig CAT database", "bytes");
@@ -63,7 +63,7 @@ bool rig_reader::load_data(map<string, rig_data_t*>* data, istream& in) {
 }
 
 // <rigs version="...">
-bool rig_reader::start_rigs(xml_wreader* that, map<string, string>* attributes) {
+bool rig_reader::start_rigs(xml_wreader* that, std::map<std::string, std::string>* attributes) {
 	if (that->elements_.size()) {
 		status_->misc_status(ST_ERROR, "RIG DATA: unexpected RIGS element ");
 		return false;
@@ -71,7 +71,7 @@ bool rig_reader::start_rigs(xml_wreader* that, map<string, string>* attributes) 
 	// else
 	that->elements_.push_back(RIG_RIGS);
 	for (auto it : *attributes) {
-		string name = to_upper(it.first);
+		std::string name = to_upper(it.first);
 		if (name == "VERSION") {
 			//if (!((rig_reader*)that)->check_version(it.second)) {
 			//	return false;
@@ -88,7 +88,7 @@ bool rig_reader::start_rigs(xml_wreader* that, map<string, string>* attributes) 
 }
 
 // <rig name="FlRig">
-bool rig_reader::start_rig(xml_wreader* that, map<string, string>*attributes) {
+bool rig_reader::start_rig(xml_wreader* that, std::map<std::string, std::string>*attributes) {
 	char msg[128];
 	// Only expect in RIGS
 	if (that->elements_.back() != RIG_RIGS) {
@@ -99,7 +99,7 @@ bool rig_reader::start_rig(xml_wreader* that, map<string, string>*attributes) {
 	that->elements_.push_back(RIG_RIG);
 	// get the name
 	for (auto it : *attributes) {
-		string name = to_upper(it.first);
+		std::string name = to_upper(it.first);
 		if (name == "NAME") {
 			if (((rig_reader*)that)->data_->find(it.second) != ((rig_reader*)that)->data_->end()) {
 				snprintf(msg, sizeof(msg), "RIG DATA: Duplicate rig %s found",
@@ -124,14 +124,14 @@ bool rig_reader::start_rig(xml_wreader* that, map<string, string>*attributes) {
 }
 
 // <value name=...>....
-bool rig_reader::start_value(xml_wreader* that, map<string, string>* attributes) {
+bool rig_reader::start_value(xml_wreader* that, std::map<std::string, std::string>* attributes) {
 	switch(that->elements_.back()) {
 	case RIG_RIG:
 	case RIG_APP:
 		that->elements_.push_back(RIG_VALUE);
 		// get the name
 		for (auto it : *attributes) {
-			string name = to_upper(it.first);
+			std::string name = to_upper(it.first);
 			if (name == "NAME") {
 				// Iyt might be an empty value
 				((rig_reader*)that)->value_data_ = "";
@@ -151,7 +151,7 @@ bool rig_reader::start_value(xml_wreader* that, map<string, string>* attributes)
 }
 
 // <app name="FlRig">
-bool rig_reader::start_app(xml_wreader* that, map<string, string>*attributes) {
+bool rig_reader::start_app(xml_wreader* that, std::map<std::string, std::string>*attributes) {
 	// Only expect in RIGS
 	if (that->elements_.back() != RIG_RIG) {
 		status_->misc_status(ST_ERROR, "RIG DATA: Unexpected APP element");
@@ -161,7 +161,7 @@ bool rig_reader::start_app(xml_wreader* that, map<string, string>*attributes) {
 	that->elements_.push_back(RIG_APP);
 	// get the name
 	for (auto it : *attributes) {
-		string name = to_upper(it.first);
+		std::string name = to_upper(it.first);
 		if (name == "NAME") {
 			((rig_reader*)that)->app_name_ = it.second;
 			((rig_reader*)that)->app_data_ = new cat_data_t;
@@ -237,11 +237,11 @@ bool rig_reader::end_value(xml_wreader* that) {
 	switch(parent) {
 	case RIG_RIG: 
 		if (((rig_reader*)that)->value_name_ == "Default App") 
-			rd->default_app = stoi(((rig_reader*)that)->value_data_);
+			rd->default_app = std::stoi(((rig_reader*)that)->value_data_);
 		else if (((rig_reader*)that)->value_name_ == "Antenna")
 			rd->antenna = ((rig_reader*)that)->value_data_;
 		else if (((rig_reader*)that)->value_name_ == "Instantaneous Values")
-			rd->use_instant_values = (bool)stoi(((rig_reader*)that)->value_data_);
+			rd->use_instant_values = (bool)std::stoi(((rig_reader*)that)->value_data_);
 		else {
 			snprintf(msg, sizeof(msg), "RIG DATA: Unexpected value item %s: %s in RIG %s",
 				((rig_reader*)that)->value_name_.c_str(),
@@ -258,43 +258,43 @@ bool rig_reader::end_value(xml_wreader* that) {
 		else if (((rig_reader*)that)->value_name_ == "Manufacturer") hd->mfr = ((rig_reader*)that)->value_data_;
 		else if (((rig_reader*)that)->value_name_ == "Port") hd->port_name = ((rig_reader*)that)->value_data_;
 		else if (((rig_reader*)that)->value_name_ == "Baud Rate") 
-			hd->baud_rate = stoi(((rig_reader*)that)->value_data_);
+			hd->baud_rate = std::stoi(((rig_reader*)that)->value_data_);
 		else if (((rig_reader*)that)->value_name_ == "Model ID") 
-			hd->model_id = stoi(((rig_reader*)that)->value_data_);
+			hd->model_id = std::stoi(((rig_reader*)that)->value_data_);
 		else if (((rig_reader*)that)->value_name_ == "Timeout") 
-			hd->timeout = stod(((rig_reader*)that)->value_data_);
+			hd->timeout = std::stod(((rig_reader*)that)->value_data_);
 		else if (((rig_reader*)that)->value_name_ == "Maximum Timeouts")
-			hd->max_to_count = stoi(((rig_reader*)that)->value_data_);
+			hd->max_to_count = std::stoi(((rig_reader*)that)->value_data_);
 		else if (((rig_reader*)that)->value_name_ == "S-meter Hold")
-			hd->num_smeters = stoi(((rig_reader*)that)->value_data_);
+			hd->num_smeters = std::stoi(((rig_reader*)that)->value_data_);
 		else if (((rig_reader*)that)->value_name_ == "Command") {
 			ad->app = ((rig_reader*)that)->value_data_;
 			if (ad->app.length()) ad->use_cat_app = true;
 		}
 		else if (((rig_reader*)that)->value_name_ == "Override Hamlib") 
-			ad->override_hamlib = (bool)stoi(((rig_reader*)that)->value_data_);
+			ad->override_hamlib = (bool)std::stoi(((rig_reader*)that)->value_data_);
 		else if (((rig_reader*)that)->value_name_ == "Power Mode")
-			hd->power_mode = (power_mode_t)stoi(((rig_reader*)that)->value_data_);
+			hd->power_mode = (power_mode_t)std::stoi(((rig_reader*)that)->value_data_);
 		else if (((rig_reader*)that)->value_name_ == "Maximum Power") 
-			hd->max_power = stod(((rig_reader*)that)->value_data_);
+			hd->max_power = std::stod(((rig_reader*)that)->value_data_);
 		else if (((rig_reader*)that)->value_name_ == "Frequency Mode")
-			hd->freq_mode = (freq_mode_t)stoi(((rig_reader*)that)->value_data_);
+			hd->freq_mode = (freq_mode_t)std::stoi(((rig_reader*)that)->value_data_);
 		else if (((rig_reader*)that)->value_name_ == "Crystal Frequency")
-			hd->frequency = stod(((rig_reader*)that)->value_data_);
+			hd->frequency = std::stod(((rig_reader*)that)->value_data_);
 		else if (((rig_reader*)that)->value_name_ == "Amplifier Gain")
-			hd->gain = stoi(((rig_reader*)that)->value_data_);
+			hd->gain = std::stoi(((rig_reader*)that)->value_data_);
 		else if (((rig_reader*)that)->value_name_ == "Transverter Offset")
-			hd->freq_offset = stod(((rig_reader*)that)->value_data_);
+			hd->freq_offset = std::stod(((rig_reader*)that)->value_data_);
 		else if (((rig_reader*)that)->value_name_ == "Transverter Power") 
-			hd->tvtr_power = stod(((rig_reader*)that)->value_data_);
+			hd->tvtr_power = std::stod(((rig_reader*)that)->value_data_);
 		else if (((rig_reader*)that)->value_name_ == "Accessories")
-			hd->accessory = (accessory_t)stoi(((rig_reader*)that)->value_data_);
+			hd->accessory = (accessory_t)std::stoi(((rig_reader*)that)->value_data_);
 		else if (((rig_reader*)that)->value_name_ == "Start Automatically")
-			ad->auto_start = (bool)stoi(((rig_reader*)that)->value_data_);
+			ad->auto_start = (bool)std::stoi(((rig_reader*)that)->value_data_);
 		else if (((rig_reader*)that)->value_name_ == "Connect Automatically")
-			ad->auto_connect = (bool)stoi(((rig_reader*)that)->value_data_);
+			ad->auto_connect = (bool)std::stoi(((rig_reader*)that)->value_data_);
 		else if (((rig_reader*)that)->value_name_ == "Connect Delay")
-			ad->connect_delay = stod(((rig_reader*)that)->value_data_);
+			ad->connect_delay = std::stod(((rig_reader*)that)->value_data_);
 		else {
 			snprintf(msg, sizeof(msg), "RIG DATA: Unexpected value item %s: %s in RIG/APP %s/%s",
 				((rig_reader*)that)->value_name_.c_str(),
@@ -310,25 +310,25 @@ bool rig_reader::end_value(xml_wreader* that) {
 	}
 }
 
-bool rig_reader::chars_value(xml_wreader* that, string content) {
+bool rig_reader::chars_value(xml_wreader* that, std::string content) {
 	((rig_reader*)that)->value_data_ = content;
 	return true;
 }
 
 // Check app version is >= version in settings file
-bool rig_reader::check_version(string v) {
-	vector<string> file_words;
+bool rig_reader::check_version(std::string v) {
+	std::vector<std::string> file_words;
 	split_line(v, file_words, '.');
-	vector<string> prog_words;
+	std::vector<std::string> prog_words;
 	split_line(PROGRAM_VERSION, prog_words, '.');
-	if (stoi(prog_words[0]) > stoi(file_words[0])) {
+	if (std::stoi(prog_words[0]) > std::stoi(file_words[0])) {
 		return true;
 	} else if (prog_words[0] == file_words[0]) {
-		if (stoi(prog_words[1]) > stoi(file_words[1])) {
+		if (std::stoi(prog_words[1]) > std::stoi(file_words[1])) {
 			return true;
 		}
 		else if (prog_words[1] == file_words[1]) {
-			if (stoi(prog_words[2]) >= stoi(file_words[2])) {
+			if (std::stoi(prog_words[2]) >= std::stoi(file_words[2])) {
 				return true;
 			}
 		}

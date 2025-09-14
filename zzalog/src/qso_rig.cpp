@@ -27,7 +27,7 @@
 #include <FL/Fl_Tabs.H>
 #include <FL/Fl_Value_Slider.H>
 
-using namespace std;
+
 
 extern status* status_;
 extern band_data* band_data_;
@@ -35,8 +35,8 @@ extern spec_data* spec_data_;
 extern rig_data* rig_data_;
 extern bool DARK;
 extern ticker* ticker_;
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
 extern void open_html(const char*);
 
 
@@ -48,7 +48,7 @@ qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :
 {
 	// If no name is provided then get from qso_manager
 	if (L == nullptr || strlen(L) == 0) copy_label(ancestor_view<qso_manager>(this)->get_default(qso_manager::RIG).c_str());
-	// Otherwise copy that supplied as it is probably a transient string
+	// Otherwise copy that supplied as it is probably a transient std::string
 	else copy_label(L);
 	// CAT control group
 	labelfont(FL_BOLD);
@@ -215,7 +215,7 @@ void qso_rig::create_rig_ant(int curr_x, int curr_y) {
 	// field input to select an antenna from the ones previously logged or type in new
 	ip_antenna_ = new field_input(curr_x, curr_y, WSMEDIT, HBUTTON, "Antenna");
 	ip_antenna_->align(FL_ALIGN_LEFT);
-	ip_antenna_->callback(cb_value<field_input, string>, &rig_info_->antenna);
+	ip_antenna_->callback(cb_value<field_input, std::string>, &rig_info_->antenna);
 	ip_antenna_->tooltip("Select the preferred antenna for this rig");
 	ip_antenna_->field_name("MY_ANTENNA");
 	ip_antenna_->value(rig_info_->antenna.c_str());
@@ -373,7 +373,7 @@ void qso_rig::create_network(int curr_x, int curr_y) {
 
 	// App name (flrig or wfview to connect to rig
 	ip_app_name_ = new filename_input(curr_x, curr_y, this_w, HTEXT);
-	ip_app_name_->callback(cb_value<Fl_Input, string>, nullptr);
+	ip_app_name_->callback(cb_value<Fl_Input, std::string>, nullptr);
 	ip_app_name_->tooltip("Please provide the command to use to connect");
 	ip_app_name_->value("");
 
@@ -1083,8 +1083,8 @@ void qso_rig::enable_widgets(uchar damage) {
 		op_freq_mode_->labelcolor(FL_YELLOW);
 
 		char msg[200];
-		string rig_mode;
-		string submode;
+		std::string rig_mode;
+		std::string submode;
 		rig_->get_string_mode(rig_mode, submode);
 		bool ptt = rig_->get_ptt();
 		char bullet[] = "\342\200\243";
@@ -1165,8 +1165,8 @@ void qso_rig::populate_model_choice() {
 	// Get hamlib Model number and populate control with all model names
 	ch_rig_model_->clear();
 	rig_choice_pos_.clear();
-	set<string> rig_list;
-	map<string, rig_model_t> rig_ids;
+	std::set<std::string> rig_list;
+	std::map<std::string, rig_model_t> rig_ids;
 	rig_list.clear();
 	rig_ids.clear();
 	// For each possible rig ids in hamlib
@@ -1199,8 +1199,8 @@ void qso_rig::populate_model_choice() {
 			char* temp = new char[256];
 			// The '/' ensures all rigs from same manufacturer are in a 
 			// a sub-menu to the manufacturer
-			string mfg = escape_menu(capabilities->mfg_name);
-			string model = escape_menu(capabilities->model_name);
+			std::string mfg = escape_menu(capabilities->mfg_name);
+			std::string model = escape_menu(capabilities->model_name);
 			if (model.length() == 0) {
 				model = mfg;
 				mfg = "Other";
@@ -1212,8 +1212,8 @@ void qso_rig::populate_model_choice() {
 			rig_list.insert(temp);
 			rig_ids[temp] = capabilities->rig_model;
 			if (cat_data_) {
-				if (string(capabilities->mfg_name) == cat_data_->hamlib->mfr &&
-					string(capabilities->model_name) == cat_data_->hamlib->model) {
+				if (std::string(capabilities->mfg_name) == cat_data_->hamlib->mfr &&
+					std::string(capabilities->model_name) == cat_data_->hamlib->model) {
 					cat_data_->hamlib->model_id = capabilities->rig_model;
 					cat_data_->hamlib->port_type = capabilities->port_type;
 				}
@@ -1221,10 +1221,10 @@ void qso_rig::populate_model_choice() {
 		}
 	}
 	// Add the rigs in alphabetical order to the choice widget,
-	// set widget's value to intended
+	// std::set widget's value to intended
 	ch_rig_model_->add("", 0, nullptr, nullptr);
 	for (auto ix = rig_list.begin(); ix != rig_list.end(); ix++) {
-		string name = *ix;
+		std::string name = *ix;
 		rig_model_t id = rig_ids.at(name);
 		// Add the id as user data for the menu item
 		int pos = ch_rig_model_->add(name.c_str(), 0, nullptr, (void*)(intptr_t)id);
@@ -1242,23 +1242,23 @@ void qso_rig::populate_port_choice() {
 		ch_port_name_->add("NONE");
 		ch_port_name_->value(0);
 		int num_ports = 1;
-		string* existing_ports = new string[1];
+		std::string* existing_ports = new std::string[1];
 		serial serial;
-		// Get the list of all ports or available (not in use) ports
+		// Get the std::list of all ports or available (not in use) ports
 		while (!serial.available_ports(num_ports, existing_ports, use_all_ports_, num_ports)) {
 			delete[] existing_ports;
-			existing_ports = new string[num_ports];
+			existing_ports = new std::string[num_ports];
 		}
 		// now for the returned ports
 		for (int i = 0; i < num_ports; i++) {
-			// Add the name onto the choice drop-down list
+			// Add the name onto the choice drop-down std::list
 			char message[100];
-			string sport = *(existing_ports + i);
+			std::string sport = *(existing_ports + i);
 			const char* port = sport.c_str();
 			snprintf(message, sizeof(message), "DASH: Found port %s", port);
 			status_->misc_status(ST_LOG, message);
 			ch_port_name_->add(port);
-			// Set the value to the list of ports
+			// Set the value to the std::list of ports
 			if (strcmp(port, cat_data_->hamlib->port_name.c_str()) == 0) {
 				ch_port_name_->value(i);
 			}
@@ -1374,14 +1374,14 @@ void qso_rig::cb_ch_model(Fl_Widget* w, void* v) {
 // v is unused
 void qso_rig::cb_ch_port(Fl_Widget* w, void* v) {
 	qso_rig* that = ancestor_view<qso_rig>(w);
-	cb_text<Fl_Choice, string>(w, (void*)&that->cat_data_->hamlib->port_name);
+	cb_text<Fl_Choice, std::string>(w, (void*)&that->cat_data_->hamlib->port_name);
 }
 
 // Callback entering named port
 // v is unused
 void qso_rig::cb_ip_port(Fl_Widget* w, void* v) {
 	qso_rig* that = ancestor_view<qso_rig>(w);
-	cb_value<Fl_Input, string>(w, (void*)&that->cat_data_->hamlib->port_name);
+	cb_value<Fl_Input, std::string>(w, (void*)&that->cat_data_->hamlib->port_name);
 }
 
 // Callback selecting baud-rate
@@ -1445,14 +1445,14 @@ void qso_rig::cb_bn_select(Fl_Widget* w, void* v) {
 }
 
 // Clicked start button
-// v points to the string containing the command to  invoke flrig
+// v points to the std::string containing the command to  invoke flrig
 void qso_rig::cb_bn_start(Fl_Widget* w, void* v) {
 	qso_rig* that = ancestor_view<qso_rig>(w);
 	cat_data_t* cat_data = that->cat_data_;
 #ifdef _WIN32
-	string command = "start /min " + cat_data->app;
+	std::string command = "start /min " + cat_data->app;
 #else
-	string command = cat_data->app + "&";
+	std::string command = cat_data->app + "&";
 #endif
 	int result = system(command.c_str());
 	char msg[100];
@@ -1654,7 +1654,7 @@ void qso_rig::ticker() {
 
 // Static 1s ticker
 void qso_rig::cb_ticker(void* v) {
-	// temporarily remove onself from the ticker list as this may take for than 1 s
+	// temporarily remove onself from the ticker std::list as this may take for than 1 s
 	ticker_->activate_ticker(v, false);
 	((qso_rig*)v)->ticker();
 	ticker_->activate_ticker(v, true);
@@ -1703,7 +1703,7 @@ void qso_rig::modify_hamlib_data() {
 }
 
 // Return the preferred antenna
-string qso_rig::antenna() {
+std::string qso_rig::antenna() {
 	return rig_info_->antenna;
 }
 

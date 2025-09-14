@@ -9,30 +9,30 @@ cty3_reader::cty3_reader() {}
 cty3_reader::~cty3_reader() {}
 
 // Parse the generic parts of the record
-cty_element* cty3_reader::load_element(cty_element::type_t type, string line, string& nickname, string& patterns) {
-	vector<string> fields;
+cty_element* cty3_reader::load_element(cty_element::type_t type, std::string line, std::string& nickname, std::string& patterns) {
+	std::vector<std::string> fields;
 	split_line(line, fields, '|');
 	cty_element* result = new cty_element;
 	result->type_ = type;
-	if (fields[FT_DXCC_ID].length()) result->dxcc_id_ = stoi(fields[FT_DXCC_ID]);
+	if (fields[FT_DXCC_ID].length()) result->dxcc_id_ = std::stoi(fields[FT_DXCC_ID]);
 	result->name_ = fields[FT_NAME];
 	if (fields[FT_START].length())	result->time_validity_.start = fields[FT_START] + "0000";
 	if (fields[FT_FINISH].length())	result->time_validity_.finish = fields[FT_FINISH] + "2359";
-	if (fields[FT_CQZ].length()) result->cq_zone_ = stoi(fields[FT_CQZ]);
-	if (fields[FT_ITUZ].length()) result->itu_zone_ = stoi(fields[FT_ITUZ]);
+	if (fields[FT_CQZ].length()) result->cq_zone_ = std::stoi(fields[FT_CQZ]);
+	if (fields[FT_ITUZ].length()) result->itu_zone_ = std::stoi(fields[FT_ITUZ]);
 	if (fields[FT_CONTINENT].length()) result->continent_ = fields[FT_CONTINENT];
-	if (fields[FT_LONGITUDE].length()) result->coordinates_.longitude = stod(fields[FT_LONGITUDE]) / 180.;
-	if (fields[FT_LATITUDE].length()) result->coordinates_.latitude = stod(fields[FT_LATITUDE]) / 180.;
+	if (fields[FT_LONGITUDE].length()) result->coordinates_.longitude = std::stod(fields[FT_LONGITUDE]) / 180.;
+	if (fields[FT_LATITUDE].length()) result->coordinates_.latitude = std::stod(fields[FT_LATITUDE]) / 180.;
 	patterns = fields[FT_PFX_MASK];
 	nickname = fields[FT_NICKNAME];
 	return result;
 }
 
-// Convert prefix mask to list of prefixes
-list<string> cty3_reader::expand_mask(string patterns) {
-	list<string> result;
+// Convert prefix mask to std::list of prefixes
+std::list<std::string> cty3_reader::expand_mask(std::string patterns) {
+	std::list<std::string> result;
 	// Separate int patterns
-	vector<string> indiv_patts;
+	std::vector<std::string> indiv_patts;
 	split_line(patterns, indiv_patts, ',');
 	for (auto ptn : indiv_patts) {
 		int num_multis = 0;
@@ -52,7 +52,7 @@ list<string> cty3_reader::expand_mask(string patterns) {
 			continue;
 		}
 		// Preprocess removing #,@,? and -
-		string expanded = "";
+		std::string expanded = "";
 		expanded.reserve(500);
 		bool braced = false;
 		bool slash_seen = false;
@@ -102,8 +102,8 @@ list<string> cty3_reader::expand_mask(string patterns) {
 
 		if (ignore) continue;
 
-		list<string> interim; // Interim result
-		list<string> temp_start;
+		std::list<std::string> interim; // Interim result
+		std::list<std::string> temp_start;
 		braced = false;
 		for (auto c : expanded) {
 			switch (c) {
@@ -156,9 +156,9 @@ list<string> cty3_reader::expand_mask(string patterns) {
 }
 
 // Decode entity record
-cty_element* cty3_reader::load_entity(string line, bool deleted) {
-	string nickname = "";
-	string pattern;
+cty_element* cty3_reader::load_entity(std::string line, bool deleted) {
+	std::string nickname = "";
+	std::string pattern;
 	// Get the basic data
 	cty_element* element = load_element(cty_element::CTY_ENTITY, line, nickname, pattern);
 	// Generate entity record 
@@ -168,14 +168,14 @@ cty_element* cty3_reader::load_entity(string line, bool deleted) {
 	entity->nickname_ = nickname;
 	data_->add_entity(entity);
 	// Generate all prefix records
-	list<string> pfx_pattern = expand_mask(pattern);
+	std::list<std::string> pfx_pattern = expand_mask(pattern);
 	return entity;
 }
 
 // Decode geography record
-cty_element* cty3_reader::load_geography(string line, bool deleted) {
-	string nickname = "";
-	string pattern;
+cty_element* cty3_reader::load_geography(std::string line, bool deleted) {
+	std::string nickname = "";
+	std::string pattern;
 	cty_geography* geo = new cty_geography;
 	cty_element* element = load_element(cty_element::CTY_GEOGRAPHY, line, nickname, pattern);
 	*(cty_element*)geo = *element;
@@ -186,9 +186,9 @@ cty_element* cty3_reader::load_geography(string line, bool deleted) {
 }
 
 // Decode usage record
-cty_element* cty3_reader::load_usage(string line) {
-	string nickname = "";
-	string pattern;
+cty_element* cty3_reader::load_usage(std::string line) {
+	std::string nickname = "";
+	std::string pattern;
 	cty_filter* usage = new cty_filter;
 	cty_element* element = load_element(cty_element::CTY_FILTER, line, nickname, pattern);
 	*(cty_element*)usage = *element;
@@ -198,23 +198,23 @@ cty_element* cty3_reader::load_usage(string line) {
 }
 
 
-// Load data from specified file into and add each record to the map
-bool cty3_reader::load_data(cty_data* data, istream& in, string& version) {
+// Load data from specified file into and add each record to the std::map
+bool cty3_reader::load_data(cty_data* data, std::istream& in, std::string& version) {
 	data_ = data;
 	// calculate the file size and initialise the progress bar
-	streampos startpos = in.tellg();
-	in.seekg(0, ios::end);
-	streampos endpos = in.tellg();
+	std::streampos startpos = in.tellg();
+	in.seekg(0, std::ios::end);
+	std::streampos endpos = in.tellg();
 	long file_size = (long)(endpos - startpos);
 	int bytes;
 	// reposition back to beginning
-	in.seekg(0, ios::beg);
+	in.seekg(0, std::ios::beg);
 	// Initialsie the progress
 	status_->misc_status(ST_NOTE, "CTY DATA: Started importing data");
 	status_->progress(file_size, OT_PREFIX, "Importing country data from DxAtlas", "bytes");
 
 	// Read and discard header lines
-	string line;
+	std::string line;
 	getline(in, line);
 	while (line[0] == '#') getline(in, line);
 	bool ok = in.good();
@@ -224,27 +224,27 @@ bool cty3_reader::load_data(cty_data* data, istream& in, string& version) {
 		size_t pos = line.find('|');
 		int depth = 0;
 		rec_type_t type;
-		string stype = line.substr(0, pos);
+		std::string stype = line.substr(0, pos);
 		switch (pos) {
 		case 2:
 			// top-level record "<TYPE>"
 			depth = 0;
-			type = (rec_type_t)stoi(stype, 0, 10);
+			type = (rec_type_t)std::stoi(stype, 0, 10);
 			break;
 		case 3:
 			// top-level record "<MODE><TYPE>"
 			depth = 0;
-			type = (rec_type_t)stoi(stype.substr(1, 2), 0, 10);
+			type = (rec_type_t)std::stoi(stype.substr(1, 2), 0, 10);
 			break;
 		case 4:
 			// sub-level record "<TYPE><DEPTH>"
-			depth = stoi(stype.substr(2, 2));
-			type = (rec_type_t)stoi(stype.substr(0, 2), 0, 10);
+			depth = std::stoi(stype.substr(2, 2));
+			type = (rec_type_t)std::stoi(stype.substr(0, 2), 0, 10);
 			break;
 		case 5:
 			// sub-level record "<MODE><TYPE><DEPTH>"
-			depth = stoi(stype.substr(3, 2));
-			type = (rec_type_t)stoi(stype.substr(1, 2), 0, 10);
+			depth = std::stoi(stype.substr(3, 2));
+			type = (rec_type_t)std::stoi(stype.substr(1, 2), 0, 10);
 			break;
 		}
 		current_elements_.resize(depth + 1);

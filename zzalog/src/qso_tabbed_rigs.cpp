@@ -11,11 +11,11 @@ extern rig_data* rig_data_;
 extern spec_data* spec_data_;
 extern status* status_;
 extern bool closing_;
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
 
-// Constructor for the rigs set of tabs
+// Constructor for the rigs std::set of tabs
 qso_tabbed_rigs::qso_tabbed_rigs(int X, int Y, int W, int H, const char* L) :
 	Fl_Tabs(X, Y, W, H, L)
 {
@@ -41,13 +41,13 @@ qso_tabbed_rigs::~qso_tabbed_rigs() {
 void qso_tabbed_rigs::load_values() {
 	// Get existing rig names from spec_data - as seen in log
 	spec_dataset* rig_dataset = spec_data_->dataset("Dynamic MY_RIG");
-	// Ger the list of rigs as seen in rig.xml
-	vector<string> rigs = rig_data_->rigs();
+	// Ger the std::list of rigs as seen in rig.xml
+	std::vector<std::string> rigs = rig_data_->rigs();
 	for (auto it : rigs) {
 		// If the rig is in both lists
 		rig_data_t* rig_info = rig_data_->get_rig(it);
 		if (rig_info->default_app >= 0 && rig_dataset && rig_dataset->data.find(it) != rig_dataset->data.end()) {
-			label_map_[string(it)] = nullptr;
+			label_map_[std::string(it)] = nullptr;
 		}
 	}
 	// Load default tab value
@@ -99,7 +99,7 @@ void qso_tabbed_rigs::create_form(int X, int Y) {
 
 // Enable widgets
 void qso_tabbed_rigs::enable_widgets() {
-	string name;
+	std::string name;
 	if (label_map_.size() > 0) {
 		if (label() == nullptr || strlen(label()) == 0) {
 			name = (*label_map_.begin()).first;
@@ -139,13 +139,13 @@ void qso_tabbed_rigs::save_values() {
 
 // Switch to the selected rig
 void qso_tabbed_rigs::switch_rig() {
-	string rig_name = label();
+	std::string rig_name = label();
 	if (rig_name.length()) {
 		if (label_map_.find(rig_name) == label_map_.end() || label_map_.at(rig_name) == nullptr) {
-			if (label_map_.size() == 1 && (*label_map_.begin()).first == string("")) {
-				// Place holder null string - delete it and its reference
+			if (label_map_.size() == 1 && (*label_map_.begin()).first == std::string("")) {
+				// Place holder null std::string - delete it and its reference
 				delete (qso_rig*)(*label_map_.begin()).second;
-				label_map_.erase(string(""));
+				label_map_.erase(std::string(""));
 			}
 			// Rig does not yet exist, create it and select it
 			int rx = 0;

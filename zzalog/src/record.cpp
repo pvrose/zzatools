@@ -23,7 +23,7 @@ record.cpp - Individual record data item: implementation file
 #include <FL/Fl_Preferences.H>
 #include <FL/fl_utf8.h>
 
-using namespace std;
+
 
 
 
@@ -31,8 +31,8 @@ extern cty_data* cty_data_;
 extern spec_data* spec_data_;
 extern status* status_;
 extern book* book_;
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
 
 // initialise the static variables
 bool record::expecting_header_ = true;
@@ -40,9 +40,9 @@ bool record::inhibit_error_reporting_ = false;
 
 // Comparison operator - compares QSO_DATE and TIME_ON - orders the records by time.
 bool record::operator > (record& them) {
-	// Basic string comparison "YYYYMMDDHHMMSS"
-	string my_time = item("QSO_DATE") + item("TIME_ON");
-	string their_time = them.item("QSO_DATE") + them.item("TIME_ON");
+	// Basic std::string comparison "YYYYMMDDHHMMSS"
+	std::string my_time = item("QSO_DATE") + item("TIME_ON");
+	std::string their_time = them.item("QSO_DATE") + them.item("TIME_ON");
 	if (my_time > their_time) {
 		return true;
 	}
@@ -77,8 +77,8 @@ record& record::operator= (const record& rhs) {
 		this->header_comment_ = rhs.header_comment_;
 		// Copy over the mapped items
 		for (auto iter = rhs.begin(); iter != rhs.end(); iter++) {
-			string field = iter->first;
-			string value = iter->second;
+			std::string field = iter->first;
+			std::string value = iter->second;
 			item(field, value, false, false);
 		}
 	}
@@ -100,7 +100,7 @@ void record::delete_contents() {
 }
 
 // Set an item pair.
-void record::item(string field, string value, bool formatted/* = false*/, bool dirty /*=true*/) {
+void record::item(std::string field, std::string value, bool formatted/* = false*/, bool dirty /*=true*/) {
 	// Check we are not deleting an important field - crash the program if this was unintentional
 	char message[256];
 	snprintf(message, 256, "You are deleting %s, are you sure", field.c_str());
@@ -116,7 +116,7 @@ void record::item(string field, string value, bool formatted/* = false*/, bool d
 	if (!value.length()) {
 		// SEt dirty flag if contents are changing
 		if (dirty) {
-			string orig_value;
+			std::string orig_value;
 			if (find(field) != end()) {
 				orig_value = at(field);
 			}
@@ -133,7 +133,7 @@ void record::item(string field, string value, bool formatted/* = false*/, bool d
 		return;
 	}
 	// Certain fields - always log in upper case
-	string upper_value;
+	std::string upper_value;
 	if (field == "CALL" ||
 		field == "CONT" ||
 		field == "MY_CALL" ||
@@ -157,24 +157,24 @@ void record::item(string field, string value, bool formatted/* = false*/, bool d
 		}
 		else {
 			// Get the type of data. Different processing for different types
-			string datatype = spec_data_->datatype(field);
+			std::string datatype = spec_data_->datatype(field);
 			if (datatype == "PositiveInteger") {
 				// Always strip off leading zeros
 				size_t dummy;
 				int int_value;
 				try {
-					int_value = stoi(value, &dummy);
+					int_value = std::stoi(value, &dummy);
 					if (dummy == value.length()) {
-						// The whole string is an integer - convert it back to string
+						// The whole std::string is an integer - convert it back to std::string
 						upper_value = to_string(int_value);
 					}
 					else {
-						// Use the original string
+						// Use the original std::string
 						upper_value = value;
 					}
 				}
 				catch (invalid_argument&) {
-					// Empty string, so use that
+					// Empty std::string, so use that
 					upper_value = value;
 				}
 			}
@@ -191,11 +191,11 @@ void record::item(string field, string value, bool formatted/* = false*/, bool d
 			}
 		}
 	}
-	string formatted_value;
+	std::string formatted_value;
 	if (formatted) {
 		// Convert from the displayed format to ADIF format
 		if (upper_value == "") {
-			// empty string gives empty string
+			// empty std::string gives empty std::string
 			formatted_value = "";
 		}
 		else {
@@ -232,14 +232,14 @@ void record::item(string field, string value, bool formatted/* = false*/, bool d
 						formatted_value = spec_data_->mode_for_submode(formatted_value);
 					}
 					else {
-						// set submode to ""
-						item("SUBMODE", string(""));
+						// std::set submode to ""
+						item("SUBMODE", std::string(""));
 					}
 				}
 				break;
 			case 'L':
 				// Convert signed decimal degree to ADIF spec LAT or LON value.
-				as_d = stod(upper_value);
+				as_d = std::stod(upper_value);
 				if (as_d < 0.0) {
 					// Negative - West for LON, South for LAT. Covert degrees to positive number
 					as_d = -as_d;
@@ -280,7 +280,7 @@ void record::item(string field, string value, bool formatted/* = false*/, bool d
 	}
 	// SEt dirty flag if contents are changing
 	if (dirty) {
-		string orig_value;
+		std::string orig_value;
 		if (find(field) != end()) {
 			orig_value = at(field);
 		}
@@ -297,13 +297,13 @@ void record::item(string field, string value, bool formatted/* = false*/, bool d
 	(*this)[field] = formatted_value;
 }
 
-// Get an item - as string
-string record::item(string field, bool formatted/* = false*/) {
-	string result;
+// Get an item - as std::string
+std::string record::item(std::string field, bool formatted/* = false*/) {
+	std::string result;
 	if (formatted) {
 		// Return the display format for the field
-		string unformatted_value = item(field);
-		// Convert empty string to empty string
+		std::string unformatted_value = item(field);
+		// Convert empty std::string to empty std::string
 		if (unformatted_value == "") {
 			result = unformatted_value;
 		}
@@ -347,15 +347,15 @@ string record::item(string field, bool formatted/* = false*/) {
 				break;
 			case 'L':
 				// LAT/LON value return signed decimal degree
-				as_d = stod(unformatted_value.substr(1, 3));
-				as_d += (stod(unformatted_value.substr(5)) / 60.0);
+				as_d = std::stod(unformatted_value.substr(1, 3));
+				as_d += (std::stod(unformatted_value.substr(5)) / 60.0);
 				switch (unformatted_value[0]) {
 				case 'W':
 				case 'S':
 					as_d = -as_d;
 				}
 				snprintf(as_c, 15, "%g", as_d);
-				result = string(as_c);
+				result = std::string(as_c);
 			default:
 				// If any other data indicator gets returned - it shouldn't
 				result = unformatted_value;
@@ -367,7 +367,7 @@ string record::item(string field, bool formatted/* = false*/) {
 		// Use the field directly
 		auto it = find(field);
 		if (it == end()) {
-			// Field not present return empty string
+			// Field not present return empty std::string
 			result = "";
 		}
 		else {
@@ -379,11 +379,11 @@ string record::item(string field, bool formatted/* = false*/) {
 }
 
 // get an item - as an integer, default 0
-void record::item(string field, int& value) {
+void record::item(std::string field, int& value) {
 	if (item_exists(field)) {
 		try {
 			// Return integer value
-			value = stoi(item(field));
+			value = std::stoi(item(field));
 		}
 		catch (invalid_argument&) {
 			// Not a valid integer
@@ -397,7 +397,7 @@ void record::item(string field, int& value) {
 }
 
 // get an item - as an unsigned long long, default 0
-void record::item(string field, unsigned long long& value) {
+void record::item(std::string field, unsigned long long& value) {
 	if (item_exists(field)) {
 		try {
 			// Return integer value
@@ -415,19 +415,19 @@ void record::item(string field, unsigned long long& value) {
 }
 
 // get an item - as a double, default "not-a-number"
-void record::item(string field, double& value) {
+void record::item(std::string field, double& value) {
 	if (item_exists(field)) {
 		try {
 			// return double value
-			value = stod(item(field));
+			value = std::stod(item(field));
 		}
 		catch (invalid_argument&) {
 			// If it's not a valid decimal it may be in LAT/LON format
 			if (field == "LAT" || field == "LON" || field == "MY_LAT" || field == "MY_LON") {
 				// Get formatted version
-				string item_value = item(field, true);
+				std::string item_value = item(field, true);
 				try {
-					value = stod(item_value);
+					value = std::stod(item_value);
 				}
 				catch (invalid_argument&) {
 					value = nan("");
@@ -459,20 +459,20 @@ bool record::is_valid() {
 	}
 }
 
-// does the item exist - in the map and not an empty string
-bool record::item_exists(string field) {
+// does the item exist - in the std::map and not an empty std::string
+bool record::item_exists(std::string field) {
 	return find(field) != end() && at(field) != "";
 }
 
-// set the header information
-void record::header(string comment) {
+// std::set the header information
+void record::header(std::string comment) {
 	is_header_ = true;
 	header_comment_ = comment;
 	book_->add_dirty_record(this, comment);
 }
 
 // get the header information
-string record::header() {
+std::string record::header() {
 	return header_comment_;
 }
 
@@ -484,18 +484,18 @@ bool record::is_header() {
 // Delete all parsed fields
 void record::unparse() {
 	// Band - only if frequency is there
-	if (item_exists("FREQ")) item("BAND", string(""));
-	if (item_exists("FREQ_RX")) item("BAND_RX", string(""));
+	if (item_exists("FREQ")) item("BAND", std::string(""));
+	if (item_exists("FREQ_RX")) item("BAND_RX", std::string(""));
 	// Geography fields - based on parsing the callsign
-	item("DXCC", string(""));
-	item("COUNTRY", string(""));
-	item("CONT", string(""));
-	item("CQZ", string(""));
-	item("ITUZ", string(""));
-	item("APP_ZZA_PFX", string(""));
+	item("DXCC", std::string(""));
+	item("COUNTRY", std::string(""));
+	item("CONT", std::string(""));
+	item("CQZ", std::string(""));
+	item("ITUZ", std::string(""));
+	item("APP_ZZA_PFX", std::string(""));
 	// bearing and distance - based on home location and DX location (from record or prefix)
-	item("ANT_AZ", string(""));
-	item("DISTANCE", string(""));
+	item("ANT_AZ", std::string(""));
+	item("DISTANCE", std::string(""));
 	char message[100];
 	sprintf(message,"LOG: %s %s %s - parsed data removed",
 		item("QSO_DATE").c_str(), item("TIME_ON").c_str(), item("CALL").c_str());
@@ -515,8 +515,8 @@ lat_long_t record::location(bool my_station, location_t& source) {
 
 	// now look at the various sources of lat/lon
 	// By preference use LAT/LON
-	string value_1;
-	string value_2;
+	std::string value_1;
+	std::string value_2;
 	// Use LAT/LON fields
 	if (my_station) {
 		item("MY_LAT", lat_long.latitude);
@@ -605,7 +605,7 @@ bool record::update_band(bool force /*=false*/) {
 			double frequency;
 			item("FREQ", frequency);
 			// Look it up
-			string band = spec_data_->band_for_freq(frequency);
+			std::string band = spec_data_->band_for_freq(frequency);
 			item("BAND", band);
 			updated = true;
 		}
@@ -616,13 +616,13 @@ bool record::update_band(bool force /*=false*/) {
 			item("FREQ_RX", frequency);
 			// If it exists - look up the band
 			if (!isnan(frequency)) {
-				string band = spec_data_->band_for_freq(frequency);
+				std::string band = spec_data_->band_for_freq(frequency);
 				item("BAND_RX", band);
 				updated = true;
 			}
 			else {
 				if (item("BAND_RX") != "") {
-					item("BAND_RX", string(""), true);
+					item("BAND_RX", std::string(""), true);
 					updated = true;
 				}
 			}
@@ -639,10 +639,10 @@ bool record::merge_records(record* merge_record, match_flags_t flags, hint_t* re
 	bool bearing_change = false;
 	// For each field in other merge_record
 	for (auto it = merge_record->begin(); it != merge_record->end(); it++) {
-		string field_name = it->first;
-		string merge_data = it->second;
+		std::string field_name = it->first;
+		std::string merge_data = it->second;
 		// Get my value for the field
-		string my_data = item(field_name);
+		std::string my_data = item(field_name);
 		bool item_match = items_match(merge_record, field_name);
 		bool is_location = false;
 		bool is_grid_4_to_6 = false;
@@ -687,7 +687,7 @@ bool record::merge_records(record* merge_record, match_flags_t flags, hint_t* re
 		else if (field_name == "LOTW_QSL_RCVD") {
 			// Change club log upload status
 			if (item("CLUBLOG_QSO_UPLOAD_STATUS") == "Y") {
-				item("CLUBLOG_QSO_UPLOAD_STATUS", string("M"));
+				item("CLUBLOG_QSO_UPLOAD_STATUS", std::string("M"));
 				merged = true;
 			}
 			is_qsl_rcvd = true;
@@ -739,7 +739,7 @@ bool record::merge_records(record* merge_record, match_flags_t flags, hint_t* re
 			merged = true;
 		}
 		else if (!item_match && (field_name == "RST_RVCD" || field_name == "RST_SENT")) {
-			// Use merge data if the values match numerically but differ in string value
+			// Use merge data if the values match numerically but differ in std::string value
 			int l_value;
 			int r_value;
 			item(field_name, l_value);
@@ -794,21 +794,21 @@ void record::update_bearing() {
 		sprintf(distance_string, "%0.f", distance);
 		// Update if different
 		if (item("ANT_AZ") != azimuth) {
-			item("ANT_AZ", string(azimuth));
+			item("ANT_AZ", std::string(azimuth));
 		}
 		if (item("DISTANCE") != distance_string) {
-			item("DISTANCE", string(distance_string));
+			item("DISTANCE", std::string(distance_string));
 		}
 	}
 }
 
 
 // Change a field name
-void record::change_field_name(string from, string to) {
+void record::change_field_name(std::string from, std::string to) {
 	// Set the item changing it to
 	item(to, item(from));
 	// Clear the existing one
-	item(from, string(""));
+	item(from, std::string(""));
 }
 
 // records are potential duplicates - returns result
@@ -835,8 +835,8 @@ match_result_t record::match_records(record* record) {
 	bool call_match = true;
 	// For each field in this record
 	for (auto it = begin(); it != end(); it++) {
-		string field_name = it->first;
-		string value = it->second;
+		std::string field_name = it->first;
+		std::string value = it->second;
 		// Time/date match
 		if (field_name == "QSO_DATE" ||
 			field_name == "TIME_ON" ) {
@@ -905,11 +905,11 @@ match_result_t record::match_records(record* record) {
 	// Need more detailed analysis 
 	else {
 		// The two records overlap
-		chrono::system_clock::time_point this_on = ctimestamp();
-		chrono::system_clock::time_point this_off = ctimestamp(true);
-		chrono::system_clock::time_point that_on = record->ctimestamp();
-		chrono::system_clock::time_point that_off = record->ctimestamp(true);
-		chrono::seconds min30(1800);
+		std::chrono::system_clock::time_point this_on = ctimestamp();
+		std::chrono::system_clock::time_point this_off = ctimestamp(true);
+		std::chrono::system_clock::time_point that_on = record->ctimestamp();
+		std::chrono::system_clock::time_point that_off = record->ctimestamp(true);
+		std::chrono::seconds min30(1800);
 		// Make the QSO lengths >= 30 minutes
 		if (this_off - this_on < min30) this_off = this_on + min30;
 		if (that_off - that_on < min30) that_off = that_on + min30;
@@ -958,9 +958,9 @@ match_result_t record::match_records(record* record) {
 }
 
 // compare the item between this record and supplied record
-bool record::items_match(record* record, string field_name) {
-	string lhs = item(field_name);
-	string rhs = record->item(field_name);
+bool record::items_match(record* record, std::string field_name) {
+	std::string lhs = item(field_name);
+	std::string rhs = record->item(field_name);
 	// Convert both fields to upper case
 	for (unsigned int i = 0; i < lhs.length(); i++) {
 		lhs[i] = toupper(lhs[i]);
@@ -996,11 +996,11 @@ bool record::items_match(record* record, string field_name) {
 			return true;
 		} else {
 			// Remove intermediate dashes in SWL calls
-			string lhs1;
+			std::string lhs1;
 			for (int ix = 0; ix < lhs.length(); ix++) {
 				if (lhs[ix] != '-') lhs1 += lhs[ix];
 			}
-			string rhs1;
+			std::string rhs1;
 			for (int ix = 0; ix < rhs.length(); ix++) {
 				if (rhs[ix] != '-') rhs1 += rhs[ix];
 			}
@@ -1053,9 +1053,9 @@ bool record::items_match(record* record, string field_name) {
 	return false;
 }
 
-// Get the date and time as a chrono::system_clock::timepoisnt
-chrono::system_clock::time_point record::ctimestamp(bool time_off) {
-	return chrono::system_clock::from_time_t(timestamp(time_off));
+// Get the date and time as a std::chrono::system_clock::timepoisnt
+std::chrono::system_clock::time_point record::ctimestamp(bool time_off) {
+	return std::chrono::system_clock::from_time_t(timestamp(time_off));
 }
 
 // get the date and time as a time_t object
@@ -1068,15 +1068,15 @@ time_t record::timestamp(bool time_off /*= false*/) {
 				// Get end timestamp
 				if (item_exists("QSO_DATE_OFF")) {
 					// Use QSO_DATE_OFF if it exists
-					qso_time.tm_year = stoi(item("QSO_DATE_OFF").substr(0, 4)) - 1900;
-					qso_time.tm_mon = stoi(item("QSO_DATE_OFF").substr(4, 2)) - 1;
-					qso_time.tm_mday = stoi(item("QSO_DATE_OFF").substr(6, 2));
+					qso_time.tm_year = std::stoi(item("QSO_DATE_OFF").substr(0, 4)) - 1900;
+					qso_time.tm_mon = std::stoi(item("QSO_DATE_OFF").substr(4, 2)) - 1;
+					qso_time.tm_mday = std::stoi(item("QSO_DATE_OFF").substr(6, 2));
 				}
 				else {
 					// Use QSO_DATE if it doesn't
-					qso_time.tm_year = stoi(item("QSO_DATE").substr(0, 4)) - 1900;
-					qso_time.tm_mon = stoi(item("QSO_DATE").substr(4, 2)) - 1;
-					qso_time.tm_mday = stoi(item("QSO_DATE").substr(6, 2));
+					qso_time.tm_year = std::stoi(item("QSO_DATE").substr(0, 4)) - 1900;
+					qso_time.tm_mon = std::stoi(item("QSO_DATE").substr(4, 2)) - 1;
+					qso_time.tm_mday = std::stoi(item("QSO_DATE").substr(6, 2));
 					if (item("TIME_ON") > item("TIME_OFF")) {
 						// QSO_DATE_OFF show be inferred to be the day after - increment date
 						if (qso_time.tm_mday > days_in_month(&qso_time)) {
@@ -1097,32 +1097,32 @@ time_t record::timestamp(bool time_off /*= false*/) {
 			} else {
 				// Assume QSO is 10 minutes long
 				// Check this is 10 mins
-				chrono::system_clock::time_point time_on = chrono::system_clock::from_time_t(timestamp());
-				chrono::seconds ten_minutes(600);
-				time_t time_off = chrono::system_clock::to_time_t(time_on + ten_minutes);
+				std::chrono::system_clock::time_point time_on = std::chrono::system_clock::from_time_t(timestamp());
+				std::chrono::seconds ten_minutes(600);
+				time_t time_off = std::chrono::system_clock::to_time_t(time_on + ten_minutes);
 				return time_off;
 			}
 			// Add time on
-			qso_time.tm_hour = stoi(item("TIME_OFF").substr(0, 2));
-			qso_time.tm_min = stoi(item("TIME_OFF").substr(2, 2));
+			qso_time.tm_hour = std::stoi(item("TIME_OFF").substr(0, 2));
+			qso_time.tm_min = std::stoi(item("TIME_OFF").substr(2, 2));
 			qso_time.tm_sec = 0;
 			if (item("TIME_OFF").length() == 6) {
-				qso_time.tm_sec = stoi(item("TIME_OFF").substr(4, 2));
+				qso_time.tm_sec = std::stoi(item("TIME_OFF").substr(4, 2));
 			}
 		}
 		else {
 			// Get start timestamp
-			qso_time.tm_year = stoi(item("QSO_DATE").substr(0, 4)) - 1900;
-			qso_time.tm_mon = stoi(item("QSO_DATE").substr(4, 2)) - 1;
-			qso_time.tm_mday = stoi(item("QSO_DATE").substr(6, 2));
-			qso_time.tm_hour = stoi(item("TIME_ON").substr(0, 2));
-			qso_time.tm_min = stoi(item("TIME_ON").substr(2, 2));
+			qso_time.tm_year = std::stoi(item("QSO_DATE").substr(0, 4)) - 1900;
+			qso_time.tm_mon = std::stoi(item("QSO_DATE").substr(4, 2)) - 1;
+			qso_time.tm_mday = std::stoi(item("QSO_DATE").substr(6, 2));
+			qso_time.tm_hour = std::stoi(item("TIME_ON").substr(0, 2));
+			qso_time.tm_min = std::stoi(item("TIME_ON").substr(2, 2));
 			qso_time.tm_sec = 0;
 			if (item("TIME_ON").length() == 6) {
-				qso_time.tm_sec = stoi(item("TIME_ON").substr(4, 2));
+				qso_time.tm_sec = std::stoi(item("TIME_ON").substr(4, 2));
 			}
 		}
-		// To stop it getting randomly set in implementations that do not consistently initialise structures
+		// To stop it getting randomly std::set in implementations that do not consistently initialise structures
 		qso_time.tm_isdst = false;
 
 		return mktime(&qso_time);
@@ -1138,28 +1138,28 @@ void record::update_timeoff() {
 	if (!is_header_ && item("TIME_OFF").length() == 0) {
 		// TIME_OFF has no meaning in a header record
 		// Set TIME_OFF to TIME_ON plus 10 s.
-		chrono::system_clock::time_point time_on = chrono::system_clock::from_time_t(timestamp());
-		chrono::seconds ten_seconds(10);
-		time_t time_off = chrono::system_clock::to_time_t(time_on + ten_seconds);
+		std::chrono::system_clock::time_point time_on = std::chrono::system_clock::from_time_t(timestamp());
+		std::chrono::seconds ten_seconds(10);
+		time_t time_off = std::chrono::system_clock::to_time_t(time_on + ten_seconds);
 		char temp[10];
 		// Convert to date YYYYMMDD and time HHMMSS and update record
 		strftime(temp, sizeof(temp), "%Y%m%d", gmtime(&time_off));
-		item("QSO_DATE_OFF", string(temp));
+		item("QSO_DATE_OFF", std::string(temp));
 		strftime(temp, sizeof(temp), "%H%M%S", gmtime(&time_off));
-		item("TIME_OFF", string(temp));
+		item("TIME_OFF", std::string(temp));
 	}
 }
 
 // merge data from a number of items - equivalent to a mail-merge 
 // replace <FIELD> with the value of that field.
-string record::item_merge(string data, bool indirect /*=false*/) {
-	string result = data;
+std::string record::item_merge(std::string data, bool indirect /*=false*/) {
+	std::string result = data;
 	size_t left = result.find('<');
-	size_t right = string::npos;
+	size_t right = std::string::npos;
 	if (left != result.npos) right = result.substr(left).find_first_of(":>");
 	// while we still have an unprocessed <> pair
 	while (left != result.npos && right != result.npos) {
-		string field_name = result.substr(left + 1, right - 1);
+		std::string field_name = result.substr(left + 1, right - 1);
 		if (result[left + right] == ':') {
 			size_t close = result.substr(left + right + 1).find('>');
 			int len = 0;
@@ -1181,12 +1181,12 @@ string record::item_merge(string data, bool indirect /*=false*/) {
 void record::invalidate_qsl_status() {
 	// eQSL
 	if (item("EQSL_QSL_SENT") == "Y") {
-		item("EQSL_QSL_SENT", string("I"));
+		item("EQSL_QSL_SENT", std::string("I"));
 	}
 	if (item("LOTW_QSL_SENT") == "Y") {
-		item("LOTW_QSL_SENT", string("I"));
+		item("LOTW_QSL_SENT", std::string("I"));
 	}
 	if (item("CLUBLOG_QSO_UPLOAD_STATUS") == "Y") {
-		item("CLUBLOG_QSO_UPLOAD_STATUS", string("M"));
+		item("CLUBLOG_QSO_UPLOAD_STATUS", std::string("M"));
 	}
 }

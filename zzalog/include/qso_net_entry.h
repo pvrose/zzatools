@@ -2,7 +2,7 @@
 
 #include <FL/Fl_Group.H>
 
-using namespace std;
+
 
 enum navigate_t : uchar;
 typedef size_t qso_num_t;

@@ -10,14 +10,14 @@ main.cpp - application entry point
 #include "main.h"
 
 // Get the backup filename
-string backup_filename(string source) {
+std::string backup_filename(std::string source) {
 	// This needs to be int and not bool as the settings.get() would corrupt the stack.
 	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences backup_settings(settings, "Backup");
 	// Get back-up directory
 	char* temp;
 	backup_settings.get("Path", temp, "");
-	string backup = temp;
+	std::string backup = temp;
 	free(temp);
 	while (backup.length() == 0) {
 		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
@@ -41,22 +41,22 @@ string backup_filename(string source) {
 	// Create backup filename - use back-up directory and current file-name plus timestamp
 	size_t last_period = source.find_last_of('.');
 	size_t last_slash = source.find_last_of("/\\");
-	string suffix = source.substr(last_period);
-	string base_name;
-	if (last_slash == string::npos) {
+	std::string suffix = source.substr(last_period);
+	std::string base_name;
+	if (last_slash == std::string::npos) {
 		base_name = source.substr(0, last_period);
 	}
 	else {
 		base_name = source.substr(last_slash + 1, last_period - last_slash - 1);
 	}
-	string timestamp = now(false, "%Y%m%d_%H%MZ");
+	std::string timestamp = now(false, "%Y%m%d_%H%MZ");
 	backup += base_name + "_" + timestamp + suffix;
 	return backup;
 }
 
 // Restore from last backup
 void restore_backup() {
-	string filename = book_->filename();
+	std::string filename = book_->filename();
 	// Remove existing book
 	status_->misc_status(ST_WARNING, "LOG: Closing current book!");
 	menu::cb_mi_file_new(nullptr, nullptr);
@@ -66,7 +66,7 @@ void restore_backup() {
 	backup_settings.get("Last Backup", temp, "");
 	// Get backup data
 	READ_ONLY = true;
-	book_->load_data(string(temp));
+	book_->load_data(std::string(temp));
 }
 
 // This callback intercepts the close command and performs checks and tidies up
@@ -128,7 +128,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 				eqsl_handler_->enable_fetch(eqsl_handler::EQ_ABANDON);
 				break;
 			case 1:
-				// Wait for the request queue to empty
+				// Wait for the request std::queue to empty
 				status_->misc_status(ST_NOTE, "ZZALOG: Continuing card image download before closing");
 				while (eqsl_handler_->requests_queued()) Fl::check();
 				break;
@@ -392,7 +392,7 @@ void show_help() {
 	"\t\tnop|nopretty\n"
 	"\t\tq|quick\tShorten long timeout and polling intervals\n"
 	"\t\tr|rig\tPrint rig diagnostics\n"
-	"\t\tt|threads\tProvide debug tracing on thread use\n"
+	"\t\tt|threads\tProvide debug tracing on std::thread use\n"
 	"\t\t\tnot|nothreads\n"
 	"\t-e|--new\tCreate new file\n"
 	"\t-g|--userguide\tSpecify HTML Directory\n"
@@ -402,7 +402,7 @@ void show_help() {
 	"\t-l|--light\tLight mode (sticky)\n"
 	"\t-m|--resume\tResume the previous session\n"
 	"\t-n|--noisy\tDo publish QSOs to online sites (sticky)\n"
-	"\t-p|--private\tDo not update recent files list\n"
+	"\t-p|--private\tDo not update recent files std::list\n"
 	"\t-q|--quiet\tDo not publish QSOs to online sites (sticky)\n"
 	"\t-r|--read_only\tOpen file in read only mode\n"
 	"\t-t|--test\tTest mode: infers -q -w\n"
@@ -412,17 +412,17 @@ void show_help() {
 	printf(text);
 }
 
-// Use supplied argument, or read the latest file from settings or open file chooser if that's an empty string
-string get_file(char * arg_filename) {
-	string result = "";
+// Use supplied argument, or read the latest file from settings or open file chooser if that's an empty std::string
+std::string get_file(char * arg_filename) {
+	std::string result = "";
 	if (!arg_filename || !(*arg_filename)) {
-		// null argument or empty string - get the most recent file. (Recent Files->File1 in settings)
+		// null argument or empty std::string - get the most recent file. (Recent Files->File1 in settings)
 		Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 		Fl_Preferences recent_settings(settings, "Recent Files");
 		char *filename;
 		if (recent_settings.get("File1", filename, "")) {
 			// return the obtained filename
-			result = string(filename);
+			result = std::string(filename);
 			free(filename);
 		}
 		else {
@@ -473,10 +473,10 @@ void recent_files() {
 		sprintf(path, "File%d", i);
 		char* filename = nullptr;
 		recent_settings.get(path, filename, "");
-		// If we have a non empty string then add it to the list
+		// If we have a non empty std::string then add it to the std::list
 		if (filename) {
 			if (strlen(filename)) {
-				recent_files_.push_back(string(filename));
+				recent_files_.push_back(std::string(filename));
 			}
 			free(filename);
 		}
@@ -485,7 +485,7 @@ void recent_files() {
 
 // read in the prefix and adif reference data
 void add_data() {
-	// Note closing can get set during any of the below actions.
+	// Note closing can get std::set during any of the below actions.
 	if (!closing_) {
 		// add ADIF specification data.
 		spec_data_ = new spec_data;
@@ -533,7 +533,7 @@ void add_data() {
 // read in the log data
 void add_book(char* arg) {
 	if (!closing_) {
-		// Create the book options and set them in the forms
+		// Create the book options and std::set them in the forms
 		book_ = new book;
 		navigation_book_ = book_;
 		import_data_ = new import_data;
@@ -543,7 +543,7 @@ void add_book(char* arg) {
 
 		if (!NEW_BOOK || filename_) {
 			// Get filename and load the data
-			string log_file = get_file(arg);
+			std::string log_file = get_file(arg);
 
 
 			if (!new_installation_ && !book_->load_data(log_file)) {
@@ -551,7 +551,7 @@ void add_book(char* arg) {
 				Fl_Preferences backup_settings(settings, "Backup");
 				char * temp;
 				backup_settings.get("Last Backup", temp, "");
-				string backup = temp;
+				std::string backup = temp;
 				// Cannot access book - try backup
 				if (!closing_ && fl_choice("Load %s failed - load from backup %s", "Yes", "No", nullptr, log_file.c_str(), backup.c_str()) == 0) {
 					char msg[100];
@@ -570,7 +570,7 @@ void add_book(char* arg) {
 					book_->set_filename(log_file);
 				}
 			} else {
-				// Move this file to the top of the recent file list
+				// Move this file to the top of the recent file std::list
 				set_recent_file(log_file);
 				char msg[128];
 				if (new_file_) {
@@ -623,9 +623,9 @@ void add_dashboard() {
 }
 
 // Set the text in the main window label
-void main_window_label(string text) {
+void main_window_label(std::string text) {
 	// e.g. ZZALOG 3.0.0: <filename> - PROGRAM_VERSION includes (Debug) if compiled under _DEBUG
-	string label = PROGRAM_ID + " " + PROGRAM_VERSION + ": " + text;
+	std::string label = PROGRAM_ID + " " + PROGRAM_VERSION + ": " + text;
 	main_window_->copy_label(label.c_str());
 }
 
@@ -652,13 +652,13 @@ void add_widgets(int& curr_y) {
 	main_window_->add(toolbar_);
 	toolbar_->update_items();
 	curr_y += toolbar_->h();
-	// The main views - this is a set of tabs with each view
+	// The main views - this is a std::set of tabs with each view
 	tabbed_forms_ = new tabbed_forms(0, curr_y, WIDTH, HEIGHT - curr_y - FOOT_HEIGHT);
 	main_window_->add(tabbed_forms_);
 	curr_y += tabbed_forms_->h();
 	// Add a footer (with copyright
 	Fl_Box* footer = new Fl_Box(0, curr_y, WIDTH, FOOT_HEIGHT);
-	footer->copy_label(string(COPYRIGHT + " " + CONTACT + "    ").c_str());
+	footer->copy_label(std::string(COPYRIGHT + " " + CONTACT + "    ").c_str());
 	footer->labelsize(FL_NORMAL_SIZE - 1);
 	footer->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 	main_window_->add(footer);
@@ -739,12 +739,12 @@ void tidy() {
 
 // Add the icon
 void add_icon(const char* arg0) {
-	// set the default Icon
+	// std::set the default Icon
 	Fl_Window::default_icon(&main_icon_);
 }
 
 // Map argument letter to colour name
-map<uchar, string> colours = {
+std::map<uchar, std::string> colours = {
 	{ 'n', "None" },
 	{ 'r', "Red" },
 	{ 'g', "Green" },
@@ -756,14 +756,14 @@ map<uchar, string> colours = {
 
 // Display the arguments in the status log
 void print_args(int argc, char** argv) {
-	// Create a string to hold all the info
+	// Create a std::string to hold all the info
 	int length = 20;
 	for (int i = 0; i < argc; i++) {
 		length += strlen(argv[i]);
 	}
 	char message[256];
 	memset(message, 0, sizeof(message));
-	// Generate the string
+	// Generate the std::string
 	strcpy(message, "ZZALOG: ");
 	for (int i = 0; i < argc; i++) {
 		strcat(message, argv[i]);
@@ -777,7 +777,7 @@ void print_args(int argc, char** argv) {
 	status_->misc_status(ST_NOTE, message);
 
 	if (DEBUG_ERRORS) status_->misc_status(ST_NOTE, "ZZALOG: -d e - Displaying debug error messages");
-	if (DEBUG_THREADS) status_->misc_status(ST_NOTE, "ZZALOG: -d t - Displaying thread debug messages");
+	if (DEBUG_THREADS) status_->misc_status(ST_NOTE, "ZZALOG: -d t - Displaying std::thread debug messages");
 	if (DEBUG_CURL) status_->misc_status(ST_NOTE, "ZZALOG: -d c - Displaying more verbosity from libcurl");
 	if (DEBUG_QUICK) status_->misc_status(ST_WARNING, "ZZALOG: -d q - Reducing periods of some reguat events");
 	snprintf(message, sizeof(message), "ZZALOG: -d h=%d - Hamlib debug level %d", 
@@ -791,7 +791,7 @@ void print_args(int argc, char** argv) {
 	else status_->misc_status(ST_WARNING, "ZZALOG: -w - QSOs are not being saved automatically");
 	if (READ_ONLY) status_->misc_status(ST_WARNING, "ZZALOG: -r - File opened read-only");
 	if (RESUME_SESSION) status_->misc_status(ST_NOTE, "ZZALOG: -m - Resuming previous session");
-	if (PRIVATE) status_->misc_status(ST_WARNING, "ZZALOG: -p - This file not being noted on recent files list");
+	if (PRIVATE) status_->misc_status(ST_WARNING, "ZZALOG: -p - This file not being noted on recent files std::list");
 	if (DARK) status_->misc_status(ST_NOTE, "ZZALOG: -k - Opening in dark mode");
 	else status_->misc_status(ST_NOTE, "ZZALOG: -l - Opening in normal FLTK colours");
 }
@@ -891,7 +891,7 @@ bool open_settings() {
 	char stemp[128];
 	if (default_html_directory_.length() == 0) {
 		if (sys_settings.getUserdataPath(stemp, sizeof(stemp))) {
-			default_html_directory_ = string(stemp) + "userguide/html/";;
+			default_html_directory_ = std::string(stemp) + "userguide/html/";;
 		}
 	}
 	else {
@@ -925,7 +925,7 @@ bool open_settings() {
 	}
 
 	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
-	// Now set the default app data directory
+	// Now std::set the default app data directory
 	char buffer[128];
 	settings.filename(buffer, sizeof(buffer),
 		prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
@@ -935,9 +935,9 @@ bool open_settings() {
 
 	for (char c = '8'; c > '0'; c--) {
 		// Rename will fail if file does not exist, so no need to test file exists
-		string oldfile = string(buffer) + c;
+		std::string oldfile = std::string(buffer) + c;
 		char c2 = c + 1;
-		string newfile = string(buffer) + c2;
+		std::string newfile = std::string(buffer) + c2;
 		fl_rename(oldfile.c_str(), newfile.c_str());
 	}
 	char backup[256];
@@ -952,7 +952,7 @@ bool open_settings() {
 		// We do have a (probably) valid settings file
 		const int increment = 8000;
 		in.seekg(0, in.beg);
-		ofstream out(backup);
+		std::ofstream out(backup);
 		ok = in.good() && out.good();
 		char buffer[increment];
 		int count = 0;
@@ -989,7 +989,7 @@ void club_operator() {
 // The main app entry point
 int main(int argc, char** argv)
 {
-	// Allow the main thread to respond to Fl::awake() requests
+	// Allow the main std::thread to respond to Fl::awake() requests
 	Fl::lock();
 	// 
 	printf("%s %s: Loading...\n", PROGRAM_ID.c_str(), PROGRAM_VERSION.c_str());
@@ -1037,7 +1037,7 @@ int main(int argc, char** argv)
 	status_ = new status();
 	// Create banner
 	banner_ = new banner(400, 200);
-	string title = PROGRAM_ID + " " + PROGRAM_VERSION;
+	std::string title = PROGRAM_ID + " " + PROGRAM_VERSION;
 	banner_->copy_label(title.c_str());
 
 	// Read the fields data
@@ -1107,8 +1107,8 @@ int main(int argc, char** argv)
 
 // Copy existing data to back up file. force = true used by menu command, 
 void backup_file() {
-	string source = book_->filename();
-	string backup = backup_filename(source);
+	std::string source = book_->filename();
+	std::string backup = backup_filename(source);
 	char* message = new char[backup.length() + 25];
 	sprintf(message, "BACKUP: Writing %s", backup.c_str());
 	status_->misc_status(ST_NOTE, message);
@@ -1120,7 +1120,7 @@ void backup_file() {
 	const int increment = 8000;
 	in.seekg(0, in.beg);
 	status_->progress(length, OT_MAIN, "Copying data to backup", "bytes");
-	ofstream out(backup);
+	std::ofstream out(backup);
 	bool ok = in.good() && out.good();
 	char buffer[increment];
 	int count = 0;
@@ -1152,12 +1152,12 @@ void backup_file() {
 	}
 }
 
-// Add the current file to the recent files list
-void set_recent_file(string filename) {
-	// Do not add to recent file list if using backup or CLI inihibited
+// Add the current file to the recent files std::list
+void set_recent_file(std::string filename) {
+	// Do not add to recent file std::list if using backup or CLI inihibited
 	if (!PRIVATE && !using_backup_ && filename.length()) {
 
-		// Add or move the file to the front of list
+		// Add or move the file to the front of std::list
 		recent_files_.remove(filename);
 		recent_files_.push_front(filename);
 
@@ -1166,7 +1166,7 @@ void set_recent_file(string filename) {
 		Fl_Preferences recent_settings(settings, "Recent Files");
 		// Clear the existing settings
 		recent_settings.clear();
-		// And write the top four names on the list to settings
+		// And write the top four names on the std::list to settings
 		int i = 1;
 		for (auto it = recent_files_.begin(); i <= 4 && it != recent_files_.end(); i++, it++) {
 			char path[6];
@@ -1182,7 +1182,7 @@ void set_recent_file(string filename) {
 
 void open_html(const char* file) {
 	// OS dependent code to open a document
-	string full_filename = default_html_directory_ + string(file);
+	std::string full_filename = default_html_directory_ + std::string(file);
 #ifdef _WIN32
 	HINSTANCE result = ShellExecute(NULL, "open", full_filename.c_str(), NULL, NULL, SW_SHOWNORMAL);
 	if ((intptr_t)result <= 32) {
@@ -1193,7 +1193,7 @@ void open_html(const char* file) {
 		status_->misc_status(ST_ERROR, msg);
 	}
 #else 
-	string cmd = "xdg-open \"" + full_filename + "\"";
+	std::string cmd = "xdg-open \"" + full_filename + "\"";
 	int res = system(cmd.c_str());
 	if (res != 0) {
 		char msg[128];

@@ -19,7 +19,7 @@
 extern spec_data* spec_data_;
 extern status* status_;
 
-using namespace std;
+
 
 // Standard constructor
 adx_writer::adx_writer()
@@ -39,7 +39,7 @@ adx_writer::~adx_writer()
 }
 
 // Generate XML for the records in book and send them to the output stream
-bool adx_writer::store_book(book* book, ostream& os, bool clean) {
+bool adx_writer::store_book(book* book, std::ostream& os, bool clean) {
 	bool ok = true;
 	clean_records_ = clean;
 	// Takes time so display the timer cursor
@@ -92,15 +92,15 @@ bool adx_writer::store_book(book* book, ostream& os, bool clean) {
 // Generate an individual element - this will iteratively generate further elements
 bool adx_writer::write_element(adx_element_t element) {
 
-	string name; 
-	string data;
+	std::string name; 
+	std::string data;
 	char datatype;
-	string temp;
+	std::string temp;
 	int index1;
 	int index2;
 	int total;
 	bool ok = true;
-	map<string, string>* attributes;
+	std::map<std::string, std::string>* attributes;
 	switch (element) {
 	case AET_NONE:
 		// Initial prolog <?xml version="1.0" encoding="utf-8" ?>
@@ -166,7 +166,7 @@ bool adx_writer::write_element(adx_element_t element) {
 		if (TYPE == "E") ENUM = ....->GetUserdefValue() 
 		if (TYPE == "N") RANGE = ....->GetUserdefValue() unless ""
 		*/
-		attributes = new map<string, string>;
+		attributes = new std::map<std::string, std::string>;
 		attributes->clear();
 		// Add attribute FIELDID="<id>" - represents USERDEFn used in book
 		(*attributes)["FIELDID"] = field_name_.substr(7);
@@ -174,11 +174,11 @@ bool adx_writer::write_element(adx_element_t element) {
 		datatype = spec_data_->datatype_indicator(value_);
 		// add attribute TYPE="<type>"
 		(*attributes)["TYPE"] = datatype;
-		// Get the enum list or range - returns empty string if not enum or numeric or its unbounded
+		// Get the enum std::list or range - returns empty std::string if not enum or numeric or its unbounded
 		temp = spec_data_->userdef_values(value_);
 		if (temp != "") {
-			string temp2 = '{' + temp + '}';
-			// add attribute ENUM="{list}" if it's an enumeration
+			std::string temp2 = '{' + temp + '}';
+			// add attribute ENUM="{std::list}" if it's an enumeration
 			if (datatype == 'E') {
 				(*attributes)["ENUM"] = temp2;
 			}
@@ -204,7 +204,7 @@ bool adx_writer::write_element(adx_element_t element) {
 		index1 = field_name_.find('_', 0);
 		index2 = field_name_.find('_', index1 + 1);
 		// add PROGRAM_ID=<id> attribute
-		attributes = new map<string, string>;
+		attributes = new std::map<std::string, std::string>;
 		attributes->clear();
 		(*attributes)["PROGRAMID"] = field_name_.substr(index1 + 1, index2 - index1 - 1);
 		// add FIELDNAME=<name> attribute
@@ -246,7 +246,7 @@ bool adx_writer::write_element(adx_element_t element) {
 			// Get field name
 			value_ = record_->item(field_name_);
 			if (value_ != "") {
-				// Only write field if it's not an empty string - USERDEF, APP or named field.
+				// Only write field if it's not an empty std::string - USERDEF, APP or named field.
 				if (spec_data_->is_userdef(field_name_)) {
 					ok &= write_element(AET_USERDEFR);
 				}
@@ -267,7 +267,7 @@ bool adx_writer::write_element(adx_element_t element) {
 		*/
 		name = "USERDEF";
 		// Add FIELDNAME=<name> attribute
-		attributes = new map<string, string>;
+		attributes = new std::map<std::string, std::string>;
 		attributes->clear();
 		(*attributes)["FIELDNAME"] = field_name_;
 		// write element

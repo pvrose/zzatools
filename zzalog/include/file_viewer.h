@@ -4,7 +4,7 @@
 
 #include <FL/Fl_Window.H>
 
-using namespace std;
+
 class Fl_Text_Editor;
 class Fl_Text_Buffer;
 class Fl_Button;
@@ -29,10 +29,10 @@ public:
     void enable_widgets();
 
     //! Load  specified file \p name into the editor.
-    void load_file(string name);
+    void load_file(std::string name);
 
     //! Returns name of displayed file
-    string file();
+    std::string file();
 
     //! File has been changed and not saved.
     bool is_dirty();
@@ -63,7 +63,7 @@ protected:
     Fl_Button* bn_save_;         //!< "Save" button.
     Fl_Button* bn_reload_;       //!< "Reload" button.
 
-    string filename_;            //!< Name of file being edited.
+    std::string filename_;            //!< Name of file being edited.
     bool dirty_;                 //!< Data is "dirty", ie it has been changed and 
                                  //!< not written to store.
 

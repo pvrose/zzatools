@@ -9,7 +9,7 @@
 
 #include <FL/Fl_Group.H>
 
-using namespace std;
+
 
 class qso_buttons;
 class contest_scorer;
@@ -23,7 +23,7 @@ typedef size_t qso_num_t;
 enum navigate_t : uchar;
 
 
-//! Default field set for qso_entry.
+//! Default field std::set for qso_entry.
 static const field_list QSO_FIELDS = {
 	"QSO_DATE",
 	"TIME_ON",
@@ -138,7 +138,7 @@ public:
 	//! \param query_num Index of QSO being queried.
 	void update_query(logging_state_t query, qso_num_t match_num, qso_num_t query_num);
 	//! start a modem QSO feom \p source modem with \p call, returns the QSO record.
-	record* start_modem_qso(string call, qso_init_t source);
+	record* start_modem_qso(std::string call, qso_init_t source);
 	//! Update modem QSO and if \p log_it is true save the record.
 	void update_modem_qso(bool log_it);
 	//! Add a modemm QSO
@@ -146,7 +146,7 @@ public:
 	//! Returns index of default copy record
 	qso_num_t get_default_number();
 	//! Returns defined fields
-	string get_defined_fields();
+	std::string get_defined_fields();
 	//! Returns current QSO
 	record* current_qso();
 	//! Returns xcrrent QSO number
@@ -156,13 +156,13 @@ public:
 	//! Update QSO with details from rig.
 	void update_rig();
 	//! Returns callsign
-	string get_call();
+	std::string get_call();
 	//! Returns true if the qso with index \p number is being edited.
 	bool qso_editing(qso_num_t number);
 	//! Returns true if not actively editing
 	bool inactive();
 	//! Returns default station information
-	string get_default_station(char t);
+	std::string get_default_station(char t);
 	//! Update record from station information
 	void update_station_fields(record* qso = nullptr);
 	//! Update station choices

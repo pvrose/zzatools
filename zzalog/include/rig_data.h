@@ -7,7 +7,7 @@
 
 #include <FL/Fl_Preferences.H>
 
-using namespace std;
+
 
 struct hamlib_data_t;
 
@@ -16,8 +16,8 @@ struct cat_data_t {
     hamlib_data_t* hamlib = nullptr;   //!< Hamlib API configuration  
     bool use_cat_app = false;          //!< Use another app for accessing CAT interface.
     bool override_hamlib = false;      //!< Override values obtained from CAT interface
-    string app = "";                   //!< Name of the command to launch app
-    string nickname = "";              //!< Short form of the name used in CAT menu.
+    std::string app = "";                   //!< Name of the command to launch app
+    std::string nickname = "";              //!< Short form of the name used in CAT menu.
     bool auto_start = false;           //!< Automatically start app when ZZALOG starts.
     bool auto_connect = false;         //!< Automatically connect to app after starting it.
     double connect_delay = 1.0;        //!< Delay between starting app and connecting (in seconds).
@@ -26,9 +26,9 @@ struct cat_data_t {
 //! This structure configures the use of the rig interface.
 struct rig_data_t {          
     int default_app = -1;              //!< Index into cat_data for the default CAT method.
-    string antenna = "";               //!< Preferred antenna when using this rig.
+    std::string antenna = "";               //!< Preferred antenna when using this rig.
     bool use_instant_values = false;   //!< Use values just radfrom rig rather than smoothed ones.
-    vector<cat_data_t*> cat_data;      //!< Methods of accessing this particular rig.
+    std::vector<cat_data_t*> cat_data;      //!< Methods of accessing this particular rig.
 };
 
 //! This class provides the data required for configuring, accessing and using each rig.
@@ -40,11 +40,11 @@ public:
     //! Destructor
     ~rig_data();
     //! Returns reference to the CAT for the \p rig with index \ app. 
-    cat_data_t* cat_data(string rig, int app = -1);
+    cat_data_t* cat_data(std::string rig, int app = -1);
     //! Returns all the rigs currently supported by this database.
-    vector<string> rigs();
+    std::vector<std::string> rigs();
     //! Returns the rig_data_t structure for the specified \p rig.
-    rig_data_t* get_rig(string rig); 
+    rig_data_t* get_rig(std::string rig); 
     
 
 protected:
@@ -53,7 +53,7 @@ protected:
     //! Store data  to rigs,xml.
     bool store_data();
     //! Configuration data for all rigs.
-    map<string, rig_data_t*> data_;
+    std::map<std::string, rig_data_t*> data_;
     //! Load failed.
     bool load_failed_;
 };

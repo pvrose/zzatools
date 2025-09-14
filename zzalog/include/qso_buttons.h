@@ -4,7 +4,7 @@
 
 #include <FL/Fl_Group.H>
 
-using namespace std;
+
 
 class qso_data;
 class Fl_Button;

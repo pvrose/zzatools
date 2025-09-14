@@ -14,9 +14,9 @@
 #include <FL/Fl_Preferences.H>
 
 extern ticker* ticker_;
-extern string PROGRAM_ID;
-extern string PROGRAM_VERSION;
-extern string VENDOR;
+extern std::string PROGRAM_ID;
+extern std::string PROGRAM_VERSION;
+extern std::string VENDOR;
 extern bool DARK;
 extern Fl_Preferences::Root prefs_mode_;
 extern void open_html(const char*);

@@ -11,14 +11,14 @@
 #include <vector>
 #include <list>
 
-using namespace std;
+
 
 class Fl_Preferences;
 
 //! Field data element. 
 struct field_info_t {
-	string field;			//!< Field name
-	string header;			//!< Text used for column headers in log table views
+	std::string field;			//!< Field name
+	std::string header;			//!< Text used for column headers in log table views
 	unsigned int width;		//!< Column width in log table views
 	//! Default constructor.
 	field_info_t() :
@@ -27,7 +27,7 @@ struct field_info_t {
 		width(0)
 	{}
 	//! Declaration constructor.
-	field_info_t(string f, string h, unsigned int w) :
+	field_info_t(std::string f, std::string h, unsigned int w) :
 		field(f),
 		header(h),
 		width(w)
@@ -65,7 +65,7 @@ const field_info_t DEFAULT_FIELDS[] = {
 };
 
 //! Convert usage type to text.
-const map<field_app_t, string> APPLICATION_LABELS = {
+const std::map<field_app_t, std::string> APPLICATION_LABELS = {
 	{ FO_NONE, "None" },
 	{ FO_MAINLOG, "Main Log" },
 	{ FO_EXTRACTLOG, "Extracted" },
@@ -73,10 +73,10 @@ const map<field_app_t, string> APPLICATION_LABELS = {
 	{ FO_IMPORTLOG, "Imported data" }
 };
 
-//! Field collection: a set of field descriptions.
-typedef vector<field_info_t> collection_t;
+//! Field collection: a std::set of field descriptions.
+typedef std::vector<field_info_t> collection_t;
 //! List of fields.
-typedef vector<string> field_list;
+typedef std::vector<std::string> field_list;
 
 //! Container class for the field descriptions.
 class fields {
@@ -91,22 +91,22 @@ public:
 	//! Returns the collection for the usage \p app.
 	collection_t* collection(field_app_t app);
 	//! Returns the collection named amd if necessary create it by copying from \p source.
-	collection_t* collection(string name, string source = "Default", bool* copied = nullptr);
+	collection_t* collection(std::string name, std::string source = "Default", bool* copied = nullptr);
 	//! Returns the collection named and if necessary pre-populate it from the supplied \p values.
-	collection_t* collection(string name, field_list values);
-	//! Returns the list of field names in the collection in the collection \p name.
-	field_list field_names(string name);
+	collection_t* collection(std::string name, field_list values);
+	//! Returns the std::list of field names in the collection in the collection \p name.
+	field_list field_names(std::string name);
 
-	//! Returns the set of collection names.
-	set<string> coll_names();
+	//! Returns the std::set of collection names.
+	std::set<std::string> coll_names();
 	//! Returns the collection name for the usage \p app.
-	string coll_name(field_app_t app);
+	std::string coll_name(field_app_t app);
 
 	//! Link the usage \p app to collection \p coll.
-	void link_app(field_app_t app, string coll);
+	void link_app(field_app_t app, std::string coll);
 
 	//! Delete collection named \p coll, returns false if failed.
-	bool delete_coll(string coll);
+	bool delete_coll(std::string coll);
 
 	//! Save any update made in the usage.
 	void save_update();
@@ -120,11 +120,11 @@ protected:
 	bool load_collections();
 
 	//! Mapping usage to collection name.
-	map<field_app_t, string> app_map_;
+	std::map<field_app_t, std::string> app_map_;
 	//! The database, mapped by collection name.
-	map<string, collection_t*> coll_map_;
+	std::map<std::string, collection_t*> coll_map_;
 	//! Field settings filename.
-	string filename_;
+	std::string filename_;
 
 };
 

@@ -7,8 +7,8 @@
 #include <FL/Fl_Tree_Item.H>
 #include <FL/Fl_Preferences.H>
 
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
 extern void open_html(const char*);
 
@@ -66,7 +66,7 @@ void config_tree::create_tree() {
 }
 
 // Add a leaf node - label plus value
-void config_tree::add_leaf(Fl_Tree_Item* parent, string label, string value) {
+void config_tree::add_leaf(Fl_Tree_Item* parent, std::string label, std::string value) {
 	Fl_Tree_Item* leaf;
 	char text[256];
 	sprintf(text, "%s: %s", label.c_str(), value.c_str());
@@ -108,7 +108,7 @@ void config_tree::add_branch(Fl_Tree_Item* parent, Fl_Preferences& settings) {
 		// Add a leaf with it's name and value
 		char *temp;
 		settings.get(settings.entry(i), temp, "");
-		string value = temp;
+		std::string value = temp;
 		free(temp);
 		add_leaf(branch, settings.entry(i), value);
 	}

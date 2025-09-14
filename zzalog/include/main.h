@@ -69,7 +69,7 @@
 // included to allow windows specifics to be called
 #include <FL/platform.H>
 
-using namespace std;
+
 
 
 //! \mainpage ZZALOG Code Documentation
@@ -88,70 +88,70 @@ using namespace std;
 
 
 //! Program copyright - displayed in all windows.
-string COPYRIGHT = "\302\251 Philip Rose GM3ZZA 2018-2025. All rights reserved.";
+std::string COPYRIGHT = "\302\251 Philip Rose GM3ZZA 2018-2025. All rights reserved.";
 //! Third-party acknowledgments.
-string PARTY3RD_COPYRIGHT = "Prefix data courtesy of clublog.org, country-files.com and dxatlas.com\n"
+std::string PARTY3RD_COPYRIGHT = "Prefix data courtesy of clublog.org, country-files.com and dxatlas.com\n"
 "ZZALOG is based in part on the work of the FLTK project https://www.fltk.org.";
 //! Contact address for use in FLTK widget labels.
-string CONTACT = "gm3zza@@btinternet.com";
+std::string CONTACT = "gm3zza@@btinternet.com";
 //! Contact address for use in general texts.
-string CONTACT2 = "gm3zza@btinternet.com";
+std::string CONTACT2 = "gm3zza@btinternet.com";
 //! Copyright placed in exported data items.
-string DATA_COPYRIGHT = "\302\251 Philip Rose %s. This data may be copied for the purpose of correlation and analysis";
+std::string DATA_COPYRIGHT = "\302\251 Philip Rose %s. This data may be copied for the purpose of correlation and analysis";
 //! Program identifier: used in ADIF PROGRAM_ID field and Fl_Preferences.
-string PROGRAM_ID = "ZZALOG";
+std::string PROGRAM_ID = "ZZALOG";
 //! Short-form program identifier.
-string PROG_ID = "ZLG";
+std::string PROG_ID = "ZLG";
 //! Program version. 
-string PROGRAM_VERSION = "3.6.6+";
+std::string PROGRAM_VERSION = "3.6.6+";
 //! Program vendor: used for Fl_Preferences.
-string VENDOR = "GM3ZZA";
+std::string VENDOR = "GM3ZZA";
 //! Target ADIF version number
-string TARGET_ADIF_VN = "315";
+std::string TARGET_ADIF_VN = "315";
 
 // Debug switches
-//! Print errors - set by "-d e"
+//! Print errors - std::set by "-d e"
 bool DEBUG_ERRORS = true;
-//! Print thread debugging messages - set by "-d t"
+//! Print std::thread debugging messages - std::set by "-d t"
 bool DEBUG_THREADS = false;
-//! Print libcurl debugging messages - set by "-d c"
+//! Print libcurl debugging messages - std::set by "-d c"
 bool DEBUG_CURL = false;
-//! Reduce long duration tiemouts and waits - set by "-d q"
+//! Reduce long duration tiemouts and waits - std::set by "-d q"
 bool DEBUG_QUICK = false;
-//! Print rig access debugging messages - set by "-d r"
+//! Print rig access debugging messages - std::set by "-d r"
 bool DEBUG_RIGS = false;
-//! Print callsign parsing messages - set by "-d d"
+//! Print callsign parsing messages - std::set by "-d d"
 bool DEBUG_PARSE = false;
-//! Set hamlib debugging verbosity level - set by "-d h=<level>"
+//! Set hamlib debugging verbosity level - std::set by "-d h=<level>"
 rig_debug_level_e HAMLIB_DEBUG_LEVEL = RIG_DEBUG_ERR;
 
 // Operation switches - _S versions used to override sticky switch
-//! Automatically upload QSOs to QSL sites - set by "-n"
+//! Automatically upload QSOs to QSL sites - std::set by "-n"
 bool AUTO_UPLOAD = true;
 //! Version of \p AUTO_UPLOAD read from settings
 bool AUTO_UPLOAD_S = false;
-//! Automatically save QSO record after each change - set by "-a"
+//! Automatically save QSO record after each change - std::set by "-a"
 bool AUTO_SAVE = true;
 //! Version of \p AUTO_SAVE read from settings.
 bool AUTO_SAVE_S = false;
-//! Dark mode: Dark background, light forreground - set by "-k"
+//! Dark mode: Dark background, light forreground - std::set by "-k"
 bool DARK = false;
 //! Version of \p DARK read from settings.
 bool DARK_S = false;
-//! Print version details instead of running ZZALOG - set by "-v"
+//! Print version details instead of running ZZALOG - std::set by "-v"
 bool DISPLAY_VERSION = false;
-//! Print command-line interface instead of running ZZALOG - set by "-h"
+//! Print command-line interface instead of running ZZALOG - std::set by "-h"
 bool HELP = false;
-//! Start with an empty logbook - set by "-e"
+//! Start with an empty logbook - std::set by "-e"
 bool NEW_BOOK = false;
-//! Do not add file to recent file list - set by "-p"
+//! Do not add file to recent file std::list - std::set by "-p"
 bool PRIVATE = false;
-//! Open file in read-only mode - set by "-r"
+//! Open file in read-only mode - std::set by "-r"
 bool READ_ONLY = false;
-//! Resum logging including previous session - set by "-m"
+//! Resum logging including previous session - std::set by "-m"
 bool RESUME_SESSION = false;
 
-//! Access to FLTK global attribute to set default text size throughout ZZALOG.
+//! Access to FLTK global attribute to std::set default text size throughout ZZALOG.
 extern int FL_NORMAL_SIZE;
 
 //! \cond
@@ -189,13 +189,13 @@ wsjtx_handler* wsjtx_handler_ = nullptr;
 wx_handler* wx_handler_ = nullptr;
 
 //! List of files most recently opened. Maximum: 4 files. 
-list<string> recent_files_;
+std::list<std::string> recent_files_;
 //! \endcond
 
 // Forward declarations
 //! Get the backup filename.
 //! \return filename.
-string backup_filename(string source);
+std::string backup_filename(std::string source);
 //! Restores file from backup location.
 void restore_backup();
 //! Callback for main_window and qso_manager.
@@ -213,15 +213,15 @@ void show_help();
 //! Get the specified logbook filename
 //! \param arg_filename filename supplied by argument.
 //! \return selected filename: argument if specified otherwise most recently file opened.
-string get_file(char* arg_filename);
+std::string get_file(char* arg_filename);
 //! Add some global properties
 void add_properties();
-//! Read the recent file list from the settings.
+//! Read the recent file std::list from the settings.
 void recent_files();
 //! Read the following data items:
 //! - ADIF specification.
 //! - Callsign parsing database.
-//! - International character set.
+//! - International character std::set.
 //! - Bandplan data.
 //! - QSL Designs.
 //! - Configured rig data.
@@ -244,7 +244,7 @@ void add_qsl_handlers();
 void add_dashboard();
 //! Label the main_window window as "[PROGRAM_ID] [PROGRAM_VERSION]: \a text". 
 //! \param text 
-void main_window_label(string text);
+void main_window_label(std::string text);
 //! Instantiate main_window.
 void create_window();
 //! Add the component widgets to the main_window.
@@ -285,8 +285,8 @@ void club_operator();
 int main(int argc, char** argv);
 //! Backs up file to separate location.
 void backup_file();
-//! Add the specified file to the recent files list.
-void set_recent_file(string filename);
+//! Add the specified file to the recent files std::list.
+void set_recent_file(std::string filename);
 //! Open the user-guide at the specified page &lt;\a file&gt;.html.
 void open_html(const char* file);
 
@@ -303,19 +303,19 @@ char* filename_ = nullptr;
 //! File is new (neither in argument or settings.
 bool new_file_ = false;
 //! Default station callsign.
-string default_station_ = "";
+std::string default_station_ = "";
 //! Main logo.
 Fl_PNG_Image main_icon_("ZZALOG_ICON", ___rose_png, ___rose_png_len);
 //! Using backp.
 bool using_backup_ = false;
 //! Sticky switches mesasge.
-string sticky_message_ = "";
+std::string sticky_message_ = "";
 //! Common seed to use in password encryption - maintaned with sessions.
 uint32_t seed_ = 0;
 //! Default location for configuration files.
-string default_data_directory_ = "";
+std::string default_data_directory_ = "";
 //! Default location for userguide files.
-string default_html_directory_ = "";
+std::string default_html_directory_ = "";
 //! Preferences root - system-wide or per-user.
 Fl_Preferences::Root prefs_mode_;
 //! Do not close banner. Kept \p false unless banner is not deleted at ZZALOG closure in error cases.

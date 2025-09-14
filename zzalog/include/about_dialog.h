@@ -5,7 +5,7 @@
 
 #include <FL/Fl_Widget.H>
 
-using namespace std;
+
 
 	//! Dialog to provide program information.
 	

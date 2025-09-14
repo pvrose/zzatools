@@ -20,7 +20,7 @@ extern void open_html(const char*);
 
 
 // Map showing the buttons available in each qso_data logging_state
-map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
+std::map<qso_data::logging_state_t, std::list<qso_buttons::button_type> > button_map_ =
 {
 	{ qso_data::QSO_INACTIVE, {qso_buttons::ACTIVATE, qso_buttons::START_QSO, qso_buttons::ADD_QSO, 
 		qso_buttons::EDIT_QSO, qso_buttons::COPY_QSO, qso_buttons::CLONE_QSO, qso_buttons::DELETE_QSO,
@@ -73,7 +73,7 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 };
 
 // Map describing all the parameters for each button
-map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
+std::map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 {
 	{ qso_buttons::ACTIVATE, { "Activate", "Pre-load QSO fields based on logging mode", qso_buttons::cb_activate, 0 } },
 	{ qso_buttons::START_QSO, { "Start QSO", "Start a QSO in real-time", qso_buttons::cb_start, (void*)qso_data::QSO_ON_AIR } },
@@ -84,7 +84,7 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::CLONE_QSO, { "Clone QSO", "Create a new record (copy conditions)", qso_buttons::cb_start, (void*)qso_data::QSO_COPY_CONDX }},
 	{ qso_buttons::BROWSE, { "Browse Log", "Browse the log without editing", qso_buttons::cb_bn_browse, 0}} ,
 	{ qso_buttons::QUIT_QSO, { "Quit", "Quit entry mode", qso_buttons::cb_cancel, 0 } },
-	{ qso_buttons::SAVE_QSO, { "Save", "Log the QSO (set start time if not set) and quit", qso_buttons::cb_save, (void*)qso_buttons::SAVE_QSO } },
+	{ qso_buttons::SAVE_QSO, { "Save", "Log the QSO (std::set start time if not std::set) and quit", qso_buttons::cb_save, (void*)qso_buttons::SAVE_QSO } },
 	{ qso_buttons::CANCEL_QSO, { "Quit QSO", "Cancel the current QSO entry", qso_buttons::cb_cancel, 0 } },
 	{ qso_buttons::DELETE_QSO, { "Delete QSO", "Delete the selected QSO", qso_buttons::cb_bn_delete_qso, 0 } },
 	{ qso_buttons::SAVE_EDIT, { "Save", "Copy changed record back to book", qso_buttons::cb_save, (void*)qso_buttons::SAVE_EDIT}},
@@ -210,9 +210,9 @@ void qso_buttons::create_form(int X, int Y) {
 void qso_buttons::enable_widgets() {
 	int ix = 0;
 	if (button_map_.find(qso_data_->logging_state()) != button_map_.end()) {
-		// If we have a button map for the state use it - else deactivate all buttons
-		const list<button_type>& buttons = button_map_.at(qso_data_->logging_state());
-		// Activate the buttons we need and set their parameters
+		// If we have a button std::map for the state use it - else deactivate all buttons
+		const std::list<button_type>& buttons = button_map_.at(qso_data_->logging_state());
+		// Activate the buttons we need and std::set their parameters
 		for (auto bn = buttons.begin(); bn != buttons.end() && ix < MAX_ACTIONS; bn++, ix++) {
 			const button_action& action = action_map_.at(*bn);
 			bn_action_[ix]->label(action.label);

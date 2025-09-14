@@ -4,10 +4,10 @@
 #include "rig_if.h"
 #include "status.h"
 
-using namespace std;
+
 
 extern status* status_;
-extern string PROGRAM_VERSION;
+extern std::string PROGRAM_VERSION;
 
 rig_writer::rig_writer() {
     rig_name_ = "";
@@ -20,7 +20,7 @@ rig_writer::~rig_writer() {
 
 }
 
-bool rig_writer::store_data(map<string, rig_data_t*>* all_data, ostream& os) {
+bool rig_writer::store_data(std::map<std::string, rig_data_t*>* all_data, std::ostream& os) {
     data_ = all_data;
     status_->misc_status(ST_NOTE, "RIG DATA: Starting XML generation");
 
@@ -40,9 +40,9 @@ bool rig_writer::store_data(map<string, rig_data_t*>* all_data, ostream& os) {
 }
 
 bool rig_writer::write_element(rigs_element_t element) {
-    string name;
-    string data;
-    map<string, string>* attributes;
+    std::string name;
+    std::string data;
+    std::map<std::string, std::string>* attributes;
     hamlib_data_t* hamlib;
     switch(element) {
     case RIG_NONE:
@@ -55,7 +55,7 @@ bool rig_writer::write_element(rigs_element_t element) {
         return true;
     case RIG_RIGS:
         name = "rigs";
-        attributes = new map<string, string>;
+        attributes = new std::map<std::string, std::string>;
         (*attributes)["version"] = PROGRAM_VERSION;
         if (!start_element(name, attributes)) return false;
         // else
@@ -68,7 +68,7 @@ bool rig_writer::write_element(rigs_element_t element) {
         return true;
     case RIG_RIG:
         name = "rig";
-        attributes = new map<string, string>;
+        attributes = new std::map<std::string, std::string>;
         (*attributes)["name"] = rig_name_;
         if (!start_element(name, attributes)) return false;
         // else
@@ -84,7 +84,7 @@ bool rig_writer::write_element(rigs_element_t element) {
         return true;
     case RIG_APP:
         name = "app";
-        attributes = new map<string, string>;
+        attributes = new std::map<std::string, std::string>;
         (*attributes)["name"] = app_name_;
         if (!start_element(name, attributes)) return false;
         // else
@@ -120,8 +120,8 @@ bool rig_writer::write_element(rigs_element_t element) {
     }
 }
 
-bool rig_writer::write_value(string name, string data) {
-    map<string, string>* attributes = new map<string, string>;
+bool rig_writer::write_value(std::string name, std::string data) {
+    std::map<std::string, std::string>* attributes = new std::map<std::string, std::string>;
     (*attributes)["name"] = name;
     if (!start_element("value", attributes)) return false;
     if (!characters(data)) return false;
@@ -129,12 +129,12 @@ bool rig_writer::write_value(string name, string data) {
     return true;
 }
 
-bool rig_writer::write_value(string name, int data) {
+bool rig_writer::write_value(std::string name, int data) {
     return write_value(name, to_string(data));
 }
 
-bool rig_writer::write_value(string name, double data) {
+bool rig_writer::write_value(std::string name, double data) {
     char text[32];
     snprintf(text, sizeof(text), "%g", data);
-    return write_value(name, string(text));
+    return write_value(name, std::string(text));
 }

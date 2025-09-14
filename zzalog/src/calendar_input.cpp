@@ -16,7 +16,7 @@ calendar_input::~calendar_input() {}
 void calendar_input::callback(Fl_Callback* cb, void* v) {
 	// Default behaviour of button input - sets ip_ callback
 	button_input::callback(cb, v);
-	// Now set the user data on the button
+	// Now std::set the user data on the button
 	bn_->user_data(v);
 }
 
@@ -32,7 +32,7 @@ void calendar_input::cb_button(Fl_Widget* w, void* v) {
 	calendar* cal = new calendar(w->x(), w->y());
 	const char* ip_value = that->input()->value();
 	if (strlen(ip_value) == 0) {
-		string today = now(false, "%Y%m%d").c_str();
+		std::string today = now(false, "%Y%m%d").c_str();
 		cal->value(today.c_str());
 		that->input()->value(today.c_str());
 	}

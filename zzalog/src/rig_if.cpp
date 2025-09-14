@@ -24,7 +24,7 @@ bool rig_if::is_open() {
 }
 
 // Convert s-meter reading into display format
-string rig_if::get_smeter(bool max) {
+std::string rig_if::get_smeter(bool max) {
 	char text[100];
 	int value = max ? (int)rig_data_.s_value : (int)rig_data_.s_meter;
 	// SMeter value is relative to S9
@@ -72,7 +72,7 @@ double rig_if::get_dfrequency(bool tx) {
 	return frequency;
 }
 
-string rig_if::get_frequency(bool tx) {
+std::string rig_if::get_frequency(bool tx) {
 	double frequency = get_dfrequency(tx);
 	char text[15];
 	snprintf(text, 15, "%0.6f", frequency);
@@ -105,15 +105,15 @@ double rig_if::get_dpower(bool max) {
 	return value;
 }
 
-// Convert power to string
-string rig_if::get_tx_power(bool max) {
+// Convert power to std::string
+std::string rig_if::get_tx_power(bool max) {
 	char text[100];
 	snprintf(text, 100, "%g", get_dpower(max));
 	return text;
 }
 
 // Converts rig mode to ADIF mode/submode
-void rig_if::get_string_mode(string& mode, string& submode) {
+void rig_if::get_string_mode(std::string& mode, std::string& submode) {
 	rig_mode_t rig_mode = rig_data_.mode;
 	mode = "";
 	submode = "";
@@ -187,7 +187,7 @@ rig_if::rig_if(const char* name, hamlib_data_t* data)
 	hamlib_data_ = data;
 	run_read_ = false;
 	// Last PTT off
-	last_ptt_off_ = system_clock::now();
+	last_ptt_off_ = std::chrono::system_clock::now();
 	thread_ = nullptr;
 	// Access flags
 	toc_split_ = 0;
@@ -203,7 +203,7 @@ rig_if::rig_if(const char* name, hamlib_data_t* data)
 	sum_smeters_ = 0;
 	read_item_ = "";
 	
-	// If the name has been set, there is a rig
+	// If the name has been std::set, there is a rig
 	if (hamlib_data_ && my_rig_name_.length()) {
 		if (hamlib_data_->port_type != RIG_PORT_NONE) {
 			open();
@@ -238,7 +238,7 @@ void rig_if::close() {
 			status_->misc_status(ST_NOTE, msg);
 		}
 		// If we have a connection and it's open, close it and tidy memory used by hamlib
-		// Delete the thread that reads the required rig values
+		// Delete the std::thread that reads the required rig values
 		run_read_ = false;
 		thread_->join();
 		delete thread_;
@@ -269,12 +269,12 @@ bool rig_if::open() {
 		return false;
 
 	}
-	if (DEBUG_THREADS) printf("RIG MAIN: Starting rig %s/%s access thread\n",
+	if (DEBUG_THREADS) printf("RIG MAIN: Starting rig %s/%s access std::thread\n",
 		hamlib_data_->mfr.c_str(), hamlib_data_->model.c_str());
 	if (rig_ == nullptr) close();
 	opening_.store(true, memory_order_seq_cst);
-	thread_ = new thread(th_sopen_rig, this);
-	chrono::system_clock::time_point wait_start = chrono::system_clock::now();
+	thread_ = new std::thread(th_sopen_rig, this);
+	std::chrono::system_clock::time_point wait_start = std::chrono::system_clock::now();
 	int timeout = 40000;
 	snprintf(msg, sizeof(msg), "RIG: Connecting %s/%s - timeout = %d ms",
 		hamlib_data_->mfr.c_str(),
@@ -284,7 +284,7 @@ bool rig_if::open() {
 	while(opening_.load()) {
 		// Allow FLTK scheduler in
 		Fl::check();
-		if (chrono::system_clock::now() - wait_start > chrono::milliseconds(timeout)) {
+		if (std::chrono::system_clock::now() - wait_start > std::chrono::milliseconds(timeout)) {
 			char msg[128];
 			snprintf(msg, sizeof(msg), "RIG: Connecting %s/%s abandoned after %d ms", 
 				hamlib_data_->mfr.c_str(),
@@ -316,7 +316,7 @@ bool rig_if::open() {
 		status_->misc_status(ST_OK, msg);
 
 		if (DEBUG_THREADS) printf("RIG MAIN: Starting reading rig daya\n");
-		thread_ = new thread(th_run_rig, this);
+		thread_ = new std::thread(th_run_rig, this);
 
 		return true;
 	}
@@ -332,7 +332,7 @@ bool rig_if::open() {
 	}
 }
 
-// This is within the thread
+// This is within the std::thread
 void rig_if::th_sopen_rig(rig_if* that) {
 	if (DEBUG_THREADS) printf("RIG THREAD: Opening rig\n");
 	that->th_open_rig(that);
@@ -347,7 +347,7 @@ void rig_if::th_open_rig(rig_if* that) {
 	if (rig_ != nullptr) {
 		switch (hamlib_data_->port_type) {
 		case RIG_PORT_SERIAL:
-			// Successful - set up the serial port parameters
+			// Successful - std::set up the serial port parameters
 			strcpy(rig_->state.rigport.pathname, hamlib_data_->port_name.c_str());
 			rig_->state.rigport.parm.serial.rate = hamlib_data_->baud_rate;
 			rig_->state.timeout = (int)(hamlib_data_->timeout * 1000.);
@@ -379,7 +379,7 @@ void rig_if::th_open_rig(rig_if* that) {
 }
 
 // Return rig name
-string& rig_if::rig_name() {
+std::string& rig_if::rig_name() {
 	// Read capabilities to get manufacturer and model name
 	full_rig_name_ = rig_get_info(rig_);
 	return full_rig_name_;
@@ -387,7 +387,7 @@ string& rig_if::rig_name() {
 
 // Thraed method
 void rig_if::th_run_rig(rig_if* that) {
-	if (DEBUG_THREADS) printf("RIG THREAD: Rig access thread started\n");
+	if (DEBUG_THREADS) printf("RIG THREAD: Rig access std::thread started\n");
 	// run_read_ will be cleared when the rig closes or errors.
 	bool ok = that->th_read_values();
 	that->opened_ok_.store(ok);
@@ -397,7 +397,7 @@ void rig_if::th_run_rig(rig_if* that) {
 		that->run_read_ = true;
 		while (that->run_read_ && ok) {
 			// Read the values from the rig once per second
-			this_thread::sleep_for(chrono::milliseconds(1000));
+			this_thread::sleep_for(std::chrono::milliseconds(1000));
 			ok = that->th_read_values();
 			that->opened_ok_.store(ok);
 		}
@@ -412,7 +412,7 @@ void rig_if::th_run_rig(rig_if* that) {
 
 // Read the data from the rig
 bool rig_if::th_read_values() {
-	system_clock::time_point start = system_clock::now();
+	std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 	if (hamlib_data_->port_type == RIG_PORT_NONE) {
 		return false;
 	}
@@ -479,7 +479,7 @@ bool rig_if::th_read_values() {
 	rig_data_.ptt = ptt == ptt_t::RIG_PTT_ON;
 	// If we are releasing PTT record the time
 	if (current_ptt & !ptt) {
-		last_ptt_off_ = system_clock::now();
+		last_ptt_off_ = std::chrono::system_clock::now();
 	}
 	// Read frequencies
 	double d_temp;
@@ -516,7 +516,7 @@ bool rig_if::th_read_values() {
 		double previous_freq = rig_data_.rx_frequency;
 		if (!rig_data_.ptt) {
 			rig_data_.rx_frequency = d_temp;
-			// If we have QSY'd then set TX frequency to RX frequency
+			// If we have QSY'd then std::set TX frequency to RX frequency
 			if (previous_freq != d_temp || previous_split) rig_data_.tx_frequency = d_temp;
 		} else {
 			rig_data_.tx_frequency = d_temp;
@@ -584,7 +584,7 @@ bool rig_if::th_read_values() {
 	value_t meter_value;
 	if (has_smeter_) {
 		read_item_ = "S-meter";
-		// S-meter - set to max value during RX and last RX value during TX
+		// S-meter - std::set to max value during RX and last RX value during TX
 		if (DEBUG_RIGS) printf("RIGS: Reading S-meter\n");
 		error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_STRENGTH, &meter_value);
 		if (DEBUG_RIGS) printf("RIGS: Read S-meter - %d\n", meter_value.i);
@@ -593,7 +593,7 @@ bool rig_if::th_read_values() {
 		}
 		// TX->RX (or changed RX frequency - use read value
 		if (current_ptt && !rig_data_.ptt) {
-			// empty smeter queue
+			// empty smeter std::queue
 			smeters_.clear();
 		}
 		// Push value into smeters stack
@@ -621,8 +621,8 @@ bool rig_if::th_read_values() {
 		// RX->TX - reset the power level unless...
 		if (!current_ptt && rig_data_.ptt) {
 			// ...PTT is released for only a few seconds (e.g. CW break-in or SSB VOX)
-			seconds gap = duration_cast<seconds>(system_clock::now() - last_ptt_off_);
-			if (gap > seconds(5)) {
+			std::chrono::seconds gap = duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - last_ptt_off_);
+			if (gap > std::chrono::seconds(5)) {
 				rig_data_.pwr_value = meter_value.f;
 			}
 		}
@@ -640,16 +640,16 @@ bool rig_if::th_read_values() {
 	count_down_ = FAST_RIG_TIMER;
 	// Check rig response time and inform use if it's slowed down or back to normal
 	char msg[128];
-	system_clock::time_point finish = system_clock::now();
-	milliseconds response = duration_cast<milliseconds>(finish - start);
+	std::chrono::system_clock::time_point finish = std::chrono::system_clock::now();
+	std::chrono::milliseconds response = duration_cast<std::chrono::milliseconds>(finish - start);
 	if (rig_data_.slow) {
-		if (response < milliseconds(100)) {
+		if (response < std::chrono::milliseconds(100)) {
 			snprintf(msg, sizeof(msg), "RIG %s Responding normally %dms", 
 				my_rig_name_.c_str(), (int)response.count());
 			Fl::awake(cb_rig_warning, msg);
 			rig_data_.slow = false;
 		}
-	} else if (response > milliseconds((int)(hamlib_data_->timeout * 1000.0))) {
+	} else if (response > std::chrono::milliseconds((int)(hamlib_data_->timeout * 1000.0))) {
 			snprintf(msg, sizeof(msg), "RIG %s Responding slowly %dms", 
 				my_rig_name_.c_str(), (int)response.count());
 			Fl::awake(cb_rig_warning, msg);
@@ -714,12 +714,12 @@ void rig_if::cb_rig_warning(void* v) {
 }
 
 // Return the most recent error message
-string rig_if::error_message(const char* func_name) {
+std::string rig_if::error_message(const char* func_name) {
 	char msg[256];
 	snprintf(msg, 256, "RIG: Hamlib error \"%s\" processing %s",
 		error_text((rig_errcode_e)abs(error_code_)),
 		func_name);
-	return string(msg);
+	return std::string(msg);
 }
 
 // Error Code is OK.

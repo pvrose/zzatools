@@ -11,13 +11,13 @@
 
 #include <FL/Fl_Output.H>
 
-typedef vector<string> field_list;
+typedef std::vector<std::string> field_list;
 
 extern qso_manager* qso_manager_;
 extern spec_data* spec_data_;
 extern stn_data* stn_data_;
 
-map< string, contest_algorithm* >* algorithms_ = nullptr;
+std::map< std::string, contest_algorithm* >* algorithms_ = nullptr;
 
 // Constructor - should be overriden by the algoritmic specific
 contest_algorithm::contest_algorithm() {
@@ -40,21 +40,21 @@ void contest_algorithm::attach(contest_scorer* cs) {
 }
 
 void contest_algorithm::set_default_rst(record* qso) {
-	string contest_mode = spec_data_->dxcc_mode(qso->item("MODE"));
+	std::string contest_mode = spec_data_->dxcc_mode(qso->item("MODE"));
 	if (contest_mode == "CW" || contest_mode == "DATA") {
 		// CW/Data
-		qso->item("RST_SENT", string("599"));
+		qso->item("RST_SENT", std::string("599"));
 	}
 	else {
 		// Phone
-		qso->item("RST_SENT", string("59"));
+		qso->item("RST_SENT", std::string("59"));
 	}
 
 }
 
 // Return all fields used in algorithm
 field_list contest_algorithm::fields() {
-	vector<string> result;
+	std::vector<std::string> result;
 	for (auto it : rx_items_) {
 		result.push_back(it);
 	}

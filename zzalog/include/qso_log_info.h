@@ -2,7 +2,7 @@
 
 #include <FL/Fl_Group.H>
 
-using namespace std;
+
 
 class Fl_Output;
 class Fl_Button;

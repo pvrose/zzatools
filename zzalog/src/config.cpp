@@ -18,10 +18,10 @@
 #include <FL/Fl_Tabs.H>
 
 extern config* config_;
-extern string CONTACT;
-extern string COPYRIGHT;
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern std::string CONTACT;
+extern std::string COPYRIGHT;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
 
 // Constructor
@@ -42,7 +42,7 @@ config::config(int W, int H, const char* label) :
 	position(left, top);
 
 	children_ids_.clear();
-	// Create the set of tabs_ - leave enough space beneath for OK etc buttons.
+	// Create the std::set of tabs_ - leave enough space beneath for OK etc buttons.
 	tabs_ = new Fl_Tabs(0, 0, W, H - HBUTTON - FOOT_HEIGHT);
 	tabs_->callback(cb_tab);
 	tabs_->box(FL_FLAT_BOX);
@@ -131,7 +131,7 @@ config::config(int W, int H, const char* label) :
 	callback(cb_bn_cal, (long)CA_CANCEL);
 
 	Fl_Box* b_cr = new Fl_Box(0, H - FOOT_HEIGHT, W, FOOT_HEIGHT);
-	b_cr->copy_label(string(COPYRIGHT + " " + CONTACT + "     ").c_str());
+	b_cr->copy_label(std::string(COPYRIGHT + " " + CONTACT + "     ").c_str());
 	b_cr->labelsize(FL_NORMAL_SIZE - 1);
 	b_cr->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 

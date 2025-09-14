@@ -54,7 +54,7 @@ class record;
 		//! \param response Returned response.
 		//! \return true if request fails, otherwise false.
 		static int update_record(rpc_data_item::rpc_list& params, rpc_data_item& response);
-		//! List methods - string responds with a list of methods suppported
+		//! List methods - std::string responds with a std::list of methods suppported
 
 		//! \param params Request.
 		//! \param response Returned response.
@@ -66,7 +66,7 @@ class record;
 		//! \param code Error code.
 		//! \param message Error message
 		//! \param response Formatted response for sending to client.
-		void generate_error(int code, string message, rpc_data_item& response);
+		void generate_error(int code, std::string message, rpc_data_item& response);
 
 		//! Check FlDigi isconnected
 		void check_connected();
@@ -77,8 +77,8 @@ class record;
 		record* putative_qso_;
 		//! XMK-RPC handler.
 		rpc_handler* rpc_handler_;
-		//! The list of methods supported by the RPC interface
-		list<rpc_handler::method_entry> method_list_;
+		//! The std::list of methods supported by the RPC interface
+		std::list<rpc_handler::method_entry> method_list_;
 		
 		//! The only instance
 		static fllog_emul* that_;

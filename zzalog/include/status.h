@@ -11,7 +11,7 @@
 #include <vector>
 #include <cstdint>
 
-using namespace std;
+
 
 class banner;
 
@@ -36,7 +36,7 @@ class banner;
 	};
 
 	//! MAp the values of status_t to the colours used to display them.
-	const map<status_t, colours_t> STATUS_COLOURS = {
+	const std::map<status_t, colours_t> STATUS_COLOURS = {
 		{ ST_NONE, { FL_BLUE, FL_BLACK } },
 		{ ST_LOG, { fl_lighter(FL_BLUE), FL_BLACK } },
 		{ ST_DEBUG, { fl_lighter(FL_MAGENTA), FL_BLACK } },
@@ -50,7 +50,7 @@ class banner;
 	};
 
 	//! Code - letters witten to log file to indicate severity of the logged status
-	const map<status_t, char> STATUS_CODES = {
+	const std::map<status_t, char> STATUS_CODES = {
 		{ ST_NONE, ' '},
 		{ ST_LOG, 'L'},
 		{ ST_DEBUG, 'B' },
@@ -98,14 +98,14 @@ class banner;
 
 	protected:
 		//! Returns the terminal characters used for the specific \p fg or bg colour for \p status.
-		string colour_code(status_t status, bool fg); 
+		std::string colour_code(status_t status, bool fg); 
 
 
 	protected:
 		//! Status report file
-		string report_filename_;
+		std::string report_filename_;
 		//! Output stream for report file.
-		ofstream* report_file_;
+		std::ofstream* report_file_;
 		//! Report file unusable
 		bool file_unusable_;
 	};

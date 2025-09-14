@@ -76,7 +76,7 @@ void tabbed_forms::add_view(const char* label, field_app_t column_data, object_t
 	view->tooltip(tooltip);
 	// Add the view to the Fl_Tabs widget
 	container->add(view);
-	// map the object type to the particular instance of view and Fl_Widget (they inherit both)
+	// std::map the object type to the particular instance of view and Fl_Widget (they inherit both)
 	add(container);
 	forms_[object] = { view, view };
 }
@@ -168,7 +168,7 @@ void tabbed_forms::activate_pane(object_t pane, bool active) {
 	enable_widgets();
 }
 
-// set the books into the various views
+// std::set the books into the various views
 void tabbed_forms::books() {
 	// For each view (as view)
 	for (auto ix = forms_.begin(); ix != forms_.end(); ix++) {

@@ -9,7 +9,7 @@ class qso_qsl_vwr;
 class contest_scorer;
 typedef size_t qso_num_t;
 
-//! This class displays a set of tabs for qso_qth, qso_details, qso_dxcc, qso_qsl_vwr and contest_scorer.
+//! This class displays a std::set of tabs for qso_qth, qso_details, qso_dxcc, qso_qsl_vwr and contest_scorer.
 class qso_misc :
     public Fl_Tabs
 {

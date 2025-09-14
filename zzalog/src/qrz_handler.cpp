@@ -26,8 +26,8 @@ extern status* status_;
 extern tabbed_forms* tabbed_forms_;
 extern url_handler* url_handler_;
 extern book* navigation_book_;
-extern string PROG_ID;
-extern string PROGRAM_VERSION;
+extern std::string PROG_ID;
+extern std::string PROGRAM_VERSION;
 extern uint32_t seed_;
 extern import_data* import_data_;
 extern qso_manager* qso_manager_;
@@ -46,8 +46,8 @@ qrz_handler::qrz_handler() :
 {
 
 	run_threads_ = true;
-	if (DEBUG_THREADS) printf("QRZ MAIN: Starting thread\n");
-	th_upload_ = new thread(thread_run, this);
+	if (DEBUG_THREADS) printf("QRZ MAIN: Starting std::thread\n");
+	th_upload_ = new std::thread(thread_run, this);
 
 	// Got no log-in details - raise a warning for now.
 	if (!user_details()) {
@@ -61,7 +61,7 @@ qrz_handler::qrz_handler() :
 
 // Destructor
 qrz_handler::~qrz_handler() {
-	// Close the upload thread
+	// Close the upload std::thread
 	run_threads_ = false;
 	th_upload_->join();
 	delete th_upload_;
@@ -80,8 +80,8 @@ bool qrz_handler::open_session() {
 	// We can use the XML database - note this is subscription only
 	if (use_xml_database_) {
 		// Generate XML request.
-		string uri = generate_session_uri();
-		stringstream response;
+		std::string uri = generate_session_uri();
+		std::stringstream response;
 		// Send Session requesst to QRZ
 		if (!url_handler_->read_url(uri, &response)) {
 			int length = uri.length() + 50;
@@ -126,9 +126,9 @@ bool qrz_handler::fetch_details(record* qso) {
 		return false;
 	}
 	// Request 
-	status_->misc_status(ST_NOTE, string("QRZ: Fetching information for " + qso->item("CALL")).c_str());
-	string uri = generate_details_uri(qso->item("CALL"));
-	stringstream response;
+	status_->misc_status(ST_NOTE, std::string("QRZ: Fetching information for " + qso->item("CALL")).c_str());
+	std::string uri = generate_details_uri(qso->item("CALL"));
+	std::stringstream response;
 	// Send Session requesst to QRZ
 	if (!url_handler_->read_url(uri, &response)) {
 		int length = uri.length() + 50;
@@ -140,7 +140,7 @@ bool qrz_handler::fetch_details(record* qso) {
 	delete qrz_info_;
 	qrz_info_ = new record;
 	if (decode_details_response(response)) {
-		status_->misc_status(ST_OK, string("QRZ: query for " + qso->item("CALL") + " completed.").c_str());
+		status_->misc_status(ST_OK, std::string("QRZ: query for " + qso->item("CALL") + " completed.").c_str());
 		return true;
 	}
 	else {
@@ -149,7 +149,7 @@ bool qrz_handler::fetch_details(record* qso) {
 }
 
 // Decode session response
-bool qrz_handler::decode_session_response(istream& response) {
+bool qrz_handler::decode_session_response(std::istream& response) {
 	qrz_version_ = "";
 	xml_reader* reader = new xml_reader;
 	reader->parse(response);
@@ -160,7 +160,7 @@ bool qrz_handler::decode_session_response(istream& response) {
 }
 
 // Decode details response
-bool qrz_handler::decode_details_response(istream& response) {
+bool qrz_handler::decode_details_response(std::istream& response) {
 	xml_reader* reader = new xml_reader;
 	reader->parse(response);
 	xml_element* top_element = reader->element();
@@ -180,8 +180,8 @@ bool qrz_handler::query_merge() {
 }
 
 // Generate URI for session request
-string qrz_handler::generate_session_uri() {
-	string result;
+std::string qrz_handler::generate_session_uri() {
+	std::string result;
 	char format[] = "http://xmldata.qrz.com/xml/current/?username=%s;password=%s;agent=%s%s";
 	int length = strlen(format) + username_.length() + password_.length() + PROG_ID.length() + PROGRAM_VERSION.length();
 	char* uri = new char[length];
@@ -191,8 +191,8 @@ string qrz_handler::generate_session_uri() {
 }
 
 // Generate URI for details request
-string qrz_handler::generate_details_uri(string callsign) {
-	string result;
+std::string qrz_handler::generate_details_uri(std::string callsign) {
+	std::string result;
 	char format[] = "http://xmldata.qrz.com/xml/current/?s=%s;callsign=%s";
 	int length = strlen(format) + session_key_.length() + callsign.length();
 	char* uri = new char[length];
@@ -225,7 +225,7 @@ bool qrz_handler::decode_xml(xml_element* element) {
 	if (element->parent() == nullptr) {
 		// Top element - must be named QRZDatabase
 		if (element->name() != "QRZDatabase") {
-			string message = "QRZ: unexpected XML " + element->name() + " received";
+			std::string message = "QRZ: unexpected XML " + element->name() + " received";
 			status_->misc_status(ST_ERROR, message.c_str());
 			return false;
 		}
@@ -248,9 +248,9 @@ bool qrz_handler::decode_xml(xml_element* element) {
 	// Decode QRZDatabase element
 bool qrz_handler::decode_top(xml_element* element) {
 	// Check the QRZ Database version matches that previously received
-	map <string, string>* attributes = element->attributes();
+	std::map <std::string, std::string>* attributes = element->attributes();
 	if (attributes->find("version") != attributes->end()) {
-		string version = attributes->at("version");
+		std::string version = attributes->at("version");
 		if (qrz_version_.length() && qrz_version_ != version) {
 			char format[] = "QRZ: database version mis-match: previously %s currently %s";
 			int length = strlen(format) + version.length() + qrz_version_.length();
@@ -278,11 +278,11 @@ bool qrz_handler::decode_session(xml_element* element) {
 	if (!result) return false;
 	// Check the key is as received previously
 	if (data_.find("Key") != data_.end()) {
-		string key = data_.at("Key");
+		std::string key = data_.at("Key");
 		if (session_key_.length() && session_key_ != key) {
 			status_->misc_status(ST_ERROR, "QRZ: Incompatible session keys received - see log");
-			status_->misc_status(ST_LOG, string("QRZ: Previously " + session_key_).c_str());
-			status_->misc_status(ST_LOG, string("QRZ: Currently  " + key).c_str());
+			status_->misc_status(ST_LOG, std::string("QRZ: Previously " + session_key_).c_str());
+			status_->misc_status(ST_LOG, std::string("QRZ: Currently  " + key).c_str());
 			return false;
 		}
 		else {
@@ -291,12 +291,12 @@ bool qrz_handler::decode_session(xml_element* element) {
 	}
 	// Error detected - stop decoding
 	if (data_.find("Error") != data_.end()) {
-		status_->misc_status(ST_ERROR, string("QRZ: error: " + data_.at("Error")).c_str());
+		status_->misc_status(ST_ERROR, std::string("QRZ: error: " + data_.at("Error")).c_str());
 		return false;
 	}
 	// Warning message received
 	if (data_.find("Message") != data_.end()) {
-		status_->misc_status(ST_WARNING, string("QRZ: warning: " + data_.at("Message")).c_str());
+		status_->misc_status(ST_WARNING, std::string("QRZ: warning: " + data_.at("Message")).c_str());
 	}
 	// Check subscription status
 	if (data_.find("SubExp") != data_.end() && data_["SubExp"] == "non-subscriber") {
@@ -365,7 +365,7 @@ void qrz_handler::merge_done() {
 }
 
 // REturn message
-string qrz_handler::get_merge_message() {
+std::string qrz_handler::get_merge_message() {
 	return "Please merge in data downloaded from QRZ database";
 }
 
@@ -385,11 +385,11 @@ bool qrz_handler::has_session() {
 }
 
 // Non-subscriber access to QRZ.com web interface
-void qrz_handler::open_web_page(string callsign) {
+void qrz_handler::open_web_page(std::string callsign) {
 	// Open browser with QRZ URL 
 	char uri[256];
 	snprintf(uri, sizeof(uri), "http://www.qrz.com/lookup?callsign=%s", callsign.c_str());
-	status_->misc_status(ST_NOTE, string("QRZ: Launching QRZ web page for " + callsign).c_str());
+	status_->misc_status(ST_NOTE, std::string("QRZ: Launching QRZ web page for " + callsign).c_str());
 	fl_open_uri(uri);
 }
 
@@ -402,7 +402,7 @@ void qrz_handler::load_data() {
 }
 
 // Request download for callsign
-bool qrz_handler::download_qrzlog_log(stringstream* adif) {
+bool qrz_handler::download_qrzlog_log(std::stringstream* adif) {
 	char msg[128];
 	load_data();
 	if (!use_api_) {
@@ -410,7 +410,7 @@ bool qrz_handler::download_qrzlog_log(stringstream* adif) {
 		status_->misc_status(ST_WARNING, msg);
 		return false;
 	}
-	string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
+	std::string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
 	if (api_data_->find(callsign) == api_data_->end() ||
 		!api_data_->at(callsign)->used) {
 		snprintf(msg, sizeof(msg), "QRZ: No logbook exists for call %s", callsign.c_str());
@@ -418,14 +418,14 @@ bool qrz_handler::download_qrzlog_log(stringstream* adif) {
 		return false;
 	}
 	int count = 0;
-	// Create a 1M holding string (for debug)
-	string sadif;
+	// Create a 1M holding std::string (for debug)
+	std::string sadif;
 	sadif.reserve(1024 * 1024);
-	stringstream request;
-	stringstream response;
+	std::stringstream request;
+	std::stringstream response;
 	fetch_request(api_data_->at(callsign), request);
 	url_handler_->post_url("https://logbook.qrz.com/api", "", &request, &response);
-	response.seekg(0, ios::beg);
+	response.seekg(0, std::ios::beg);
 	if (!fetch_response(api_data_->at(callsign), response, count, sadif)) {
 		status_->misc_status(ST_WARNING, "QRZ: Fetch data over API has failed");
 	} else {
@@ -443,20 +443,20 @@ bool qrz_handler::download_qrzlog_log(stringstream* adif) {
 }
 
 // Generate the fetch request
-bool qrz_handler::fetch_request(qsl_call_data* api, ostream& req) {
+bool qrz_handler::fetch_request(qsl_call_data* api, std::ostream& req) {
 	// Key
 	req << "KEY=" << api->key << "&";
 	// Action
 	req << "ACTION=FETCH" <<"&";
 	// Options
-	string lastdate = api->last_download.substr(0,4) + "-" +
+	std::string lastdate = api->last_download.substr(0,4) + "-" +
 		api->last_download.substr(4,2) + "-" + api->last_download.substr(6,2);
  	req << "OPTION=MODSINCE:" << lastdate << '\n';
 	return true;
 }
 
 // Decode the fetch response and copy to import_data
-bool qrz_handler::fetch_response(qsl_call_data* api, istream& resp, int& count, string& adif) {
+bool qrz_handler::fetch_response(qsl_call_data* api, std::istream& resp, int& count, std::string& adif) {
 	bool ok = true;
 	char msg[128];
 	bool done = false;
@@ -469,8 +469,8 @@ bool qrz_handler::fetch_response(qsl_call_data* api, istream& resp, int& count, 
 	int count_logid = 0;
 	bool eod = false; // end of data
 	int count_records = 0;
-	string buffer;
-	string buff1;
+	std::string buffer;
+	std::string buff1;
 	size_t pos = 0;
 	unsigned long long last_logid = api->last_logid;
 	// Read the entire stream into buffer
@@ -481,8 +481,8 @@ bool qrz_handler::fetch_response(qsl_call_data* api, istream& resp, int& count, 
 	while (!done && ok) {
 		// Get the next bit of data
 		size_t amper = buffer.find('&', pos);
-		string data;
-		if (amper == string::npos) {
+		std::string data;
+		if (amper == std::string::npos) {
 			data = buffer.substr(pos);
 			eod = true;
 		} else {
@@ -504,7 +504,7 @@ bool qrz_handler::fetch_response(qsl_call_data* api, istream& resp, int& count, 
 		} else if (len > 6 && data.substr(0,6) == "COUNT=") {
 			state = COUNT;
 			got_count = true;
-			count = stoi(data.substr(6));
+			count = std::stoi(data.substr(6));
 		} else if (len >= 5 && data.substr(0,5) == "ADIF=") {
 			state = ADIF;
 			got_adif = true;
@@ -520,7 +520,7 @@ bool qrz_handler::fetch_response(qsl_call_data* api, istream& resp, int& count, 
 			if (len > 20 && data.substr(3, 17) == "app_qrzlog_logid:") {
 				// Special processing - required after next '>'
 				is_logid = true;
-				count_logid = stoi(data.substr(20));
+				count_logid = std::stoi(data.substr(20));
 			}
 		} else if (state == ADIF && len > 3 && data.substr(0,3) == "gt;") {
 			if (is_logid) {
@@ -563,7 +563,7 @@ bool qrz_handler::fetch_response(qsl_call_data* api, istream& resp, int& count, 
 		pos = amper + 1;
 	}
 	if (ok)  {
-		string today = now(false, "%Y%m%d");
+		std::string today = now(false, "%Y%m%d");
 		api->last_download = today;
 		api->last_logid = last_logid;
 	}
@@ -585,7 +585,7 @@ bool qrz_handler::upload_single_qso(qso_num_t qso_number) {
 		return false;
 	}
 	record* qso = book_->get_record(qso_number, false);
-	string sent_status = qso->item("QRZCOM_QSO_UPLOAD_STATUS");
+	std::string sent_status = qso->item("QRZCOM_QSO_UPLOAD_STATUS");
 	if (sent_status == "Y") {
 		strcpy(msg, "QRZ: Already uploaded this QSO - not uploading");
 		status_->misc_status(ST_WARNING, msg);
@@ -596,7 +596,7 @@ bool qrz_handler::upload_single_qso(qso_num_t qso_number) {
 		status_->misc_status(ST_NOTE, msg);
 		return false;
 	}
-	string callsign = qso->item("STATION_CALLSIGN");
+	std::string callsign = qso->item("STATION_CALLSIGN");
 	if (api_data_->find(callsign) == api_data_->end() ||
 		!api_data_->at(callsign)->used) {
 		snprintf(msg, sizeof(msg), "QRZ: No logbook exists for call %s", callsign.c_str());
@@ -604,7 +604,7 @@ bool qrz_handler::upload_single_qso(qso_num_t qso_number) {
 		return false;
 	}
 	book_->enable_save(false, "Uploading to QRZ.com");
-	// Now send to upload thread to process
+	// Now send to upload std::thread to process
 	upload_lock_.lock();
 	if (DEBUG_THREADS) printf("EQSL MAIN: Enqueueing eQSL request %s\n", qso->item("CALL").c_str());
 	upload_queue_.push(qso);
@@ -623,13 +623,13 @@ bool qrz_handler::upload_log(book* log) {
 	return ok;
 }
 
-// Upload thread - sit in a loop waiting for upload requests
+// Upload std::thread - sit in a loop waiting for upload requests
 void qrz_handler::thread_run(qrz_handler* that) {
 	if (DEBUG_THREADS) printf("QRZ THREAD: Thread started\n");
 	while (that->run_threads_) {
 		// Wait until qso placed on interface
 		while (that->run_threads_ && that->upload_queue_.empty()) {
-			this_thread::sleep_for(chrono::milliseconds(1000));
+			this_thread::sleep_for(std::chrono::milliseconds(1000));
 		}
 		// Process it
 		that->upload_lock_.lock();
@@ -649,27 +649,27 @@ void qrz_handler::thread_run(qrz_handler* that) {
 
 // Upload a single QSO in th ethead
 void qrz_handler::th_upload_qso(record* qso) {
-	stringstream request;
-	stringstream response;
-	string callsign = qso->item("STATION_CALLSIGN");
+	std::stringstream request;
+	std::stringstream response;
+	std::string callsign = qso->item("STATION_CALLSIGN");
 	qsl_call_data* call_data = api_data_->at(callsign);
-	string fail_message;
+	std::string fail_message;
 	insert_request(call_data, request, qso);
 	url_handler_->post_url("https://logbook.qrz.com/api", "", &request, &response);
-	response.seekg(0, ios::beg);
+	response.seekg(0, std::ios::beg);
 	upload_resp_t* resp = new upload_resp_t;
 	resp->success = insert_response(call_data, response, resp->message, resp->logid);
 	resp->qso = qso;
 	// Send response back to 
 	upload_resp_ = resp;
-	if (DEBUG_THREADS) printf("QRZ THREAD: Calling thread callback\n");
+	if (DEBUG_THREADS) printf("QRZ THREAD: Calling std::thread callback\n");
 	Fl::awake(cb_upload_done, (void*)this);
 	this_thread::yield();
 }
 
 // Upload done: wrapper
 void qrz_handler::cb_upload_done(void* v) {
-	if (DEBUG_THREADS) printf("QRZ MAIN: Entered thread callback handler\n");
+	if (DEBUG_THREADS) printf("QRZ MAIN: Entered std::thread callback handler\n");
 	qrz_handler* that = (qrz_handler*)v;
 	that->upload_done(that->upload_resp_);
 }
@@ -679,7 +679,7 @@ void qrz_handler::upload_done(upload_resp_t* resp) {
 	char msg[128];
 	switch(resp->success) {
 		case IR_GOOD:
-		resp->qso->item("QRZCOM_QSO_UPLOAD_STATUS", string("Y"));
+		resp->qso->item("QRZCOM_QSO_UPLOAD_STATUS", std::string("Y"));
 		resp->qso->item("QRZCOM_QSO_UPLOAD_DATE", now(false, "%Y%m%d"));
 		resp->qso->item("APP_QRZLOG_LOGID", to_string(resp->logid));
 		snprintf(msg, sizeof(msg), "QRZ: %s %s %s QSL uploaded (logid=%llu)",
@@ -691,7 +691,7 @@ void qrz_handler::upload_done(upload_resp_t* resp) {
 		book_->enable_save(true, "Uploaded to QRZ.com");
 		break;
 	case IR_DUPLICATE:
-		resp->qso->item("QRZCOM_QSO_UPLOAD_STATUS", string("Y"));
+		resp->qso->item("QRZCOM_QSO_UPLOAD_STATUS", std::string("Y"));
 		resp->qso->item("QRZCOM_QSO_UPLOAD_DATE", now(false, "%Y%m%d"));
 		resp->qso->item("APP_QRZLOG_LOGID", to_string(resp->logid));
 		snprintf(msg, sizeof(msg), "QRZ: %s %s %s QSL uploaded (duplicate logid=%llu)",
@@ -714,7 +714,7 @@ void qrz_handler::upload_done(upload_resp_t* resp) {
 }
 
 // Generate insert request
-bool qrz_handler::insert_request(qsl_call_data* api, ostream& request, record* qso) {
+bool qrz_handler::insert_request(qsl_call_data* api, std::ostream& request, record* qso) {
 	// Key
 	request << "KEY=" << api->key << "&";
 	// Action insert
@@ -730,12 +730,12 @@ bool qrz_handler::insert_request(qsl_call_data* api, ostream& request, record* q
 // Decode insert response
 qrz_handler::insert_resp_t qrz_handler::insert_response(
 	qsl_call_data* api, 
-	istream& response, 
-	string& fail_reason,
+	std::istream& response, 
+	std::string& fail_reason,
 	unsigned long long& logid
 ) {
-	string buffer;
-	string buff1;
+	std::string buffer;
+	std::string buff1;
 	bool done = false;
 	insert_resp_t resp = IR_GOOD;
 	size_t pos = 0;
@@ -747,8 +747,8 @@ qrz_handler::insert_resp_t qrz_handler::insert_response(
 	while (!done) {
 		// Get the next bit of data
 		size_t amper = buffer.find('&', pos);
-		string data;
-		if (amper == string::npos) {
+		std::string data;
+		if (amper == std::string::npos) {
 			data = buffer.substr(pos);
 			done = true;
 		} else {

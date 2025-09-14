@@ -3,12 +3,12 @@
 #include "stn_data.h"
 #include "status.h"
 
-using namespace std;
 
-using namespace std;
+
+
 
 extern status* status_;
-extern string PROGRAM_VERSION;
+extern std::string PROGRAM_VERSION;
 
 stn_writer::stn_writer() :
 	qth_name_(""),
@@ -22,10 +22,10 @@ stn_writer::~stn_writer() {
 }
 
 bool stn_writer::store_data(
-    map<string, qth_info_t*>* qths, 
-    map<string, oper_info_t*>* opers, 
-    map<string, string>* scalls,
-    ostream& os) {
+    std::map<std::string, qth_info_t*>* qths, 
+    std::map<std::string, oper_info_t*>* opers, 
+    std::map<std::string, std::string>* scalls,
+    std::ostream& os) {
     qths_ = qths;
     opers_ = opers;
     scalls_ = scalls;
@@ -47,7 +47,7 @@ bool stn_writer::store_data(
     return true;
 }
 
-map<qth_value_t, string> stn_writer::qth_value_map_ = {
+std::map<qth_value_t, std::string> stn_writer::qth_value_map_ = {
     { STREET, "Street" },
     { CITY, "City" },
     { POSTCODE, "Postcode" },
@@ -63,15 +63,15 @@ map<qth_value_t, string> stn_writer::qth_value_map_ = {
     { WAB, "WAB" }
 };
 
-map<oper_value_t, string> stn_writer::oper_value_map_ = {
+std::map<oper_value_t, std::string> stn_writer::oper_value_map_ = {
     { NAME, "Name" },
     { CALLSIGN, "Callsign" }
 };
 
 bool stn_writer::write_element(stn_element_t element) {
-    string name;
-    string data;
-    map<string, string>* attributes = nullptr;
+    std::string name;
+    std::string data;
+    std::map<std::string, std::string>* attributes = nullptr;
     switch (element) {
     case STN_NONE:
         // Prolog
@@ -95,7 +95,7 @@ bool stn_writer::write_element(stn_element_t element) {
             qth_name_ = it.first;
             qth_ = it.second;
             name = "location";
-            attributes = new map<string, string>;
+            attributes = new std::map<std::string, std::string>;
             (*attributes)["id"] = qth_name_;
             if (!start_element(name, attributes)) return false;
             for (auto iu : qth_->data) {
@@ -109,7 +109,7 @@ bool stn_writer::write_element(stn_element_t element) {
             oper_name_ = it.first;
             oper_ = it.second;
             name = "operator";
-            attributes = new map<string, string>;
+            attributes = new std::map<std::string, std::string>;
             (*attributes)["id"] = oper_name_;
             if (!start_element(name, attributes)) return false;
             for (auto iu : oper_->data) {
@@ -121,7 +121,7 @@ bool stn_writer::write_element(stn_element_t element) {
     case STN_SCALLSIGN:
         for (auto it: *scalls_) {
             name = "scallsign";
-            attributes = new map<string, string>;
+            attributes = new std::map<std::string, std::string>;
             (*attributes)["call"] = it.first;
             if (!start_element(name, attributes)) return false;
             if (!end_element(name)) return false;
@@ -134,8 +134,8 @@ bool stn_writer::write_element(stn_element_t element) {
 }
 
 // Write an individual item
-bool stn_writer::write_item(string name, string data) {
-    map<string, string>* attributes = new map<string, string>;
+bool stn_writer::write_item(std::string name, std::string data) {
+    std::map<std::string, std::string>* attributes = new std::map<std::string, std::string>;
     (*attributes)["name"] = name;
     if (!start_element("item", attributes)) return false;
     if (!characters(data)) return false;

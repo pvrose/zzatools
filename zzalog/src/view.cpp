@@ -17,7 +17,7 @@ view::~view()
 {
 }
 
-//  Return the book set for this view
+//  Return the book std::set for this view
 book* view::get_book() {
 	return my_book_;
 }

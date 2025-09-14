@@ -8,7 +8,7 @@
 #include <cmath>
 
 
-using namespace std;
+
 
 class record;
 class Fl_Image;
@@ -67,15 +67,15 @@ protected:
     void draw_text(const char* text, Fl_Color colour);
 
     //! Returns the ADIF format date in the remembered format.
-    string convert_date(string text);
+    std::string convert_date(std::string text);
     //! Returns the ADIF format time in the remembered format.
-    string convert_time(string text);
+    std::string convert_time(std::string text);
  
     //! Returns the specified \p value as points.
     int to_points(float value);
 
     //! Returns the image at that filename.
-    Fl_Image* get_image(string filename);
+    Fl_Image* get_image(std::string filename);
 
     //! Returns the input \p value scaled by the necessary amount. 
     int scale(int value);
@@ -83,7 +83,7 @@ protected:
     void calculate_scale(int tgt_w, int tgt_h);
 
     //! Convert file name to absolute
-    bool absolute_filename(string& filename);
+    bool absolute_filename(std::string& filename);
 
     //! Drawing data for the current instance.
     qsl_data* data_;

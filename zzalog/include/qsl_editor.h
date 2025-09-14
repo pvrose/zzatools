@@ -62,11 +62,11 @@ protected:
     void create_items();
     //! Create column header at y position \p curr_y.
     void create_labels(int curr_y);
-    //! Create the widgets to edit one set of field parameters \p params at (\p x, \p y).
+    //! Create the widgets to edit one std::set of field parameters \p params at (\p x, \p y).
     void create_fparams(int& x, int& y, qsl_data::field_def* params);
-    //! Create the widgets to edit one set of text parameters \p params at (\p x, \p y).
+    //! Create the widgets to edit one std::set of text parameters \p params at (\p x, \p y).
     void create_tparams(int& x, int& y, qsl_data::text_def* params);
-    //! Create the widgets to edit one set of image parameters \p params at (\p x, \p y).
+    //! Create the widgets to edit one std::set of image parameters \p params at (\p x, \p y).
     void create_iparams(int& x, int& y, qsl_data::image_def* params);
     //! Resize the group after adding or deleting an item
     void resize();
@@ -90,7 +90,7 @@ protected:
     static void cb_ch_field(Fl_Widget* w, void* v);
     //! Callback to edit a style.
     static void cb_bn_style(Fl_Widget* w, void* v);
-    //! Callback when a string value has been updated.
+    //! Callback when a std::string value has been updated.
     static void cb_ip_string(Fl_Widget* w, void* v);
     //! Callback when an integer value has been updated.
     static void cb_ip_int(Fl_Widget* w, void* v);
@@ -122,10 +122,10 @@ protected:
     void populate_qsl_type(Fl_Choice* ch);
 
     //! Remove filepath from filename - returns false if unsuccesful
-    bool relative_filename(string& filename);
+    bool relative_filename(std::string& filename);
 
     //! Station callsign to read parameters.
-    string callsign_;
+    std::string callsign_;
    // display window coordinates
     int win_x_;     //!< X coordinate of display window.
     int win_y_;     //!< Y coordinate of display window.
@@ -136,7 +136,7 @@ protected:
     //! Card display
     qsl_display* qsl_;
     //! Directory of filename
-    string dir_name_;
+    std::string dir_name_;
     //! Pointer to card data item
     qsl_data* data_;
     //! QSL type

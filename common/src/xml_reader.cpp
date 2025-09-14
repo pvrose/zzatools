@@ -3,16 +3,16 @@
 
 #include <regex>
 #include <ctime>
-#include <istream>
+#include<istream>
 #include <string>
 
 #include <FL/fl_ask.H>
 #include <FL/Fl.H>
 
 // Definition of valid white-space
-const basic_regex<char> REGEX_WHITE_SPACE("\\s*");
+const std::basic_regex<char> REGEX_WHITE_SPACE("\\s*");
 
-using namespace std;
+
 
 // Constructor
 xml_reader::xml_reader()
@@ -44,7 +44,7 @@ xml_reader::~xml_reader()
 }
 
 // Process input stream
-bool xml_reader::parse(istream& is) {
+bool xml_reader::parse(std::istream& is) {
 	bool ok = true;
 	// Process alternately character data and tags
 	while (is.good() && ok) {
@@ -65,7 +65,7 @@ xml_element* xml_reader::element() {
 }
 
 // Process the data between the < and the next > - leaves stream after >
-bool xml_reader::process_tag(istream& is) {
+bool xml_reader::process_tag(std::istream& is) {
 	// Don't do it if at the end of the data - but return OK
 	if (is.eof()) {
 		return true;
@@ -100,7 +100,7 @@ bool xml_reader::process_tag(istream& is) {
 }
 
 // Report the error message - can_accept indicates it may be a recoverable error
-bool xml_reader::report_error(string message, bool can_accept) {
+bool xml_reader::report_error(std::string message, bool can_accept) {
 	bool accepted = false;
 	// Offer the user the option of continuing
 	if (can_accept || report_errors_to_screen_) {
@@ -115,7 +115,7 @@ bool xml_reader::report_error(string message, bool can_accept) {
 }
 
 // reads the stream until white space or = / > - leaves stream at that character
-bool xml_reader::process_name(istream& is, string& name) {
+bool xml_reader::process_name(std::istream& is, std::string& name) {
 	// find the end of the name indicated by white-space, / or >
 	bool end = false;
 	while (!end) {
@@ -144,17 +144,17 @@ bool xml_reader::process_name(istream& is, string& name) {
 
 // Looks at the parse point and gets the next NAME = VALUE pair
 // Moves the parse point to after the attribute and adjusts the search length
-bool xml_reader::process_attr(istream& is, map<string, string>*& attributes) {
+bool xml_reader::process_attr(std::istream& is, std::map<std::string, std::string>*& attributes) {
 	// Create attributes
 	if (attributes == nullptr) {
-		attributes = new map<string, string>;
+		attributes = new std::map<std::string, std::string>;
 		attributes->clear();
 	}
 	bool ok = true;
 	// Skip white space
 	if (ok) ok = ignore_white_space(is);
 	if (ok) {
-		string name;
+		std::string name;
 		// Get name and skip any white space
 		ok = process_name(is, name);
 		ok &= ignore_white_space(is);
@@ -168,7 +168,7 @@ bool xml_reader::process_attr(istream& is, map<string, string>*& attributes) {
 				// the first character will be ' or " - the attribute value will end with the same
 				char quote = is.get();
 				char c = is.get();
-				string value = "";
+				std::string value = "";
 				// Until closing quote or erroneously read end bracket
 				while (c != quote && is.good() && c != '>') {
 					value += c;
@@ -189,7 +189,7 @@ bool xml_reader::process_attr(istream& is, map<string, string>*& attributes) {
 }
 
 // Ignore white space
-bool xml_reader::ignore_white_space(istream& is) {
+bool xml_reader::ignore_white_space(std::istream& is) {
 	bool cr = false;
 	bool ok = true;
 	bool white_space = true;
@@ -233,10 +233,10 @@ bool xml_reader::ignore_white_space(istream& is) {
 }
 
 // Get declaration - process tag starting <! - leave after >
-bool xml_reader::process_decl(istream& is) {
+bool xml_reader::process_decl(std::istream& is) {
 	ignore_white_space(is);
-	string name;
-	string content;
+	std::string name;
+	std::string content;
 	xml_element::element_t type;
 	bool ok = true;
 	char data[8];
@@ -244,7 +244,7 @@ bool xml_reader::process_decl(istream& is) {
 	if (strncmp(data, "--", 2) == 0) {
 		// Comment - & and are allowed so copy tag directly
 		// Step back to start of comments
-		is.seekg(-6, ios_base::cur);
+		is.seekg(-6, std::ios_base::cur);
 		bool end = false;
 		bool crlf = false;
 		while (!end && is.good()) {
@@ -271,14 +271,14 @@ bool xml_reader::process_decl(istream& is) {
 					crlf = false;
 				}
 				// step back two to effectively step the start of checked characters by 1
-				is.seekg(-2, ios_base::cur);
+				is.seekg(-2, std::ios_base::cur);
 			}
 		}
 		type = xml_element::COMMENT;
 	}
 	else if (strncmp(data, "[CDATA[", 7) == 0) {
 		// Looking at CDATA
-		is.seekg(-1, ios_base::cur);
+		is.seekg(-1, std::ios_base::cur);
 		ignore_white_space(is);
 		bool end = false;
 		while (!end && is.good()) {
@@ -290,48 +290,48 @@ bool xml_reader::process_decl(istream& is) {
 			else {
 				content += data[0];
 				// step back to check the next three characters
-				is.seekg(-2, ios_base::cur);
+				is.seekg(-2, std::ios_base::cur);
 			}
 		}
 		type = xml_element::CDATA_DECL;
 	}
 	else if (strncmp(data, "DOCTYPE", 7) == 0) {
-		is.seekg(-1, ios_base::cur);
+		is.seekg(-1, std::ios_base::cur);
 		// DOCTYPE - & and are not allowed so unescape
 		ignore_white_space(is);
 		type = xml_element::DOC_DECL;
 		while (is.peek() != '>' && is.good()) process_escape(is, content);
 	}
 	else if (strncmp(data, "ELEMENT", 7) == 0) {
-		is.seekg(-1, ios_base::cur);
+		is.seekg(-1, std::ios_base::cur);
 		// ELEMENT - & and are not allowed so unescape
 		ignore_white_space(is);
 		type = xml_element::ELEM_DECL;
 		while (is.peek() != '>' && is.good()) process_escape(is, content);
-		is.seekg(1, ios_base::cur);
+		is.seekg(1, std::ios_base::cur);
 	}
 	else if (strncmp(data, "ATTLIST", 7) == 0) {
-		is.seekg(-1, ios_base::cur);
+		is.seekg(-1, std::ios_base::cur);
 		// ATTLIST - & and are not allowed so unescape
 		ignore_white_space(is);
 		type = xml_element::ATTLIST_DECL;
 		while (is.peek() != '>' && is.good()) process_escape(is, content);
-		is.seekg(1, ios_base::cur);
+		is.seekg(1, std::ios_base::cur);
 	}
 	else if (strncmp(data, "ENTITY", 6) == 0) {
-		is.seekg(-2, ios_base::cur);
+		is.seekg(-2, std::ios_base::cur);
 		// ENTITY - & and are not allowed so unescape
 		ignore_white_space(is);
 		type = xml_element::ENTITY_DECL;
 		while (is.peek() != '>' && is.good()) process_escape(is, content);
-		is.seekg(1, ios_base::cur);
+		is.seekg(1, std::ios_base::cur);
 	}
 	else if (strncmp(data, "NOTATION", 8) == 0) {
 		// NOTATION - & and are not allowed so unescape
 		ignore_white_space(is);
 		type = xml_element::NOTATION_DECL;
 		while (is.peek() != '>' && is.good()) process_escape(is, content);
-		is.seekg(1, ios_base::cur);
+		is.seekg(1, std::ios_base::cur);
 	}
 	else {
 		ok = false;
@@ -348,9 +348,9 @@ bool xml_reader::process_decl(istream& is) {
 }
 
 // Process <? - leave after ?>
-bool xml_reader::process_process(istream& is) {
-	string name;
-	string content;
+bool xml_reader::process_process(std::istream& is) {
+	std::string name;
+	std::string content;
 	bool ok = process_name(is, name);
 	if (ok) {
 		char data[2];
@@ -364,7 +364,7 @@ bool xml_reader::process_process(istream& is) {
 			}
 			else {
 				// Step back
-				is.seekg(-1, ios_base::cur);
+				is.seekg(-1, std::ios_base::cur);
 				content += data[0];
 			}
 		}
@@ -379,8 +379,8 @@ bool xml_reader::process_process(istream& is) {
 }
 
 // Process </ - leave after >
-bool xml_reader::process_end_tag(istream& is) {
-	string name;
+bool xml_reader::process_end_tag(std::istream& is) {
+	std::string name;
 	bool ok = true;
 	// get name of element
 	ok &= process_name(is, name);
@@ -405,9 +405,9 @@ bool xml_reader::process_end_tag(istream& is) {
 
 // Process other <
 // Leave stream after >
-bool xml_reader::process_start_tag(istream& is) {
-	string name;
-	map<string, string>* attributes = new map<string, string>;
+bool xml_reader::process_start_tag(std::istream& is) {
+	std::string name;
+	std::map<std::string, std::string>* attributes = new std::map<std::string, std::string>;
 	bool ok = true;
 	// Gat name
 	ok &= process_name(is, name);
@@ -442,11 +442,11 @@ bool xml_reader::process_start_tag(istream& is) {
 }
 
 // Process non-mark-up characters - i.e. between > and next < - white space is preserved
-bool xml_reader::process_chars(istream& is) {
-	string chars = "";
-	// read string until we read an open tag character (or EOF)
+bool xml_reader::process_chars(std::istream& is) {
+	std::string chars = "";
+	// read std::string until we read an open tag character (or EOF)
 	while (is.peek() != '<' && is.good()) {
-		string escapee;
+		std::string escapee;
 		process_escape(is, escapee);
 		chars += escapee;
 	}
@@ -456,7 +456,7 @@ bool xml_reader::process_chars(istream& is) {
 
 // Look at next character in stream, replace CR/LF combinations by single CR, lookup &...; escaped
 // Reference XML specification - CR-LF pair or alone CR must be replaced by LF before processing
-void xml_reader::process_escape(istream& is, string& output) {
+void xml_reader::process_escape(std::istream& is, std::string& output) {
 	bool cr = false;
 	bool lf = false;
 	char c = is.get();
@@ -478,13 +478,13 @@ void xml_reader::process_escape(istream& is, string& output) {
 		}
 		else {
 			cr = true;
-			// Copy to string as LF
+			// Copy to std::string as LF
 			output += '\n';
 		}
 		break;
 	case '&': {
 		// Look for matching ';' and copy &...; to escapee
-		string escapee = "";
+		std::string escapee = "";
 		escapee += c;
 		do {
 			c = is.get();
@@ -512,7 +512,7 @@ void xml_reader::process_escape(istream& is, string& output) {
 // Default XML handlers
 
 // Start element
-bool xml_reader::start_element(string name, map<string, string>* attributes) {
+bool xml_reader::start_element(std::string name, std::map<std::string, std::string>* attributes) {
 	if (current_element_ == nullptr) {
 		// This is the top element - create it and allow other elements to hang from it
 		element_ = new xml_element(nullptr, name, "", attributes);
@@ -528,7 +528,7 @@ bool xml_reader::start_element(string name, map<string, string>* attributes) {
 }
 
 // End element
-bool xml_reader::end_element(string name) {
+bool xml_reader::end_element(std::string name) {
 	if (current_element_ != nullptr) {
 		// Check ths is the end tag for the equivalent start tag - names match
 		if (current_element_->name() != name) {
@@ -553,11 +553,11 @@ bool xml_reader::end_element(string name) {
 }
 
 // Special element - only comments are currently handled
-bool xml_reader::declaration(xml_element::element_t type, string name, string content) {
+bool xml_reader::declaration(xml_element::element_t type, std::string name, std::string content) {
 	if (type == xml_element::COMMENT) {
 		// Add the comment to the current element
 		if (current_element_ == nullptr) {
-			string message = "Comment found outwuth an element - comment ignored\n" + content;
+			std::string message = "Comment found outwuth an element - comment ignored\n" + content;
 			report_error(message, true);
 			return true;
 		}
@@ -576,7 +576,7 @@ bool xml_reader::declaration(xml_element::element_t type, string name, string co
 }
 
 // Processing instruction - only prologue is handled
-bool xml_reader::process_instr(string name, string content) {
+bool xml_reader::process_instr(std::string name, std::string content) {
 	if (name != "xml") {
 		char message[256];
 		snprintf(message, 256, "Processing instruction %s %s not yet handled by default processor", name.c_str(), content.c_str());
@@ -591,7 +591,7 @@ bool xml_reader::process_instr(string name, string content) {
 }
 
 // characters - the elements text content
-bool xml_reader::characters(string content) {
+bool xml_reader::characters(std::string content) {
 	if (current_element_ != nullptr) {
 		// Add the content to the element
 		current_element_->content(content);
@@ -599,7 +599,7 @@ bool xml_reader::characters(string content) {
 	else {
 		// Report if text found outwith the top-level element
 		if (!regex_match(content.c_str(), REGEX_WHITE_SPACE)) {
-			string message = "Non-white space data found outwith an element\n" + content;
+			std::string message = "Non-white space data found outwith an element\n" + content;
 			report_error(message, true);
 		}
 	}
@@ -607,12 +607,12 @@ bool xml_reader::characters(string content) {
 }
 
 // Returns the accumulated error messages
-string& xml_reader::information() {
+std::string& xml_reader::information() {
 	return information_;
 }
 
 // Convert XML date time format (ISO format) to time_t
-time_t xml_reader::convert_xml_datetime(string value) {
+time_t xml_reader::convert_xml_datetime(std::string value) {
 	// Get resolution of time_t
 	time_t now;
 	time(&now);
@@ -621,12 +621,12 @@ time_t xml_reader::convert_xml_datetime(string value) {
 
 	// YYY-MM-DDTHH:MM:SS+HH:MM
 	tm tv;
-	tv.tm_year = stoi(value.substr(0, 4)) - 1900;
-	tv.tm_mon = stoi(value.substr(5, 2)) - 1;
-	tv.tm_mday = stoi(value.substr(8, 2));
-	tv.tm_hour = stoi(value.substr(11, 2));
-	tv.tm_min = stoi(value.substr(14, 2));
-	tv.tm_sec = stoi(value.substr(17, 2));
+	tv.tm_year = std::stoi(value.substr(0, 4)) - 1900;
+	tv.tm_mon = std::stoi(value.substr(5, 2)) - 1;
+	tv.tm_mday = std::stoi(value.substr(8, 2));
+	tv.tm_hour = std::stoi(value.substr(11, 2));
+	tv.tm_min = std::stoi(value.substr(14, 2));
+	tv.tm_sec = std::stoi(value.substr(17, 2));
 	tv.tm_isdst = false;
 #ifdef _WIN32
 	time_t result = _mkgmtime(&tv);
@@ -635,8 +635,8 @@ time_t xml_reader::convert_xml_datetime(string value) {
 #endif
 	if (value.length() > 19) {
 		bool subtract = value[19] == '+';
-		long tz_hour = stoi(value.substr(20, 2));
-		long tz_min = stoi(value.substr(23, 2));
+		long tz_hour = std::stoi(value.substr(20, 2));
+		long tz_min = std::stoi(value.substr(23, 2));
 		double seconds = (3600.0 * tz_hour) + (60.0 * tz_min);
 		long adjust = (long)(seconds / resolution);
 #ifdef _WIN32

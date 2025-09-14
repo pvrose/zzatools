@@ -4,7 +4,7 @@
 #include "status.h"
 
 extern status* status_;
-extern string default_data_directory_;
+extern std::string default_data_directory_;
 
 stn_data::stn_data()
 {
@@ -18,10 +18,10 @@ stn_data::~stn_data() {
 
 // Load data from station.xml
 void stn_data::load_data() {
-	string filename = default_data_directory_ + "station.xml";
+	std::string filename = default_data_directory_ + "station.xml";
 	ifstream is;
 	char msg[128];
-	is.open(filename, ios_base::in);
+	is.open(filename, std::ios_base::in);
 	if (is.good()) {
 		stn_reader* reader = new stn_reader();
 		if (reader->load_data(&qths_, &opers_, &calls_, is)) {
@@ -42,9 +42,9 @@ void stn_data::load_data() {
 // Store data to station.xml
 void stn_data::store_data() {
 	if (!load_failed_) {
-		string filename = default_data_directory_ + "station.xml";
-		ofstream os;
-		os.open(filename, ios_base::out);
+		std::string filename = default_data_directory_ + "station.xml";
+		std::ofstream os;
+		os.open(filename, std::ios_base::out);
 		if (os.good()) {
 			stn_writer* writer = new stn_writer();
 			if (!writer->store_data(&qths_, &opers_, &calls_, os)) {
@@ -59,7 +59,7 @@ void stn_data::store_data() {
 }
 
 // Add a specific item - returns true if added
-bool stn_data::add_qth_item(string id, qth_value_t item, string value) {
+bool stn_data::add_qth_item(std::string id, qth_value_t item, std::string value) {
 	if (qths_.find(id) == qths_.end()) {
 		// New QTH
 		qth_info_t* info = new qth_info_t;
@@ -80,14 +80,14 @@ bool stn_data::add_qth_item(string id, qth_value_t item, string value) {
 }
 
 // remove an item
-void stn_data::remove_qth_item(string id, qth_value_t item) {
+void stn_data::remove_qth_item(std::string id, qth_value_t item) {
 	if (qths_.find(id) != qths_.end()) {
 		qths_.at(id)->data.erase(item);
 	}
 }
 
 // Add a new QTH
-bool stn_data::add_qth(string id, qth_info_t* qth) {
+bool stn_data::add_qth(std::string id, qth_info_t* qth) {
 	if (qths_.find(id) == qths_.end()) {
 		// New QTH
 		qths_[id] = qth;
@@ -102,7 +102,7 @@ bool stn_data::add_qth(string id, qth_info_t* qth) {
 }
 
 // Add a specific item - returns true if added
-bool stn_data::add_oper_item(string id, oper_value_t item, string value) {
+bool stn_data::add_oper_item(std::string id, oper_value_t item, std::string value) {
 	if (opers_.find(id) == opers_.end()) {
 		// New QTH
 		oper_info_t* info = new oper_info_t;
@@ -124,7 +124,7 @@ bool stn_data::add_oper_item(string id, oper_value_t item, string value) {
 }
 
 // Add a new operator
-bool stn_data::add_oper(string id, oper_info_t* oper) {
+bool stn_data::add_oper(std::string id, oper_info_t* oper) {
 	if (opers_.find(id) == opers_.end()) {
 		// New QTH
 		opers_[id] = oper;
@@ -139,7 +139,7 @@ bool stn_data::add_oper(string id, oper_info_t* oper) {
 }
 
 // Fetch the QTH info
-const qth_info_t* stn_data::get_qth(string id) {
+const qth_info_t* stn_data::get_qth(std::string id) {
 	if (qths_.find(id) == qths_.end()) {
 		//char msg[128];
 		//snprintf(msg, sizeof(msg), "STN DATA: No data for QTH \"%s\"", id.c_str());
@@ -151,7 +151,7 @@ const qth_info_t* stn_data::get_qth(string id) {
 	}
 }
 // Fetch the Operatot info
-const oper_info_t* stn_data::get_oper(string id) {
+const oper_info_t* stn_data::get_oper(std::string id) {
 	if (opers_.find(id) == opers_.end()) {
 		//char msg[128];
 		//snprintf(msg, sizeof(msg), "STN DATA: No data for Operator \"%s\"", id.c_str());
@@ -164,17 +164,17 @@ const oper_info_t* stn_data::get_oper(string id) {
 }
 
 // Get all QTHs
-const map<string, qth_info_t*>* stn_data::get_qths() {
+const std::map<std::string, qth_info_t*>* stn_data::get_qths() {
 	return &qths_;
 }
 
 // Get all operators
-const map<string, oper_info_t*>* stn_data::get_opers() {
+const std::map<std::string, oper_info_t*>* stn_data::get_opers() {
 	return &opers_;
 }
 
 // Add a new callsign
-bool stn_data::add_call(string call) {
+bool stn_data::add_call(std::string call) {
 	if (calls_.find(call) != calls_.end()) {
 		return false;
 	}
@@ -185,30 +185,30 @@ bool stn_data::add_call(string call) {
 }
 
 // get existing calls
-const map<string, string>* stn_data::get_calls() {
+const std::map<std::string, std::string>* stn_data::get_calls() {
 	return &calls_;
 }
 
 // Known call
-bool stn_data::known_call(string call) {
+bool stn_data::known_call(std::string call) {
 	if (calls_.find(call) == calls_.end()) return false;
 	else return true;
 }
 
 // Known call
-bool stn_data::known_qth(string call) {
+bool stn_data::known_qth(std::string call) {
 	if (qths_.find(call) == qths_.end()) return false;
 	else return true;
 }
 
 // Known call
-bool stn_data::known_oper(string call) {
+bool stn_data::known_oper(std::string call) {
 	if (opers_.find(call) == opers_.end()) return false;
 	else return true;
 }
 
 // Get descriptor for a specific call
-string stn_data::get_call_descr(string id) {
+std::string stn_data::get_call_descr(std::string id) {
 	if (calls_.find(id) == calls_.end()) {
 		return "";
 	}

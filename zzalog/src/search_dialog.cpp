@@ -18,16 +18,16 @@
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_RGB_Image.H>
 
-using namespace std;
+
 
 
 
 extern spec_data* spec_data_;
 extern cty_data* cty_data_;
-extern string CONTACT;
-extern string COPYRIGHT;
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern std::string CONTACT;
+extern std::string COPYRIGHT;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
 extern void open_html(const char*);
 
@@ -121,7 +121,7 @@ search_dialog::search_dialog() :
 
 	const int H = YGX + HBUTTON + FOOT_HEIGHT;
 
-	// now set the correct size
+	// now std::set the correct size
 	size(W, H);
 	// Read initial settings
 	load_values();
@@ -189,7 +189,7 @@ search_dialog::search_dialog() :
 	field_input* ip14 = new field_input(C11, R15
 		, WEDIT, HTEXT, "Search text");
 	ip14->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ip14->callback(cb_value<field_input, string>, (void*)&criteria_->pattern);
+	ip14->callback(cb_value<field_input, std::string>, (void*)&criteria_->pattern);
 	ip14->when(FL_WHEN_CHANGED);
 	ip14->value(criteria_->pattern.c_str());
 	ip14->tooltip("The expression to match records against");
@@ -217,14 +217,14 @@ search_dialog::search_dialog() :
 	calendar_input* in22 = new calendar_input(C212, R21, W212 + HBUTTON, HTEXT, "From:");
 	in22->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in22->value(criteria_->from_date.c_str());
-	in22->callback(cb_value<Fl_Input, string>, &criteria_->from_date);
+	in22->callback(cb_value<Fl_Input, std::string>, &criteria_->from_date);
 	in22->when(FL_WHEN_CHANGED);
 	in22->tooltip("Select date to start matching records");
 	// Input - End date
 	calendar_input* in24 = new calendar_input(C214, R21, W214 + HBUTTON , HTEXT, "To:");
 	in24->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in24->value(criteria_->to_date.c_str());
-	in24->callback(cb_value<Fl_Input, string>, &criteria_->to_date);
+	in24->callback(cb_value<Fl_Input, std::string>, &criteria_->to_date);
 	in24->when(FL_WHEN_CHANGED);
 	in24->tooltip("Select date to end matching records");
 
@@ -232,7 +232,7 @@ search_dialog::search_dialog() :
 	// Choice - Band to limit search to
 	Fl_Choice* ch26 = new Fl_Choice(C221, R22, W221, HTEXT, "Band");
 	ch26->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	// Get the list of bands from ADIF specification
+	// Get the std::list of bands from ADIF specification
 	band_set* bands = spec_data_->bands();
 	// Start with "Any"
 	ch26->add("Any");
@@ -247,13 +247,13 @@ search_dialog::search_dialog() :
 			ch26->value(ix);
 		}
 	}
-	ch26->callback(cb_text<Fl_Choice, string>, (void*)&criteria_->band);
+	ch26->callback(cb_text<Fl_Choice, std::string>, (void*)&criteria_->band);
 	ch26->when(FL_WHEN_RELEASE);
 	ch26->tooltip("Select the band for matching records");
 	// Choice - Mode to limit search to
 	Fl_Choice* ch27 = new Fl_Choice(C222, R22, W222, HTEXT, "Mode");
 	ch27->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	// Get the list of modes from the ADIF specification
+	// Get the std::list of modes from the ADIF specification
 	spec_dataset* modes = spec_data_->dataset("Combined");
 	// Start with "Any"
 	ch27->add("Any");
@@ -261,20 +261,20 @@ search_dialog::search_dialog() :
 		ch27->value(0);
 	}
 	ix = 1;
-	// Append all the modes in the data set
+	// Append all the modes in the data std::set
 	for (auto it = modes->data.begin(); it != modes->data.end(); it++, ix++) {
 		ch27->add(it->first.c_str());
 		if (it->first == criteria_->mode) {
 			ch27->value(ix);
 		}
 	}
-	ch27->callback(cb_text<Fl_Choice, string>, (void*)&criteria_->mode);
+	ch27->callback(cb_text<Fl_Choice, std::string>, (void*)&criteria_->mode);
 	ch27->when(FL_WHEN_RELEASE);
 	ch27->tooltip("Select the mode for matching records - a mode will match all submodes");
 	// Choice - Mode to limit search to
 	Fl_Choice* ch27a = new Fl_Choice(C223, R22, W223, HTEXT, "My Call");
 	ch27a->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	// Get the list of modes from the ADIF specification
+	// Get the std::list of modes from the ADIF specification
 	spec_dataset* callsigns = spec_data_->dataset("Dynamic STATION_CALLSIGN");
 	// Start with "Any"
 	ch27a->add("Any");
@@ -282,14 +282,14 @@ search_dialog::search_dialog() :
 		ch27a->value(0);
 	}
 	ix = 1;
-	// Append all the modes in the data set
+	// Append all the modes in the data std::set
 	for (auto it = callsigns->data.begin(); it != callsigns->data.end(); it++, ix++) {
 		ch27a->add(escape_menu(it->first).c_str());
 		if (it->first == criteria_->mode) {
 			ch27a->value(ix);
 		}
 	}
-	ch27a->callback(cb_text<Fl_Choice, string>, (void*)&criteria_->my_call);
+	ch27a->callback(cb_text<Fl_Choice, std::string>, (void*)&criteria_->my_call);
 	ch27a->when(FL_WHEN_RELEASE);
 	ch27a->tooltip("Select 'STATION_CALLSIGN' for matching records");
 
@@ -373,7 +373,7 @@ search_dialog::search_dialog() :
 	bn_cancel->tooltip("Cancel the search");
 
 	Fl_Box* b_cr = new Fl_Box(x(), YGX + HBUTTON, W, FOOT_HEIGHT);
-	b_cr->copy_label(string(COPYRIGHT + " " + CONTACT + "     ").c_str());
+	b_cr->copy_label(std::string(COPYRIGHT + " " + CONTACT + "     ").c_str());
 	b_cr->labelsize(FL_NORMAL_SIZE - 1);
 	b_cr->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 
@@ -459,11 +459,11 @@ void search_dialog::save_values() {
 		// special case - DXCC and pattern not numeric
 		criteria_->pattern = to_upper(criteria_->pattern);
 		if (!criteria_->comparator != XP_REGEX && criteria_->pattern.length()) {
-			string::size_type dummy;
+			std::string::size_type dummy;
 			int dxcc;
 			// Match by DXCC - either code number or nickname (default prefix)
 			try {
-				dxcc = stoi(criteria_->pattern, &dummy);
+				dxcc = std::stoi(criteria_->pattern, &dummy);
 			}
 			catch (const invalid_argument&) {
 				// exception raised if first character is non-numeric
@@ -511,8 +511,8 @@ search_criteria_t* search_dialog::criteria() {
 	return criteria_;
 }
 
-// Add a fail message to the dialog - empty string clears it
-void search_dialog::fail(string message) {
+// Add a fail message to the dialog - empty std::string clears it
+void search_dialog::fail(std::string message) {
 	if (message.length()) {
 		// Copy message to box and colour the box red.
 		fail_box_->copy_label(message.c_str());
@@ -520,7 +520,7 @@ void search_dialog::fail(string message) {
 		fail_box_->labelcolor(FL_BLACK);
 	}
 	else {
-		// Write empty string to box and set its colour to the background
+		// Write empty std::string to box and std::set its colour to the background
 		fail_box_->copy_label("");
 		fail_box_->color(FL_BACKGROUND_COLOR);
 		fail_box_->labelcolor(FL_FOREGROUND_COLOR);
@@ -555,7 +555,7 @@ void search_dialog::cb_bn_condx(Fl_Widget* w, void* v) {
 // Field name choice
 void search_dialog::cb_ch_field(Fl_Widget* w, void* v) {
 	search_dialog* that = ancestor_view<search_dialog>(w);
-	cb_value<field_choice, string>(w, v);
+	cb_value<field_choice, std::string>(w, v);
 	that->criteria_->pattern = "";
 	that->enable_widgets();
 }

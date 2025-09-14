@@ -14,8 +14,8 @@
 #include <FL/Fl_Native_File_Chooser.H>
 
 extern status* status_;
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
 
 const qsl_data LABEL_QSL_DATA =
@@ -50,7 +50,7 @@ const qsl_data FILE_QSL_DATA =
 	qsl_data::FMT_HMS_ADIF,    // time_format
 	{}                    // items
 };
-const map<qsl_data::qsl_type, qsl_data> DEFAULT_QSL_DATA = {
+const std::map<qsl_data::qsl_type, qsl_data> DEFAULT_QSL_DATA = {
 	{ qsl_data::LABEL, LABEL_QSL_DATA },
 	{ qsl_data::FILE, FILE_QSL_DATA }
 };
@@ -65,7 +65,7 @@ qsl_dataset::~qsl_dataset() {
 }
 
 // Return the QSL design associated with the callsign and QSL type
-qsl_data* qsl_dataset::get_card(string callsign, qsl_data::qsl_type type, bool create) {
+qsl_data* qsl_dataset::get_card(std::string callsign, qsl_data::qsl_type type, bool create) {
 	if (data_.find(type) != data_.end()) {
 		auto call_map = data_.at(type);
 		if (call_map->find(callsign) != call_map->end()) {
@@ -75,7 +75,7 @@ qsl_data* qsl_dataset::get_card(string callsign, qsl_data::qsl_type type, bool c
 	qsl_data* data = new qsl_data(DEFAULT_QSL_DATA.at(type));
 	if (create) {
 		if (data_.find(type) == data_.end()) {
-			map<string, qsl_data*>* call_map = new map<string, qsl_data* >;
+			std::map<std::string, qsl_data*>* call_map = new std::map<std::string, qsl_data* >;
 			data_[type] = call_map;
 		}
 		(*data_[type])[callsign] = data;
@@ -87,7 +87,7 @@ qsl_data* qsl_dataset::get_card(string callsign, qsl_data::qsl_type type, bool c
 } 
 
 // Return the server data associated with the extract type
-server_data_t* qsl_dataset::get_server_data(string server) {
+server_data_t* qsl_dataset::get_server_data(std::string server) {
 	if (server_data_.find(server) == server_data_.end()) {
 		char msg[128];
 		snprintf(msg, sizeof(msg), "QSL: Unsupported server %s", server.c_str());
@@ -97,7 +97,7 @@ server_data_t* qsl_dataset::get_server_data(string server) {
 	return server_data_.at(server);
 }
 
-qsl_call_data* qsl_dataset::get_qrz_api(string callsign) {
+qsl_call_data* qsl_dataset::get_qrz_api(std::string callsign) {
 	server_data_t* sd = get_server_data("QRZ") ;
 	if (sd) {
 		if (sd->call_data.find(callsign) != sd->call_data.end()) {
@@ -122,7 +122,7 @@ void qsl_dataset::load_data() {
 
 }
 
-string qsl_dataset::xml_file(Fl_Preferences& settings) {
+std::string qsl_dataset::xml_file(Fl_Preferences& settings) {
 	char* temp;
 	Fl_Preferences data_settings(settings, "Datapath");
 	data_settings.get("QSLs", temp,"");
@@ -137,14 +137,14 @@ string qsl_dataset::xml_file(Fl_Preferences& settings) {
 		delete chooser;
 		data_settings.set("QSLs", qsl_path_.c_str());
 	}
-	string filename = qsl_path_ + "/config.xml";
+	std::string filename = qsl_path_ + "/config.xml";
 	free(temp);
 	return filename;
 }
 
 bool qsl_dataset::load_xml(Fl_Preferences& settings) {
 	ifstream is;
-	is.open(xml_file(settings), ios_base::in);
+	is.open(xml_file(settings), std::ios_base::in);
 	if (is.good()) {
 		qsl_reader* reader = new qsl_reader();
 		if (reader->load_data(&data_, &server_data_, is)) {
@@ -167,9 +167,9 @@ void qsl_dataset::save_data() {
 }
 
 void qsl_dataset::save_xml(Fl_Preferences& settings) {
-	string filename = xml_file(settings);
-	ofstream os;
-	os.open(filename, ios_base::out);
+	std::string filename = xml_file(settings);
+	std::ofstream os;
+	os.open(filename, std::ios_base::out);
 	if (os.good()) {
 		qsl_writer* writer = new qsl_writer();
 		if (!writer->store_data(&data_, &server_data_, os)) {
@@ -179,12 +179,12 @@ void qsl_dataset::save_xml(Fl_Preferences& settings) {
 }
 
 // Get path to QSL data
-string qsl_dataset::get_path() {
+std::string qsl_dataset::get_path() {
 	return qsl_path_;
 }
 
 // Create new server data
-bool qsl_dataset::new_server(string server) {
+bool qsl_dataset::new_server(std::string server) {
 	char msg[128];
 	if (server_data_.find(server) != server_data_.end()) {
 		snprintf(msg, sizeof(msg), "QSL: Already have server data for %s", server.c_str());

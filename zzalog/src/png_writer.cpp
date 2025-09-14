@@ -14,8 +14,8 @@
 
 
 extern status* status_;
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
 
 png_writer::png_writer() {
@@ -35,16 +35,16 @@ png_writer::~png_writer() {
 }
 
 // Generate PNG filename
-string png_writer::png_filename(record* qso) {
-	string my_call = qso->item("STATION_CALLSIGN");
-	string call = qso->item("CALL");
-	string date = qso->item("QSO_DATE");
+std::string png_writer::png_filename(record* qso) {
+	std::string my_call = qso->item("STATION_CALLSIGN");
+	std::string call = qso->item("CALL");
+	std::string date = qso->item("QSO_DATE");
 
 	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences dp_settings(settings, "Datapath");
 	char* temp;
 	dp_settings.get("QSLs", temp, "");
-	string dir = temp;
+	std::string dir = temp;
 	free(temp);
 
 	char result[256];
@@ -54,11 +54,11 @@ string png_writer::png_filename(record* qso) {
 		call.c_str(),
 		date.c_str());
 
-	return string(result);
+	return std::string(result);
 }
 
 // Create the file
-bool png_writer::write_image(Fl_RGB_Image* image, string filename) {
+bool png_writer::write_image(Fl_RGB_Image* image, std::string filename) {
 	image_ = image;
 	fl_make_path_for_file(filename.c_str());
 	out_file_ = fopen(filename.c_str(), "wb");
@@ -92,7 +92,7 @@ bool png_writer::write_book(book* qsos) {
 	bool bad = false;
 	for(auto it = qsos->begin(); it != qsos->end() && !bad; it++) {
 		Fl_RGB_Image* image = qsl_image::image(*it, qsl_data::FILE);
-		string filename = png_filename(*it);
+		std::string filename = png_filename(*it);
 		bad = write_image(image, filename);
 		if (bad) {
 			char msg[128];
@@ -128,7 +128,7 @@ bool png_writer::initialise_png() {
 	png_init_io(png_, out_file_);
 	// Set the compression level - go nuclear
 	png_set_compression_level(png_, Z_BEST_COMPRESSION);
-	// Now set image attributes
+	// Now std::set image attributes
 	png_set_IHDR(png_, info_,
 		image_->data_w(), image_->data_h(), 8, // width, height and bit-depth
 		PNG_COLOR_TYPE_RGB,                 // RGB

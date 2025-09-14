@@ -15,8 +15,6 @@
 #include <chrono>
 #include <vector>
 
-using namespace std;
-using namespace std::chrono;
 
 	//! Internal representation of the mode read from the rig.
 	enum rig_mode_t {
@@ -63,11 +61,11 @@ using namespace std::chrono;
 	//! Interface configuration data:
 	struct hamlib_data_t {
 		//! Manufacturer as known by hamlib.
-		string mfr = "";
+		std::string mfr = "";
 		//! Model as known by hamlib.
-		string model = "";
+		std::string model = "";
 		//! Port name used by hamlib.
-		string port_name = "";
+		std::string port_name = "";
 		//! Baud rate used by hamlib.
 		int baud_rate = 9600;
 		//! Model ID - index into hamlib capabilities table.
@@ -79,7 +77,7 @@ using namespace std::chrono;
 		// additional features required by rig_if to return data
 		//! Timeout value (not a hamlib item
 		double timeout = 1.0;
-		//! S-meter reading queue length
+		//! S-meter reading std::queue length
 		int num_smeters = 5;
 		//! Default power mode.
 		power_mode_t power_mode = RF_METER;
@@ -114,18 +112,18 @@ using namespace std::chrono;
 
 		//! Values read from rig
 		struct rig_values {
-			atomic<double> tx_frequency;  //!< Transmit Frequency (in megahertz)
-			atomic<double> rx_frequency;  //!< Receive Frequency (in megahertz)
-			atomic<rig_mode_t> mode;      //!< Transmit mode
-			atomic<double> drive ;        //!< Drive level (fraction)
-			atomic<bool> split;           //!< Split mode.
-			atomic<int> s_value;          //!< Smoothed S-meter reading (in decibels)
-			atomic<int> s_meter;          //!< Immediate S-meter reading (in decibels)
-			atomic<double> pwr_value;     //!< Smoothed RF power meter reading (in watts)
-			atomic<double> pwr_meter;     //!< Immediate power meter reading (in watts)
-			atomic<bool> ptt;             //!< If true indicates transmitting otherwise receiving.
-			atomic<bool> slow;            //!< Rig is not responding 
-			atomic<bool> powered_on;      //!< Rig appears powered on.
+			std::atomic<double> tx_frequency;  //!< Transmit Frequency (in megahertz)
+			std::atomic<double> rx_frequency;  //!< Receive Frequency (in megahertz)
+			std::atomic<rig_mode_t> mode;      //!< Transmit mode
+			std::atomic<double> drive ;        //!< Drive level (fraction)
+			std::atomic<bool> split;           //!< Split mode.
+			std::atomic<int> s_value;          //!< Smoothed S-meter reading (in decibels)
+			std::atomic<int> s_meter;          //!< Immediate S-meter reading (in decibels)
+			std::atomic<double> pwr_value;     //!< Smoothed RF power meter reading (in watts)
+			std::atomic<double> pwr_meter;     //!< Immediate power meter reading (in watts)
+			std::atomic<bool> ptt;             //!< If true indicates transmitting otherwise receiving.
+			std::atomic<bool> slow;            //!< Rig is not responding 
+			std::atomic<bool> powered_on;      //!< Rig appears powered on.
 			
 			//! Constrctor.
 			rig_values() {
@@ -147,9 +145,9 @@ using namespace std::chrono;
 		//! Opens the connection to the rig
 		bool open();
 		//! Returns rig name
-		string& rig_name();
+		std::string& rig_name();
 		//! Returns the most recent error message and adds \p func_name.
-		string error_message(const char* func_name);
+		std::string error_message(const char* func_name);
 
 		//! Returns that the rig connection is not in an error state.
 		bool is_good();
@@ -170,63 +168,63 @@ using namespace std::chrono;
 		bool has_no_cat();
 
 		//! Receives \p mode and \p submode.  
-		void get_string_mode(string& mode, string& submode);
-		//! Returns frequency as string (in megahertz to 1 hertz resolution)
-		string get_frequency(bool tx);
+		void get_string_mode(std::string& mode, std::string& submode);
+		//! Returns frequency as std::string (in megahertz to 1 hertz resolution)
+		std::string get_frequency(bool tx);
 		//! Returns frequency as double (in megahertz)
 		double get_dfrequency(bool tx);
 		//! Returns power (in watts): \p max maximum value over the transmit period.
-		string get_tx_power(bool max = true);
+		std::string get_tx_power(bool max = true);
 		//! Returns power (in watts): \p max maximum value over the transmit period.
 		double get_dpower(bool max = true);
 		//! Returns S-meter reading - \p max - maximum over receive perion, false = instatntaneous
-		string get_smeter(bool max = true);
+		std::string get_smeter(bool max = true);
 		//! Returns PTT value: true indicates transmit.
 		bool get_ptt();
 		//! Returns Split value
 		bool get_split();
-		//! Run in thread to get the data from the rig
+		//! Run in std::thread to get the data from the rig
 		static void th_run_rig(rig_if* that);
 		//! Returns true if the rig is taking over 1 second to access
 		bool get_slow();
 		//! Returns true if thr rig appears powered.
 		bool get_powered();
-		//! Open rig in rig access thread.
+		//! Open rig in rig access std::thread.
 		static void th_sopen_rig(rig_if* that);
-		//! Callback from rig thread if an error is detected.
+		//! Callback from rig std::thread if an error is detected.
 		static void cb_rig_error(void* v);
-		//! Callback from rig thread if a warning is detected.
+		//! Callback from rig std::thread if a warning is detected.
 		static void cb_rig_warning(void* v);
-		//! set frequency (in megahertz)
+		//! std::set frequency (in megahertz)
 		bool set_frequency(double f);
 
 
 		// Protected attributes
 	protected:
-		//! Runs in rig thread to poll values every 1 second.
+		//! Runs in rig std::thread to poll values every 1 second.
 		bool th_read_values();
-		//! Open rig - run in thread
+		//! Open rig - run in std::thread
 		void th_open_rig(rig_if* that);
 		//! Handle errors.
 		
 		//! \param code Error code
 		//! \param meter Name of meter value being accessed.
-		//! \param flag Pointer to a Boolean value that if set inhibits further attempts to acccess.
+		//! \param flag Pointer to a Boolean value that if std::set inhibits further attempts to acccess.
 		//! \param to_count Number of accesses allowed befor further ones are inhibited.
 		//! \return true indicates error prevents further access.
 		bool error_handler(int code, const char* meter, bool* flag, int* to_count);
 		//! Rig opened OK
-		atomic<bool> opened_ok_;
+		std::atomic<bool> opened_ok_;
 		//! Semaphore to use around opening
-		atomic<bool> opening_;
+		std::atomic<bool> opening_;
 		//! Full rig name
-		string full_rig_name_;
+		std::string full_rig_name_;
 
 		//! Returns error message for error \p code.
 		const char* error_text(rig_errcode_e code);
 
 		//! Name to log as MY_RIG
-		string my_rig_name_;
+		std::string my_rig_name_;
 		//! Interface specific attributes
 		hamlib_data_t* hamlib_data_;
 		//! Hamlib rig interface
@@ -238,15 +236,15 @@ using namespace std::chrono;
 		//! Timer count down
 		int count_down_;
 		//! Thread in whcih to run rig access.
-		thread* thread_;
-		//! Keep rig thread running.
-		atomic<bool> run_read_;
+		std::thread* thread_;
+		//! Keep rig std::thread running.
+		std::atomic<bool> run_read_;
 
 		//! The time of the last PTT off - to decide if it's a new transmission.
-		system_clock::time_point last_ptt_off_;
+		std::chrono::system_clock::time_point last_ptt_off_;
 
 		//! The most recent S-meter readings: used for smoothing the value read.
-		vector<int> smeters_;
+		std::vector<int> smeters_;
 		//! Cumulated value of smeter readings
 		int sum_smeters_;
 		// Flags to avoid unsupported meters
@@ -257,7 +255,7 @@ using namespace std::chrono;
 		//! Timeout counts
 		int toc_split_;
 		//! Function being performed - for error debug mostly
-		string read_item_;
+		std::string read_item_;
 
 
 };

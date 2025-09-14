@@ -3,10 +3,10 @@
 #include "xml_wreader.h"
 #include "qsl_data.h"
 
-#include <istream>
+#include<istream>
 #include <list>
 
-using namespace std;
+
 
 struct server_data_t;
 struct qsl_call_data;
@@ -95,50 +95,50 @@ public:
     //! \param servers Receives QSL server credentials.
     //! \param in input data stream.
     //! \return true if successful.
-    bool load_data(map<qsl_data::qsl_type, map<string, qsl_data*>* >* data, 
-        map<string, server_data_t*>* servers,
-        istream& in);
+    bool load_data(std::map<qsl_data::qsl_type, std::map<std::string, qsl_data*>* >* data, 
+        std::map<std::string, server_data_t*>* servers,
+        std::istream& in);
 
 protected:
     // Start the specific elementys
     //! Start QSL_DATA element.
-    static bool start_qsl_data(xml_wreader* w, map<string, string>* attributes);
+    static bool start_qsl_data(xml_wreader* w, std::map<std::string, std::string>* attributes);
     //! Start QSLS element.
-    static bool start_qsls(xml_wreader* that, map<string, string>* attributes);
+    static bool start_qsls(xml_wreader* that, std::map<std::string, std::string>* attributes);
     //! Start QSL element.
-    static bool start_qsl(xml_wreader* that, map<string, string>* attributes);
+    static bool start_qsl(xml_wreader* that, std::map<std::string, std::string>* attributes);
     //! Start SIZE element.
-    static bool start_size(xml_wreader* that, map<string, string>* attributes);
+    static bool start_size(xml_wreader* that, std::map<std::string, std::string>* attributes);
     //! Start ARRAY element.
-    static bool start_array(xml_wreader* that, map<string, string>* attributes);
+    static bool start_array(xml_wreader* that, std::map<std::string, std::string>* attributes);
     //! Start DESIGN element.
-    static bool start_design(xml_wreader* that, map<string, string>* attributes);
+    static bool start_design(xml_wreader* that, std::map<std::string, std::string>* attributes);
     //! Start FORMATS element.
-    static bool start_formats(xml_wreader* that, map<string, string>* attributes);
+    static bool start_formats(xml_wreader* that, std::map<std::string, std::string>* attributes);
     //! Start TEXT element.
-    static bool start_text(xml_wreader* that, map<string, string>* attributes);
+    static bool start_text(xml_wreader* that, std::map<std::string, std::string>* attributes);
     //! Start POSITION element.
-    static bool start_position(xml_wreader* that, map<string, string>* attributes);
+    static bool start_position(xml_wreader* that, std::map<std::string, std::string>* attributes);
     //! Start LABEL element.
-    static bool start_label(xml_wreader* that, map<string, string>* attributes);
+    static bool start_label(xml_wreader* that, std::map<std::string, std::string>* attributes);
     //! Start FIELD element.
-    static bool start_field(xml_wreader* that, map<string, string>* attributes);
+    static bool start_field(xml_wreader* that, std::map<std::string, std::string>* attributes);
     //! Start DATA element.
-    static bool start_data(xml_wreader* that, map<string, string>* attributes);
+    static bool start_data(xml_wreader* that, std::map<std::string, std::string>* attributes);
     //! Start OPTIONS element.
-    static bool start_options(xml_wreader* that, map<string, string>* attributes);
+    static bool start_options(xml_wreader* that, std::map<std::string, std::string>* attributes);
     //! Start IMAGE element.
-    static bool start_image(xml_wreader* that, map<string, string>* attributes);
+    static bool start_image(xml_wreader* that, std::map<std::string, std::string>* attributes);
     //! Start FILE element.
-    static bool start_file(xml_wreader* that, map<string, string>* attributes);
+    static bool start_file(xml_wreader* that, std::map<std::string, std::string>* attributes);
     //! Start SERVERS element.
-    static bool start_servers(xml_wreader* w, map<string, string>* attributes);
+    static bool start_servers(xml_wreader* w, std::map<std::string, std::string>* attributes);
     //! Start SERVER element.
-    static bool start_server(xml_wreader* w, map<string, string>* attributes);
+    static bool start_server(xml_wreader* w, std::map<std::string, std::string>* attributes);
     //! Start LOGBOOK element.
-    static bool start_logbook(xml_wreader* w, map<string, string>* attributes);
+    static bool start_logbook(xml_wreader* w, std::map<std::string, std::string>* attributes);
     //! Start VALUE element.
-    static bool start_value(xml_wreader* w, map<string, string>* attributes);
+    static bool start_value(xml_wreader* w, std::map<std::string, std::string>* attributes);
 
     // End the specific elements
     //! End QSL_DATA element.
@@ -150,33 +150,33 @@ protected:
 
     // Specific character processing
     //! Process characters for FILE element.
-    static bool chars_file(xml_wreader* that, string content);
+    static bool chars_file(xml_wreader* that, std::string content);
     //! Process characters for LABEL element.
-    static bool chars_label(xml_wreader* that, string content);
+    static bool chars_label(xml_wreader* that, std::string content);
     //! Process characters for DATA element.
-    static bool chars_data(xml_wreader* that, string content);
+    static bool chars_data(xml_wreader* that, std::string content);
     //! Process characters for VALUE element.
-    static bool chars_value(xml_wreader* w, string content);
+    static bool chars_value(xml_wreader* w, std::string content);
     
 
     //! Check version
-    bool check_version(string v);
+    bool check_version(std::string v);
 
     //! Parse date format into enumerated type
-    static qsl_data::date_format parse_date(string s);
+    static qsl_data::date_format parse_date(std::string s);
     //! Parse time format into enumerated type
-    static qsl_data::time_format parse_time(string s);
+    static qsl_data::time_format parse_time(std::string s);
 
     //! Convert font description to font number
-    static Fl_Font parse_font(string s);
+    static Fl_Font parse_font(std::string s);
     //! Convert yes/no into bool
-    static bool parse_bool(string s);
-    //! Decode encrypted string \p s using \p offset into key-chain.
-    static string decrypt(string s, uchar offset);
+    static bool parse_bool(std::string s);
+    //! Decode encrypted std::string \p s using \p offset into key-chain.
+    static std::string decrypt(std::string s, uchar offset);
 
 
     //! Name to element enumration mapping
-    const map<string, char> element_map_ = {
+    const std::map<std::string, char> element_map_ = {
         { "QSL_DATA", QSL_QSL_DATA },
         { "QSLS", QSL_QSLS },
         { "QSL", QSL_QSL },
@@ -199,7 +199,7 @@ protected:
     };
 
     //! Map element type into the hander methods.
-    const map<char, methods> method_map_ = {
+    const std::map<char, methods> method_map_ = {
         { QSL_QSL_DATA, { start_qsl_data, end_qsl_data, nullptr }},
         { QSL_QSLS, { start_qsls, nullptr, nullptr }},
         { QSL_QSL, { start_qsl, end_qsl, nullptr }},
@@ -223,12 +223,12 @@ protected:
     };
 
     //! The QSL design data.
-    map<qsl_data::qsl_type, map<string, qsl_data*>* >* data_;
+    std::map<qsl_data::qsl_type, std::map<std::string, qsl_data*>* >* data_;
     //! The QSL server credentials.
-    map<string, server_data_t*>* servers_;
+    std::map<std::string, server_data_t*>* servers_;
    // Attributes
     //! Station callsign.
-    string callsign_;
+    std::string callsign_;
     //! type of QSL - file for e-mail, label for printing.
     qsl_data::qsl_type type_;
 
@@ -241,12 +241,12 @@ protected:
     //! Current QRZ logbook api credentials.
     qsl_call_data* api_data_;
     //! Current value name.
-    string value_name_;
+    std::string value_name_;
     //! Current value data.
-    string value_data_;
+    std::string value_data_;
     //! Current encryption keychain offset.
     uchar offset_;
     //! Name of parent.
-    string parent_name_;
+    std::string parent_name_;
 
 };

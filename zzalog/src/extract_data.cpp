@@ -69,9 +69,9 @@ int extract_data::criteria(search_criteria_t criteria, extract_data::extract_mod
 		status_->misc_status(ST_ERROR, "EXTRACT: A follow-on search has been requested but is incompatible. Ignored!");
 		return -1;
 	}
-	// set criteria
+	// std::set criteria
 	use_mode_ = mode;
-	// Append to the set of criteria
+	// Append to the std::set of criteria
 	extract_criteria_.push_back(criteria);
 	// Get the most recent
 	criteria_ = &extract_criteria_.back();
@@ -292,8 +292,8 @@ inline item_num_t extract_data::item_number(qso_num_t record_number, bool neares
 }
 
 // Describe the search criteria so it can be added to the header comment
-string extract_data::comment() {
-	string result;
+std::string extract_data::comment() {
+	std::string result;
 	if (criteria_) {
 		result = "Data extracted for criteria:-\n";
 		// Add the main condition
@@ -361,8 +361,8 @@ string extract_data::comment() {
 }
 
 // Describe the search criteria so it can be added to the header comment
-string extract_data::short_comment() {
-	string result;
+std::string extract_data::short_comment() {
+	std::string result;
 	if (criteria_) {
 		result = "EXTRACT: ";
 		// And whether results are new, anded or ored
@@ -431,8 +431,8 @@ string extract_data::short_comment() {
 
 // Extract records that need sending to the named server (eQSL, LotW, mail or ClubLog)
 void extract_data::extract_qsl(extract_data::extract_mode_t server) {
-	string reason;
-	string field_name;
+	std::string reason;
+	std::string field_name;
 	// Define the field that shows it's not been sent
 	switch (server) {
 	case EQSL:
@@ -463,24 +463,24 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		break;
 	}
 	// Now check that they are all for the current station
-	string station = qso_manager_->get_default(qso_manager::CALLSIGN);
+	std::string station = qso_manager_->get_default(qso_manager::CALLSIGN);
 
 	// Extract those records not sent to QSL server !(*QSL_SENT==Y) 
 	search_criteria_t	new_criteria = {
 		/*search_cond_t condition*/ XC_FIELD,
 		/*search_comp_t comparator*/ XP_NE,
 		/*bool by_dates*/ false,
-		/*string from_date*/"",
-		/*string to_date;*/"",
-		/*string band;*/ "Any",
-		/*string mode;*/ "Any",
+		/*std::string from_date*/"",
+		/*std::string to_date;*/"",
+		/*std::string band;*/ "Any",
+		/*std::string mode;*/ "Any",
 		/*bool confirmed_eqsl;*/ false,
 		/*bool confirmed_lotw;*/ false,
 		/*bool confirmed_card;*/ false,
 		/*search_combi_t combi_mode;*/ XM_NEW,
-		/*string field_name; */ field_name,
-		/*string pattern;*/ "Y",
-		/*string my_call*/ station
+		/*std::string field_name; */ field_name,
+		/*std::string pattern;*/ "Y",
+		/*std::string my_call*/ station
 	};
 	status_->misc_status(ST_NOTE, "EXTRACT: Extracting QSOs not sent already");
 	criteria(new_criteria, server);
@@ -489,17 +489,17 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		/*search_cond_t condition*/ XC_FIELD,
 		/*search_comp_t comparator*/ XP_NE,
 		/*bool by_dates*/ false,
-		/*string from_date*/"",
-		/*string to_date;*/"",
-		/*string band;*/ "Any",
-		/*string mode;*/ "Any",
+		/*std::string from_date*/"",
+		/*std::string to_date;*/"",
+		/*std::string band;*/ "Any",
+		/*std::string mode;*/ "Any",
 		/*bool confirmed_eqsl;*/ false,
 		/*bool confirmed_lotw;*/ false,
 		/*bool confirmed_card;*/ false,
 		/*search_combi_t combi_mode;*/ XM_AND,
-		/*string field_name; */ "QSO_COMPLETE",
-		/*string pattern;*/ "N",
-		/*string my_call*/ station
+		/*std::string field_name; */ "QSO_COMPLETE",
+		/*std::string pattern;*/ "N",
+		/*std::string my_call*/ station
 	};
 	status_->misc_status(ST_NOTE, "EXTRACT: Removing incomplete QSOs");
 	criteria(new_criteria, server);
@@ -509,17 +509,17 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 			/*search_cond_t condition*/ XC_FIELD,
 			/*search_comp_t comparator*/ XP_NE,
 			/*bool by_dates*/ false,
-			/*string from_date*/"",
-			/*string to_date;*/"",
-			/*string band;*/ "Any",
-			/*string mode;*/ "Any",
+			/*std::string from_date*/"",
+			/*std::string to_date;*/"",
+			/*std::string band;*/ "Any",
+			/*std::string mode;*/ "Any",
 			/*bool confirmed_eqsl;*/ false,
 			/*bool confirmed_lotw;*/ false,
 			/*bool confirmed_card;*/ false,
 			/*search_combi_t combi_mode;*/ XM_AND,
-			/*string field_name; */ "SWL",
-			/*string pattern;*/ "Y",
-			/*string my_call*/ station
+			/*std::string field_name; */ "SWL",
+			/*std::string pattern;*/ "Y",
+			/*std::string my_call*/ station
 		};
 		status_->misc_status(ST_NOTE, "EXTRACT: Removing replies to SWL reports");
 		criteria(new_criteria, server);
@@ -531,17 +531,17 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 			/*search_cond_t condition*/ XC_FIELD,
 			/*search_comp_t comparator*/ XP_REGEX,
 			/*bool by_dates*/ false,
-			/*string from_date*/"",
-			/*string to_date;*/"",
-			/*string band;*/ "Any",
-			/*string mode;*/ "Any",
+			/*std::string from_date*/"",
+			/*std::string to_date;*/"",
+			/*std::string band;*/ "Any",
+			/*std::string mode;*/ "Any",
 			/*bool confirmed_eqsl;*/ false,
 			/*bool confirmed_lotw;*/ false,
 			/*bool confirmed_card;*/ false,
 			/*search_combi_t combi_mode;*/ XM_AND,
-			/*string field_name; */ "QSL_SENT",
-			/*string pattern;*/ "[QR]",
-			/*string my_call*/ station
+			/*std::string field_name; */ "QSL_SENT",
+			/*std::string pattern;*/ "[QR]",
+			/*std::string my_call*/ station
 		};
 		status_->misc_status(ST_NOTE, "EXTRACT: Extracting queued cards only");
 		criteria(new_criteria, server);
@@ -550,17 +550,17 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 			/*search_cond_t condition*/ XC_FIELD,
 			/*search_comp_t comparator*/ XP_EQ,
 			/*bool by_dates*/ false,
-			/*string from_date*/"",
-			/*string to_date;*/"",
-			/*string band;*/ "Any",
-			/*string mode;*/ "Any",
+			/*std::string from_date*/"",
+			/*std::string to_date;*/"",
+			/*std::string band;*/ "Any",
+			/*std::string mode;*/ "Any",
 			/*bool confirmed_eqsl;*/ false,
 			/*bool confirmed_lotw;*/ false,
 			/*bool confirmed_card;*/ false,
 			/*search_combi_t combi_mode;*/ XM_AND,
-			/*string field_name; */ "QSL_SENT_VIA",
-			/*string pattern;*/ "B",
-			/*string my_call*/ station
+			/*std::string field_name; */ "QSL_SENT_VIA",
+			/*std::string pattern;*/ "B",
+			/*std::string my_call*/ station
 		};
 		status_->misc_status(ST_NOTE, "EXTRACT: Extracting cards for Bureau");
 		criteria(new_criteria, server);
@@ -574,17 +574,17 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 			/*search_cond_t condition*/ XC_FIELD,
 			/*search_comp_t comparator*/ XP_REGEX,
 			/*bool by_dates*/ false,
-			/*string from_date*/"",
-			/*string to_date;*/"",
-			/*string band;*/ "Any",
-			/*string mode;*/ "Any",
+			/*std::string from_date*/"",
+			/*std::string to_date;*/"",
+			/*std::string band;*/ "Any",
+			/*std::string mode;*/ "Any",
 			/*bool confirmed_eqsl;*/ false,
 			/*bool confirmed_lotw;*/ false,
 			/*bool confirmed_card;*/ false,
 			/*search_combi_t combi_mode;*/ XM_AND,
-			/*string field_name; */ "QSL_SENT",
-			/*string pattern;*/ "[QR]",
-			/*string my_call*/ station
+			/*std::string field_name; */ "QSL_SENT",
+			/*std::string pattern;*/ "[QR]",
+			/*std::string my_call*/ station
 		};
 		status_->misc_status(ST_NOTE, "EXTRACT: Extracting queued cards only");
 		criteria(new_criteria, server);
@@ -593,17 +593,17 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 			/*search_cond_t condition*/ XC_FIELD,
 			/*search_comp_t comparator*/ XP_EQ,
 			/*bool by_dates*/ false,
-			/*string from_date*/"",
-			/*string to_date;*/"",
-			/*string band;*/ "Any",
-			/*string mode;*/ "Any",
+			/*std::string from_date*/"",
+			/*std::string to_date;*/"",
+			/*std::string band;*/ "Any",
+			/*std::string mode;*/ "Any",
 			/*bool confirmed_eqsl;*/ false,
 			/*bool confirmed_lotw;*/ false,
 			/*bool confirmed_card;*/ false,
 			/*search_combi_t combi_mode;*/ XM_AND,
-			/*string field_name; */ "QSL_SENT_VIA",
-			/*string pattern;*/ "E",
-			/*string my_call*/ station
+			/*std::string field_name; */ "QSL_SENT_VIA",
+			/*std::string pattern;*/ "E",
+			/*std::string my_call*/ station
 		};
 		status_->misc_status(ST_NOTE, "EXTRACT: Extracting cards for sending by e-mail");
 		criteria(new_criteria, server);
@@ -614,17 +614,17 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 			/*search_cond_t condition*/ XC_FIELD,
 			/*search_comp_t comparator*/ XP_NE,
 			/*bool by_dates*/ false,
-			/*string from_date*/"",
-			/*string to_date;*/"",
-			/*string band;*/ "Any",
-			/*string mode;*/ "Any",
+			/*std::string from_date*/"",
+			/*std::string to_date;*/"",
+			/*std::string band;*/ "Any",
+			/*std::string mode;*/ "Any",
 			/*bool confirmed_eqsl;*/ false,
 			/*bool confirmed_lotw;*/ false,
 			/*bool confirmed_card;*/ false,
 			/*search_combi_t combi_mode;*/ XM_AND,
-			/*string field_name; */ field_name,
-			/*string pattern;*/ "N",
-			/*string my_call*/ station
+			/*std::string field_name; */ field_name,
+			/*std::string pattern;*/ "N",
+			/*std::string my_call*/ station
 		};
 		status_->misc_status(ST_NOTE, "EXTRACT: Removing QSOs with CLUBLOG_QSO_UPLOAD_STATUS=N - rejected");
 		criteria(new_criteria, server);
@@ -656,22 +656,22 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 
 // Extract special - no eQSL image
 void extract_data::extract_no_image() {
-	string reason_name = "eQSL received";
+	std::string reason_name = "eQSL received";
 	search_criteria_t new_criteria = {
 		/*search_cond_t condition*/ XC_FIELD,
 		/*search_comp_t comparator*/ XP_EQ,
 		/*bool by_dates*/ false,
-		/*string from_date*/"",
-		/*string to_date;*/"",
-		/*string band;*/ "Any",
-		/*string mode;*/ "Any",
+		/*std::string from_date*/"",
+		/*std::string to_date;*/"",
+		/*std::string band;*/ "Any",
+		/*std::string mode;*/ "Any",
 		/*bool confirmed_eqsl;*/ false,
 		/*bool confirmed_lotw;*/ false,
 		/*bool confirmed_card;*/ false,
 		/*search_combi_t combi_mode;*/ XM_NEW,
-		/*string field_name; */ "EQSL_QSL_RCVD",
-		/*string pattern;*/ "Y",
-		/*string my_call*/ "Any"
+		/*std::string field_name; */ "EQSL_QSL_RCVD",
+		/*std::string pattern;*/ "Y",
+		/*std::string my_call*/ "Any"
 	};
 	criteria(new_criteria);
 	if (size() == 0) {
@@ -695,7 +695,7 @@ void extract_data::extract_no_image() {
 		status_->progress((int)total, OT_EXTRACT, "Extracting records with no card image", "records");
 		for (item_num_t ixe = 0; ixe < get_count(); ) {
 			// Check file exists for this record
-			string filename = eqsl_handler_->card_filename_l(get_record(ixe, false));
+			std::string filename = eqsl_handler_->card_filename_l(get_record(ixe, false));
 			if (eqsl_handler_->card_file_valid(filename)) {
 				// If it exists, remove the record pointer from this book
 				erase(begin() + ixe);
@@ -723,7 +723,7 @@ void extract_data::extract_no_image() {
 // Extract records for special fixed criteria
 void extract_data::extract_special(extract_data::extract_mode_t reason) {
 	search_criteria_t new_criteria;
-	string reason_name;
+	std::string reason_name;
 	switch (reason) {
 	case NO_NAME:
 		// Extract those records that have NAME field empty 
@@ -731,17 +731,17 @@ void extract_data::extract_special(extract_data::extract_mode_t reason) {
 			/*search_cond_t condition*/ XC_FIELD,
 			/*search_comp_t comparator*/ XP_EQ,
 			/*bool by_dates*/ false,
-			/*string from_date*/"",
-			/*string to_date;*/"",
-			/*string band;*/ "Any",
-			/*string mode;*/ "Any",
+			/*std::string from_date*/"",
+			/*std::string to_date;*/"",
+			/*std::string band;*/ "Any",
+			/*std::string mode;*/ "Any",
 			/*bool confirmed_eqsl;*/ false,
 			/*bool confirmed_lotw;*/ false,
 			/*bool confirmed_card;*/ false,
 			/*search_combi_t combi_mode;*/ XM_NEW,
-			/*string field_name; */ "NAME",
-			/*string pattern;*/ "",
-			/*string my_call*/ "Any"
+			/*std::string field_name; */ "NAME",
+			/*std::string pattern;*/ "",
+			/*std::string my_call*/ "Any"
 		};
 		reason_name = "missing name";
 		break;
@@ -751,17 +751,17 @@ void extract_data::extract_special(extract_data::extract_mode_t reason) {
 			/*search_cond_t condition*/ XC_FIELD,
 			/*search_comp_t comparator*/ XP_EQ,
 			/*bool by_dates*/ false,
-			/*string from_date*/"",
-			/*string to_date;*/"",
-			/*string band;*/ "Any",
-			/*string mode;*/ "Any",
+			/*std::string from_date*/"",
+			/*std::string to_date;*/"",
+			/*std::string band;*/ "Any",
+			/*std::string mode;*/ "Any",
 			/*bool confirmed_eqsl;*/ false,
 			/*bool confirmed_lotw;*/ false,
 			/*bool confirmed_card;*/ false,
 			/*search_combi_t combi_mode;*/ XM_NEW,
-			/*string field_name; */ "QTH",
-			/*string pattern;*/ "",
-			/*string my_call*/ "Any"
+			/*std::string field_name; */ "QTH",
+			/*std::string pattern;*/ "",
+			/*std::string my_call*/ "Any"
 		};
 		reason_name = "missing QTH";
 		break;
@@ -771,17 +771,17 @@ void extract_data::extract_special(extract_data::extract_mode_t reason) {
 			/*search_cond_t condition*/ XC_FIELD,
 			/*search_comp_t comparator*/ XP_REGEX,
 			/*bool by_dates*/ false,
-			/*string from_date*/"",
-			/*string to_date;*/"",
-			/*string band;*/ "Any",
-			/*string mode;*/ "Any",
+			/*std::string from_date*/"",
+			/*std::string to_date;*/"",
+			/*std::string band;*/ "Any",
+			/*std::string mode;*/ "Any",
 			/*bool confirmed_eqsl;*/ false,
 			/*bool confirmed_lotw;*/ false,
 			/*bool confirmed_card;*/ false,
 			/*search_combi_t combi_mode;*/ XM_NEW,
-			/*string field_name; */ "GRIDSQUARE",
-			/*string pattern;*/ ".{0,4}",
-			/*string my_call*/ "Any"
+			/*std::string field_name; */ "GRIDSQUARE",
+			/*std::string pattern;*/ ".{0,4}",
+			/*std::string my_call*/ "Any"
 		};
 		reason_name = "with insufficient locator";
 		break;
@@ -866,42 +866,42 @@ item_num_t extract_data::selection(item_num_t num_item, hint_t hint /* = HT_SELE
 }
 
 // Extract all records for callsign
-void extract_data::extract_call(string callsign) {
+void extract_data::extract_call(std::string callsign) {
 	// Now check that they are all for the current station
-	string station = qso_manager_->get_default(qso_manager::CALLSIGN);
+	std::string station = qso_manager_->get_default(qso_manager::CALLSIGN);
 	// Extract those records where CALL matches callsign 
 	search_criteria_t	new_criteria = {
 		/*search_cond_t condition*/ XC_CALL,
 		/*search_comp_t comparator*/ XP_EQ,
 		/*bool by_dates*/ false,
-		/*string from_date*/"",
-		/*string to_date;*/"",
-		/*string band;*/ "Any",
-		/*string mode;*/ "Any",
+		/*std::string from_date*/"",
+		/*std::string to_date;*/"",
+		/*std::string band;*/ "Any",
+		/*std::string mode;*/ "Any",
 		/*bool confirmed_eqsl;*/ false,
 		/*bool confirmed_lotw;*/ false,
 		/*bool confirmed_card;*/ false,
 		/*search_combi_t combi_mode;*/ XM_NEW,
-		/*string field_name; */ "",
-		/*string pattern;*/ callsign,
-		/*string my_call;*/ station
+		/*std::string field_name; */ "",
+		/*std::string pattern;*/ callsign,
+		/*std::string my_call;*/ station
 	};
 	criteria(new_criteria, SEARCH);
 	new_criteria = {
 		/*search_cond_t condition*/ XC_FIELD,
 		/*search_comp_t comparator*/ XP_NE,
 		/*bool by_dates*/ false,
-		/*string from_date*/"",
-		/*string to_date;*/"",
-		/*string band;*/ "Any",
-		/*string mode;*/ "Any",
+		/*std::string from_date*/"",
+		/*std::string to_date;*/"",
+		/*std::string band;*/ "Any",
+		/*std::string mode;*/ "Any",
 		/*bool confirmed_eqsl;*/ false,
 		/*bool confirmed_lotw;*/ false,
 		/*bool confirmed_card;*/ false,
 		/*search_combi_t combi_mode;*/ XM_AND,
-		/*string field_name; */ "QSO_COMPLETE",
-		/*string pattern;*/ "N",
-		/*string my_call;*/ station
+		/*std::string field_name; */ "QSO_COMPLETE",
+		/*std::string pattern;*/ "N",
+		/*std::string my_call;*/ station
 	};
 	criteria(new_criteria, SEARCH);
 	if (size() == 0 || (book_->new_record() && size() == 1)) {
@@ -915,7 +915,7 @@ void extract_data::extract_call(string callsign) {
 		sprintf(message, format, size());
 		status_->misc_status(ST_OK, message);
 		delete[] message;
-		// Select first record in list and display the extraction page
+		// Select first record in std::list and display the extraction page
 		selection(0, HT_EXTRACTION);
 		tabbed_forms_->activate_pane(OT_EXTRACT, true);
 	}
@@ -923,30 +923,30 @@ void extract_data::extract_call(string callsign) {
 }
 
 // Extract all records for specified field
-void extract_data::extract_field(string field_name, string value, bool and_search, string start, string endd) {
+void extract_data::extract_field(std::string field_name, std::string value, bool and_search, std::string start, std::string endd) {
 	// Now check that they are all for the current station
-	string station = qso_manager_->get_default(qso_manager::CALLSIGN);
+	std::string station = qso_manager_->get_default(qso_manager::CALLSIGN);
 	// Extract those records where CALL matches callsign 
 	search_criteria_t	new_criteria = {
 		/*search_cond_t condition*/ XC_FIELD,
 		/*search_comp_t comparator*/ XP_EQ,
 		/*bool by_dates*/ start.length() != 0 || endd.length() != 0,
-		/*string from_date*/start,
-		/*string to_date;*/endd,
-		/*string band;*/ "Any",
-		/*string mode;*/ "Any",
+		/*std::string from_date*/start,
+		/*std::string to_date;*/endd,
+		/*std::string band;*/ "Any",
+		/*std::string mode;*/ "Any",
 		/*bool confirmed_eqsl;*/ false,
 		/*bool confirmed_lotw;*/ false,
 		/*bool confirmed_card;*/ false,
 		/*search_combi_t combi_mode;*/ and_search ? XM_AND : XM_NEW,
-		/*string field_name; */ field_name,
-		/*string pattern;*/ value,
-		/*string my_call;*/ station
+		/*std::string field_name; */ field_name,
+		/*std::string pattern;*/ value,
+		/*std::string my_call;*/ station
 	};
 	criteria(new_criteria, SEARCH);
 }
 
-// Add the record to the extract list
+// Add the record to the extract std::list
 void extract_data::add_record(qso_num_t record_num) {
 	record* record = book_->get_record(record_num, false);
 	item_num_t insert_point = get_insert_point(record);
@@ -958,7 +958,7 @@ void extract_data::add_record(qso_num_t record_num) {
 }
 
 // Compare records
-bool extract_data::comp_records(record* lhs, record* rhs, string field, bool reversed) {
+bool extract_data::comp_records(record* lhs, record* rhs, std::string field, bool reversed) {
 	if (field.length()) {
 		if (reversed) {
 			return rhs->item(field) < lhs->item(field);
@@ -979,7 +979,7 @@ bool extract_data::comp_records(record* lhs, record* rhs, string field, bool rev
 
 
 // Sort records according to field_name
-void extract_data::sort_records(string field_name, bool reversed) {
+void extract_data::sort_records(std::string field_name, bool reversed) {
 
 	fl_cursor(FL_CURSOR_WAIT);
 	item_num_t count = size();
@@ -1035,7 +1035,7 @@ void extract_data::sort_records(string field_name, bool reversed) {
 	fl_cursor(FL_CURSOR_DEFAULT);
 }
 
-// Place the node and all those beneath it in the extracted list
+// Place the node and all those beneath it in the extracted std::list
 int extract_data::pick_node(sort_node* n) {
 	int result = 0;
 	// Add all the nodes on the left

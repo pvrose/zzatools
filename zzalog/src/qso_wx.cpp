@@ -15,8 +15,8 @@
 #include <FL/Fl_Button.H>
 
 extern wx_handler* wx_handler_;
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
 extern void open_html(const char*);
 
@@ -206,19 +206,19 @@ void qso_wx::enable_widgets() {
 	// Get the data from the WX Handler object
 	time_t sunrise = wx_handler_ ? wx_handler_->sun_rise() : 0;
 	time_t sunset = wx_handler_ ? wx_handler_->sun_set() : 0;
-	string wx_descr = wx_handler_ ? wx_handler_->description() : "";
+	std::string wx_descr = wx_handler_ ? wx_handler_->description() : "";
 	float temperature = wx_handler_ ? wx_handler_->temperature() : 0.0; 
 	float wind_speed = wx_handler_ ? wx_handler_->wind_speed() : 0.0;
-	string wind_descr = wx_handler_ ? wx_handler_->wind_name() : "";
-	string wind_dirn = wx_handler_ ? wx_handler_->wind_direction() : "";
+	std::string wind_descr = wx_handler_ ? wx_handler_->wind_name() : "";
+	std::string wind_dirn = wx_handler_ ? wx_handler_->wind_direction() : "";
 	unsigned int wind_degree = wx_handler_ ? wx_handler_->wind_degrees() : 0;
 	float pressure = wx_handler_ ? wx_handler_->pressure() : 0.0;
 	float cloud_cover = wx_handler_ ? wx_handler_->cloud() : 0.0;
-	string cloud_descr = wx_handler_ ? wx_handler_->cloud_name() : "";
+	std::string cloud_descr = wx_handler_ ? wx_handler_->cloud_name() : "";
 	Fl_Image* icon = wx_handler_ ? wx_handler_->icon() : nullptr;
 	time_t updated = wx_handler_ ? wx_handler_->last_updated() : 0;
-	string wx_location = wx_handler_ ? wx_handler_->location() : "";
-	string wx_latlong = wx_handler_ ? wx_handler_->latlong() : "";
+	std::string wx_location = wx_handler_ ? wx_handler_->location() : "";
+	std::string wx_latlong = wx_handler_ ? wx_handler_->latlong() : "";
 
 	bool local = ancestor_view<qso_clocks>(this)->is_local();
 

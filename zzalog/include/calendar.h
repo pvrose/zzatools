@@ -6,7 +6,7 @@
 #include <FL/Fl_Table.H>
 #include <FL/Fl_Window.H>
 
-using namespace std;
+
 
 class Fl_Button;
 class Fl_Input;

@@ -16,7 +16,7 @@ public:
 	//! \param Y vertical position with hosr window
 	//! \param W width 
 	//! \param H height
-	//! \param date date to set.
+	//! \param date date to std::set.
 	calendar_table(int X, int Y, int W, int H, tm date);
 	//! Destructor.
 	virtual ~calendar_table();
@@ -31,7 +31,7 @@ public:
 	virtual void draw_cell(TableContext context, int R = 0, int C = 0, int X = 0, int Y = 0,
 		int W = 0, int H = 0);
 
-	//! set date using tm structure.
+	//! std::set date using tm structure.
 	void value(tm date);
 	//! Get date as a tm structure.
 	tm& value();

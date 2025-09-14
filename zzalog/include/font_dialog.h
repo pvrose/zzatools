@@ -6,7 +6,7 @@
 
 #include <FL/Enumerations.H>
 
-using namespace std;
+
 
 class Fl_Output;
 

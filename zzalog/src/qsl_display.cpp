@@ -15,7 +15,7 @@
 #include <FL/Fl_PNG_Image.H>
 #include <FL/Fl_Image_Surface.H>
 
-using namespace std;
+
 
 extern qso_manager* qso_manager_;
 extern status* status_;
@@ -108,7 +108,7 @@ void qsl_display::draw_field(qsl_data::field_def& field) {
 	Fl_Font savef = fl_font();
 	Fl_Fontsize savez = fl_size();
 	// Generate the value text for the field
-	string text = "";
+	std::string text = "";
 	if (num_records_ == 0) {
 		// No records - so use the field name as the value
 		text = field.field;
@@ -123,7 +123,7 @@ void qsl_display::draw_field(qsl_data::field_def& field) {
 		for (int i = 0; i < num_records_; i++) {
 			// Separate each QSL's value with new-line
 			if (i > 0) text += '\n';
-			string value = qsos_[i]->item(field.field, false);
+			std::string value = qsos_[i]->item(field.field, false);
 			// Format date and time items, leave others as is
 			if (field.field == "QSO_DATE" ||
 				field.field == "QSO_DATE_OFF") {
@@ -136,11 +136,11 @@ void qsl_display::draw_field(qsl_data::field_def& field) {
 			}
 		}
 	} else {
-		// We have records and concatenating valeus into a single string
-		set<string> values;
+		// We have records and concatenating valeus into a single std::string
+		std::set<std::string> values;
 		// Only print each values once
 		for (int i = 0; i < num_records_; i++) {
-			string value = qsos_[i]->item(field.field, false);
+			std::string value = qsos_[i]->item(field.field, false);
 			// Format date and time items, leave others as is
 			if (field.field == "QSO_DATE" ||
 				field.field == "QSO_DATE_OFF") {
@@ -173,7 +173,7 @@ void qsl_display::draw_field(qsl_data::field_def& field) {
 	// Get the X and Y positions - "-1" indicates abut it to previous item
 	int fx = (field.dx == -1) ? next_x_ : draw_x_ + scale(field.dx);
 	int fy = (field.dy == -1) ? next_y_ : draw_y_ + scale(field.dy);
-	// Are we displaying the field if its value is the empty string?
+	// Are we displaying the field if its value is the empty std::string?
 	if (field.display_empty || text.length()) {
 		// Draw the box if necessary
 		fl_color(FL_BLACK);
@@ -231,7 +231,7 @@ void qsl_display::draw_field(qsl_data::field_def& field) {
 	// Restore font
 	fl_font(savef, savez);
 
-	// set the next X,Y position
+	// std::set the next X,Y position
 	if (field.vertical) {
 		// The next item will be drawn to the right
 		next_x_ = fx + fw + 2 * box_gap;
@@ -248,7 +248,7 @@ void qsl_display::draw_text(qsl_data::text_def& text) {
 	fl_font(text.t_style.font,scale(text.t_style.size));
 	fl_color(text.t_style.colour);
 	// Draw the text
-	string fulltext;
+	std::string fulltext;
 	if (num_records_ == 0) {
 		fulltext = text.text;
 	}
@@ -262,7 +262,7 @@ void qsl_display::draw_text(qsl_data::text_def& text) {
 	// The next item will be drawn below
 	int fw = 0, fh = 0;
 	fl_measure(fulltext.c_str(), fw, fh);
-	// set the next X,Y position
+	// std::set the next X,Y position
 	if (text.vertical) {
 		// The next item will be drawn to the right
 		next_x_ = fx + fw;
@@ -277,7 +277,7 @@ void qsl_display::draw_text(qsl_data::text_def& text) {
 
 // Draw an image item -
 void qsl_display::draw_image(qsl_data::image_def& image) {
-	string filename = image.filename;
+	std::string filename = image.filename;
 	if (filename.length()) {
 		absolute_filename(filename);
 		Fl_Image* image_data = get_image(filename);
@@ -337,11 +337,11 @@ int qsl_display::to_points(float value) {
 }
 
 // Read the image data from the specified filename
-Fl_Image* qsl_display::get_image(string filename) {
+Fl_Image* qsl_display::get_image(std::string filename) {
 	// Get the file type (expect one of .jpg, .png, .bmp)
 	size_t pos = filename.find_last_of('.');
 	Fl_Image* image = nullptr;
-	if (pos == string::npos) {
+	if (pos == std::string::npos) {
 		char msg[128];
 		snprintf(msg, sizeof(msg), "QSL: File %s cannot be identified", filename.c_str());
 		status_->misc_status(ST_ERROR, msg);
@@ -388,9 +388,9 @@ Fl_Image* qsl_display::get_image(string filename) {
 }
 
 // Format date
-string qsl_display::convert_date(string value) {
+std::string qsl_display::convert_date(std::string value) {
 	// Input format is YYYYMMDD
-	string result;
+	std::string result;
 	switch(data_->f_date) {
 	case qsl_data::FMT_Y4MD_ADIF:
 		// "20240621"
@@ -418,9 +418,9 @@ string qsl_display::convert_date(string value) {
 }
 
 // Format time
-string qsl_display::convert_time(string value) {
+std::string qsl_display::convert_time(std::string value) {
 	// Input format may be HHMMSS or HHMM
-	string result;
+	std::string result;
 	if (value.length() == 4) {
 		// input is HHMM - do not halucinate seconds
 		switch(data_->f_time) {
@@ -482,7 +482,7 @@ void qsl_display::set_image(Fl_Image* image) {
 	alt_text_ = nullptr;
 }
 
-// set alternate text
+// std::set alternate text
 void qsl_display::set_text(const char* text, Fl_Color colour) {
 	delete alt_text_;
 	if (text == nullptr) alt_text_ = nullptr;
@@ -568,8 +568,8 @@ void qsl_display::get_size(int& w, int& h) {
 }
 
 // Prepend filename with pathname
-bool qsl_display::absolute_filename(string& filename) {
-	string path = qsl_dataset_->get_path();
+bool qsl_display::absolute_filename(std::string& filename) {
+	std::string path = qsl_dataset_->get_path();
 	filename = path + "/" + filename;
 	return true;
 }

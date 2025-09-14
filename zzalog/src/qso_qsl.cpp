@@ -40,8 +40,8 @@ extern club_handler* club_handler_;
 extern lotw_handler* lotw_handler_;
 extern qrz_handler* qrz_handler_;
 extern qsl_dataset* qsl_dataset_;
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
 extern void open_html(const char*);
 
 // Constructor
@@ -479,7 +479,7 @@ void qso_qsl::cb_print(Fl_Widget* w, void* v) {
 // Mark printing done
 void qso_qsl::cb_mark_done(Fl_Widget* w, void* v) {
 	qso_qsl* that = ancestor_view<qso_qsl>(w);
-	string via = { (char)(intptr_t)v };
+	std::string via = { (char)(intptr_t)v };
 	that->via_code_ = via;
 	that->qsl_mark_done();
 }
@@ -605,10 +605,10 @@ void qso_qsl::qsl_print() {
 void qso_qsl::qsl_mark_done() {
 	if (extract_records_->size() || single_qso_) {
 		char message[200];
-		string date_name;
-		string sent_name;
-		string via_name;
-		string today = now(false, "%Y%m%d");
+		std::string date_name;
+		std::string sent_name;
+		std::string via_name;
+		std::string today = now(false, "%Y%m%d");
 		bool overwrite = false;
 		extract_data::extract_mode_t mode = extract_records_->use_mode();
 		if (single_qso_) {
@@ -640,14 +640,14 @@ void qso_qsl::qsl_mark_done() {
 			record* qso = mgr->data()->current_qso();
 			if (qso && (overwrite || qso->item(sent_name) == "")) {
 				qso->item(date_name, today);
-				qso->item(sent_name, string("Y"));
+				qso->item(sent_name, std::string("Y"));
 				qso->item(via_name, via_code_);
 			}
 		}
 		else for (auto it = extract_records_->begin(); it != extract_records_->end(); it++) {
 			if (overwrite || (*it)->item(sent_name) == "") {
 				(*it)->item(date_name, today);
-				(*it)->item(sent_name, string("Y"));
+				(*it)->item(sent_name, std::string("Y"));
 				(*it)->item(via_name, via_code_);
 			}
 		}
@@ -683,7 +683,7 @@ void qso_qsl::qsl_1_generate_png() {
 	if (qso) {
 		png_writer* png = new png_writer();
 		Fl_RGB_Image* image = qsl_image::image(qso, qsl_data::FILE);
-		string filename = png_writer::png_filename(qso);
+		std::string filename = png_writer::png_filename(qso);
 		if (png->write_image(image, filename)) {
 			status_->misc_status(ST_ERROR, "QSL: Single PNG file generation failed");
 		}

@@ -3,7 +3,7 @@
 
 #include <FL/Fl_Double_Window.H>
 
-using namespace std;
+
 
 
 

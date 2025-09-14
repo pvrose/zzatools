@@ -116,7 +116,7 @@ void calendar_table::value(tm date) {
 	today_.tm_sec = 0;
 
 	if (mktime(&date) == -1) {
-		// The date cannot be represented - set to today
+		// The date cannot be represented - std::set to today
 		selected_date_ = today_;
 	}
 	else {

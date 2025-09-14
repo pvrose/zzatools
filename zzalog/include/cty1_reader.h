@@ -6,9 +6,9 @@
 
 #include <list>
 #include <string>
-#include <istream>
+#include<istream>
 
-using namespace std;
+
 
 	//! This class reads the XML cty.xml file obtained from Clublog.org
 	//! 
@@ -71,15 +71,15 @@ using namespace std;
 
 		// Overloadable XML handlers
 		//! Start element.
-		virtual bool start_element(string name, map<string, string>* attributes);
+		virtual bool start_element(std::string name, std::map<std::string, std::string>* attributes);
 		//! End element
-		virtual bool end_element(string name);
+		virtual bool end_element(std::string name);
 		//! Special element
-		virtual bool declaration(xml_element::element_t element_type, string name, string content);
+		virtual bool declaration(xml_element::element_t element_type, std::string name, std::string content);
 		//! Processing instruction
-		virtual bool process_instr(string name, string content);
+		virtual bool process_instr(std::string name, std::string content);
 		//! characters
-		virtual bool characters(string content);
+		virtual bool characters(std::string content);
 
 		//! Load data
 		
@@ -87,20 +87,20 @@ using namespace std;
 		//! \param in input stream.
 		//! \param version Returns any version information in the file.
 		//! \return true if successful, false if not.
-		bool load_data(cty_data* data, istream& in, string& version);
+		bool load_data(cty_data* data, std::istream& in, std::string& version);
 		// Protected methods
 	protected:
 
 		//! Converts data in standard XML format to "YYYYMMDD" format.
-		string xmldt2date(string xml_data);
+		std::string xmldt2date(std::string xml_data);
 
 	protected:
 		//! Ignore processing until the end of current element.
 		bool ignore_processing_;
-		//! Element processig list
-		list<string> elements_;
+		//! Element processig std::list
+		std::list<std::string> elements_;
 		//! File timestamp
-		string timestamp_;
+		std::string timestamp_;
 		//! Current entity being processed.
 		cty_entity* current_entity_;
 		//! Current prefix being processed.
@@ -108,13 +108,13 @@ using namespace std;
 		//! Current exception record being processed
 		cty_exception* current_exception_;
 		//! Current callsign in an exception match.
-		string current_match_;
+		std::string current_match_;
 		//! The internal database being loaded.
 		cty_data* data_;
 		//! Value of element
-		string value_;
+		std::string value_;
 		//! Input stream from file.
-		istream* file_;
+		std::istream* file_;
 		//! Number of elements read
 		int number_read_;
 

@@ -5,7 +5,7 @@
 #include <map>
 #include <string>
 
-using namespace std;
+
 
 //! XML elements for station.xml
 enum stn_element_t : char {
@@ -54,29 +54,29 @@ public:
 
     //! Load data from station.xml
     bool load_data(
-        map<string, qth_info_t*>* qths,   //!< Location data
-        map<string, oper_info_t*>* opers, //!< Operator data 
-        map<string, string>* calls,       //!< Callsign data
-        istream& in                       //!< Input data stream
+        std::map<std::string, qth_info_t*>* qths,   //!< Location data
+        std::map<std::string, oper_info_t*>* opers, //!< Operator data 
+        std::map<std::string, std::string>* calls,       //!< Callsign data
+        std::istream& in                       //!< Input data stream
     );
 
 protected:
     // The start methods
-    static bool start_station(xml_wreader* rdr, map<string, string>* attributes);   //!< STATION
-    static bool start_location(xml_wreader* rdr, map<string, string>* attributes);  //!< LOCATION
-    static bool start_item(xml_wreader* rdr, map<string, string>* attributes);      //!< ITEM
-    static bool start_operator(xml_wreader* rdr, map<string, string>* attributes);  //!< OPERATOR
-    static bool start_scallsign(xml_wreader* rdr, map<string, string>* attributes); //!< SCALLSIGN
+    static bool start_station(xml_wreader* rdr, std::map<std::string, std::string>* attributes);   //!< STATION
+    static bool start_location(xml_wreader* rdr, std::map<std::string, std::string>* attributes);  //!< LOCATION
+    static bool start_item(xml_wreader* rdr, std::map<std::string, std::string>* attributes);      //!< ITEM
+    static bool start_operator(xml_wreader* rdr, std::map<std::string, std::string>* attributes);  //!< OPERATOR
+    static bool start_scallsign(xml_wreader* rdr, std::map<std::string, std::string>* attributes); //!< SCALLSIGN
     // End mehods
     static bool end_station(xml_wreader* rdr);      //!< /STATION
     static bool end_location(xml_wreader* rdr);     //!< /LOCATION
     static bool end_item(xml_wreader* rdr);         //!< /ITEM
     static bool end_operator(xml_wreader* rdr);     //!< /OPERATOR
     // Character methods
-    static bool chars_item(xml_wreader* rdr, string content);  //!< ITEM characters
+    static bool chars_item(xml_wreader* rdr, std::string content);  //!< ITEM characters
 
     //! Maps text to element identifier
-    const map<string, char> element_map_ = {
+    const std::map<std::string, char> element_map_ = {
         { "STATION", STN_STATION },
         { "LOCATION", STN_LOCATION },
         { "ITEM", STN_ITEM },
@@ -85,7 +85,7 @@ protected:
     };
 
     //! Maps identifier to methods
-    const map<char, methods> method_map_ = {
+    const std::map<char, methods> method_map_ = {
         { STN_STATION, { start_station, end_station, nullptr } },
         { STN_LOCATION, { start_location, end_location, nullptr } },
         { STN_ITEM, { start_item, end_item, chars_item } },
@@ -94,30 +94,30 @@ protected:
     };
 
     //! Map XML item name to location item identifier.
-    static map<string, qth_value_t> qth_value_map_;
+    static std::map<std::string, qth_value_t> qth_value_map_;
     //! Map XML item name to operator item identifier.
-    static map<string, oper_value_t> oper_value_map_;
+    static std::map<std::string, oper_value_t> oper_value_map_;
 
     //! Location data, mapped by identifier
-    map<string, qth_info_t*>* qths_;
+    std::map<std::string, qth_info_t*>* qths_;
     //! Operator data, mapped by identifier
-    map<string, oper_info_t*>* opers_;
+    std::map<std::string, oper_info_t*>* opers_;
     //! Station callsign data mapped by callsign
-    map<string, string>* scalls_;
+    std::map<std::string, std::string>* scalls_;
     //! Current location name
-    string qth_name_;
+    std::string qth_name_;
     //! Current location data
     qth_info_t* qth_;
     //! Current operator ID
-    string oper_name_;
+    std::string oper_name_;
     //! Current Operator data
     oper_info_t* oper_;
     //! Current item name
-    string item_name_;
+    std::string item_name_;
     //! Current item value
-    string item_value_;
+    std::string item_value_;
     //! Input stream 
-    istream* in_file_;
+    std::istream* in_file_;
 
 };
 

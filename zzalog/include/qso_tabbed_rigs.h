@@ -5,11 +5,11 @@
 
 #include <FL/Fl_Tabs.H>
 
-using namespace std;
+
 
 class rig_if;
 
-//! This class presents a set of tabs indicating the usable rigs.
+//! This class presents a std::set of tabs indicating the usable rigs.
 
 //! Initially only rigs actively connectable are shown, but if a QSO refers to another
 //! that will tehn get shown.
@@ -50,7 +50,7 @@ protected:
 	static void cb_tabs(Fl_Widget* w, void* v);
 
 	//! Map the labels to the widgets
-	map<string, Fl_Widget*> label_map_;
+	std::map<std::string, Fl_Widget*> label_map_;
 
 	//! Default tab
 	int default_tab_;

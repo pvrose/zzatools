@@ -7,10 +7,10 @@
 
 #include <string>
 
-using namespace std;
+
 
 	//! Labels for the comparison mode labels : order matches enumeration search_comp_t.
-	static const string comparator_labels_[7] = {
+	static const std::string comparator_labels_[7] = {
 		"~", "/=", "<", "<=", "=", ">=", ">"
 	};
 
@@ -29,8 +29,8 @@ using namespace std;
 
 		//! Returns the extract criteria
 		search_criteria_t* criteria();
-		//! set extract fail message
-		void fail(string message);
+		//! std::set extract fail message
+		void fail(std::string message);
 
 		// callbacks 
 		//! Callback from "OK" button.
@@ -86,11 +86,11 @@ using namespace std;
 			{XP_GT, nullptr},
 		};
 		//! Labels for the condition radio buttons 
-		const string condition_labels_[XC_MAXIMUM] =
+		const std::string condition_labels_[XC_MAXIMUM] =
 		{ "DXCC", "CQ Zone", "ITU Zone", "Continent", "Square (2)", "Square (4)", "Callsign",
 			"All", "Field" };
 		//! Labels for the combination mode radio buttons
-		const string combination_labels_[3] = {
+		const std::string combination_labels_[3] = {
 			"New", "And", "Or"
 		};
 		//! Output: Displays error message.

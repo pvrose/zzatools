@@ -4,7 +4,7 @@
 #include <string>
 #include <FL/Fl_Tree.H>
 
-using namespace std;
+
 
 class Fl_Tree_Item;
 class Fl_Preferences;
@@ -48,7 +48,7 @@ class Fl_Preferences;
 		//! \param parent the point at which to add a leaf node.
 		//! \param label the name of the setting.
 		//! \param value the value of the setting.
-		void add_leaf(Fl_Tree_Item* parent, string label, string value);
+		void add_leaf(Fl_Tree_Item* parent, std::string label, std::string value);
 		//! Add a new branch at the current point.
 		
 		//! \param parent the point at which to add a new branch.

@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <vector>
 
-using namespace std;
+
 
 
 //! This class provides a central timer to control all the real time activity.
@@ -52,7 +52,7 @@ class ticker {
     static void cb_ticker(void* v);
 
     //! The register of tick requests.
-    vector<ticker_entry*> tickers_;
+    std::vector<ticker_entry*> tickers_;
     //! Current time (in units of 100 milliseconds since started).
     unsigned int tick_count_;
     

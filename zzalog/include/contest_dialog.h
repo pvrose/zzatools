@@ -4,7 +4,7 @@
 
 #include <string>
 
-using namespace std;
+
 
 class calendar_input;
 class field_input;
@@ -64,7 +64,7 @@ protected:
 
 	//! Populate contest instance identifier choice for the specified contest.
 	void populate_ct_index();
-	//! Populate algorithm choice from the list of coded algorithms.
+	//! Populate algorithm choice from the std::list of coded algorithms.
 	void populate_algorithm();
 	//! Update all data values from the database for specified contest instance.
 	void update_contest();
@@ -74,9 +74,9 @@ protected:
 	void update_algorithm();
 
 	//! Current contest identifier.
-	string contest_id_;
+	std::string contest_id_;
 	//! Current contest instance identifier.
-	string contest_index_;
+	std::string contest_index_;
 	//! Data relating to current contest instance.
 	ct_data_t* contest_;
 

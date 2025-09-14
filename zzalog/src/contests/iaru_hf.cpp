@@ -7,35 +7,33 @@
 
 #include "utils.h"
 
-using namespace contests;
-
 extern stn_data* stn_data_;
-extern map<string, contest_algorithm*>* algorithms_;
+extern std::map<std::string, contest_algorithm*>* algorithms_;
 
 contest_algorithm* iaru_hf_ = new contests::iaru_hf;
 
 // Constructor - add algorithmic specific data here
-iaru_hf::iaru_hf() : contest_algorithm() {
+contests::iaru_hf::iaru_hf() : contest_algorithm() {
 	// Add the QSO fields used in scoring and exchanges (RX)
 	rx_items_ = { "RST_RCVD", "ITUZ", "CONT"};
 	// Add the QSO fields used in scoring and exchanges (TX)
 	tx_items_ = { "RST_SENT", "MY_ITU_ZONE", "APP_ZZA_MY_CONT" };
-	// Add this algorithm to the list of algorithms
-	if (algorithms_ == nullptr) algorithms_ = new map<string, contest_algorithm*>;
+	// Add this algorithm to the std::list of algorithms
+	if (algorithms_ == nullptr) algorithms_ = new std::map<std::string, contest_algorithm*>;
 	(*algorithms_)["IARU-HF"] = this;
 }
 
 // Algorithm specific method to split text into a number of fields
-void iaru_hf::parse_exchange(record* qso, string text) {
-	vector<string> words;
+void contests::iaru_hf::parse_exchange(record* qso, std::string text) {
+	std::vector<std::string> words;
 	split_line(text, words, ' ');
 	qso->item("RST_RCVD", words[0]);
 	qso->item("ITUZ", words[1]);
 }
 
 // Algorithm specific method to generate text from a number of fieds
-string iaru_hf::generate_exchange(record* qso) {
-	string result = "";
+std::string contests::iaru_hf::generate_exchange(record* qso) {
+	std::string result = "";
 	if (qso) {
 		set_default_rst(qso);
 		qso->item("APP_ZZA_MY_CONT", my_info_->data.at(CONTINENT));
@@ -55,13 +53,13 @@ string iaru_hf::generate_exchange(record* qso) {
 // Multiplier = count(ITUZ x BAND)
 // Total = QSO points * multiplier
 
-score_result iaru_hf::score_qso(record* qso, set<string>& multipliers) {
+score_result contests::iaru_hf::score_qso(record* qso, std::set<std::string>& multipliers) {
 	// ITU Zone or otherwise
-	string ituz = qso->item("ITUZ");
-	string cont = qso->item("CONT");
+	std::string ituz = qso->item("ITUZ");
+	std::string cont = qso->item("CONT");
 	bool itu_station = !is_integer(ituz);
 	score_result res;
-	string multiplier = ituz + " " + qso->item("BAND");
+	std::string multiplier = ituz + " " + qso->item("BAND");
 	if (multipliers.find(multiplier) == multipliers.end()) {
 		res.multiplier = 1;
 		multipliers.insert(multiplier);

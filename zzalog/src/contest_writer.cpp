@@ -14,7 +14,7 @@ contest_writer::~contest_writer() {
 
 }
 
-bool contest_writer::store_data(contest_data* d, ostream& os) {
+bool contest_writer::store_data(contest_data* d, std::ostream& os) {
 	data_ = d;
     status_->misc_status(ST_NOTE, "CONTEST: Starting XML generation");
 
@@ -35,9 +35,9 @@ bool contest_writer::store_data(contest_data* d, ostream& os) {
 }
 
 bool contest_writer::write_element(ct_element_t element) {
-    string name;
-    string data;
-    map<string, string>* attributes;
+    std::string name;
+    std::string data;
+    std::map<std::string, std::string>* attributes;
     switch (element) {
     case CT_NONE:
         // Prolog
@@ -64,7 +64,7 @@ bool contest_writer::write_element(ct_element_t element) {
         return true;
     case CT_CONTEST:
         name = "contest";
-        attributes = new map<string, string>;
+        attributes = new std::map<std::string, std::string>;
         (*attributes)["id"] = contest_id_;
         (*attributes)["index"] = contest_ix_;
         if (!start_element(name, attributes)) return false;
@@ -74,16 +74,16 @@ bool contest_writer::write_element(ct_element_t element) {
         return true;
     case CT_ALGORITHM:
         name = "algorithm";
-        attributes = new map<string, string>;
+        attributes = new std::map<std::string, std::string>;
         (*attributes)["name"] = contest_->algorithm;
         if (!start_element(name, attributes)) return false;
         if (!end_element(name)) return false;
         return true;
     case CT_TIMEFRAME:
         name = "timeframe";
-        attributes = new map<string, string>;
-        (*attributes)["start"] = convert_xml_datetime(chrono::system_clock::to_time_t(contest_->date.start));
-        (*attributes)["finish"] = convert_xml_datetime(chrono::system_clock::to_time_t(contest_->date.finish));
+        attributes = new std::map<std::string, std::string>;
+        (*attributes)["start"] = convert_xml_datetime(std::chrono::system_clock::to_time_t(contest_->date.start));
+        (*attributes)["finish"] = convert_xml_datetime(std::chrono::system_clock::to_time_t(contest_->date.finish));
         if (!start_element(name, attributes)) return false;
         if (!end_element(name)) return false;
         return true;
@@ -93,9 +93,9 @@ bool contest_writer::write_element(ct_element_t element) {
     }
 }
 
-// write an individual value - string, integer and double versions
-bool contest_writer::write_value(string name, string data) {
-    map<string, string>* attributes = new map<string, string>;
+// write an individual value - std::string, integer and double versions
+bool contest_writer::write_value(std::string name, std::string data) {
+    std::map<std::string, std::string>* attributes = new std::map<std::string, std::string>;
     (*attributes)["name"] = name;
     if (!start_element("value", attributes)) return false;
     if (!characters(data)) return false;
@@ -103,7 +103,7 @@ bool contest_writer::write_value(string name, string data) {
     return true;
 }
 
-bool contest_writer::write_value(string name, int data) {
+bool contest_writer::write_value(std::string name, int data) {
     return write_value(name, to_string(data));
 }
 

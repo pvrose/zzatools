@@ -4,7 +4,7 @@
 
 #include <FL/Fl_Group.H>
 
-using namespace std;
+
 
 class qso_data;
 class record;
@@ -43,14 +43,14 @@ public:
 	//! \param log_number Index of QSO record in full log to check against.
 	//! \param query_qso QSO record containing queried QSO.
 	//! \param save_original Keep a copy of the original record so that changes can be undone if necessary.
-	void set_query(string message, qso_num_t log_number, record* query_qso = nullptr, bool save_original = true);
+	void set_query(std::string message, qso_num_t log_number, record* query_qso = nullptr, bool save_original = true);
 	//! Set query to merge with new QSO. \see set_query.
 	
 	//! \param message Instructions to user.
 	//! \param new_qso New QSO to check against.
 	//! \param query_qso QSO record containing queried QSO.
 	//! \param save_original Keep a copy of the original record so that changes can be undone if necessary.
-	void set_query(string message, record* new_qso, record* query_qso = nullptr, bool save_original = true);
+	void set_query(std::string message, record* new_qso, record* query_qso = nullptr, bool save_original = true);
 	//! Returns the logged QSO record.
 	record* qso();
 	//! Returns the queried QSO record.
@@ -60,16 +60,16 @@ public:
 	//! Clear the query.
 	void clear_query();
 	//! Returns the messae to the user.
-	string query_message();
+	std::string query_message();
 
 protected:
 	//! Callback from clicking the query table.
 	static void cb_tab_qso(Fl_Widget* w, void* v);
 	//! Handle a double-click action in cb_tab_qso: usually updates logged record from query or original.
-	void action_handle_dclick(int col, string field);
+	void action_handle_dclick(int col, std::string field);
 
 	//! Query message
-	string query_message_;
+	std::string query_message_;
 
 	//! Record table
 	record_table* tab_query_;

@@ -6,7 +6,7 @@
 #include <map>
 #include <string>
 
-using namespace std;
+
 
 	class book;
 	enum hint_t : uchar;
@@ -33,7 +33,7 @@ using namespace std;
 		int min_w();
 		//! Returns minimum height the view can be resized
 		int min_h();
-		//! set book used by the view.
+		//! std::set book used by the view.
 		void set_book(book* book);
 		//! Returns the book 
 		book* get_book();

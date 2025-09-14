@@ -8,7 +8,7 @@
 #include <list>
 #include <fstream>
 
-using namespace std;
+
 
 class book;
 class record;
@@ -43,23 +43,23 @@ class record;
 		~adx_reader();
 
 		//! Load data from input stream \a in to book \a book.
-		bool load_book(book* book, istream& in);
+		bool load_book(book* book, std::istream& in);
 
 		// Overloadable XML handlers
 		//! Start XML element: The element name is used to call one of the specific start... methods.
-		virtual bool start_element(string name, map<string, string>* attributes);
+		virtual bool start_element(std::string name, std::map<std::string, std::string>* attributes);
 		//! End XML element: The element name is used to call one of the specific end... methods.
-		virtual bool end_element(string name);
+		virtual bool end_element(std::string name);
 		//! Special element: If the declaration is a comment within the header record, then
 		//! it is added to the header.
-		virtual bool declaration(xml_element::element_t element_type, string name, string content);
+		virtual bool declaration(xml_element::element_t element_type, std::string name, std::string content);
 		//! Processing instruction - ignored.
-		virtual bool process_instr(string name, string content);
+		virtual bool process_instr(std::string name, std::string content);
 		//! Characters - characters are stored for use in the end_element method. 
 		
 		//! Any singleton
 		//! \p CR or \p LF characters are translated into a \p CR/LF combination.
-		virtual bool characters(string content);
+		virtual bool characters(std::string content);
 
 		//! Used in showing progress.
 		
@@ -76,7 +76,7 @@ class record;
 		//! Only ZZA and some EQSL and LOTW application-specific field names are read in.
 		//! \param attributes see above.
 		//! \return true if successful, false if not.
-		bool start_app(map<string, string>* attributes);
+		bool start_app(std::map<std::string, std::string>* attributes);
 		//! start the RECORD element.
 		
 		//! \code
@@ -108,7 +108,7 @@ class record;
 		//! start the USERDEF element.
 		
 		//! \return true if successful, false if not.
-		bool start_userdef(map<string, string>* attributes);
+		bool start_userdef(std::map<std::string, std::string>* attributes);
 		//! start the [field-name] element.
 		
 		//! in header element
@@ -120,23 +120,23 @@ class record;
 		//! <USERDEF FIELDNAME="FIELDNAME">DATA</USERDEF>
 		//! \endcode
 		//! \return true if successful, false if not.
-		bool start_field(string field_name);
+		bool start_field(std::string field_name);
 
 
 
 	protected:
 		//! The book being loaded.
 		book * my_book_;
-		//! The list of element types currently being procexxed processing
-		list<adx_element_t> elements_;
+		//! The std::list of element types currently being procexxed processing
+		std::list<adx_element_t> elements_;
 		//! Current field being read
-		string field_name_;
+		std::string field_name_;
 		//! Current data in field
-		string value_;
+		std::string value_;
 		//! Field data type
-		string datatype_;
+		std::string datatype_;
 		//! Field available values
-		string available_values_;
+		std::string available_values_;
 		//! Current QSOrecord being created
 		record* record_;
 		//! Current line within the document being accessed
@@ -146,7 +146,7 @@ class record;
 		//! Book has been modified by parse or validate on load
 		bool modified_;
 		//! List of USERDEF fields
-		set<string> userdef_fields_;
+		std::set<std::string> userdef_fields_;
 		//! count of ignored comments
 		int num_comments_;
 		//! count of ignored constructs
@@ -160,7 +160,7 @@ class record;
 		//! Current position of read (for progress)
 		long current_count_;
 		//! input stream
-		istream* in_;
+		std::istream* in_;
 		//! Not a ZZALOG application-specified field, ignore further details.
 		bool ignore_app_;
 	};

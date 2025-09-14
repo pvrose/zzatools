@@ -5,7 +5,7 @@
 #include <map>
 #include <string>
 
-using namespace std;
+
 
 enum rigs_element_t : char;
 struct rig_data_t;
@@ -24,29 +24,29 @@ public:
     ~rig_writer();
 
     //! Write \p data to output stream \p os
-    bool store_data(map<string, rig_data_t*>* data, ostream& os);
+    bool store_data(std::map<std::string, rig_data_t*>* data, std::ostream& os);
 
     //! Write an individual XML element.
     bool write_element(rigs_element_t element);
 
 protected:
-    //! Write "VALUE name="...">.....</VALUE> for string \p data,
-    bool write_value(string name, string data);
+    //! Write "VALUE name="...">.....</VALUE> for std::string \p data,
+    bool write_value(std::string name, std::string data);
     //! Write "VALUE name="...">.....</VALUE> for integer \p data,
-    bool write_value(string name, int data);
+    bool write_value(std::string name, int data);
     //! Write "VALUE name="...">.....</VALUE> for double-precision \p data,
-    bool write_value(string name, double data);
+    bool write_value(std::string name, double data);
     //! Name of rig currently being written
-    string rig_name_;
+    std::string rig_name_;
     //! Name of app currently being written
-    string app_name_;
+    std::string app_name_;
     //! Rig configuration currently being written.
     rig_data_t* rig_data_;
     //! Rig interface configuration currently being written. 
     cat_data_t* app_data_;
 
     //! Rig configuration database.
-    map<string, rig_data_t*>* data_;
+    std::map<std::string, rig_data_t*>* data_;
 
 
 };

@@ -6,7 +6,7 @@
 
 #include <fstream>
 
-extern string default_data_directory_;
+extern std::string default_data_directory_;
 extern status* status_;
 
 contest_data::contest_data() {
@@ -19,7 +19,7 @@ contest_data::~contest_data() {
 }
 
 // Get contest data structure for contest "id" 
-ct_data_t* contest_data::get_contest(string id, string ix, bool create) {
+ct_data_t* contest_data::get_contest(std::string id, std::string ix, bool create) {
 	if (contests_.find(id) == contests_.end()) {
 		if (create && ix.length()) {
 			ct_data_t* ct = new ct_data_t;
@@ -47,11 +47,11 @@ ct_data_t* contest_data::get_contest(string id, string ix, bool create) {
 	return contests_.at(id).at(ix);
 }
 
-set<string>* contest_data::get_contest_indices(string id) {
+std::set<std::string>* contest_data::get_contest_indices(std::string id) {
 	if (contests_.find(id) == contests_.end()) {
 		return nullptr;
 	}
-	set<string>* result = new set<string>;
+	std::set<std::string>* result = new std::set<std::string>;
 	for (auto it : contests_.at(id)) {
 		result->insert(it.first);
 	}
@@ -70,9 +70,9 @@ ct_entry_t* contest_data::get_contest_info(int number) {
 
 // Load data
 bool contest_data::load_data() {
-	string filename = default_data_directory_ + "contests.xml";
+	std::string filename = default_data_directory_ + "contests.xml";
 	ifstream is;
-	is.open(filename, ios_base::in);
+	is.open(filename, std::ios_base::in);
 	if (is.good()) {
 		contest_reader* reader = new contest_reader();
 		if (reader->load_data(this, is)) {
@@ -94,9 +94,9 @@ bool contest_data::load_data() {
 
 // Save data
 bool contest_data::save_data() {
-	string filename = default_data_directory_ + "contests.xml";
-	ofstream os;
-	os.open(filename, ios_base::out);
+	std::string filename = default_data_directory_ + "contests.xml";
+	std::ofstream os;
+	os.open(filename, std::ios_base::out);
 	if (os.good()) {
 		contest_writer* writer = new contest_writer();
 		if (!writer->store_data(this, os)) {

@@ -14,12 +14,12 @@
 #include <FL/Fl_PNG_Image.H>
 
 extern spec_data* spec_data_;
-extern string PROGRAM_ID;
-extern string PROGRAM_VERSION;
-extern string CONTACT;
-extern string COPYRIGHT;
-extern string PARTY3RD_COPYRIGHT;
-extern string TIMESTAMP;
+extern std::string PROGRAM_ID;
+extern std::string PROGRAM_VERSION;
+extern std::string CONTACT;
+extern std::string COPYRIGHT;
+extern std::string PARTY3RD_COPYRIGHT;
+extern std::string TIMESTAMP;
 extern Fl_PNG_Image main_icon_;
 
 // Creates the about box dialog and displays it.
@@ -42,14 +42,14 @@ about_dialog::about_dialog() :
 	curl_version_info_data* data = curl_version_info(CURLVERSION_LAST);
 
 	// Draw the two text boxes - first program ID and versions
-	string program_id = 
+	std::string program_id = 
 		"Compiled " + TIMESTAMP + "\n" +
 		(spec_data_ ? "using ADIF Version " + spec_data_->adif_version() + "\n" : "") +
 		" hamlib version " + rig_version() +
 		"\n FLTK version " + to_string(FL_MAJOR_VERSION) + "." + 
 		to_string(FL_MINOR_VERSION) + "." + to_string(FL_PATCH_VERSION) +
-		"\n CURL version " + string(data->version);
-	string copyright = COPYRIGHT + "\ne-mail: " + CONTACT + "\n" + PARTY3RD_COPYRIGHT + "\n (Hamlib " + rig_copyright() + ")";
+		"\n CURL version " + std::string(data->version);
+	std::string copyright = COPYRIGHT + "\ne-mail: " + CONTACT + "\n" + PARTY3RD_COPYRIGHT + "\n (Hamlib " + rig_copyright() + ")";
 	int w = W2;
 	int h = 0;
 	// Get the width and height required to display the message (add a bit of height) 
@@ -103,7 +103,7 @@ about_dialog::about_dialog() :
 	// resize the window to include everything
 	resizable(nullptr);
 	size(WALL, HALL);
-	copy_label(string("About " + PROGRAM_ID).c_str());
+	copy_label(std::string("About " + PROGRAM_ID).c_str());
 
 	end();
 

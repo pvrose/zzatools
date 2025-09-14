@@ -6,7 +6,7 @@
 #include <list>
 #include <string>
 
-using namespace std;
+
 
 	class spec_data;
 	struct spec_dataset;
@@ -42,7 +42,7 @@ using namespace std;
 	  </header>
 	  <record>
 		<value name="Data Type Name">AwardList</value>
-		<value name="Description">a comma-delimited list of members of the Award enumeration</value>
+		<value name="Description">a comma-delimited std::list of members of the Award enumeration</value>
 		<value name="Import-only">true</value>
 	  </record>
 	  :
@@ -102,35 +102,35 @@ using namespace std;
 
 		// Overloadable XML handlers
 		//! Start element 
-		virtual bool start_element(string name, map<string, string>* attributes);
+		virtual bool start_element(std::string name, std::map<std::string, std::string>* attributes);
 		//! End element
-		virtual bool end_element(string name);
+		virtual bool end_element(std::string name);
 		//! Special element
-		virtual bool declaration(xml_element::element_t element_type, string name, string content);
+		virtual bool declaration(xml_element::element_t element_type, std::string name, std::string content);
 		//! Processing instruction
-		virtual bool processing_instr(string name, string content);
+		virtual bool processing_instr(std::string name, std::string content);
 		//! characters
-		virtual bool characters(string content);
+		virtual bool characters(std::string content);
 
 		// Load \p data from input stream /p in: /p version receives version from file.
-		bool load_data(spec_data* data, istream& in, string& version);
+		bool load_data(spec_data* data, std::istream& in, std::string& version);
 		// Protected methods
 
 	protected:
 		//! Start: adif verstion= status= created=
-		bool start_adif(map<string, string>* attributes);
+		bool start_adif(std::map<std::string, std::string>* attributes);
 		//! Start: dataTypes
 		bool start_datatypes();
 		//! Start: header
 		bool start_header();
 		//! Start header value
-		bool start_value(map<string, string>* attributes);
+		bool start_value(std::map<std::string, std::string>* attributes);
 		//! Start record
 		bool start_record();
 		//! Start enumerations
 		bool start_enumerations();
 		//! Start enumeration
-		bool start_enumeration(map<string, string>* attributes);
+		bool start_enumeration(std::map<std::string, std::string>* attributes);
 		//! Start fields
 		bool start_fields();
 		//! End ADIF
@@ -156,31 +156,31 @@ using namespace std;
 		//! The data
 		spec_data * data_;
 		//! Stack of elments being processed
-		list<specx_element_t> elements_;
+		std::list<specx_element_t> elements_;
 		//! Current column headers
-		vector<string> column_headers_;
+		std::vector<std::string> column_headers_;
 		//! Version
-		string adif_version_;
+		std::string adif_version_;
 		//! Status
-		string file_status_;
+		std::string file_status_;
 		//! Created date
-		string created_;
+		std::string created_;
 		//! Current dataset name - Datatypes, specific enumeration or fields
-		string dataset_name_;
+		std::string dataset_name_;
 		//! Current item name
-		string item_name_;
+		std::string item_name_;
 		//! Current record
-		map<string, string>* record_data_;
+		std::map<std::string, std::string>* record_data_;
 		//! Element data
-		string element_data_;
+		std::string element_data_;
 		//! Number of ignored XML elements
 		int num_ignored_;
 		//! Name of the record item
-		string record_name_;
+		std::string record_name_;
 		//! Is this an enumeration
 		bool dataset_enumeration_;
 		//! Remember the stream so that we can display progress
-		istream* in_file_;
+		std::istream* in_file_;
 
 	};
 

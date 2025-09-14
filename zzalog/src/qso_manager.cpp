@@ -60,10 +60,10 @@ extern import_data* import_data_;
 extern qrz_handler* qrz_handler_;
 extern main_window* main_window_;
 extern bool closing_;
-extern string COPYRIGHT;
-extern string CONTACT;
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern std::string COPYRIGHT;
+extern std::string CONTACT;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
 
 
@@ -160,7 +160,7 @@ void qso_manager::create_form(int X, int Y) {
 	max_y = max(max_y, curr_y);
 
 	Fl_Box* b_cr = new Fl_Box(X, max_y, max_x + GAP - X, FOOT_HEIGHT);
-	b_cr->copy_label(string(COPYRIGHT + " " + CONTACT + "     ").c_str());
+	b_cr->copy_label(std::string(COPYRIGHT + " " + CONTACT + "     ").c_str());
 	b_cr->labelsize(FL_NORMAL_SIZE - 1);
 	b_cr->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 
@@ -303,7 +303,7 @@ void qso_manager::update_rig() {
 }
 
 // Change rig
-void qso_manager::change_rig(string rig_name) {
+void qso_manager::change_rig(std::string rig_name) {
 	bool change = false;
 	if (!rig_group_->value()) change = true;
 	else {
@@ -395,8 +395,8 @@ record* qso_manager::dummy_qso() {
 // Copy the sleected QSOs MY_RIG etc to the supplied qso record
 void qso_manager::update_import_qso(record* import_qso) {
 	if (import_qso) {
-		string mode = import_qso->item("MODE");
-		string submode = import_qso->item("SUBMODE");
+		std::string mode = import_qso->item("MODE");
+		std::string submode = import_qso->item("SUBMODE");
 		// If we have a QSO to copy from and one to copy to, copy these fields.
 		if (import_qso->item("MY_RIG").length() == 0)
 			import_qso->item("MY_RIG", get_default(RIG));
@@ -406,7 +406,7 @@ void qso_manager::update_import_qso(record* import_qso) {
 }
 
 // Get the default value of the station item
-string qso_manager::get_default(stn_item_t item) {
+std::string qso_manager::get_default(stn_item_t item) {
 	record* source = data_group_->current_qso();
 	// If there isn't a default QSO the use the latest one
 	if (source == nullptr || source->size() == 0) {
@@ -445,7 +445,7 @@ void qso_manager::update_modem_qso(bool log_it) {
 }
 
 // Start a modem QSO
-record* qso_manager::start_modem_qso(string call, uchar source) {
+record* qso_manager::start_modem_qso(std::string call, uchar source) {
 	return data_group_->start_modem_qso(call, (qso_data::qso_init_t)source);
 }
 

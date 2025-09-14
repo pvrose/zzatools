@@ -14,7 +14,7 @@
 #include <atomic>
 #include <mutex>
 
-using namespace std;
+
 
 class record;
 class book;
@@ -53,7 +53,7 @@ typedef size_t qso_num_t;
 			ER_HTML_ERR,   //!< HTML error
 			ER_DUPLICATE   //!< Duplicate request
 		};
-		//! Data required to queue requests into upload thread.
+		//! Data required to std::queue requests into upload std::thread.
 		struct request_t {
 			//! Index of QSO record in full logbook.
 			qso_num_t record_num;
@@ -71,28 +71,28 @@ typedef size_t qso_num_t;
 				, force(f)
 			{}
 		};
-		//! Request queue control
+		//! Request std::queue control
 		enum queue_control_t {
 			EQ_PAUSE,      //!< pause
 			EQ_START,      //!< start
 			EQ_ABANDON     //!< abandon
 		};
-		//! Request queue
-		typedef queue<request_t> queue_t;
-		////! Information required when removing entry from queue
+		//! Request std::queue
+		typedef std::queue<request_t> queue_t;
+		////! Information required when removing entry from std::queue
 		//struct dequeue_param_t {
-		//	//! Pointer to the request queue.
-		//	queue_t* queue;
+		//	//! Pointer to the request std::queue.
+		//	queue_t* std::queue;
 		//	//! Pointer to this eqsl_handler.
 		//	eqsl_handler* handler;
 		//	//! Default constructor.
 		//	dequeue_param_t() {
-		//		queue = nullptr;
+		//		std::queue = nullptr;
 		//		handler = nullptr;
 		//	}
 		//	//! Constructor to create an instance.
 		//	dequeue_param_t(queue_t* q, eqsl_handler* h)
-		//		: queue(q)
+		//		: std::queue(q)
 		//		, handler(h)
 		//	{
 		//	}
@@ -102,9 +102,9 @@ typedef size_t qso_num_t;
 			//! Response status.
 			response_t status;
 			//! Text showing response message.
-			string error_message;
+			std::string error_message;
 			//! HTML text.
-			string html;
+			std::string html;
 			//! QSO record whose upload request the response is for.
 			record* qso;
 			//! Default constructor.
@@ -127,8 +127,8 @@ typedef size_t qso_num_t;
 		//! \param force make the request even if already have some data.
 		void enqueue_request(qso_num_t record_num, bool force = false);
 		//! Download the data from eqsl into the data stream \p adif.
-		bool download_eqsl_log(stringstream* adif);
-		//! Control the scheduling from the request queue.
+		bool download_eqsl_log(std::stringstream* adif);
+		//! Control the scheduling from the request std::queue.
 		
 		//! \param control One of EQ_START, EQ_PAUSE or EQ_ABANDON.
 		void enable_fetch(queue_control_t control);
@@ -141,20 +141,20 @@ typedef size_t qso_num_t;
 		//! \param record QSO record 
 		//! \param use_default use the default station callsign.
 		//! \return location to store the image in local filestore.
-		string card_filename_l(record* record, bool use_default = false);
+		std::string card_filename_l(record* record, bool use_default = false);
 		//! Does the file exist and is it a valid PNG file?
 		
 		//! \param filename local QSL card image.
 		//! \return true if it exists and is valid PNG.
-		bool card_file_valid(string& filename);
-		//! Enqueue single record - passes to upload thread.
+		bool card_file_valid(std::string& filename);
+		//! Enqueue single record - passes to upload std::thread.
 		bool upload_single_qso(qso_num_t record_num);
 
 	protected:
 		//! Timer callback: 1 second ticker
 		static void cb_ticker(void* v);
 
-		//! Remove a request from the download queue
+		//! Remove a request from the download std::queue
 		void dequeue_request();
 
 		//! Perform the eQSL card image request. 
@@ -166,13 +166,13 @@ typedef size_t qso_num_t;
 		//! \param filename returns the filename.
 		//! \param filetype returns the filetype language code/
 		//! \return response structure.
-		response_t card_filename_r(record* record, string& filename, string& filetype);
+		response_t card_filename_r(record* record, std::string& filename, std::string& filetype);
 		//! Download the card image to local file-store.
 		
 		//! \param remote_filename Filename at eQSL.cc.
 		//! \param local_filename Filename on local network.
 		//! \return response structure.
-		response_t download(string remote_filename, string local_filename);
+		response_t download(std::string remote_filename, std::string local_filename);
 		//! Get user details from internal QSL server database.
 		
 		//! \param username returns username.
@@ -182,62 +182,62 @@ typedef size_t qso_num_t;
 		//! \param swl_message returns default message for SWL QSL uploads.
 		//! \param confirmed returns whether only confirmed requests are required.
 		//! \return true if username and password are available, false if not.
-		bool user_details(string* username, string* password, string* last_access, 
-			string* qsl_message, string* swl_message, bool* confirmed);
+		bool user_details(std::string* username, std::string* password, std::string* last_access, 
+			std::string* qsl_message, std::string* swl_message, bool* confirmed);
 		//! Get the filename of the data to be downloaded from eQSL.cc.
 		
 		//! \param filename returns filename.
 		//! \return response structure.
-		response_t adif_filename(string& filename);
+		response_t adif_filename(std::string& filename);
 		//! Download the data.
 		
 		//! \param filename remote filename to fetch.
 		//! \param adif datastream to receive downloaded data.
 		//! \return response structure.
-		response_t download_adif(string& filename, stringstream* adif);
-		//! Generate list of adif fields for sending to eQSL.cc.
+		response_t download_adif(std::string& filename, std::stringstream* adif);
+		//! Generate std::list of adif fields for sending to eQSL.cc.
 		void set_adif_fields();
 		//! Generate data for POST FORM fields.
-		void form_fields(vector<url_handler::field_pair>&);
+		void form_fields(std::vector<url_handler::field_pair>&);
 		//! Parse the warning message for user readable format.
-		map<string, string> parse_warning(string text);
-		//! Callback from request thread.
+		std::map<std::string, std::string> parse_warning(std::string text);
+		//! Callback from request std::thread.
 		static void cb_upload_done(void* v);
-		//! Upload QSO record \p qso on eQSL request thread.
+		//! Upload QSO record \p qso on eQSL request std::thread.
 		bool th_upload_qso(record* qso);
-		//! Start eQSL request thread.
+		//! Start eQSL request std::thread.
 		static void thread_run(eqsl_handler* that);
 
 		//! Process \p response from eQSL.cc.
 		bool upload_done(upload_response_t* response);
 		//! Open the Help Viewer to display the response from eQSL.
-		void display_response(string response);
+		void display_response(std::string response);
 		//! Progress the image downloads
 		void progress_download();
 
 	protected:
-		//! The card inage request queue between main and request threads.
+		//! The card inage request std::queue between main and request threads.
 		queue_t request_queue_;
-		//! Request queue is allowed to empty
+		//! Request std::queue is allowed to empty
 		bool empty_queue_enable_;
 		//! Username
-		string username_;
+		std::string username_;
 		//! Password
-		string password_;
+		std::string password_;
 		//! Number of fetches remaining this session.
 		//! \todo Maximum number of eQSL card image fetches depends on eQSL.cc
 		//! membership level. This needs to be user-configurable.
 		int allowed_fetches_;
 		//! Thread to run eQSL.cc requests in.
-		thread* th_upload_;
-		//! Enable for threads - normally true and set false when closing ZZALOG.
-		atomic<bool> run_threads_;
+		std::thread* th_upload_;
+		//! Enable for threads - normally true and std::set false when closing ZZALOG.
+		std::atomic<bool> run_threads_;
 		//! Queue for uplaoding QSO records.
-		queue<record*> upload_queue_;
-		//! Semaphore to lock upload queue while enqueuing and dequeueing uploads. 
-		mutex upload_lock_;
+		std::queue<record*> upload_queue_;
+		//! Semaphore to lock upload std::queue while enqueuing and dequeueing uploads. 
+		std::mutex upload_lock_;
 		//! Upload response.
-		atomic<upload_response_t*> upload_response_;
+		std::atomic<upload_response_t*> upload_response_;
 		//! Set of field names used in QSO uploads.
 		field_list adif_fields_;
 

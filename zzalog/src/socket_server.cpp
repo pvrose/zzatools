@@ -34,7 +34,7 @@ extern status *status_;
 extern bool DEBUG_THREADS;
 
 // Constructor
-socket_server::socket_server(protocol_t protocol, string address, int port_num) : 
+socket_server::socket_server(protocol_t protocol, std::string address, int port_num) : 
 	server_(INVALID_SOCKET),
 	client_(INVALID_SOCKET),
     protocol_(protocol),
@@ -72,11 +72,11 @@ void socket_server::run_server()
 			break;
 		}
 	}
-	// Start listening for packets - will set a timer to the listen after that
+	// Start listening for packets - will std::set a timer to the listen after that
 	if (DEBUG_THREADS) {
-		printf("SOCKET MAIN: Staring thread for %s\n", protocol_ == UDP ? "UDP" : "HTTP");
+		printf("SOCKET MAIN: Staring std::thread for %s\n", protocol_ == UDP ? "UDP" : "HTTP");
 	}
-	th_socket_ = new thread(thread_run, this);
+	th_socket_ = new std::thread(thread_run, this);
 }
 
 // Destructor
@@ -199,7 +199,7 @@ int socket_server::create_server()
 		result = setsockopt(server_, SOL_SOCKET, SO_REUSEADDR, (char*)&set_option_on,
 			sizeof(set_option_on));
 		if (result < 0) {
-			handle_error("Unable to set socket reusable");
+			handle_error("Unable to std::set socket reusable");
 			return result;
 		}
 		// Apply to join the multicast group
@@ -209,14 +209,14 @@ int socket_server::create_server()
 				char loop = 1;
 				result = setsockopt(server_, IPPROTO_IP, IP_MULTICAST_LOOP, &loop, sizeof(loop));
 				if (result < 0) {
-					handle_error("Cannot set multicast loopback");
+					handle_error("Cannot std::set multicast loopback");
 					return result;
 				}
 				// Set Multicast all
 				char mall = 1;
 				result = setsockopt(server_, IPPROTO_IP, IP_MULTICAST_ALL, &mall, sizeof(mall));
 				if (result < 0) {
-					handle_error("Canmnot set multicast all");
+					handle_error("Canmnot std::set multicast all");
 					return result;
 				}
 				ip_mreq mreq = { server_addr.sin_addr, INADDR_ANY };
@@ -232,7 +232,7 @@ int socket_server::create_server()
 				break;
 			}
 			case HTTP:
-				snprintf(message, sizeof(message), "SOCKET: Cannot set multicast %s for HTTP", inet_ntoa(server_addr.sin_addr));
+				snprintf(message, sizeof(message), "SOCKET: Cannot std::set multicast %s for HTTP", inet_ntoa(server_addr.sin_addr));
 				status_->misc_status(ST_WARNING, message);
 				break;
 		}
@@ -243,7 +243,7 @@ int socket_server::create_server()
 		result = setsockopt(server_, SOL_SOCKET, SO_REUSEADDR, (char*)&set_option_on,
 			sizeof(set_option_on));
 		if (result < 0) {
-			handle_error("Unable to set socket reusable");
+			handle_error("Unable to std::set socket reusable");
 			return result;
 		}
 	}
@@ -337,7 +337,7 @@ int socket_server::rcv_packet()
 	char *buffer = new char[MAX_SOCKET];
 	int buffer_len = MAX_SOCKET;
 	int bytes_rcvd = 0;
-	// Generate a set of socket descriptors for use in select()
+	// Generate a std::set of socket descriptors for use in select()
 //#ifdef _WIN32
 //	FD_SET set_sockets;
 //#else
@@ -362,8 +362,8 @@ int socket_server::rcv_packet()
 		}
 	}
 
-	string resource = "";
-	string function = "";
+	std::string resource = "";
+	std::string function = "";
 	LEN_SOCKET_ADDR len_client_addr = sizeof(client_addr_);
 	do
 	{
@@ -379,9 +379,9 @@ int socket_server::rcv_packet()
 		}
 		if (bytes_rcvd > 0)
 		{
-			if (buffer) dump(string(buffer, bytes_rcvd));
+			if (buffer) dump(std::string(buffer, bytes_rcvd));
 			mu_packet_.lock();
-			string s = string(buffer, bytes_rcvd);
+			std::string s = std::string(buffer, bytes_rcvd);
 			q_packet_.push(s);
 			mu_packet_.unlock();
 			Fl::awake(cb_th_packet, this);
@@ -408,11 +408,11 @@ int socket_server::rcv_packet()
 		else
 		{
 			// Try again after checking for any fltk events
-			this_thread::sleep_for(chrono::milliseconds(1000));
+			this_thread::sleep_for(std::chrono::milliseconds(1000));
 		}
 #endif
 	} while (!closing_);
-	// Now see if we have another - the timer goes on the scheduling queue so other tasks will get in
+	// Now see if we have another - the timer goes on the scheduling std::queue so other tasks will get in
 	closed_ = true;
 	this_thread::yield();
 	if (buffer) delete[] buffer;
@@ -420,19 +420,19 @@ int socket_server::rcv_packet()
 }
 
 // Send a response back
-int socket_server::send_response(istream &response)
+int socket_server::send_response(std::istream &response)
 {
 	// calculate the data size
-	streampos startpos = response.tellg();
-	response.seekg(0, ios::end);
-	streampos endpos = response.tellg();
+	std::streampos startpos = response.tellg();
+	response.seekg(0, std::ios::end);
+	std::streampos endpos = response.tellg();
 	int resp_size = (int)endpos - (int)startpos;
-	response.seekg(0, ios::beg);
+	response.seekg(0, std::ios::beg);
 	//
 	char *buffer = new char[resp_size + 1];
 	memset(buffer, '\0', resp_size + 1);
 	response.read(buffer, resp_size);
-	dump(string(buffer));
+	dump(std::string(buffer));
 
 	// Send the response packet
 	int result;
@@ -483,15 +483,15 @@ void socket_server::handle_error(const char *phase)
 }
 
 // Set handlers
-void socket_server::callback(int (*request)(stringstream &))
+void socket_server::callback(int (*request)(std::stringstream &))
 {
 	do_request = request;
 }
 
 // Diagnostic print
-void socket_server::dump(string data)
+void socket_server::dump(std::string data)
 {
-	string escaped = "";
+	std::string escaped = "";
 	bool newline = false;
 	// For every data byte
 	for (auto it = data.begin(); it != data.end(); it++)
@@ -532,21 +532,21 @@ void socket_server::dump(string data)
 	// printf("%s\n", escaped.c_str());
 }
 
-// main thread side handle packet
+// main std::thread side handle packet
 void socket_server::cb_th_packet(void *v)
 {
 	socket_server *that = (socket_server *)v;
-	// Lock queue while empty it
+	// Lock std::queue while empty it
 	that->mu_packet_.lock();
 	while (!that->q_packet_.empty())
 	{
-		string s = that->q_packet_.front();
-		stringstream ss;
+		std::string s = that->q_packet_.front();
+		std::stringstream ss;
 		ss.clear();
 		ss << s;
 		that->q_packet_.pop();
 		that->mu_packet_.unlock();
-		// Process packet having unlocked queue to allow another packet in
+		// Process packet having unlocked std::queue to allow another packet in
 		that->do_request(ss);
 		that->mu_packet_.lock();
 	}

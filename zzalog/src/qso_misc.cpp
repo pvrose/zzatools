@@ -8,8 +8,8 @@
 
 #include <FL/Fl_Preferences.H>
 
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
 
 // Constructor
@@ -97,7 +97,7 @@ void qso_misc::save_values() {
 	}
 }
 
-// set the QSO details into the various forms
+// std::set the QSO details into the various forms
 void qso_misc::qso(record* qso, qso_num_t number) {
 	qso_ = qso;
 	details_->set_qso(qso_);

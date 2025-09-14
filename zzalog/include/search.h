@@ -6,7 +6,7 @@
 
 #include <string>
 
-using namespace std;
+
 
 
 
@@ -47,17 +47,17 @@ using namespace std;
 		search_cond_t condition;        //!< Match condition
 		search_comp_t comparator;       //!< How to compare data
 		bool by_dates;                  //!< match records between two dates inclusively
-		string from_date;               //!< Start date 
-		string to_date;                 //!< End date
-		string band;                    //!< match only records on this band (can be ANY)
-		string mode;                    //!< match only records with this mode (can be ANY)
+		std::string from_date;               //!< Start date 
+		std::string to_date;                 //!< End date
+		std::string band;                    //!< match only records on this band (can be ANY)
+		std::string mode;                    //!< match only records with this mode (can be ANY)
 		bool confirmed_eqsl;            //!< match only records confirmed by eQSL
 		bool confirmed_lotw;            //!< match only records confirmed by LotW
 		bool confirmed_card;            //!< match only records confirmed by card
 		search_combi_t combi_mode;      //!< Combination mode
-		string field_name;              //!< Field name for criterion = FIELD
-		string pattern;                 //!< Matching pattern
-		string my_call;                 //!< match only records with this value of station callsign
+		std::string field_name;              //!< Field name for criterion = FIELD
+		std::string pattern;                 //!< Matching pattern
+		std::string my_call;                 //!< match only records with this value of station callsign
 
 		//! Default Constuctor
 		search_criteria_t() :
@@ -76,7 +76,7 @@ using namespace std;
 			pattern(""),
 			my_call("Any") {};
 		//! Value constructor.
-		search_criteria_t(search_cond_t a, search_comp_t b, bool c, string d, string e, string f, string g, bool h, bool i, bool j, search_combi_t k, string m, string n, string o) :
+		search_criteria_t(search_cond_t a, search_comp_t b, bool c, std::string d, std::string e, std::string f, std::string g, bool h, bool i, bool j, search_combi_t k, std::string m, std::string n, std::string o) :
 			condition(a),
 			comparator(b),
 			by_dates(c),

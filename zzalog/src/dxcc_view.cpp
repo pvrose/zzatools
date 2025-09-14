@@ -7,8 +7,8 @@
 #include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_Preferences.H>
 
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
 extern void open_html(const char*);
 

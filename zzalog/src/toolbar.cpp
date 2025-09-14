@@ -264,7 +264,7 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	bn = new Fl_Button(curr_x, Y, H, H, "\303\206");
 	bn->callback(cb_bn_intl, nullptr);
 	bn->when(FL_WHEN_RELEASE);
-	bn->tooltip("Hide/Show International character set");
+	bn->tooltip("Hide/Show International character std::set");
 	add(bn);
 	curr_x += H;
 	// Help->User Guide
@@ -281,7 +281,7 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	search_text_ = "";
 	record_num_ = -1;
 	intl_input* ip = new intl_input(curr_x, Y, WSMEDIT, H, 0);
-	ip->callback(cb_value<intl_input, string>, &search_text_);
+	ip->callback(cb_value<intl_input, std::string>, &search_text_);
 	ip->when(FL_WHEN_CHANGED);
 	ip->value(search_text_.c_str());
 	ip->tooltip("Enter will search for the callsign typed");
@@ -404,7 +404,7 @@ void toolbar::cb_bn_search(Fl_Widget* w, void* v) {
 	}
 	bool found = false;
 	bool keep_on = true;
-	string search_call = to_upper(that->search_text_);
+	std::string search_call = to_upper(that->search_text_);
 	while (keep_on) {
 		// For each record from the last search result until found
 		for (item_num_t i = that->record_num_; i < navigation_book_->size() && !found; i++) {
@@ -455,7 +455,7 @@ void toolbar::cb_bn_search(Fl_Widget* w, void* v) {
 // v is not used
 void toolbar::cb_bn_extract(Fl_Widget* w, void* v) {
 	toolbar* that = ancestor_view<toolbar>(w);
-	cb_value<intl_input, string>((Fl_Widget*)that->ip_search_, (void*)& that->search_text_);
+	cb_value<intl_input, std::string>((Fl_Widget*)that->ip_search_, (void*)& that->search_text_);
 	extract_records_->extract_call(that->search_text_);
 }
 
@@ -465,7 +465,7 @@ void toolbar::cb_bn_explain(Fl_Widget* w, void* v) {
 	toolbar* that = ancestor_view<toolbar>(w);
 	// Create a temporary record to parse theh callsign
 	record* tip_record = qso_manager_->dummy_qso();
-	string message = "";
+	std::string message = "";
 	// Set the callsign in the temporary record
 	tip_record->item("CALL", to_upper(that->search_text_));
 	// Parse the temporary record
@@ -511,7 +511,7 @@ void toolbar::search_text(int record_num) {
 }
 
 // Set the search text to a specific callsign
-void toolbar::search_text(string callsign) {
+void toolbar::search_text(std::string callsign) {
 	search_text_ = callsign;
 	((intl_input*)ip_search_)->value(search_text_.c_str());
 	redraw();
@@ -523,7 +523,7 @@ void toolbar::update_items() {
 	// For all widgets
 	for (int i = 0; i < num_children; i++) {
 		Fl_Widget* w = child(i);
-		// If it has the menu item callback, then set the widget active as the menu item is
+		// If it has the menu item callback, then std::set the widget active as the menu item is
 		if (w->callback() == &cb_bn_menu) {
 			const Fl_Menu_Item* item = menu_->find_item((char*)w->user_data());
 			if (item == nullptr) {

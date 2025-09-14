@@ -25,13 +25,13 @@
 #include <FL/Fl_Output.H>
 #include <Fl/Fl_Check_Button.H>
 
-using namespace std;
+
 
 extern qso_manager* qso_manager_;
 extern qsl_dataset* qsl_dataset_;
 extern status* status_;
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
 extern void open_html(const char*);
 
@@ -216,7 +216,7 @@ void qsl_editor::create_form(int X, int Y) {
     g_202->box(FL_FLAT_BOX);
 
     curr_x += WLABEL;
-    // Input to set number of columns to print
+    // Input to std::set number of columns to print
 	Fl_Value_Input* w_20201 = new Fl_Value_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Columns");
 	w_20201->value(data_->columns);
 	w_20201->align(FL_ALIGN_LEFT);
@@ -465,7 +465,7 @@ void qsl_editor::create_items() {
 	int available_h = g_4_->y() + g_4_->h() - curr_y - GAP;
 	curr_x = g_4_->x() + GAP;
 
-	// Fl_Scroll encapsulates a set of Group 4.1.x
+	// Fl_Scroll encapsulates a std::set of Group 4.1.x
 	Fl_Scroll* gg_401 = new Fl_Scroll(curr_x, curr_y, 100, available_h);
 	gg_401->type(Fl_Scroll::VERTICAL);
 	
@@ -660,7 +660,7 @@ void qsl_editor::create_fparams(int& curr_x, int& curr_y, qsl_data::field_def* f
 	f_box->when(FL_WHEN_RELEASE);
 
 	curr_x += f_box->w();
-	// Button to select whether the label and box are displayed if the value is an empty string
+	// Button to select whether the label and box are displayed if the value is an empty std::string
 	Fl_Check_Button* f_ignore = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON);
 	f_ignore->tooltip("Select if the item is to be displayed if null value");
 	f_ignore->callback(cb_ip_bool, (void*)&field->display_empty);
@@ -914,7 +914,7 @@ void qsl_editor::cb_size_double(Fl_Widget* w, void* v) {
 // String input
 void qsl_editor::cb_ip_string(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
-    cb_value<intl_input, string>(w, v);
+    cb_value<intl_input, std::string>(w, v);
     that->redraw_display(true);  
 	// that->create_items();
 }
@@ -939,7 +939,7 @@ void qsl_editor::cb_ip_bool(Fl_Widget* w, void* v) {
 // Callsign 
 void qsl_editor::cb_callsign(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
-    cb_value<field_input, string>(w, v);
+    cb_value<field_input, std::string>(w, v);
 	that->data_ = qsl_dataset_->get_card(that->callsign_, that->qsl_type_, true);
 	that->qsl_->set_card(that->data_);
 	that->update_dimensions();
@@ -954,7 +954,7 @@ void qsl_editor::cb_ch_field(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
 	field_choice* ch = (field_choice*)w;
 	const char* field = ch->value();
-	string* item_field = (string*)v;
+	std::string* item_field = (std::string*)v;
 	*item_field = field;
 	that->redraw_display(true);
 }
@@ -985,7 +985,7 @@ void qsl_editor::cb_new_item(Fl_Widget* w, void* v) {
 void qsl_editor::cb_image(Fl_Widget* w, void* v) {
 	qsl_data::image_def& image = *(qsl_data::image_def*)v;
 	qsl_editor* that = ancestor_view<qsl_editor>(w);
-	cb_value<Fl_Input, string>(w, &image.filename);
+	cb_value<Fl_Input, std::string>(w, &image.filename);
 
 	if (!that->relative_filename(image.filename)) {
 		char msg[256];
@@ -1115,12 +1115,12 @@ void qsl_editor::update() {
 }
 
 // Remove the full path name - leave what's left after the QSL Data path name
-bool qsl_editor::relative_filename(string& filename) {
-	string path = qsl_dataset_->get_path();
+bool qsl_editor::relative_filename(std::string& filename) {
+	std::string path = qsl_dataset_->get_path();
 	// Make both names portable
 	forward_slash(path);
 	forward_slash(filename);
-	string result;
+	std::string result;
 	char msg[256];
 	// First check it's directly under the path
 	if (filename.substr(0, path.length()) == path) {
@@ -1135,7 +1135,7 @@ bool qsl_editor::relative_filename(string& filename) {
 	// else - not directly in path
 	bool found = false;
 	size_t len;
-	string save_path = path;
+	std::string save_path = path;
 	// Remove any trainling searator from path
 	if (path.back() == '/' || path.back() == '\\') {
 		path = path.substr(0, path.length() - 1);
@@ -1156,7 +1156,7 @@ bool qsl_editor::relative_filename(string& filename) {
 	result = filename.substr(len);
 	// Scan the remainder of path for the number of separator and prepend "../" for each one
 	size_t pos = len;
-	while (pos != string::npos) {
+	while (pos != std::string::npos) {
 		pos = path.find_first_of("/\\", pos);
 		result = "../" + result;
 	}

@@ -13,14 +13,14 @@
 #include <FL/Fl_Output.H>
 
 extern cty_data* cty_data_;
-extern string default_data_directory_;
+extern std::string default_data_directory_;
 extern void open_html(const char*);
 
 // Check age button clicked
-map< cty_data::cty_type_t, chrono::hours > OLD_AGE = {
-	{ cty_data::CLUBLOG, chrono::hours(7 * 24) },
-	{ cty_data::COUNTRY_FILES, chrono::hours(7 * 24) },
-	{ cty_data::DXATLAS, chrono::hours(365 * 24) } };
+std::map< cty_data::cty_type_t, std::chrono::hours > OLD_AGE = {
+	{ cty_data::CLUBLOG, std::chrono::hours(7 * 24) },
+	{ cty_data::COUNTRY_FILES, std::chrono::hours(7 * 24) },
+	{ cty_data::DXATLAS, std::chrono::hours(365 * 24) } };
 
 
 cty_dialog::cty_dialog(int W, int H, const char* L) :
@@ -151,12 +151,12 @@ void cty_dialog::create_form() {
 }
 
 void cty_dialog::update_widgets() {
-	chrono::system_clock::time_point now = chrono::system_clock::now();
+	std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
 	
 	// Update the timestamp and version
 	for (auto it : OLD_AGE) {
-		chrono::system_clock::time_point t = cty_data_->timestamp(it.first);
-		time_t tt = chrono::system_clock::to_time_t(t);
+		std::chrono::system_clock::time_point t = cty_data_->timestamp(it.first);
+		time_t tt = std::chrono::system_clock::to_time_t(t);
 		tm* ttm = gmtime(&tt);
 		char ts[64];
 		strftime(ts, sizeof(ts), "%Y-%m-%d", ttm);

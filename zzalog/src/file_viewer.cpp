@@ -99,7 +99,7 @@ void file_viewer::cb_modified(int pos, int inserted, int deleted, int restyled, 
 }
 
 // Set text
-void file_viewer::load_file(string name) {
+void file_viewer::load_file(std::string name) {
 	if (is_dirty()) {
 		switch(fl_choice("Existing file has been modified - Save or cancel?", "Save", "Cancel", nullptr)) {
 			case 0: {
@@ -129,7 +129,7 @@ void file_viewer::load_file(string name) {
 	show();
 }
 
-string file_viewer::file() {
+std::string file_viewer::file() {
 	return filename_;
 }
 

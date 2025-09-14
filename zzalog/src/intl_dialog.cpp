@@ -12,23 +12,23 @@
 
 extern status* status_;
 extern menu* menu_;
-extern string CONTACT;
-extern string COPYRIGHT;
-extern string VENDOR;
-extern string PROGRAM_ID;
-extern string default_data_directory_;
+extern std::string CONTACT;
+extern std::string COPYRIGHT;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
+extern std::string default_data_directory_;
 extern void open_html(const char*);
 
 // Majo
-string DEFAULT_INTL = "";
+std::string DEFAULT_INTL = "";
 
 // Constructs a window 
 intl_dialog::intl_dialog() :
-	win_dialog(640, 480, "International character set")
+	win_dialog(640, 480, "International character std::set")
 {
 	editor_ = nullptr;
 	// Get the file name
-	string directory = get_path();
+	std::string directory = get_path();
 	filename_ = directory + "intl_chars.txt";
 	// Load the data
 	if (load_data()) {
@@ -54,16 +54,16 @@ void intl_dialog::create_form() {
 	// Button - restore the displayed characters from the file
 	Fl_Button* bn_restore = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Restore");
 	bn_restore->callback(cb_bn_restore);
-	bn_restore->tooltip("Reload the saved character set");
+	bn_restore->tooltip("Reload the saved character std::set");
 	curr_x += bn_restore->w();
 	// Button - add the characters in the adjacent input widget to the displayed characters
 	Fl_Button* bn_add = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Add");
 	bn_add->callback(cb_bn_add);
-	bn_add->tooltip("Add the characters in the adjacent display to the displayed set");
+	bn_add->tooltip("Add the characters in the adjacent display to the displayed std::set");
 	curr_x += bn_add->w();
 	// Input - allows additional characters to be defined.
 	Fl_Input* ip_new = new Fl_Input(curr_x, curr_y, WSMEDIT, HBUTTON);
-	ip_new->callback(cb_value<Fl_Input, string>, (void*)&new_char_);
+	ip_new->callback(cb_value<Fl_Input, std::string>, (void*)&new_char_);
 	ip_new->tooltip("Paste in desired additional characters");
 	// Get the size of the button array
 	int width = curr_x + ip_new->w() - EDGE;
@@ -100,7 +100,7 @@ void intl_dialog::add_buttons(int width) {
 	// For each row and column
 	for (int R = 0; R < num_rows; R++) {
 		for (int C = 0; C < num_cols && ucs != symbols_.end(); C++) {
-			// Get the next character from the list 
+			// Get the next character from the std::list 
 			len = fl_utf8encode(*ucs, utf8);
 			utf8[len] = 0;
 			// Button - copy and paste the label on the button to the current editor
@@ -124,7 +124,7 @@ void intl_dialog::add_buttons(int width) {
 	buttons_->size(width, height);
 	// Adjust the size of  the window to fit
 	Fl_Box* b_cr = new Fl_Box(x(), buttons_->y() + buttons_->h(), width + EDGE, FOOT_HEIGHT * 2);
-	b_cr->copy_label(string(COPYRIGHT + "     \n" + CONTACT + "     ").c_str());
+	b_cr->copy_label(std::string(COPYRIGHT + "     \n" + CONTACT + "     ").c_str());
 	b_cr->labelsize(FL_NORMAL_SIZE - 1);
 	b_cr->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 
@@ -190,7 +190,7 @@ void intl_dialog::cb_bn_restore(Fl_Widget* w, void* v) {
 // Callback - Add characters to the displayed buttons
 void intl_dialog::cb_bn_add(Fl_Widget* w, void* v) {
 	intl_dialog* that = ancestor_view<intl_dialog>(w);
-	// Get the string from the input
+	// Get the std::string from the input
 	that->add_symbols(that->new_char_);
 	that->add_buttons(that->buttons_->w());
 }
@@ -211,7 +211,7 @@ void intl_dialog::cb_bn_use(Fl_Widget* w, void* v) {
 }
 
 // Get the data path to the files - returns directory name
-string intl_dialog::get_path() {
+std::string intl_dialog::get_path() {
 	return default_data_directory_;
 }
 
@@ -225,15 +225,15 @@ Fl_Widget* intl_dialog::editor() {
 	return editor_;
 }
 
-// Add the characters in the input text to the list of characters displayed
-void intl_dialog::add_symbols(string text) {
-	// Create a copy of the input text and set a pointer to the end
+// Add the characters in the input text to the std::list of characters displayed
+void intl_dialog::add_symbols(std::string text) {
+	// Create a copy of the input text and std::set a pointer to the end
 	char* utf8 = new char[text.length() + 1];
 	char* end = utf8 + text.length();
 	unsigned int ucs;
 	int len;
 	strcpy(utf8, text.c_str());
-	// now scan the string for new symbols
+	// now scan the std::string for new symbols
 	while (utf8 < end) {
 		if (*utf8 & 0x80) {
 			// non-ASCII character - get it and how many bytes it is, 
@@ -251,7 +251,7 @@ void intl_dialog::add_symbols(string text) {
 bool intl_dialog::load_data() {
 	symbols_.clear();
 	ifstream is(filename_.c_str());
-	string line;
+	std::string line;
 	if (!is.good()) {
 		add_symbols(DEFAULT_INTL);
 		return true;
@@ -274,7 +274,7 @@ bool intl_dialog::load_data() {
 
 // Store the current character data
 bool intl_dialog::save_data() {
-	ofstream os(filename_.c_str());
+	std::ofstream os(filename_.c_str());
 	int col = 0;
 	for (auto it = symbols_.begin(); it != symbols_.end() && os.good(); it++) {
 		// Convert the UCS code to the appropriate UTF-8 bytes

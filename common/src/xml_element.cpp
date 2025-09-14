@@ -7,7 +7,7 @@ xml_element::xml_element() :
 }
 
 // Creates a complete element (apart from children)
-xml_element::xml_element(xml_element* parent, const string& name, const string& content, map<string, string>* attributes, xml_element::element_t type) {
+xml_element::xml_element(xml_element* parent, const std::string& name, const std::string& content, std::map<std::string, std::string>* attributes, xml_element::element_t type) {
 	type_ = type;
 	parent_ = parent;
 	name_ = name;
@@ -52,10 +52,10 @@ xml_element* xml_element::parent() {
 }
 
 // Sets an attribute name=value
-bool xml_element::attribute(string& name, string& value) {
+bool xml_element::attribute(std::string& name, std::string& value) {
 	// Create attributes if they don't exist
 	if (attributes_ == nullptr) {
-		attributes_ = new map<string, string>;
+		attributes_ = new std::map<std::string, std::string>;
 	}
 	if (attributes_->find(name) != attributes_->end()) {
 		// Not allowed two attributes of the same name
@@ -69,23 +69,23 @@ bool xml_element::attribute(string& name, string& value) {
 }
 
 // Set the content
-bool xml_element::content(string& content) {
+bool xml_element::content(std::string& content) {
 	content_ += content;
 	return true;
 }
 
 // Return the name
-string xml_element::name() {
+std::string xml_element::name() {
 	return name_;
 }
 
 // Return a pointer to the attributes
-map<string, string>* xml_element::attributes() {
+std::map<std::string, std::string>* xml_element::attributes() {
 	return attributes_;
 }
 
 // Return the content
-string xml_element::content() {
+std::string xml_element::content() {
 	return content_;
 }
 

@@ -5,7 +5,7 @@
 #include "status.h"
 
 extern status* status_;
-extern string PROGRAM_VERSION;
+extern std::string PROGRAM_VERSION;
 extern uint32_t seed_;
 
 qsl_writer::qsl_writer() {
@@ -19,8 +19,8 @@ qsl_writer::~qsl_writer() {
 }
 
 bool qsl_writer::store_data(
-    map<qsl_data::qsl_type, map<string, qsl_data*>* >* all_data, 
-    map<string, server_data_t*>* servers, ostream& os) {
+    std::map<qsl_data::qsl_type, std::map<std::string, qsl_data*>* >* all_data, 
+    std::map<std::string, server_data_t*>* servers, std::ostream& os) {
     data_ = all_data;
     servers_ = servers;
     status_->misc_status(ST_NOTE, "QSL: Starting XML generation");
@@ -43,9 +43,9 @@ bool qsl_writer::store_data(
 }
 
 bool qsl_writer::write_element(qsl_element_t element) {
-    string name;
-    string data;
-    map<string, string>* attributes;
+    std::string name;
+    std::string data;
+    std::map<std::string, std::string>* attributes;
     char text[32];
     switch(element) {
         case QSL_NONE:
@@ -58,7 +58,7 @@ bool qsl_writer::write_element(qsl_element_t element) {
         return true;
     case QSL_QSL_DATA:
         name = "qsl_data";
-        attributes = new map<string, string>;
+        attributes = new std::map<std::string, std::string>;
         (*attributes)["version"] = PROGRAM_VERSION;
         if (!start_element(name, attributes)) return false;
         if (!write_element(QSL_QSLS)) return false;
@@ -84,7 +84,7 @@ bool qsl_writer::write_element(qsl_element_t element) {
         return true;
     case QSL_QSL:
         name = "qsl";
-        attributes = new map<string, string>;
+        attributes = new std::map<std::string, std::string>;
         (*attributes)["call"] = callsign_;
         switch(type_) {
         case qsl_data::LABEL:
@@ -106,7 +106,7 @@ bool qsl_writer::write_element(qsl_element_t element) {
         return true;
     case QSL_SIZE:
         name = "size";
-        attributes = new map<string, string>;
+        attributes = new std::map<std::string, std::string>;
         switch(current_->unit) {
         case qsl_data::INCH:
             (*attributes)["unit"] = "inch";
@@ -129,7 +129,7 @@ bool qsl_writer::write_element(qsl_element_t element) {
         return true;
     case QSL_ARRAY:
         name = "array";
-        attributes = new map<string, string>;
+        attributes = new std::map<std::string, std::string>;
         snprintf(text, sizeof(text), "%d", current_->rows);
         (*attributes)["rows"] = text;
         snprintf(text, sizeof(text), "%d", current_->columns);
@@ -147,7 +147,7 @@ bool qsl_writer::write_element(qsl_element_t element) {
         return true;   
     case QSL_FORMATS:
         name = "formats";
-        attributes = new map<string, string>;
+        attributes = new std::map<std::string, std::string>;
         switch(current_->f_date) {
             case qsl_data::FMT_Y4MD_ADIF:
                 (*attributes)["date"] = now(false, "%Y%m%d");
@@ -215,7 +215,7 @@ bool qsl_writer::write_element(qsl_element_t element) {
         return true;
     case QSL_POSITION:
         name = "position";
-        attributes = new map<string, string>;
+        attributes = new std::map<std::string, std::string>;
         switch(item_->type) {
         case qsl_data::TEXT:
             snprintf(text, sizeof(text), "%d", item_->text.dx);
@@ -243,7 +243,7 @@ bool qsl_writer::write_element(qsl_element_t element) {
         return true;
     case QSL_DATA:
         name = "data";
-        attributes = new map<string, string>;
+        attributes = new std::map<std::string, std::string>;
         switch(item_->type) {
         case qsl_data::TEXT:
             (*attributes)["font"] = font2text(item_->text.t_style.font);
@@ -270,7 +270,7 @@ bool qsl_writer::write_element(qsl_element_t element) {
         return true;
     case QSL_LABEL:
         name = "label";
-        attributes = new map<string, string>;
+        attributes = new std::map<std::string, std::string>;
         switch(item_->type) {
         case qsl_data::FIELD:
             (*attributes)["font"] = font2text(item_->field.l_style.font);
@@ -288,7 +288,7 @@ bool qsl_writer::write_element(qsl_element_t element) {
         return true;
     case QSL_OPTIONS:
         name = "options";
-        attributes = new map<string, string>;
+        attributes = new std::map<std::string, std::string>;
         switch(item_->type) {
         case qsl_data::FIELD:
             (*attributes)["vertical"] = item_->field.vertical ? "yes" : "no";            
@@ -332,7 +332,7 @@ bool qsl_writer::write_element(qsl_element_t element) {
         return true;
     case QSL_SERVERS:
         name = "servers";
-        attributes = new map<string, string>;
+        attributes = new std::map<std::string, std::string>;
         snprintf(text, sizeof(text), "%d", seed_);
         (*attributes)["seed"] = text;
         if (!start_element(name, attributes)) return false;
@@ -346,7 +346,7 @@ bool qsl_writer::write_element(qsl_element_t element) {
         return true;
     case QSL_SERVER:
         name = "server";
-        attributes = new map<string, string>;
+        attributes = new std::map<std::string, std::string>;
         (*attributes)["name"] = server_name_;
         if (!start_element(name, attributes)) return false;
         if (!write_value("User", server_->user)) return false;
@@ -386,7 +386,7 @@ bool qsl_writer::write_element(qsl_element_t element) {
         return true;
     case QSL_LOGBOOK:
         name = "logbook";
-        attributes = new map<string, string>;
+        attributes = new std::map<std::string, std::string>;
         (*attributes)["call"] = logbook_name_;
         if (!start_element(name, attributes)) return false;
         if (!write_value("In Use", api_data_->used)) return false;
@@ -400,8 +400,8 @@ bool qsl_writer::write_element(qsl_element_t element) {
     return false;
 }
 
-string qsl_writer::font2text(Fl_Font f) {
-    string s;
+std::string qsl_writer::font2text(Fl_Font f) {
+    std::string s;
     // Get the base font
     Fl_Font base = (int)f & -4;
     switch(base) {
@@ -426,9 +426,9 @@ string qsl_writer::font2text(Fl_Font f) {
     return s;
 }
 
-bool qsl_writer::write_value(string name, string data) {
+bool qsl_writer::write_value(std::string name, std::string data) {
     if (data.length()) {
-        map<string, string>* attributes = new map<string, string>;
+        std::map<std::string, std::string>* attributes = new std::map<std::string, std::string>;
         (*attributes)["name"] = name;
         if (!start_element("value", attributes)) return false;
         if (!characters(data)) return false;
@@ -437,25 +437,25 @@ bool qsl_writer::write_value(string name, string data) {
     return true;
 }
 
-bool qsl_writer::write_value(string name, int data) {
+bool qsl_writer::write_value(std::string name, int data) {
     return write_value(name, to_string(data));
 }
 
-bool qsl_writer::write_value(string name, double data) {
+bool qsl_writer::write_value(std::string name, double data) {
     char text[32];
     snprintf(text, sizeof(text), "%g", data);
-    return write_value(name, string(text));
+    return write_value(name, std::string(text));
 }
 
-bool qsl_writer::write_value(string name, bool data) {
+bool qsl_writer::write_value(std::string name, bool data) {
     if (data) {
-        return write_value(name, string("yes"));
+        return write_value(name, std::string("yes"));
     } else {
-        return write_value(name, string("no"));
+        return write_value(name, std::string("no"));
     }
 }
 
 // Encrypt data and convert to hex digits
-string qsl_writer::encrypt(string s, uchar off) {
+std::string qsl_writer::encrypt(std::string s, uchar off) {
     return string_to_hex(xor_crypt(s, seed_, off));
 }

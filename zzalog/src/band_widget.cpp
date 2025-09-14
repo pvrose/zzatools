@@ -13,7 +13,7 @@
 
 #include <FL/fl_draw.H>
 
-using namespace std;
+
 
 extern spec_data* spec_data_;
 extern band_data* band_data_;
@@ -21,7 +21,7 @@ extern status* status_;
 extern bool DARK;
 
 // Mode-bar colours
-const map<string, Fl_Color> MODE_COLOURS = {
+const std::map<std::string, Fl_Color> MODE_COLOURS = {
 	{ "CW", FL_GREEN },
 	{ "Dig", FL_YELLOW },
 	{ "Phone", FL_BLUE },
@@ -134,10 +134,10 @@ void band_widget::value(double tx, double rx) {
 }
 
 void band_widget::set_range(bool restore_default) {
-	string prev_band = band_;
+	std::string prev_band = band_;
 	band_ = spec_data_->band_for_freq(value_tx_);
 	if (band_.length()) {
-		set<range_t> ranges = band_data_->bands().at(band_);
+		std::set<range_t> ranges = band_data_->bands().at(band_);
 		band_limits_ = { DBL_MAX, 0.0 };
 		for (auto it = ranges.begin(); it != ranges.end(); it++) {
 			band_limits_.lower = min(band_limits_.lower, (*it).lower);
@@ -354,10 +354,10 @@ void band_widget::draw_legend() {
 
 // Draw a background for the visible bands
 void band_widget::draw_bands() {
-	band_map<set<range_t> >& bands = band_data_->bands();
+	band_map<std::set<range_t> >& bands = band_data_->bands();
 	int prev_y = y() + h();
 	Fl_Color band_colour = fl_color_average(FL_BACKGROUND_COLOR, FL_BACKGROUND2_COLOR, 0.50F);
-	map<int, string> band_labels;
+	std::map<int, std::string> band_labels;
 	for (auto it0 = bands.begin(); it0 != bands.end(); it0++) {
 		for (auto it = it0->second.begin(); it != (*it0).second.end(); it++) {
 			int yl;
@@ -826,7 +826,7 @@ double band_widget::frequency(int x, int y) {
 		result = scale_pos * (scale_range_.upper - scale_range_.lower) + scale_range_.lower;
 	}
 	else if (x > x_kink2_) {
-		// Scan the list of markers
+		// Scan the std::list of markers
 		for (auto &it : markers_) {
 			if (y >= it.y_text && y < it.y_text + FL_NORMAL_SIZE) {
 				result = it.f;

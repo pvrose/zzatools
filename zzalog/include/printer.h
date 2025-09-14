@@ -9,7 +9,7 @@
 
 #include <FL/Fl_Printer.H>
 
-using namespace std;
+
 
 class record;
 class qsl_data;
@@ -68,7 +68,7 @@ class qsl_data;
 		//! List of fields to be printed for each QSO record.
 		collection_t fields_;
 		//! Page title when printing log.
-		string page_title_;
+		std::string page_title_;
 		//! Object being printed
 		object_t type_;
 		// Dimensions of QSL card window

@@ -10,7 +10,7 @@
 
 #include <FL/Fl_Double_Window.H>
 
-using namespace std;
+
 
 // Forward declarations
 class qso_apps;
@@ -95,7 +95,7 @@ enum hint_t : uchar;
 		//! \param query_num Index of QSO record being query.
 		void update_qso(hint_t hint, qso_num_t match_num, qso_num_t query_num);
 		//! Returns a new QSO record for a modem \p source QSO with \p call.
-		record* start_modem_qso(string call, uchar source);
+		record* start_modem_qso(std::string call, uchar source);
 		//! Update the modem QSO record: Save it to the log if \p log_it is true.
 		void update_modem_qso(bool log_it);
 		//! Enter the QSO record \p qso into the log.
@@ -113,9 +113,9 @@ enum hint_t : uchar;
 		//! Edit the selected QSO record.
 		void edit_qso();
 		//! Returns the default value for \p item.
-		string get_default(stn_item_t item);
+		std::string get_default(stn_item_t item);
 		//! Change rig to \p rig_name. 
-		void change_rig(string rig_name);
+		void change_rig(std::string rig_name);
 		//! Returns the rig_if structure for the currently attached rig.
 		rig_if* rig();
 		//! Returns the rig control widget qso_rig.
@@ -133,7 +133,7 @@ enum hint_t : uchar;
 		void deactivate_all();
 
 		// Shared QSL methods
-		//! Download list of QSLs from \p server.
+		//! Download std::list of QSLs from \p server.
 		void qsl_download(uchar server);
 		//! Extract data for uploading to \p server.
 		void qsl_extract(uchar server);
@@ -155,7 +155,7 @@ enum hint_t : uchar;
 	protected:
 
 		//!  List of bands in frequency order
-		list<string> ordered_bands_;
+		std::list<std::string> ordered_bands_;
 		//! Flag indicates that ZZALOG is being closed because this window is being closed.
 		bool close_by_dash_;
 

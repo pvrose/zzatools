@@ -6,7 +6,7 @@
 #include <string>
 #include <list>
 
-using namespace std;
+
 
 struct rig_data_t;
 struct cat_data_t;
@@ -47,17 +47,17 @@ public:
     ~rig_reader();
 
     //! Load \p data from input stream \p in.
-    bool load_data(map<string, rig_data_t*>* data, istream& in);
+    bool load_data(std::map<std::string, rig_data_t*>* data, std::istream& in);
 
 protected:
     //! Start "rigs version=....."
-    static bool start_rigs(xml_wreader* that, map<string, string>* attributes);
+    static bool start_rigs(xml_wreader* that, std::map<std::string, std::string>* attributes);
     //! Start "rig name="
-    static bool start_rig(xml_wreader* that, map<string, string>* attributes);
+    static bool start_rig(xml_wreader* that, std::map<std::string, std::string>* attributes);
     //! Start "value name="
-    static bool start_value(xml_wreader* that, map<string, string>* attributes);
+    static bool start_value(xml_wreader* that, std::map<std::string, std::string>* attributes);
     //! Start "app name=..."
-    static bool start_app(xml_wreader* that, map<string, string>* attributes);
+    static bool start_app(xml_wreader* that, std::map<std::string, std::string>* attributes);
     //! End RIGS
     static bool end_rigs(xml_wreader* that);
     //! End RIG
@@ -67,21 +67,21 @@ protected:
     //! End VALUE
     static bool end_value(xml_wreader* that);
     //! Characters VALUE
-    static bool chars_value(xml_wreader* that, string content);
+    static bool chars_value(xml_wreader* that, std::string content);
     //! Check ZZALOG version against \p v
-    bool check_version(string v);
+    bool check_version(std::string v);
 
  
-    //! Name to element map
-    const map<string, char> element_map_ = {
+    //! Name to element std::map
+    const std::map<std::string, char> element_map_ = {
         { "RIGS", RIG_RIGS },
         { "RIG", RIG_RIG },
         { "VALUE", RIG_VALUE },
         { "APP", RIG_APP }
     };
 
-    //! Element to start method map
-    const map<char, methods> method_map_ = {
+    //! Element to start method std::map
+    const std::map<char, methods> method_map_ = {
         { RIG_RIGS, { start_rigs, end_rigs, nullptr }},
         { RIG_RIG, { start_rig, end_rig, nullptr }},
         { RIG_VALUE, { start_value, end_value, chars_value }},
@@ -89,21 +89,21 @@ protected:
     };
 
     //! The data being loaded
-    map<string, rig_data_t*>* data_;
+    std::map<std::string, rig_data_t*>* data_;
     //! Current rig data
     rig_data_t* rig_data_;
-    //! string current rig name
-    string rig_name_;
+    //! std::string current rig name
+    std::string rig_name_;
     //! Current app_name
-    string app_name_;
+    std::string app_name_;
     //! Current app data
     cat_data_t* app_data_;
     //! Input stream 
-    istream* in_file_;
+    std::istream* in_file_;
     //! Current value name
-    string value_name_;
+    std::string value_name_;
     //! Current value data
-    string value_data_;
+    std::string value_data_;
 };
 
 

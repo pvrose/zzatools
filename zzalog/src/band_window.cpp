@@ -9,8 +9,8 @@
 
 #include <FL/Fl_Box.H>
 
-extern string CONTACT;
-extern string COPYRIGHT;
+extern std::string CONTACT;
+extern std::string COPYRIGHT;
 extern qso_manager* qso_manager_;
 extern status* status_;
 
@@ -25,7 +25,7 @@ band_window::band_window(int X, int Y, int W, int H, const char* L) :
 
 	Fl_Box* b_cr = new Fl_Box(0, H - FOOT_HEIGHT, W, FOOT_HEIGHT);
 	b_cr->box(FL_FLAT_BOX);
-	b_cr->copy_label(string(COPYRIGHT + " " + CONTACT + "     ").c_str());
+	b_cr->copy_label(std::string(COPYRIGHT + " " + CONTACT + "     ").c_str());
 	b_cr->labelsize(FL_NORMAL_SIZE - 1);
 	b_cr->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 
@@ -59,7 +59,7 @@ void band_window::cb_widget(Fl_Widget* w, void* v) {
 		if (rig) {
 			if (!rig->set_frequency(f)) {
 				char msg[128];
-				snprintf(msg, sizeof(msg), "BAND: Unable to set frequency %g", f);
+				snprintf(msg, sizeof(msg), "BAND: Unable to std::set frequency %g", f);
 				status_->misc_status(ST_WARNING, msg);
 			}
 		}

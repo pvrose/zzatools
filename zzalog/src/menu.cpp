@@ -75,10 +75,10 @@ extern url_handler* url_handler_;
 extern wsjtx_handler* wsjtx_handler_;
 
 extern bool READ_ONLY;
-extern list<string> recent_files_;
-extern string default_data_directory_;
-extern string PROGRAM_ID;
-extern string VENDOR;
+extern std::list<std::string> recent_files_;
+extern std::string default_data_directory_;
+extern std::string PROGRAM_ID;
+extern std::string VENDOR;
 extern time_t session_start_;
 extern void open_html(const char*);
 
@@ -86,7 +86,7 @@ extern Fl_Preferences::Root prefs_mode_;
 
 
 
-	// The default menu - set of menu items
+	// The default menu - std::set of menu items
 	Fl_Menu_Item menu_items[] = {
 		// File operations
 	{ "&File", 0, 0, 0, FL_SUBMENU },
@@ -253,10 +253,10 @@ extern Fl_Preferences::Root prefs_mode_;
 	};
 
 extern void add_data();
-extern void main_window_label(string text);
+extern void main_window_label(std::string text);
 extern void backup_file();
 extern void restore_backup();
-extern void set_recent_file(string filename);
+extern void set_recent_file(std::string filename);
 
 
 // Constructor
@@ -265,7 +265,7 @@ menu::menu(int X, int Y, int W, int H, const char* label) :
 {
 	// Add the menu
 	Fl_Menu_Bar::menu(menu_items);
-	// Add the recent files list to it
+	// Add the recent files std::list to it
 	add_recent_files();
 	// default text size - just larger than default font size
 	textsize(FL_NORMAL_SIZE + 1);
@@ -365,7 +365,7 @@ void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 	
 	// Set to a recent file number (1 to 4) or 0 for file_chooser
 	char file_id = (char)(intptr_t)v;
-	string filename = "";
+	std::string filename = "";
 	// Set read_only flag
 	if (file_id < 0) {
 		READ_ONLY = true;
@@ -408,7 +408,7 @@ void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 		if (book_->load_data(filename)) {
 			tabbed_forms_->activate_pane(OT_MAIN, true);
 			book_->navigate(NV_LAST);
-			// Set the filename in the window title and recent file list
+			// Set the filename in the window title and recent file std::list
 			main_window_label(filename);
 			set_recent_file(filename);
 		}
@@ -417,7 +417,7 @@ void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 }
 
 // File->Save
-// v is set to 0 to represent object_t = OT_MAIN
+// v is std::set to 0 to represent object_t = OT_MAIN
 void menu::cb_mi_file_save(Fl_Widget* w, void* v) {
 	import_data_->stop_update(false);
 	while (!import_data_->update_complete()) Fl::check();
@@ -442,9 +442,9 @@ void menu::cb_mi_file_save(Fl_Widget* w, void* v) {
 }
 
 // File->SaveAs 
-// v is set to the enum object_t. OT_MAIN = save main book, OT_EXTRACT = save extracted records
+// v is std::set to the enum object_t. OT_MAIN = save main book, OT_EXTRACT = save extracted records
 void menu::cb_mi_file_saveas(Fl_Widget* w, void* v) {
-	string filename = book_->filename();
+	std::string filename = book_->filename();
 	Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
 	chooser->title("Select file name to save");
 	chooser->filter("ADI Files\t*.adi\nADX Files\t*.adx\nTSV Files\t*.{tsv,tab}");
@@ -452,7 +452,7 @@ void menu::cb_mi_file_saveas(Fl_Widget* w, void* v) {
 	if (chooser->show() == 0) {
 		filename = chooser->filename();
 		// No file type - force it to .adi
-		string suffix = filename.substr(filename.length() - 4);
+		std::string suffix = filename.substr(filename.length() - 4);
 		if (suffix != ".adi" && suffix != ".adx" && suffix != ".tsv" && suffix != ".tab") {
 			filename += ".adi";
 		}
@@ -478,7 +478,7 @@ void menu::cb_mi_file_saveas(Fl_Widget* w, void* v) {
 			// Save even if not modified
 			b->store_data(filename, true);
 			if (type == OT_MAIN) {
-				// Change filename in title and top of recent file list
+				// Change filename in title and top of recent file std::list
 				main_window_label(filename);
 				set_recent_file(filename);
 			}
@@ -594,12 +594,12 @@ void menu::cb_mi_navigate(Fl_Widget* w, void* v) {
 void menu::cb_mi_nav_date(Fl_Widget* w, void* v) {
 	// Populate calendar with today's date
 	record* qso = navigation_book_->get_record();
-	string date;
+	std::string date;
 	if (qso) date = qso->item("QSO_DATE");
 	else date = now(false, "%Y%m%d");
 	calendar* cal = new calendar(Fl::event_x_root(), Fl::event_y_root());
 	cal->value(date.c_str());
-	cal->callback(cb_value<calendar, string>, &date);
+	cal->callback(cb_value<calendar, std::string>, &date);
 	cal->show();
 	Fl_Widget_Tracker wt(cal);
 	while (wt.exists()) Fl::check();
@@ -827,8 +827,8 @@ void menu::cb_mi_log_retime(Fl_Widget* w, void* v) {
 		status_->misc_status(ST_ERROR, "LOG: Do not have a current record to retime");
 		return;
 	}
-	string old_time = this_record->item("TIME_OFF");
-	string time = now(false, "%H%M%S");
+	std::string old_time = this_record->item("TIME_OFF");
+	std::string time = now(false, "%H%M%S");
 	this_record->item("TIME_OFF", time);
 	char message[200];
 	snprintf(message, 200, "LOG: %s %s %s record changed %s from %s to %s",
@@ -854,9 +854,9 @@ void menu::cb_mi_log_bulk(Fl_Widget* w, void* v) {
 		button_t result = dialog->display();
 		if (result != BN_CANCEL) {
 			change_action_t action = CHANGE_FIELD;
-			string old_field_name = "";
-			string new_field_name = "";
-			string new_text = "";
+			std::string old_field_name = "";
+			std::string new_field_name = "";
+			std::string new_text = "";
 			int num_changed = 0;
 			fl_cursor(FL_CURSOR_WAIT);
 			// get action
@@ -875,7 +875,7 @@ void menu::cb_mi_log_bulk(Fl_Widget* w, void* v) {
 					break;
 				case DELETE_FIELD:
 					// Delete the field with this name
-					record->item(old_field_name, string(""));
+					record->item(old_field_name, std::string(""));
 					num_changed++;
 					break;
 				case ADD_FIELD:
@@ -909,7 +909,7 @@ void menu::cb_mi_log_bulk(Fl_Widget* w, void* v) {
 					num_changed, (int)navigation_book_->size(), old_field_name.c_str(), new_text.c_str());
 				break;
 			case CHANGE_FIELD:
-				snprintf(message, 256, "LOG: Bulk Change done, %d records: Field %s set to %s",
+				snprintf(message, 256, "LOG: Bulk Change done, %d records: Field %s std::set to %s",
 					num_changed, old_field_name.c_str(), new_text.c_str());
 				break;
 			}
@@ -957,7 +957,7 @@ void menu::cb_mi_log_start(Fl_Widget* w, void* v) {
 		// Get most recent QSO
 		item_num_t pos = book_->size() - 1;
 		record* start = book_->get_record(pos, false);
-		string qso_date = start->item("QSO_DATE");
+		std::string qso_date = start->item("QSO_DATE");
 		pos--;
 		while (book_->get_record(pos, false)->item("QSO_DATE") == qso_date) {
 			start = book_->get_record(pos, false);
@@ -1004,7 +1004,7 @@ void menu::cb_mi_imp_file(Fl_Widget* w, void* v) {
 	Fl_Preferences datapath_settings(settings, "Datapath");
 	datapath_settings.get("Log Directory", directory, "");
 	// Open file chooser
-	string filename;
+	std::string filename;
 	Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
 	chooser->title("Select file name");
 	chooser->directory(directory);
@@ -1105,7 +1105,7 @@ void menu::cb_mi_ext_redo(Fl_Widget* w, void* v) {
 // Extract->display - display the extract criteria in a tooltip window
 // v is not used
 void menu::cb_mi_ext_disp(Fl_Widget* w, void* v) {
-	string message = "There are no extracted records!\n";
+	std::string message = "There are no extracted records!\n";
 	if (extract_records_->size()) {
 		message = extract_records_->header()->header();
 	}
@@ -1175,7 +1175,7 @@ void menu::cb_mi_ext_dl_images(Fl_Widget* w, void* v) {
 	eqsl_handler_->enable_fetch(eqsl_handler::EQ_START);
 }
 
-// Report->Clear etc. - set the report filter
+// Report->Clear etc. - std::set the report filter
 // v is enum report_filter_t: RF_NONE, RF_ALL, RF_ALL_CURRENT, RF_EXTRACTED or RF_SELECTED
 void menu::cb_mi_rep_filter(Fl_Widget* w, void* v) {
 	// v has the filter
@@ -1184,11 +1184,11 @@ void menu::cb_mi_rep_filter(Fl_Widget* w, void* v) {
 	tabbed_forms_->activate_pane(OT_REPORT, true);
 }
 
-// Report->Levelx - set report level n to category
+// Report->Levelx - std::set report level n to category
 // v contains two bytes { level, category }
 void menu::cb_mi_rep_level(Fl_Widget* w, void* v) {
 	long params = (intptr_t)v;
-	string custom_field = "";
+	std::string custom_field = "";
 	report_cat_t category = (report_cat_t)(params & 0xFF);
 	int level = params >> 8;
 	if (category == RC_CUSTOM) {
@@ -1203,14 +1203,14 @@ void menu::cb_mi_rep_level(Fl_Widget* w, void* v) {
 }
 
 // Information->QRZ.com - query QRZ.com about the selected contact
-// v is string*. nullptr = uses selected record else uses call sign in v.
+// v is std::string*. nullptr = uses selected record else uses call sign in v.
 void menu::cb_mi_info_qrz(Fl_Widget* w, void* v) {
 	if (v == nullptr) {
 		// Treat as button(s) within qso_manager_
 		qso_manager_->merge_qrz_com();
 	}
 	else {
-		qrz_handler_->open_web_page(*(string*)v);
+		qrz_handler_->open_web_page(*(std::string*)v);
 	}
 }
 
@@ -1224,11 +1224,11 @@ void menu::cb_mi_info_map(Fl_Widget* w, void* v) {
 		// Get locator, QTH and callsign
 		location_t source;
 		lat_long_t location = record->location(false, source);
-		string locator = record->item("GRIDSQUARE");
-		string city = record->item("QTH");
-		string label = record->item("CALL");
+		std::string locator = record->item("GRIDSQUARE");
+		std::string city = record->item("QTH");
+		std::string label = record->item("CALL");
 		// These are DOS specific, will need the Linux version
-		string format_coords = "http://google.com/maps/@%f,%f,25000m";
+		std::string format_coords = "http://google.com/maps/@%f,%f,25000m";
 		char message[128];
 		char uri[256];
 		if ((source == LOC_NONE || source == LOC_GRID2 || source == LOC_GRID4) && city != "") {
@@ -1262,12 +1262,12 @@ void menu::cb_mi_info_web(Fl_Widget* w, void* v) {
 	if (record != nullptr && record->item_exists("WEB")) {
 		// Website logged for contact
 		// Get browser from config
-		string browser = that->get_browser();
+		std::string browser = that->get_browser();
 		if (browser.length() == 0) {
 			return;
 		}
 		// Open browser with URL from WEB field in record
-		string website = record->item("WEB");
+		std::string website = record->item("WEB");
 		char uri[256];
 		snprintf(uri, sizeof(uri), "%s", website.c_str());
 		char message[128];
@@ -1316,7 +1316,7 @@ void menu::enable(bool active) {
 		// Disable specific items that do not make sense in the current state of the app
 		update_items();
 	}
-	// Enable/disable toolbar buttons that map onto menu items
+	// Enable/disable toolbar buttons that std::map onto menu items
 	if (toolbar_) toolbar_->update_items();
 }
 
@@ -1331,7 +1331,7 @@ void menu::add_recent_files() {
 	char i = '1';
 
 	for (auto it = recent_files_.begin(); i <= '4' && it != recent_files_.end(); i++, it++) {
-		string& filename = *it;
+		std::string& filename = *it;
 		// We have a filename - Find the last slash in the filename
 		int start = filename.find_last_of("/\\");
 		char label[100];
@@ -1348,10 +1348,10 @@ void menu::add_recent_files() {
 }
 
 // Set check marks on the menu to represent the actual report tree mode and filter
-void menu::report_mode(vector<report_cat_t> report_mode, report_filter_t filter) {
+void menu::report_mode(std::vector<report_cat_t> report_mode, report_filter_t filter) {
 	// Set the Report->Level N->* menu items
 	for (int i = 1; i < 4; i++) {
-		// Get the item indices to set modes
+		// Get the item indices to std::set modes
 		char item_label[128];
 		sprintf(item_label, "Re&port/Level &%d/&Entities", i);
 		int index_entities = find_index(item_label);
@@ -1437,7 +1437,7 @@ void menu::report_mode(vector<report_cat_t> report_mode, report_filter_t filter)
 			}
 		}
 		else {
-			// This level is not used - set Nothing
+			// This level is not used - std::set Nothing
 			mode(index_nothing, mode(index_nothing) | FL_MENU_VALUE);
 			mode(index_entities, mode(index_entities) & ~FL_MENU_VALUE);
 			mode(index_states, mode(index_states) & ~FL_MENU_VALUE);
@@ -1691,13 +1691,13 @@ void menu::update_windows_items() {
 }
 
 // Get the browser form config or if not ask user
-string menu::get_browser() {
+std::string menu::get_browser() {
 	// Get browser from config
 	char* temp;
 	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences datapath_settings(settings, "Datapath");
 	datapath_settings.get("Web Browser", temp, "");
-	string browser = temp;
+	std::string browser = temp;
 	free(temp);
 	if (!browser.length()) {
 		// User hasn't defined browser yet - open dialog to get it

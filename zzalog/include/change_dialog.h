@@ -22,7 +22,7 @@ class Fl_Widget;
 	public:
 		//! Constructor.
 		
-		//! \param label set the window label.
+		//! \param label std::set the window label.
 		change_dialog(const char* label = 0);
 		//! Destructor.
 		virtual ~change_dialog();
@@ -36,7 +36,7 @@ class Fl_Widget;
 		//! Instantiate all the component widgets.
 		void create_form();
 		//! Get the changes specified by the dialog.
-		void get_data(change_action_t& action, string& old_field_name, string& new_field_name, string& new_text);
+		void get_data(change_action_t& action, std::string& old_field_name, std::string& new_field_name, std::string& new_text);
 
 		//! Callback for OK button: sets the OK response for the dialog.
 		static void cb_bn_ok(Fl_Widget* w, void* v);
@@ -53,15 +53,15 @@ class Fl_Widget;
 		//! Update the dialog as a result of changes.
 		void enable_widgets();
 		//! Populate the choice menu for the enumeration selector of possible field values.
-		void populate_enum(string name);
+		void populate_enum(std::string name);
 		//! Original field name when changing field name or the field name when changing values.
-		string old_field_name_;
+		std::string old_field_name_;
 		//! Action selected by radio buttons.
 		change_action_t action_;
 		//! New field name when changing field name.
-		string new_field_name_;
+		std::string new_field_name_;
 		//! New value for the field being changed.
-		string new_text_;
+		std::string new_text_;
 		//! Radio button callback data: sets the action for each radio button.
 		const radio_param_t radio_params_[4] =
 		{

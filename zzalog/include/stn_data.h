@@ -4,7 +4,7 @@
 #include <map>
 #include <set>
 
-using namespace std;
+
 
 //! Identifiers for ADIF fields indicating user's location
 enum qth_value_t : char {
@@ -25,11 +25,11 @@ enum qth_value_t : char {
 
 //! Station location data
 struct qth_info_t {
-	map<qth_value_t, string> data;
+	std::map<qth_value_t, std::string> data;
 };
 
 //! Mapping identifiers to ADIF field names.
-const map<qth_value_t, string> QTH_ADIF_MAP = {
+const std::map<qth_value_t, std::string> QTH_ADIF_MAP = {
 	{ STREET, "MY_STREET" },
 	{ CITY, "MY_CITY" },
 	{ POSTCODE, "MY_POSTAL_CODE" },
@@ -53,11 +53,11 @@ enum oper_value_t : char {
 
 //! Station operator database.
 struct oper_info_t {
-	map< oper_value_t, string> data;
+	std::map< oper_value_t, std::string> data;
 };
 
 //! Map of identifiers to ADIF field names
-const map<oper_value_t, string> OPER_ADIF_MAP = {
+const std::map<oper_value_t, std::string> OPER_ADIF_MAP = {
 	{ NAME, "MY_NAME" },
 	{ CALLSIGN, "OPERATOR" }
 };
@@ -77,43 +77,43 @@ public:
 	//! Store data to station.xml
 	void store_data();
 	//! Add a specific \p item to location \p id, \p value - returns true if added
-	bool add_qth_item(string id, qth_value_t item, string value);
+	bool add_qth_item(std::string id, qth_value_t item, std::string value);
 	//! Remove \p item from location \p id. 
-	void remove_qth_item(string id, qth_value_t item);
+	void remove_qth_item(std::string id, qth_value_t item);
 	//! Add a new QTH \p id with data \p qth.
-	bool add_qth(string id, qth_info_t* qth);
+	bool add_qth(std::string id, qth_info_t* qth);
 	//! Add a specific item for operator \p id, \p value - return true if added.
-	bool add_oper_item(string id, oper_value_t item, string value);
+	bool add_oper_item(std::string id, oper_value_t item, std::string value);
 	//! Add a new operator \p with data \p oper.
-	bool add_oper(string id, oper_info_t* oper);
+	bool add_oper(std::string id, oper_info_t* oper);
 	//! Add a new station callsign
-	bool add_call(string call);
+	bool add_call(std::string call);
 	//! Returns the location data for \p id.
-	const qth_info_t* get_qth(string id);
+	const qth_info_t* get_qth(std::string id);
 	//! Returns the operator data for \p id.
-	const oper_info_t* get_oper(string id);
+	const oper_info_t* get_oper(std::string id);
 	//! Returns true if data exists for location \p id.
-	bool known_qth(string id);
+	bool known_qth(std::string id);
 	//! Returns true if data exists for operator \p oper.
-	bool known_oper(string oper);
+	bool known_oper(std::string oper);
 	//! Returns true if data exists for callsign \p call.
-	bool known_call(string call);
+	bool known_call(std::string call);
 	//! Returns all locations
-	const map<string, qth_info_t*>* get_qths();
+	const std::map<std::string, qth_info_t*>* get_qths();
 	//! Returns all operators
-	const map<string, oper_info_t*>* get_opers();
+	const std::map<std::string, oper_info_t*>* get_opers();
 	//! Returns all callsigns
-	const map<string, string>* get_calls();
+	const std::map<std::string, std::string>* get_calls();
 	//! Returns the description for callsign \p id.
-	string get_call_descr(string id);
+	std::string get_call_descr(std::string id);
 
 protected:
 	//! Station location data
-	map<string, qth_info_t*> qths_;
+	std::map<std::string, qth_info_t*> qths_;
 	//! Station operator data
-	map<string, oper_info_t*> opers_;
+	std::map<std::string, oper_info_t*> opers_;
 	//! Station callsign data
-	map<string, string> calls_;
+	std::map<std::string, std::string> calls_;
 	//! Load failed
 	bool load_failed_;
 };

@@ -19,8 +19,8 @@ extern config *config_;
 extern status *status_;
 extern stn_data *stn_data_;
 
-extern string PROGRAM_ID;
-extern string VENDOR;
+extern std::string PROGRAM_ID;
+extern std::string VENDOR;
 extern void open_html(const char*);
 extern Fl_Preferences::Root prefs_mode_;
 
@@ -133,7 +133,7 @@ void qso_operation::load_data() {
 	current_oper_ = temp;
 	free(temp);
 	station_settings.get("Callsign", temp, "");
-	current_call_ = to_upper(string(temp));
+	current_call_ = to_upper(std::string(temp));
 	free(temp);
 	station_settings.get("Location", temp, "");
 	current_qth_ = temp;
@@ -154,7 +154,7 @@ void qso_operation::cb_qth(Fl_Widget *w, void *v)
 {
 	Fl_Input_Choice *ch = (Fl_Input_Choice *)w;
 	qso_operation *that = ancestor_view<qso_operation>(w);
-	*(string *)v = ch->value();
+	*(std::string *)v = ch->value();
 	if (!ch->menubutton()->changed())
 	{
 		// New QTH typed in - check if it's really new
@@ -170,7 +170,7 @@ void qso_operation::cb_oper(Fl_Widget *w, void *v)
 {
 	Fl_Input_Choice *ch = (Fl_Input_Choice *)w;
 	qso_operation *that = ancestor_view<qso_operation>(w);
-	*(string *)v = ch->value();
+	*(std::string *)v = ch->value();
 	if (!ch->menubutton()->changed())
 	{
 		// New QTH typed in - check if it's really new
@@ -186,7 +186,7 @@ void qso_operation::cb_call(Fl_Widget *w, void *v)
 {
 	Fl_Input_Choice *ch = (Fl_Input_Choice *)w;
 	qso_operation *that = ancestor_view<qso_operation>(w);
-	*(string *)v = ch->value();
+	*(std::string *)v = ch->value();
 	if (!ch->menubutton()->changed())
 	{
 		// New QTH typed in - check if it's really new
@@ -215,7 +215,7 @@ void qso_operation::cb_show(Fl_Widget *w, void *v)
 		break;
 	}
 }
-// set the QSO
+// std::set the QSO
 void qso_operation::qso(record *qso)
 {
 	current_qso_ = qso;
@@ -223,17 +223,17 @@ void qso_operation::qso(record *qso)
 }
 
 // get the current QTH
-string qso_operation::current_qth()
+std::string qso_operation::current_qth()
 {
 	return current_qth_;
 }
 
-string qso_operation::current_oper()
+std::string qso_operation::current_oper()
 {
 	return current_oper_;
 }
 
-string qso_operation::current_call()
+std::string qso_operation::current_call()
 {
 	return current_call_;
 }
@@ -247,7 +247,7 @@ void qso_operation::populate_choices()
 	ch_qth_->add("");
 	for (auto it : *stn_data_->get_qths())
 	{
-		map<qth_value_t, string> &data = it.second->data;
+		std::map<qth_value_t, std::string> &data = it.second->data;
 		snprintf(l, sizeof(l), "%s:--->%s,%s,%s",
 					escape_menu(it.first).c_str(),
 					data.find(STREET) == data.end() ? "" : data.at(STREET).c_str(),
@@ -261,7 +261,7 @@ void qso_operation::populate_choices()
 	ch_oper_->add("");
 	for (auto it : *stn_data_->get_opers())
 	{
-		map<oper_value_t, string> &data = it.second->data;
+		std::map<oper_value_t, std::string> &data = it.second->data;
 		snprintf(l, sizeof(l), "%s:--->%s,%s",
 			escape_menu(it.first).c_str(),
 			data.find(NAME) == data.end() ? "" : data.at(NAME).c_str(),

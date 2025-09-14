@@ -123,7 +123,7 @@ void dxcc_table::draw_cell(TableContext context, int R, int C, int X, int Y, int
             }
         }
         else {
-            string column_name = column_names_[C];
+            std::string column_name = column_names_[C];
             if (R == row_ids_.size()) {
                 fl_font(FL_BOLD, FL_NORMAL_SIZE);
                 if (total_counts_.find(column_name) == total_counts_.end()) {
@@ -188,15 +188,15 @@ void dxcc_table::scan_book() {
             break;
         }
         case MODES: {
-            set<string>* modes = book_->used_modes();
+            std::set<std::string>* modes = book_->used_modes();
             for (auto it = modes->begin(); it != modes->end(); it++) {
                 column_names_.push_back(*it);
             }
             break;
         }
         case DXCC_MODES:
-            set<string>* modes = book_->used_modes();
-            set<string> dmodes;
+            std::set<std::string>* modes = book_->used_modes();
+            std::set<std::string> dmodes;
             for (auto it = modes->begin(); it != modes->end(); it++) {
                 dmodes.insert(spec_data_->dxcc_mode(*it));
             }
@@ -206,7 +206,7 @@ void dxcc_table::scan_book() {
             break;
         }
         // Now read the book
-        set<int> dxccs;
+        std::set<int> dxccs;
         for (int ix = 0; ix < book_->size(); ix++) {
             record* qso = book_->get_record(ix, false);
             // Check if we need to count it
@@ -221,7 +221,7 @@ void dxcc_table::scan_book() {
                 qso->item("DXCC", dxcc);
                 dxccs.insert(dxcc);
                 count_t& data = data_[dxcc];
-                string column;
+                std::string column;
                 switch (display_type_) {
                 case TOTAL:
                     column = "All Modes";
@@ -244,7 +244,7 @@ void dxcc_table::scan_book() {
                 total_qsos_++;
             }
         }
-        // convert to vector
+        // convert to std::vector
         for (auto it = dxccs.begin(); it != dxccs.end(); it++) {
             row_ids_.push_back(*it);
         }

@@ -5,7 +5,7 @@
 
 #include <FL/Fl_Group.H>
 
-using namespace std;
+
 class password_input;
 class Fl_Input;
 class Fl_Int_Input;
@@ -17,8 +17,8 @@ class Fl_Tabs;
 class filename_input;
 class file_viewer;
 
-const string FLDIGI = "FLDigi";
-const string WSJTX = "WSJT-X";
+const std::string FLDIGI = "FLDigi";
+const std::string WSJTX = "WSJT-X";
 
 //! How the app needs to access the rig.
 enum app_rig_class_t {
@@ -29,15 +29,15 @@ enum app_rig_class_t {
 
 //! The app related data
 struct app_data_t {
-    string name;                 //!< The name of the app.
+    std::string name;                 //!< The name of the app.
     bool server{ false };        //!< ZZALOG acts as a log server.
     app_rig_class_t rig_class{ ALL_RIGS };  //!< How the app requires rig access.
-    map<string, string> commands;//!< The commands for each rig.
+    std::map<std::string, std::string> commands;//!< The commands for each rig.
     bool admin{ false };         //!< The command needs to be run in administrator mode.
     bool can_disable{ false };   //!< The app can be disconnected (Rig = NONE).
     bool (*has_server)() { nullptr };       //!< Function to call to see if serever is active.
     bool (*has_data)() { nullptr };         //!< Function to call to see if server has request.
-    string address{ "" };        //!< Network address.
+    std::string address{ "" };        //!< Network address.
     int port_num{ 0 };           //!< Network port number.
 };
 
@@ -163,9 +163,9 @@ public:
     //! Returns the file_editor displaying the command script.
     file_viewer* viewer();
     //! Returns network address for the app \p app_name.
-    string network_address(string app_name);
+    std::string network_address(std::string app_name);
     //! Returns network port number for the app \p app_name.
-    int network_port(string app_name);
+    int network_port(std::string app_name);
 
     //! Callback from "New" button - creates a new item in the configuration data.
     void static cb_bn_new(Fl_Widget* w, void* v);
@@ -179,7 +179,7 @@ public:
 protected:
 
     //! Add all the tabs
-    void create_tabs(string name = "");
+    void create_tabs(std::string name = "");
 
     //! ADjust the size of the widget after creating the component widgets.
     void adjust_size();
@@ -187,17 +187,17 @@ protected:
     Fl_Button* bn_new_;       //!< Button to create new app configuration.
     Fl_Input* ip_new_;        //!< Inputfor name of new application.
 
-   // Tabbed set of app_grp
+   // Tabbed std::set of app_grp
     Fl_Tabs* tabs_;           //!< Tabs, one for each app.
 
     // File viewer
     file_viewer* viewer_;     //!< File viewr window.
 
     //! The application data - items mapped by name of app.
-    map<string, app_data_t*> apps_data_; 
+    std::map<std::string, app_data_t*> apps_data_; 
 
     //! Name of new app.
-    string new_name_;
+    std::string new_name_;
     //! Read from settings, the index of the default tab to display.
     int default_tab_;
   

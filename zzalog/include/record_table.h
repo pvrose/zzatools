@@ -5,7 +5,7 @@
 #include <string>
 #include <FL/Fl_Table_Row.H>
 
-using namespace std;
+
 
 class record;
 
@@ -38,7 +38,7 @@ class record;
 		//! Inherited from Fl_Table_Row: draws the contents of each cell from the records.
 		virtual void draw_cell(TableContext context, int R = 0, int C = 0, int X = 0, int Y = 0,
 			int W = 0, int H = 0);
-		//! set the records to display.
+		//! std::set the records to display.
 		
 		//! \param log_record QSO record from the log.
 		//! \param query_record QSO record being queried against log_record.
@@ -46,11 +46,11 @@ class record;
 		//! Note that log_record and saved_record can be nullptr. 
 		void set_records(record* log_record, record* query_record, record* saved_record);
 		//! Returns the name of the field in row \p row.
-		string field(int row);
+		std::string field(int row);
 
 		// protected methods
 	protected:
-		//! Get the fields that will be displayed - those used in records being displayed plus the minimum set of records specified in settings.
+		//! Get the fields that will be displayed - those used in records being displayed plus the minimum std::set of records specified in settings.
 		void assess_fields();
 
 		// protected attributes
@@ -64,7 +64,7 @@ class record;
 		//! The nature of the request
 		display_mode_t display_mode_;
 		//! the fields to include
-		vector<string> display_fields_;
+		std::vector<std::string> display_fields_;
 
 	};
 #endif
