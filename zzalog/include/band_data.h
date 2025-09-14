@@ -64,8 +64,10 @@ public:
 	band_map<set<range_t> >& bands();
 
 protected:
-	//! Read the data
-	bool load_data();
+	//! Store data to JSON file
+	void save_json();
+	//! Read data from JSON file
+	bool load_json();
 	//! Process the data to bands
 	void create_bands();
 	//! Get the file name

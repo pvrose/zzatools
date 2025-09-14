@@ -52,77 +52,58 @@ void from_json(const json& j, band_data::band_entry_t& e) {
 // Constructor 
 band_data::band_data()
 {
-	load_data();
+	load_json();
 	create_bands();
-
-	//// Example dumping data to a JSON stream
-	// json j;
-	// for (auto it : entries_ ) {
-	// 	json j1 (*it );
-	// 	j.push_back(j1);
-	// }
-    // std::cout << std::setw(4) << j << '\n';
 
 }
 
 // Destructor
 band_data::~band_data()
 {
+//	save_json();
 	for (auto it = entries_.begin(); it != entries_.end(); it++) {
 		delete* it;
 	}
 	entries_.clear();
 }
 
-// Read the band plan data
-bool band_data::load_data() {
-	string filename = get_path() + "band_plan.tsv";
-	ifstream file;
-	file.open(filename.c_str(), fstream::in);
-	if (!file.good()) {
-		file.close();
-		bool ok = find_and_copy_data();
-		ok &= load_data();
-		return ok;
-	}
-	// calculate the file size
-	streampos startpos = file.tellg();
-	file.seekg(0, ios::end);
-	streampos currpos = file.tellg();
-	// reposition back to beginning
-	file.seekg(0, ios::beg);
-	// Initialise progress
+// Load data from JSON file
+bool band_data::load_json() {
+	json j;
+	// Wrte JSON out to band_plan.json
+	string filename = get_path() + "band_plan.json";
 	status_->misc_status(ST_NOTE, ("BAND: Loading band-plan data"));
-	status_->progress((int)(currpos - startpos), OT_BAND, "Reading band-plan file", "bytes");
-	// Read and ignore first line
-	string line;
-	getline(file, line);
-	currpos = file.tellg();
-	status_->progress((int)(currpos - startpos), OT_BAND);
-	while (file.good()) {
-		// Read the line and parse it
-		getline(file, line);
-		currpos = file.tellg();
-		if (file.good()) {
-			// Update progress bar
-			status_->progress((int)(currpos - startpos), OT_BAND);
-			// Read and decode the entry and add to the end
-			band_entry_t* entry = get_entry(line);
-			entries_.push_back(entry);
+	ifstream i(filename);
+	if (i.good()) {
+		i >> j;
+		i.close();
+		for (auto jt : j) {
+			band_entry_t* e = new band_entry_t(jt.template get<band_entry_t>());
+			entries_.push_back(e);
 		}
-	}
-	// Return success or fail
-	if (file.eof()) {
 		status_->misc_status(ST_OK, "BAND: Loaded band-plan data");
 		return true;
 	}
 	else {
 		status_->misc_status(ST_ERROR, "BAND: Load band-plan data failed");
-		status_->progress("Load failed!", OT_BAND);
 		return false;
 	}
 }
 
+// Save data in a JSON file
+void band_data::save_json() {
+	// Convert entries_ to a JSON object
+	json j;
+	for (auto it : entries_) {
+		json j1(*it);
+		j.push_back(j1);
+	}
+	// Wrte JSON out to band_plan.json
+	string filename = get_path() + "band_plan.json";
+	ofstream o(filename);
+	o << std::setw(4) << j << '\n';
+	o.close();
+}
 // Decode an entry
 band_data::band_entry_t* band_data::get_entry(string line) {
 	vector<string> words;
