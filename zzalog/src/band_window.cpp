@@ -54,7 +54,7 @@ void band_window::set_frequency(double tx, double rx) {
 void band_window::cb_widget(Fl_Widget* w, void* v) {
 	band_widget* bw = (band_widget*)w;
 	double f = bw->frequency(Fl::event_x(), Fl::event_y());
-	if (!isnan(f)) {
+	if (!std::isnan(f)) {
 		rig_if* rig = qso_manager_->rig();
 		if (rig) {
 			if (!rig->set_frequency(f)) {

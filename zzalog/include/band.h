@@ -22,8 +22,8 @@ struct band_lt {
         // If the supploed std::string is not a real band name - return assume 0.0Hz
         double lv = spec_data_->freq_for_band(l);
         double rv = spec_data_->freq_for_band(r);
-        if (isnan(lv)) lv = 0.0;
-        if (isnan(rv)) rv = 0.0;
+        if (std::isnan(lv)) lv = 0.0;
+        if (std::isnan(rv)) rv = 0.0;
         return lv < rv;
     }
 };

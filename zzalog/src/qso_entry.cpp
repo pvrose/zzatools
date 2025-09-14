@@ -462,7 +462,7 @@ void qso_entry::copy_cat_to_qso(bool clear) {
 				}
 				std::string old_txp = qso_->item("TX_POWER");
 				qso_->item("TX_PWR", tx_power);
-				if (isnan(tx_power)) tx_power = 0.0;
+				if (std::isnan(tx_power)) tx_power = 0.0;
 				tx_power = max(tx_power, rig->get_dpower(true));
 				snprintf(txp, sizeof(txp), "%0.0f", tx_power);
 				qso_->item("TX_PWR", std::string(txp));

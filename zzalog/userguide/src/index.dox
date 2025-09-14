@@ -36,8 +36,12 @@ any time from the menu or the toolbar:
 
 For help on any specific window or panel, click on it and press F1.
 
+\section ack Acknowledgments.
+
+For third-party contributions see <A class="e1" HREF=file:../../docs/html/index.html#ack>Acknowledgments</A>
+in the code documentation.
+
 \copyright Philip Rose GM3ZZA 2018-2025. All rights reserved.
 
-ZZALOG is based in part on the work of the FLTK project https://www.fltk.org.
 
 */

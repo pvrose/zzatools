@@ -77,10 +77,14 @@
 //! This document describes the code interfaces between the constituent parts
 //! of ZZALOG. For the user interface see <A class="el" HREF=file:../../userguide/html/index.html>Userguide.</A>
 //! 
+//! \section revision Release History
+//! For release details see <A class="e1" HREF=file:../../userguide/html/release_notes.html>Release Notes.</A>
+//! \section ack Acknowledgements
 //! ZZALOG uses the following third-party libraries:
 //! - <A HREF=https://www.fltk.org/doc-1.4/index.html>FLTK</A>: Graphical user interface library.
 //! - <A HREF=https://github.com/Hamlib/Hamlib/wiki/Hamlib>hamlib</A>: CAT Interface library.
 //! - <A HREF=https://curl.se/libcurl/c/libcurl.html>libcurl</A>: HTTP support library.
+//! - <A HREF=https://json.nlohmann.me/>nlohmann/json</A>: JSON support library.
 //! 
 //! \copyright Philip Rose GM3ZZA 2018-2025. All rights reserved.
 //!

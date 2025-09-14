@@ -189,7 +189,7 @@ void wx_handler::update() {
             location = dummy->location(true);
         }
     }
-    if (isnan(location.latitude) || isnan(location.longitude)) {
+    if (std::isnan(location.latitude) || std::isnan(location.longitude)) {
         report_ = wx_report();
         report_.city_name = "Not known";
         return;

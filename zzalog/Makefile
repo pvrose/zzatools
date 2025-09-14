@@ -74,7 +74,7 @@ CPPFLAGS := $(INC_FLAGS) -MMD -MP
 LINTFLAG := -Wunused -Wswitch 
 # Set ccompile flags
 # include debug data
-CFLAGS += -g $(LINTFLAG) -std=c++11
+CFLAGS += -g $(LINTFLAG) -std=c++20
 CXXFLAGS += -g $(LINTFLAG) 
 
 ifeq ($(BUILD_TYPE), Anal)

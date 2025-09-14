@@ -621,7 +621,7 @@ bool rig_if::th_read_values() {
 		// RX->TX - reset the power level unless...
 		if (!current_ptt && rig_data_.ptt) {
 			// ...PTT is released for only a few seconds (e.g. CW break-in or SSB VOX)
-			std::chrono::seconds gap = duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - last_ptt_off_);
+			std::chrono::seconds gap = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - last_ptt_off_);
 			if (gap > std::chrono::seconds(5)) {
 				rig_data_.pwr_value = meter_value.f;
 			}
@@ -641,7 +641,7 @@ bool rig_if::th_read_values() {
 	// Check rig response time and inform use if it's slowed down or back to normal
 	char msg[128];
 	std::chrono::system_clock::time_point finish = std::chrono::system_clock::now();
-	std::chrono::milliseconds response = duration_cast<std::chrono::milliseconds>(finish - start);
+	std::chrono::milliseconds response = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
 	if (rig_data_.slow) {
 		if (response < std::chrono::milliseconds(100)) {
 			snprintf(msg, sizeof(msg), "RIG %s Responding normally %dms", 

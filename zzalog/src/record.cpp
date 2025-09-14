@@ -526,7 +526,7 @@ lat_long_t record::location(bool my_station, location_t& source) {
 		item("LAT", lat_long.latitude);
 		item("LON", lat_long.longitude);
 	}
-	if (isnan(lat_long.latitude) || isnan(lat_long.longitude)) {
+	if (std::isnan(lat_long.latitude) || std::isnan(lat_long.longitude)) {
 		// Use either Gridsquare or prefix centre if that is more accurate
 		if (my_station) {
 			value_1 = item("MY_GRIDSQUARE", false);
@@ -615,7 +615,7 @@ bool record::update_band(bool force /*=false*/) {
 			double frequency;
 			item("FREQ_RX", frequency);
 			// If it exists - look up the band
-			if (!isnan(frequency)) {
+			if (!std::isnan(frequency)) {
 				std::string band = spec_data_->band_for_freq(frequency);
 				item("BAND_RX", band);
 				updated = true;
@@ -782,8 +782,8 @@ void record::update_bearing() {
 	lat_long_t their_location = location(false);
 	lat_long_t my_location = location(true);
 	// Need both user and contact locations
-	if (!isnan(my_location.latitude) && !isnan(my_location.longitude) &&
-		!isnan(their_location.latitude) && !isnan(their_location.longitude)) {
+	if (!std::isnan(my_location.latitude) && !std::isnan(my_location.longitude) &&
+		!std::isnan(their_location.latitude) && !std::isnan(their_location.longitude)) {
 		double bearing;
 		double distance;
 		// Calculate bearing and distance
