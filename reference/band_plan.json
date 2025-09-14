@@ -1,0 +1,3428 @@
+[
+    {
+        "bandwidth": 0.2,
+        "modes": [
+            "CW",
+            "Dig"
+        ],
+        "range": {
+            "lower": 0.1357,
+            "upper": 0.1378
+        },
+        "summary": "CW, QRSS and narrow-band digital modes"
+    },
+    {
+        "bandwidth": 0.5,
+        "modes": [
+            "CW",
+            "Dig"
+        ],
+        "range": {
+            "lower": 0.472,
+            "upper": 0.479
+        },
+        "summary": "CW, QRSS and narrow-band digital modes (Note-1)"
+    },
+    {
+        "bandwidth": 0.2,
+        "modes": [
+            "CW"
+        ],
+        "range": {
+            "lower": 1.81,
+            "upper": 1.838
+        },
+        "summary": "Telegraphy"
+    },
+    {
+        "bandwidth": 0.5,
+        "modes": [
+            "Dig"
+        ],
+        "range": {
+            "lower": 1.838,
+            "upper": 1.84
+        },
+        "summary": "Narrow band modes"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 1.84,
+            "upper": 1.843
+        },
+        "summary": "All modes"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Phone"
+        ],
+        "range": {
+            "lower": 1.843,
+            "upper": 2.0
+        },
+        "summary": "Telephony, Telegraphy  "
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 1.836,
+            "upper": 1.836
+        },
+        "summary": "QRP (low power) Centre of Activity, "
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 1.96,
+            "upper": 1.96
+        },
+        "summary": "DF Contest beacons (14dBW)"
+    },
+    {
+        "bandwidth": 0.2,
+        "modes": [
+            "CW"
+        ],
+        "range": {
+            "lower": 3.5,
+            "upper": 3.51
+        },
+        "summary": "Telegraphy - Priority for inter-continental operation"
+    },
+    {
+        "bandwidth": 0.2,
+        "modes": [
+            "CW"
+        ],
+        "range": {
+            "lower": 3.51,
+            "upper": 3.56
+        },
+        "summary": "Telegraphy - contest preferred."
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 3.555,
+            "upper": 3.555
+        },
+        "summary": "QRS (slow telegraphy) Centre of Activity"
+    },
+    {
+        "bandwidth": 0.2,
+        "modes": [
+            "CW"
+        ],
+        "range": {
+            "lower": 3.56,
+            "upper": 3.57
+        },
+        "summary": "Telegraphy"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 3.56,
+            "upper": 3.56
+        },
+        "summary": "QRP (low power) Centre of Activity, "
+    },
+    {
+        "bandwidth": 0.2,
+        "modes": [
+            "CW",
+            "Dig"
+        ],
+        "range": {
+            "lower": 3.57,
+            "upper": 3.58
+        },
+        "summary": "Narrow band modes"
+    },
+    {
+        "bandwidth": 0.5,
+        "modes": [
+            "CW",
+            "Dig"
+        ],
+        "range": {
+            "lower": 3.58,
+            "upper": 3.59
+        },
+        "summary": "Narrow band modes"
+    },
+    {
+        "bandwidth": 0.5,
+        "modes": [
+            "CW",
+            "Dig"
+        ],
+        "range": {
+            "lower": 3.59,
+            "upper": 3.6
+        },
+        "summary": "Narrow band modes - automatically controlled data stations (unattended)"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 3.6,
+            "upper": 3.62
+        },
+        "summary": "All modes - automatically controlled data stations (unattended)"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 3.6,
+            "upper": 3.65
+        },
+        "summary": "All modes - Phone contest preferred."
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 3.63,
+            "upper": 3.63
+        },
+        "summary": "digital voice Centre of Activity"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 3.65,
+            "upper": 3.7
+        },
+        "summary": "All modes - Telephony, Telegraphy"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 3.663,
+            "upper": 3.663
+        },
+        "summary": "may be used for UK emergency comms traffic."
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 3.69,
+            "upper": 3.69
+        },
+        "summary": "3,690 SSB QRP (low power) Centre of Activity."
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 3.7,
+            "upper": 3.775
+        },
+        "summary": "All modes - Phone contest preferred"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 3.735,
+            "upper": 3.735
+        },
+        "summary": "Image mode Centre of Activity"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 3.76,
+            "upper": 3.76
+        },
+        "summary": "IARU Region 1 Emergency Centre of Activity"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 3.775,
+            "upper": 3.8
+        },
+        "summary": "All modes - Phone contest preferred. Priority for inter-continental telephony (SSB) operation"
+    },
+    {
+        "bandwidth": 5.5,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 5.2585,
+            "upper": 5.264
+        },
+        "summary": "All Modes. "
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 5.262,
+            "upper": 5.262
+        },
+        "summary": "CW QRP Centre of Activity"
+    },
+    {
+        "bandwidth": 8.0,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 5.276,
+            "upper": 5.284
+        },
+        "summary": "All modes"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 5.2785,
+            "upper": 5.2785
+        },
+        "summary": "May be used for UK emergency comms traffic"
+    },
+    {
+        "bandwidth": 3.5,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 5.2885,
+            "upper": 5.292
+        },
+        "summary": "All modes"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 5.29,
+            "upper": 5.29
+        },
+        "summary": "Beacons"
+    },
+    {
+        "bandwidth": 9.0,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 5.298,
+            "upper": 5.307
+        },
+        "summary": "All modes"
+    },
+    {
+        "bandwidth": 10.0,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 5.313,
+            "upper": 5.323
+        },
+        "summary": "All modes"
+    },
+    {
+        "bandwidth": 6.0,
+        "modes": [],
+        "range": {
+            "lower": 5.317,
+            "upper": 5.317
+        },
+        "summary": "AM Spot frequency"
+    },
+    {
+        "bandwidth": 5.0,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 5.333,
+            "upper": 5.338
+        },
+        "summary": "All modes"
+    },
+    {
+        "bandwidth": 4.0,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 5.354,
+            "upper": 5.358
+        },
+        "summary": "All modes – within WRC-15 Band"
+    },
+    {
+        "bandwidth": 12.5,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 5.362,
+            "upper": 5.3745
+        },
+        "summary": "All modes – partly within WRC-15 band, WSPR"
+    },
+    {
+        "bandwidth": 4.0,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 5.378,
+            "upper": 5.382
+        },
+        "summary": "All modes"
+    },
+    {
+        "bandwidth": 6.5,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 5.395,
+            "upper": 5.4015
+        },
+        "summary": "All modes"
+    },
+    {
+        "bandwidth": 3.0,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 5.4035,
+            "upper": 5.4065
+        },
+        "summary": "All modes"
+    },
+    {
+        "bandwidth": 0.2,
+        "modes": [
+            "CW"
+        ],
+        "range": {
+            "lower": 7.0,
+            "upper": 7.04
+        },
+        "summary": "Telegraphy"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 7.03,
+            "upper": 7.03
+        },
+        "summary": "QRP Centre of Activity "
+    },
+    {
+        "bandwidth": 0.5,
+        "modes": [
+            "CW",
+            "Dig"
+        ],
+        "range": {
+            "lower": 7.04,
+            "upper": 7.047
+        },
+        "summary": "Narrow band modes"
+    },
+    {
+        "bandwidth": 0.5,
+        "modes": [
+            "CW",
+            "Dig"
+        ],
+        "range": {
+            "lower": 7.047,
+            "upper": 7.05
+        },
+        "summary": "Narrow band modes, automatically controlled data stations (unattended) "
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 7.05,
+            "upper": 7.053
+        },
+        "summary": "All modes, automatically controlled data stations (unattended)"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 7.053,
+            "upper": 7.06
+        },
+        "summary": "All modes, digimodes"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 7.06,
+            "upper": 7.1
+        },
+        "summary": "All modes"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 7.07,
+            "upper": 7.07
+        },
+        "summary": "digital voice Centre of Activity"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 7.09,
+            "upper": 7.09
+        },
+        "summary": "SSB QRP Centre of Activity"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 7.1,
+            "upper": 7.13
+        },
+        "summary": "All modes"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 7.11,
+            "upper": 7.11
+        },
+        "summary": "Region 1 Emergency Centre of Activity."
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 7.13,
+            "upper": 7.2
+        },
+        "summary": "All modes, SSB Contest Preferred Segment"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 7.165,
+            "upper": 7.165
+        },
+        "summary": "Image Centre of Activity"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 7.175,
+            "upper": 7.2
+        },
+        "summary": "All modes, priority for intercontinental operation"
+    },
+    {
+        "bandwidth": 0.2,
+        "modes": [
+            "CW"
+        ],
+        "range": {
+            "lower": 10.1,
+            "upper": 10.13
+        },
+        "summary": "Telegraphy (CW)"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 10.116,
+            "upper": 10.116
+        },
+        "summary": "QRP (low power) Centre of Activity"
+    },
+    {
+        "bandwidth": 0.5,
+        "modes": [
+            "CW",
+            "Dig"
+        ],
+        "range": {
+            "lower": 10.13,
+            "upper": 10.15
+        },
+        "summary": "Narrow band modes "
+    },
+    {
+        "bandwidth": 0.2,
+        "modes": [
+            "CW"
+        ],
+        "range": {
+            "lower": 14.0,
+            "upper": 14.06
+        },
+        "summary": "Telegraphy - contest preferred"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 14.055,
+            "upper": 14.055
+        },
+        "summary": "QRS (slow telegraphy Centre of Activity"
+    },
+    {
+        "bandwidth": 0.2,
+        "modes": [
+            "CW"
+        ],
+        "range": {
+            "lower": 14.06,
+            "upper": 14.07
+        },
+        "summary": "Telegraphy "
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 14.06,
+            "upper": 14.06
+        },
+        "summary": "QRP (low power) Centre of Activity "
+    },
+    {
+        "bandwidth": 0.5,
+        "modes": [
+            "CW",
+            "Dig"
+        ],
+        "range": {
+            "lower": 14.07,
+            "upper": 14.089
+        },
+        "summary": "Narrow band modes"
+    },
+    {
+        "bandwidth": 0.5,
+        "modes": [
+            "CW",
+            "Dig"
+        ],
+        "range": {
+            "lower": 14.089,
+            "upper": 14.099
+        },
+        "summary": "Narrow band modes - automatically controlled data stations (unattended)"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "Beacons"
+        ],
+        "range": {
+            "lower": 14.099,
+            "upper": 14.101
+        },
+        "summary": "IBP - reserved exclusively for beacons"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 14.101,
+            "upper": 14.112
+        },
+        "summary": "All modes - automatically controlled data stations (unattended)    "
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Phone"
+        ],
+        "range": {
+            "lower": 14.112,
+            "upper": 14.125
+        },
+        "summary": "All modes (excluding digimodes)"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 14.125,
+            "upper": 14.3
+        },
+        "summary": "All modes -       SSB contest preferred segment "
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 14.13,
+            "upper": 14.13
+        },
+        "summary": "digital voice Centre of Activity"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 14.195,
+            "upper": 14.195
+        },
+        "summary": "+/-5  Priority for Dxpeditions"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 14.23,
+            "upper": 14.23
+        },
+        "summary": "Image Centre of Activity."
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 14.285,
+            "upper": 14.285
+        },
+        "summary": "QRP Centre of Activity"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 14.3,
+            "upper": 14.35
+        },
+        "summary": "All modes"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 14.3,
+            "upper": 14.3
+        },
+        "summary": "Global Emergency Centre of Activity"
+    },
+    {
+        "bandwidth": 0.2,
+        "modes": [
+            "CW"
+        ],
+        "range": {
+            "lower": 18.068,
+            "upper": 18.095
+        },
+        "summary": "Telegraphy"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 18.086,
+            "upper": 18.086
+        },
+        "summary": "QRP (low power) Centre of Activity. "
+    },
+    {
+        "bandwidth": 0.5,
+        "modes": [
+            "CW",
+            "Dig"
+        ],
+        "range": {
+            "lower": 18.095,
+            "upper": 18.105
+        },
+        "summary": "Narrow band modes"
+    },
+    {
+        "bandwidth": 0.5,
+        "modes": [
+            "CW",
+            "Dig"
+        ],
+        "range": {
+            "lower": 18.105,
+            "upper": 18.109
+        },
+        "summary": "Narrow band modes - automatically controlled data stations (unattended)  "
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "Beacons"
+        ],
+        "range": {
+            "lower": 18.109,
+            "upper": 18.111
+        },
+        "summary": "IBP - reserved exclusively for beacons"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 18.111,
+            "upper": 18.12
+        },
+        "summary": "All modes - automatically controlled data stations (unattended)"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 18.12,
+            "upper": 18.168
+        },
+        "summary": "All modes"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 18.13,
+            "upper": 18.13
+        },
+        "summary": "SSB QRP Centre of Activity"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 18.15,
+            "upper": 18.15
+        },
+        "summary": "digital voice Centre of Activity"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 18.16,
+            "upper": 18.16
+        },
+        "summary": "Global Emergency Centre of Activity"
+    },
+    {
+        "bandwidth": 0.2,
+        "modes": [
+            "CW"
+        ],
+        "range": {
+            "lower": 21.0,
+            "upper": 21.07
+        },
+        "summary": "Telegraphy"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 21.055,
+            "upper": 21.055
+        },
+        "summary": "QRS (slow telegraphy) Centre of Activity. "
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 21.06,
+            "upper": 21.06
+        },
+        "summary": "QRP (low power) Centre of Activity"
+    },
+    {
+        "bandwidth": 0.5,
+        "modes": [
+            "CW",
+            "Dig"
+        ],
+        "range": {
+            "lower": 21.07,
+            "upper": 21.09
+        },
+        "summary": "Narrow band modes"
+    },
+    {
+        "bandwidth": 0.5,
+        "modes": [
+            "CW",
+            "Dig"
+        ],
+        "range": {
+            "lower": 21.09,
+            "upper": 21.11
+        },
+        "summary": "Narrow band modes - automatically controlled data stations (unattended)"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig"
+        ],
+        "range": {
+            "lower": 21.11,
+            "upper": 21.12
+        },
+        "summary": "All modes (excluding SSB) - automatically controlled data stations (unattended)"
+    },
+    {
+        "bandwidth": 0.5,
+        "modes": [
+            "CW",
+            "Dig"
+        ],
+        "range": {
+            "lower": 21.12,
+            "upper": 21.149
+        },
+        "summary": "Narrow band modes"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "Beacons"
+        ],
+        "range": {
+            "lower": 21.149,
+            "upper": 21.151
+        },
+        "summary": "IBP - reserved exclusively for beacons"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 21.151,
+            "upper": 21.45
+        },
+        "summary": "All modes. "
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 21.18,
+            "upper": 21.18
+        },
+        "summary": "digital voice Centre of Activity"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 21.285,
+            "upper": 21.285
+        },
+        "summary": "QRP Centre of Activity.   "
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 21.34,
+            "upper": 21.34
+        },
+        "summary": "Image Centre of Activity."
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 21.36,
+            "upper": 21.36
+        },
+        "summary": "Global Emergency Centre of Activity"
+    },
+    {
+        "bandwidth": 0.2,
+        "modes": [
+            "CW"
+        ],
+        "range": {
+            "lower": 24.89,
+            "upper": 24.915
+        },
+        "summary": "Telegraphy "
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 24.906,
+            "upper": 24.906
+        },
+        "summary": "QRP (low power) Centre of Activity"
+    },
+    {
+        "bandwidth": 0.5,
+        "modes": [
+            "CW",
+            "Dig"
+        ],
+        "range": {
+            "lower": 24.915,
+            "upper": 24.925
+        },
+        "summary": "Narrow band modes"
+    },
+    {
+        "bandwidth": 0.5,
+        "modes": [
+            "CW",
+            "Dig"
+        ],
+        "range": {
+            "lower": 24.925,
+            "upper": 24.929
+        },
+        "summary": "Narrow band modes  - automatically controlled data stations (unattended) "
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "Beacons"
+        ],
+        "range": {
+            "lower": 24.929,
+            "upper": 24.931
+        },
+        "summary": "IBP - reserved exclusively for beacons"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 24.931,
+            "upper": 24.94
+        },
+        "summary": "All modes - automatically controlled data stations (unattended)"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 24.94,
+            "upper": 24.99
+        },
+        "summary": "All modes"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 24.95,
+            "upper": 24.95
+        },
+        "summary": "SSB QRP Centre of Activity"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 24.96,
+            "upper": 24.96
+        },
+        "summary": "digital voice Centre of Activity"
+    },
+    {
+        "bandwidth": 0.2,
+        "modes": [
+            "CW"
+        ],
+        "range": {
+            "lower": 28.0,
+            "upper": 28.07
+        },
+        "summary": "Telegraphy"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 28.055,
+            "upper": 28.055
+        },
+        "summary": "QRS (slow telegraphy) Centre of Activity.  "
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 28.06,
+            "upper": 28.06
+        },
+        "summary": "QRP (low power) Centre of Activity. "
+    },
+    {
+        "bandwidth": 0.5,
+        "modes": [
+            "CW",
+            "Dig"
+        ],
+        "range": {
+            "lower": 28.07,
+            "upper": 28.12
+        },
+        "summary": "Narrow band modes"
+    },
+    {
+        "bandwidth": 0.5,
+        "modes": [
+            "CW",
+            "Dig"
+        ],
+        "range": {
+            "lower": 28.12,
+            "upper": 28.15
+        },
+        "summary": "Narrow band modes - automatically controlled data stations (unattended) "
+    },
+    {
+        "bandwidth": 0.5,
+        "modes": [
+            "CW",
+            "Dig"
+        ],
+        "range": {
+            "lower": 28.15,
+            "upper": 28.19
+        },
+        "summary": "Narrow band modes"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "Beacons"
+        ],
+        "range": {
+            "lower": 28.19,
+            "upper": 28.199
+        },
+        "summary": "IBP - regional time shared beacons"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "Beacons"
+        ],
+        "range": {
+            "lower": 28.199,
+            "upper": 28.201
+        },
+        "summary": "IBP - world wide time shared beacons"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "Beacons"
+        ],
+        "range": {
+            "lower": 28.201,
+            "upper": 28.225
+        },
+        "summary": "IBP - continuous-duty beacons"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 28.225,
+            "upper": 28.3
+        },
+        "summary": "All modes - beacons"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 28.3,
+            "upper": 28.32
+        },
+        "summary": "All modes - automatically controlled data stations (unattended) "
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 28.32,
+            "upper": 29.0
+        },
+        "summary": "All modes"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 28.33,
+            "upper": 28.33
+        },
+        "summary": "digital voice Centre of Activity"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 28.36,
+            "upper": 28.36
+        },
+        "summary": "QRP Centre of Activity. "
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 28.68,
+            "upper": 28.68
+        },
+        "summary": "Image Centre of Activity."
+    },
+    {
+        "bandwidth": 6.0,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 29.0,
+            "upper": 29.1
+        },
+        "summary": "All modes"
+    },
+    {
+        "bandwidth": 6.0,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 29.1,
+            "upper": 29.2
+        },
+        "summary": "All modes - FM simplex - 10 channels"
+    },
+    {
+        "bandwidth": 6.0,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 29.2,
+            "upper": 29.3
+        },
+        "summary": "All modes - automatically controlled data stations (unattended) "
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 29.27,
+            "upper": 29.27
+        },
+        "summary": "Internet voice gateway - unattended"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 29.28,
+            "upper": 29.28
+        },
+        "summary": "UK Internet voice gateway - unattended"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 29.29,
+            "upper": 29.29
+        },
+        "summary": "UK Internet voice gateway - unattended"
+    },
+    {
+        "bandwidth": 6.0,
+        "modes": [
+            "Satellite"
+        ],
+        "range": {
+            "lower": 29.3,
+            "upper": 29.51
+        },
+        "summary": "Satellite links"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "Guard"
+        ],
+        "range": {
+            "lower": 29.51,
+            "upper": 29.52
+        },
+        "summary": "Guard channel"
+    },
+    {
+        "bandwidth": 6.0,
+        "modes": [
+            "FM",
+            "Repeater"
+        ],
+        "range": {
+            "lower": 29.52,
+            "upper": 29.7
+        },
+        "summary": ""
+    },
+    {
+        "bandwidth": 6.0,
+        "modes": [],
+        "range": {
+            "lower": 29.52,
+            "upper": 29.59
+        },
+        "summary": "All modes - FM repeater inputs (RH1-RH8)"
+    },
+    {
+        "bandwidth": 6.0,
+        "modes": [],
+        "range": {
+            "lower": 29.6,
+            "upper": 29.6
+        },
+        "summary": "All modes - FM calling channel"
+    },
+    {
+        "bandwidth": 6.0,
+        "modes": [],
+        "range": {
+            "lower": 29.61,
+            "upper": 29.61
+        },
+        "summary": "All modes - FM simplex repeater (parrot) - input and output"
+    },
+    {
+        "bandwidth": 6.0,
+        "modes": [],
+        "range": {
+            "lower": 29.62,
+            "upper": 29.7
+        },
+        "summary": "All modes - FM repeater outputs (RH1-RH8)"
+    },
+    {
+        "bandwidth": 0.5,
+        "modes": [
+            "CW"
+        ],
+        "range": {
+            "lower": 50.0,
+            "upper": 50.1
+        },
+        "summary": "Telegraphy only - beacon project (50000-50030)"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 50.05,
+            "upper": 50.05
+        },
+        "summary": "Future International CoA"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 50.09,
+            "upper": 50.09
+        },
+        "summary": "Intercontinental DX CoA"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Phone"
+        ],
+        "range": {
+            "lower": 50.1,
+            "upper": 50.2
+        },
+        "summary": "SSB/Telegraphy - international"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 50.11,
+            "upper": 50.11
+        },
+        "summary": "Intercontinental DX CoA"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 50.15,
+            "upper": 50.15
+        },
+        "summary": "International CoA"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Phone"
+        ],
+        "range": {
+            "lower": 50.2,
+            "upper": 50.3
+        },
+        "summary": "SSB/Telegraphy - general"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 50.285,
+            "upper": 50.285
+        },
+        "summary": "Crossband CoA"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig"
+        ],
+        "range": {
+            "lower": 50.3,
+            "upper": 50.4
+        },
+        "summary": "MGM/Narrowband/Telegraphy"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 50.305,
+            "upper": 50.305
+        },
+        "summary": "PSK CoA"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 50.31,
+            "upper": 50.32
+        },
+        "summary": "EME"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 50.32,
+            "upper": 50.38
+        },
+        "summary": "MS"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "Beacons"
+        ],
+        "range": {
+            "lower": 50.4,
+            "upper": 50.5
+        },
+        "summary": "Propagation Beacons only"
+    },
+    {
+        "bandwidth": 12.5,
+        "modes": [
+            "DV",
+            "FM"
+        ],
+        "range": {
+            "lower": 50.5,
+            "upper": 50.7
+        },
+        "summary": "All modes"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 50.52,
+            "upper": 50.52
+        },
+        "summary": "FM/DV Internet Gateway"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 50.53,
+            "upper": 50.53
+        },
+        "summary": "FM/DV Internet Gateway"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 50.54,
+            "upper": 50.54
+        },
+        "summary": "FM/DV Internet Gateway"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 50.6,
+            "upper": 50.7
+        },
+        "summary": "Digital Communications"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 50.63,
+            "upper": 50.63
+        },
+        "summary": "DV Calling"
+    },
+    {
+        "bandwidth": 12.0,
+        "modes": [
+            "DV",
+            "FM",
+            "Repeater"
+        ],
+        "range": {
+            "lower": 50.7,
+            "upper": 50.9
+        },
+        "summary": "FM/DV Repeater outputs @ 10 kHz channels"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "CW",
+            "DV",
+            "Dig",
+            "FM",
+            "Phone"
+        ],
+        "range": {
+            "lower": 50.9,
+            "upper": 51.2
+        },
+        "summary": "All modes"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "DV",
+            "FM",
+            "Repeater"
+        ],
+        "range": {
+            "lower": 51.2,
+            "upper": 51.4
+        },
+        "summary": "FM/DV Repeater inputs @ 10 kHz channels"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "CW",
+            "DV",
+            "Dig",
+            "FM",
+            "Phone"
+        ],
+        "range": {
+            "lower": 51.4,
+            "upper": 52.0
+        },
+        "summary": "All modes"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 51.41,
+            "upper": 51.59
+        },
+        "summary": "FM/DV Simplex"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 51.51,
+            "upper": 51.51
+        },
+        "summary": "FM Calling Channel"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 51.53,
+            "upper": 51.53
+        },
+        "summary": "GB2RS News Broadcast and Slow Morse"
+    },
+    {
+        "bandwidth": 1.0,
+        "modes": [
+            "Beacons"
+        ],
+        "range": {
+            "lower": 70.0,
+            "upper": 70.09
+        },
+        "summary": "Propagation Beacons Only"
+    },
+    {
+        "bandwidth": 1.0,
+        "modes": [
+            "Beacons"
+        ],
+        "range": {
+            "lower": 70.09,
+            "upper": 70.1
+        },
+        "summary": "Personal Beacons"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 70.1,
+            "upper": 70.25
+        },
+        "summary": "Narrowband Modes"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 70.185,
+            "upper": 70.185
+        },
+        "summary": "Crossband CoA"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 70.2,
+            "upper": 70.2
+        },
+        "summary": "CW/SSB CoA"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 70.25,
+            "upper": 70.25
+        },
+        "summary": "MS CoA"
+    },
+    {
+        "bandwidth": 12.0,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 70.25,
+            "upper": 70.294
+        },
+        "summary": "All modes"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 70.26,
+            "upper": 70.26
+        },
+        "summary": "AM/FM Calling Channel"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 70.27,
+            "upper": 70.27
+        },
+        "summary": "MGM CoA"
+    },
+    {
+        "bandwidth": 12.0,
+        "modes": [
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 70.294,
+            "upper": 70.5
+        },
+        "summary": "All modes - channelised operation @ 12.5 kHz - specialised channels"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 70.3125,
+            "upper": 70.3125
+        },
+        "summary": "Digital modes"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 70.325,
+            "upper": 70.325
+        },
+        "summary": "DX Cluster"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 70.3375,
+            "upper": 70.3375
+        },
+        "summary": "Digital Modes"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 70.35,
+            "upper": 70.35
+        },
+        "summary": "Internet Voice gateway"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 70.3625,
+            "upper": 70.3625
+        },
+        "summary": "Internet Voice gateway"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 70.3875,
+            "upper": 70.3875
+        },
+        "summary": "Internet Voice gateway"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 70.4125,
+            "upper": 70.4125
+        },
+        "summary": "Internet Voice gateway"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 70.425,
+            "upper": 70.425
+        },
+        "summary": "FM Simplex"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 70.4375,
+            "upper": 70.4375
+        },
+        "summary": "Digital Modes (special projects)"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 70.45,
+            "upper": 70.45
+        },
+        "summary": "FM Calling channel"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 70.4265,
+            "upper": 70.4265
+        },
+        "summary": "Digital Modes"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 70.4875,
+            "upper": 70.4875
+        },
+        "summary": "Digital Modes"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 144.0,
+            "upper": 144.025
+        },
+        "summary": "All modes - incl. Satellite downlinks"
+    },
+    {
+        "bandwidth": 0.5,
+        "modes": [
+            "CW"
+        ],
+        "range": {
+            "lower": 144.025,
+            "upper": 144.1
+        },
+        "summary": "Telegraphy - incl. EME"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 144.05,
+            "upper": 144.05
+        },
+        "summary": "Telegraphy CoA"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 144.1,
+            "upper": 144.1
+        },
+        "summary": "Random MS Telegraphy"
+    },
+    {
+        "bandwidth": 0.5,
+        "modes": [
+            "CW",
+            "Dig"
+        ],
+        "range": {
+            "lower": 144.1,
+            "upper": 144.15
+        },
+        "summary": "Telegraphy and MGM"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 144.15,
+            "upper": 144.4
+        },
+        "summary": "Limited band modse"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 144.25,
+            "upper": 144.25
+        },
+        "summary": "GB2RS and Slow Morse"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 144.3,
+            "upper": 144.3
+        },
+        "summary": "SSB CoA"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 144.37,
+            "upper": 144.37
+        },
+        "summary": "MGM MS Calling"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "Beacons"
+        ],
+        "range": {
+            "lower": 144.4,
+            "upper": 144.49
+        },
+        "summary": "Propagation Beacons"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "Beacons"
+        ],
+        "range": {
+            "lower": 144.49,
+            "upper": 144.5
+        },
+        "summary": "Personal Beacons"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 144.491,
+            "upper": 144.493
+        },
+        "summary": "Weak Signal MGM beacons"
+    },
+    {
+        "bandwidth": 20.0,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 144.5,
+            "upper": 144.794
+        },
+        "summary": "All modes"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 144.5,
+            "upper": 144.5
+        },
+        "summary": "Image Modes CoA"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 144.6,
+            "upper": 144.6
+        },
+        "summary": "Data CoA"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 144.6125,
+            "upper": 144.6125
+        },
+        "summary": "UK DV Calling"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 144.75,
+            "upper": 144.75
+        },
+        "summary": "ATV Callback"
+    },
+    {
+        "bandwidth": 12.0,
+        "modes": [
+            "Dig"
+        ],
+        "range": {
+            "lower": 144.794,
+            "upper": 144.99
+        },
+        "summary": "MGM Digital"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 144.8,
+            "upper": 144.8
+        },
+        "summary": "Unconnected nets: APRS, Uview etc."
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 144.8125,
+            "upper": 144.8125
+        },
+        "summary": "DV Internet voice gateway"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 144.825,
+            "upper": 144.825
+        },
+        "summary": "DV Internet voice gateway"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 144.8375,
+            "upper": 144.8375
+        },
+        "summary": "DV Internet voice gateway"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 144.85,
+            "upper": 144.85
+        },
+        "summary": "DV Internet voice gateway"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 144.8625,
+            "upper": 144.8625
+        },
+        "summary": "DV Internet voice gateway"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 144.875,
+            "upper": 144.9125
+        },
+        "summary": "Internet gateways"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 144.925,
+            "upper": 144.925
+        },
+        "summary": "Digital Usage"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 144.9375,
+            "upper": 144.9375
+        },
+        "summary": "Digital Usage"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 144.95,
+            "upper": 144.95
+        },
+        "summary": "Digital Usage"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 144.9625,
+            "upper": 144.9625
+        },
+        "summary": "FM Internet Voice gateway"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 144.975,
+            "upper": 144.975
+        },
+        "summary": "Low power, ad-hoc repeaters"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 144.9875,
+            "upper": 144.9875
+        },
+        "summary": "Low power, ad-hoc repeaters"
+    },
+    {
+        "bandwidth": 12.0,
+        "modes": [
+            "DV",
+            "FM",
+            "Repeater"
+        ],
+        "range": {
+            "lower": 144.99,
+            "upper": 145.1935
+        },
+        "summary": "FM/DV Repeater inputs @ 12.5 kHz channels"
+    },
+    {
+        "bandwidth": 12.0,
+        "modes": [
+            "DV",
+            "FM"
+        ],
+        "range": {
+            "lower": 145.1935,
+            "upper": 145.5935
+        },
+        "summary": "FM/DV Simplex @ 12.5 kHz channels"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 145.2,
+            "upper": 145.2
+        },
+        "summary": "FM/DV Space Communications – Earth to Space"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 145.2125,
+            "upper": 145.2125
+        },
+        "summary": "FM Internet Voice gateway"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 145.225,
+            "upper": 145.225
+        },
+        "summary": "FM Internet Voice gateway"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 145.23770000000002,
+            "upper": 145.23770000000002
+        },
+        "summary": "FM Internet Voice gateway"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 145.25,
+            "upper": 145.25
+        },
+        "summary": "Slow Morse Transmission"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 145.2625,
+            "upper": 145.2625
+        },
+        "summary": "FM Internet Voice gateway"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 145.2875,
+            "upper": 145.2875
+        },
+        "summary": "FM Internet Voice gateway"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 145.3125,
+            "upper": 145.3125
+        },
+        "summary": "FM Internet Voice gateway"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 145.3375,
+            "upper": 145.3375
+        },
+        "summary": "FM Internet Voice gateway"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 145.5,
+            "upper": 145.5
+        },
+        "summary": "FM Calling Channel"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 145.525,
+            "upper": 145.525
+        },
+        "summary": "Used for GB2RS"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 145.55,
+            "upper": 145.55
+        },
+        "summary": "Used for rally/exhibition talk-in"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 145.575,
+            "upper": 145.575
+        },
+        "summary": "Low power, ad-hoc repeaters"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 145.5875,
+            "upper": 145.5875
+        },
+        "summary": ""
+    },
+    {
+        "bandwidth": 12.0,
+        "modes": [
+            "DV",
+            "FM",
+            "Repeater"
+        ],
+        "range": {
+            "lower": 145.5935,
+            "upper": 145.7935
+        },
+        "summary": "FM/DV Repeater outputs @ 12.5 kHz channels"
+    },
+    {
+        "bandwidth": 12.0,
+        "modes": [
+            "DV",
+            "FM"
+        ],
+        "range": {
+            "lower": 145.7935,
+            "upper": 145.806
+        },
+        "summary": "FM/DV Space downlink @145800"
+    },
+    {
+        "bandwidth": 12.0,
+        "modes": [
+            "CW",
+            "DV",
+            "Dig",
+            "FM"
+        ],
+        "range": {
+            "lower": 145.806,
+            "upper": 146.0
+        },
+        "summary": "All modes - satellite exclusive"
+    },
+    {
+        "bandwidth": 500.0,
+        "modes": [
+            "Dig"
+        ],
+        "range": {
+            "lower": 146.0,
+            "upper": 146.9
+        },
+        "summary": "Wideband digital modes (high-speed data or DATV)"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 146.5,
+            "upper": 146.5
+        },
+        "summary": "Centre Frequency"
+    },
+    {
+        "bandwidth": 12.0,
+        "modes": [
+            "Dig"
+        ],
+        "range": {
+            "lower": 146.9,
+            "upper": 147.0
+        },
+        "summary": "Narrow band digital (incl. DV)"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 146.9375,
+            "upper": 146.9375
+        },
+        "summary": "Not available in/near Scotland"
+    },
+    {
+        "bandwidth": 20.0,
+        "modes": [
+            "DV",
+            "FM",
+            "Repeater"
+        ],
+        "range": {
+            "lower": 430.0,
+            "upper": 432.0
+        },
+        "summary": "FM/DV Various"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 430.0125,
+            "upper": 430.1
+        },
+        "summary": "FM Internet Voice gateway"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 430.125,
+            "upper": 430.1375
+        },
+        "summary": "DV 9 MHz split repeater inputs"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 430.25,
+            "upper": 430.3
+        },
+        "summary": "DV 9 MHz reverse-split repeater outputs"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 430.4,
+            "upper": 430.775
+        },
+        "summary": "DV 9 MHz split repeater inputs"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 430.7875,
+            "upper": 430.7875
+        },
+        "summary": "7.6 MHz reverse-split repeater inputs"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 430.8,
+            "upper": 430.8
+        },
+        "summary": "7.6 MHz talk-through"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 430.8125,
+            "upper": 430.975
+        },
+        "summary": "7.6 MHz split repeater outputs"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 430.99,
+            "upper": 431.9
+        },
+        "summary": "Digital Communications"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 431.015,
+            "upper": 431.25
+        },
+        "summary": "DV Internet voice gateway"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 432.0,
+            "upper": 432.4
+        },
+        "summary": "Narrowband modes"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 432.2,
+            "upper": 432.2
+        },
+        "summary": "CW CoA"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 432.35,
+            "upper": 432.35
+        },
+        "summary": "Microwave talk-back"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "Beacons"
+        ],
+        "range": {
+            "lower": 432.4,
+            "upper": 432.49
+        },
+        "summary": "Propagation beacons only"
+    },
+    {
+        "bandwidth": 12.0,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 432.49,
+            "upper": 432.994
+        },
+        "summary": "All modes non-channelised"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 432.491,
+            "upper": 432.493
+        },
+        "summary": "Personal Beacons"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 432.5,
+            "upper": 432.5
+        },
+        "summary": "Narrowband SSTV CoA"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 432.625,
+            "upper": 432.675
+        },
+        "summary": "Digital Communications"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 432.775,
+            "upper": 432.775
+        },
+        "summary": "1.6 MHz Talk-through"
+    },
+    {
+        "bandwidth": 12.0,
+        "modes": [
+            "FM",
+            "Repeater"
+        ],
+        "range": {
+            "lower": 432.994,
+            "upper": 433.3875
+        },
+        "summary": "FM Repeater outputs"
+    },
+    {
+        "bandwidth": 12.0,
+        "modes": [],
+        "range": {
+            "lower": 433.3875,
+            "upper": 433.6
+        },
+        "summary": "FM/DV Simplex"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 433.5,
+            "upper": 433.5
+        },
+        "summary": "FM Calling Channel"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 433.55,
+            "upper": 433.55
+        },
+        "summary": "Used for rally/exhibition talk-in"
+    },
+    {
+        "bandwidth": 12.0,
+        "modes": [
+            "CW",
+            "DV",
+            "Dig",
+            "FM"
+        ],
+        "range": {
+            "lower": 433.6,
+            "upper": 434.0
+        },
+        "summary": "All modes"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 433.625,
+            "upper": 433.675
+        },
+        "summary": "Digital Communications"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 433.8,
+            "upper": 433.8
+        },
+        "summary": "Alternate APRS"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 433.8,
+            "upper": 434.25
+        },
+        "summary": "Digital Communications and Experiments"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 434.0,
+            "upper": 434.0
+        },
+        "summary": "Low-power hot-spot"
+    },
+    {
+        "bandwidth": 12.0,
+        "modes": [
+            "DV",
+            "FM"
+        ],
+        "range": {
+            "lower": 434.0,
+            "upper": 434.594
+        },
+        "summary": "FM/DV "
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 433.95,
+            "upper": 434.05
+        },
+        "summary": "Internet Voice gateway"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 434.375,
+            "upper": 434.375
+        },
+        "summary": "1.6 MHz Talk-through"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 434.475,
+            "upper": 434.525
+        },
+        "summary": "DV Internet voice gateway"
+    },
+    {
+        "bandwidth": 12.0,
+        "modes": [
+            "DV",
+            "FM",
+            "Repeater"
+        ],
+        "range": {
+            "lower": 434.594,
+            "upper": 435.0
+        },
+        "summary": "FM/DV Repeater inputs"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "Satellite"
+        ],
+        "range": {
+            "lower": 435.0,
+            "upper": 436.0
+        },
+        "summary": "Satellites only"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "Satellite",
+            "TV"
+        ],
+        "range": {
+            "lower": 436.0,
+            "upper": 438.0
+        },
+        "summary": "Satellites and experimental DATV"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 437.0,
+            "upper": 437.0
+        },
+        "summary": "Experimental DATV CoA"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "DV",
+            "FM",
+            "Repeater"
+        ],
+        "range": {
+            "lower": 438.0,
+            "upper": 440.0
+        },
+        "summary": "All modes"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 438.0,
+            "upper": 438.375
+        },
+        "summary": "5 MHz split repeater inputs"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 438.4,
+            "upper": 438.4
+        },
+        "summary": "7.6 MHz talk-through"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 438.4125,
+            "upper": 438.575
+        },
+        "summary": "7.6 MHz split repeater inputs"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 438.6125,
+            "upper": 438.6125
+        },
+        "summary": "DV Calling"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 438.8,
+            "upper": 438.8
+        },
+        "summary": "Low-power hot-spot"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 439.125,
+            "upper": 439.1375
+        },
+        "summary": "9 MHz split repeater outputs"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 439.6,
+            "upper": 440.0
+        },
+        "summary": "Digital Communications"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 439.4,
+            "upper": 439.775
+        },
+        "summary": "9 MHz split repeater outputs"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [],
+        "range": {
+            "lower": 439.9,
+            "upper": 439.9875
+        },
+        "summary": "Digital Communications"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Phone"
+        ],
+        "range": {
+            "lower": 1240.0,
+            "upper": 1240.75
+        },
+        "summary": "Alternative narrow-band operations"
+    },
+    {
+        "bandwidth": 20.0,
+        "modes": [
+            "DV",
+            "FM",
+            "Repeater"
+        ],
+        "range": {
+            "lower": 1240.75,
+            "upper": 1241.0
+        },
+        "summary": "FM/DV Repeater inputs"
+    },
+    {
+        "bandwidth": 150.0,
+        "modes": [
+            "Dig"
+        ],
+        "range": {
+            "lower": 1241.0,
+            "upper": 1241.75
+        },
+        "summary": "High-speed digital data"
+    },
+    {
+        "bandwidth": 20.0,
+        "modes": [
+            "DV",
+            "FM"
+        ],
+        "range": {
+            "lower": 1241.75,
+            "upper": 1242.0
+        },
+        "summary": "FM/DV Simplex @ 25 kHz channels"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "TV"
+        ],
+        "range": {
+            "lower": 1242.0,
+            "upper": 1249.0
+        },
+        "summary": "Repeater inputs"
+    },
+    {
+        "bandwidth": 20.0,
+        "modes": [
+            "DV",
+            "FM",
+            "Repeater"
+        ],
+        "range": {
+            "lower": 1249.0,
+            "upper": 1249.25
+        },
+        "summary": "FM/DV Repeater outputs"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "Guard"
+        ],
+        "range": {
+            "lower": 1249.25,
+            "upper": 1250.0
+        },
+        "summary": ""
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "Satellite"
+        ],
+        "range": {
+            "lower": 1250.0,
+            "upper": 1290.0
+        },
+        "summary": "Amateur Satellite service"
+    },
+    {
+        "bandwidth": 20.0,
+        "modes": [
+            "DV",
+            "FM",
+            "Repeater"
+        ],
+        "range": {
+            "lower": 1290.0,
+            "upper": 1291.5
+        },
+        "summary": "FM/DV Repeater – inputs"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "CW",
+            "DV",
+            "Dig",
+            "FM",
+            "Phone"
+        ],
+        "range": {
+            "lower": 1291.5,
+            "upper": 1296.0
+        },
+        "summary": "All mdes"
+    },
+    {
+        "bandwidth": 0.5,
+        "modes": [
+            "CW",
+            "Dig"
+        ],
+        "range": {
+            "lower": 1296.0,
+            "upper": 1296.15
+        },
+        "summary": "Narrow band "
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 1296.15,
+            "upper": 1296.8
+        },
+        "summary": ""
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "Beacons"
+        ],
+        "range": {
+            "lower": 1296.8,
+            "upper": 1296.994
+        },
+        "summary": "Beacons"
+    },
+    {
+        "bandwidth": 20.0,
+        "modes": [
+            "DV",
+            "FM",
+            "Repeater"
+        ],
+        "range": {
+            "lower": 1296.994,
+            "upper": 1297.4875
+        },
+        "summary": "FM/DV Repeater outputs"
+    },
+    {
+        "bandwidth": 20.0,
+        "modes": [
+            "DV",
+            "FM"
+        ],
+        "range": {
+            "lower": 1297.4875,
+            "upper": 1298.0
+        },
+        "summary": "FM/DV Simplex"
+    },
+    {
+        "bandwidth": 20.0,
+        "modes": [
+            "CW",
+            "DV",
+            "Dig",
+            "FM",
+            "Phone"
+        ],
+        "range": {
+            "lower": 1298.0,
+            "upper": 1299.0
+        },
+        "summary": "All modes"
+    },
+    {
+        "bandwidth": 150.0,
+        "modes": [
+            "Dig"
+        ],
+        "range": {
+            "lower": 1299.0,
+            "upper": 1299.75
+        },
+        "summary": "High-speed digital data"
+    },
+    {
+        "bandwidth": 20.0,
+        "modes": [
+            "DV",
+            "FM"
+        ],
+        "range": {
+            "lower": 1299.75,
+            "upper": 1300.0
+        },
+        "summary": "FM/DV Simplex"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "Repeater",
+            "TV"
+        ],
+        "range": {
+            "lower": 1300.0,
+            "upper": 1325.0
+        },
+        "summary": "TV Repeaters"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 2300.0,
+            "upper": 2300.4
+        },
+        "summary": "Narrowband modes"
+    },
+    {
+        "bandwidth": 500.0,
+        "modes": [
+            "DV",
+            "Dig",
+            "FM"
+        ],
+        "range": {
+            "lower": 2300.4,
+            "upper": 2301.8
+        },
+        "summary": "Wideband modes"
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 2301.8,
+            "upper": 2301.0
+        },
+        "summary": "Narrowband modes"
+    },
+    {
+        "bandwidth": 200.0,
+        "modes": [
+            "Dig",
+            "Repeater"
+        ],
+        "range": {
+            "lower": 2310.0,
+            "upper": 2320.0
+        },
+        "summary": ""
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "Phone"
+        ],
+        "range": {
+            "lower": 2320.0,
+            "upper": 2320.8
+        },
+        "summary": ""
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "Beacons"
+        ],
+        "range": {
+            "lower": 2320.8,
+            "upper": 2321.0
+        },
+        "summary": ""
+    },
+    {
+        "bandwidth": 20.0,
+        "modes": [
+            "DV",
+            "FM"
+        ],
+        "range": {
+            "lower": 2321.0,
+            "upper": 2322.0
+        },
+        "summary": ""
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "Dig",
+            "TV"
+        ],
+        "range": {
+            "lower": 2322.0,
+            "upper": 2350.0
+        },
+        "summary": "Wideband modes"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "Repeater",
+            "TV"
+        ],
+        "range": {
+            "lower": 2390.0,
+            "upper": 2400.0
+        },
+        "summary": ""
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "Repeater",
+            "TV"
+        ],
+        "range": {
+            "lower": 2400.0,
+            "upper": 2450.0
+        },
+        "summary": ""
+    },
+    {
+        "bandwidth": 2.7,
+        "modes": [
+            "CW",
+            "Dig",
+            "Phone"
+        ],
+        "range": {
+            "lower": 3400.0,
+            "upper": 3400.8
+        },
+        "summary": "Narrowband modes"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "Beacons"
+        ],
+        "range": {
+            "lower": 3400.8,
+            "upper": 3401.0
+        },
+        "summary": ""
+    },
+    {
+        "bandwidth": 200.0,
+        "modes": [
+            "Dig"
+        ],
+        "range": {
+            "lower": 3401.0,
+            "upper": 3402.0
+        },
+        "summary": "Wideband "
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "Dig",
+            "TV"
+        ],
+        "range": {
+            "lower": 3402.0,
+            "upper": 3410.0
+        },
+        "summary": "Wideband modes"
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "All"
+        ],
+        "range": {
+            "lower": 5650.0,
+            "upper": 5850.0
+        },
+        "summary": ""
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "All"
+        ],
+        "range": {
+            "lower": 10000.0,
+            "upper": 10500.0
+        },
+        "summary": ""
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "All"
+        ],
+        "range": {
+            "lower": 24000.0,
+            "upper": 24250.0
+        },
+        "summary": ""
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "All"
+        ],
+        "range": {
+            "lower": 47000.0,
+            "upper": 47090.0
+        },
+        "summary": ""
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "All"
+        ],
+        "range": {
+            "lower": 75500.0,
+            "upper": 81000.0
+        },
+        "summary": ""
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "All"
+        ],
+        "range": {
+            "lower": 122250.0,
+            "upper": 123000.0
+        },
+        "summary": ""
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "All"
+        ],
+        "range": {
+            "lower": 134000.0,
+            "upper": 141000.0
+        },
+        "summary": ""
+    },
+    {
+        "bandwidth": 0.0,
+        "modes": [
+            "All"
+        ],
+        "range": {
+            "lower": 241000.0,
+            "upper": 250000.0
+        },
+        "summary": ""
+    }
+]
