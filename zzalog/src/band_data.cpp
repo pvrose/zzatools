@@ -77,7 +77,7 @@ bool band_data::load_json() {
 	if (i.good()) {
 		i >> j;
 		i.close();
-		for (auto jt : j) {
+		for (auto jt : j.at("band plan")) {
 			band_entry_t* e = new band_entry_t(jt.template get<band_entry_t>());
 			entries_.push_back(e);
 		}
@@ -94,14 +94,17 @@ bool band_data::load_json() {
 void band_data::save_json() {
 	// Convert entries_ to a JSON object
 	json j;
+
 	for (auto it : entries_) {
 		json j1(*it);
 		j.push_back(j1);
 	}
+	json jout;
+	jout["band plan"] = j;
 	// Wrte JSON out to band_plan.json
 	string filename = get_path() + "band_plan.json";
 	ofstream o(filename);
-	o << std::setw(4) << j << '\n';
+	o << std::setw(4) << jout << '\n';
 	o.close();
 }
 // Decode an entry
