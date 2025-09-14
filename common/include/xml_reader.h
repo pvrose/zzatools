@@ -73,8 +73,6 @@
 		bool ignore_white_space(std::istream& is);
 		//! Convert &..; to original character
 		void process_escape(std::istream& is, std::string& result);
-		//! Convert XML date-time format to time_t
-		time_t convert_xml_datetime(std::string value);
 		//! The prolog element
 		xml_element* prolog_;
 		//! The top-element

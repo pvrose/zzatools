@@ -188,6 +188,9 @@ utils.h - various utility methods
 	//! \see xor_crypt.
 	std::string xor_crypt(std::string, uint32_t seed, uchar offset);
 
+	//! Convert ISO date-time format to time_t
+	std::time_t convert_iso_datetime(std::string value);
+
 	//! Returns the widget of class WIDGET that encloses \p w.
 	template <class WIDGET>
 	WIDGET* ancestor_view(Fl_Widget* w) {

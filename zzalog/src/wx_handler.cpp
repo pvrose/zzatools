@@ -419,7 +419,7 @@ bool wx_handler::start_sun(std::map<std::string, std::string>* attributes) {
     elements_.push_back(WXE_SUN);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
         std::string att_name = to_upper(it->first);
-        time_t value = convert_xml_datetime(it->second);
+        time_t value = convert_iso_datetime(it->second);
         if (att_name == "RISE") {
             report_.sunrise = value;
         }
@@ -705,7 +705,7 @@ bool wx_handler::start_updated(std::map<std::string, std::string>* attributes) {
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
         std::string att_name = to_upper(it->first);
         if (att_name == "VALUE") {
-            time_t value = convert_xml_datetime(it->second);
+            time_t value = convert_iso_datetime(it->second);
             report_.updated = value;
         }
     }

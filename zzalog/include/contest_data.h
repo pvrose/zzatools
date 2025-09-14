@@ -1,5 +1,7 @@
 #pragma once
 
+#include "nlohmann/json.hpp"
+
 #include <chrono>
 #include <map>
 #include <set>
@@ -11,6 +13,7 @@
 class contest_reader;
 class contest_score;
 class contest_write;
+using json = nlohmann::json;
 
 //! Definition of contest timeframe
 struct ct_date_t {
@@ -29,17 +32,27 @@ struct ct_date_t {
 	}
 };
 
+//! Conversion of ct_date_t to JSON
+void to_json(json& j, const ct_date_t& s);
+//! Conversion of JSON to ct_data_t
+void from_json(const json& j, ct_date_t& s);
+
 //! Definition of the contest.
 struct ct_data_t {
 	std::string algorithm;        //!< Scoring and exchange algorithm.
 	ct_date_t date;          //!< Period of the contest.
 };
 
+//! Conversion of ct_data_ to JSON
+void to_json(json& j, const ct_data_t& s);
+//! Conversion of JSON to ct_data_t
+void from_json(const json& j, ct_data_t& s);
+
 //! Amalgamated contest std::list entry
 struct ct_entry_t {
 	std::string id;               //!< Identifier for the contest.
 	std::string index;            //!< Speciifc instance of the contest (eg 2025)
-	ct_data_t* definition;   //!< Contest definition.
+	ct_data_t* definition;        //!< Contest definition.
 };
 
 //! The contest definition database
@@ -82,12 +95,16 @@ protected:
 	bool load_data();
 	//! Store the internal database into contests.xml.
 	bool save_data();
+	//! SAve as JSON
+	bool save_json(std::ofstream& os);
+	//! Load as JSON
+	bool load_json(std::ifstream& is);
 
 	// The databases 
 	//! Individual contests mapped by ID and index (e.g. year)
 	
-	//! - <B>Outer std::map</B> Addressed by instance identifier.
-	//! - <B>Inner std::map</B> Addressed by contest identifier.
+	//! - <B>Inner std::map</B> Addressed by instance identifier.
+	//! - <B>Outer std::map</B> Addressed by contest identifier.
 	std::map<std::string, std::map<std::string, ct_data_t*> > contests_;
 	//! Consolidated database of all contest entries.
 	std::vector<ct_entry_t*> contest_infos_;
