@@ -1092,3 +1092,52 @@ std::string xor_crypt(std::string src, uint32_t seed, uchar offset) {
 	}
 	return result;
 }
+
+// Convert ISO date time format to time_t
+std::time_t convert_iso_datetime(std::string value) {
+	// Get resolution of time_t
+	time_t now;
+	time(&now);
+	time_t then = now + 1;
+	double resolution = difftime(then, now);
+
+	// YYY-MM-DDTHH:MM:SS+HH:MM
+	tm tv;
+	tv.tm_year = std::stoi(value.substr(0, 4)) - 1900;
+	tv.tm_mon = std::stoi(value.substr(5, 2)) - 1;
+	tv.tm_mday = std::stoi(value.substr(8, 2));
+	tv.tm_hour = std::stoi(value.substr(11, 2));
+	tv.tm_min = std::stoi(value.substr(14, 2));
+	tv.tm_sec = std::stoi(value.substr(17, 2));
+	tv.tm_isdst = false;
+#ifdef _WIN32
+	time_t result = _mkgmtime(&tv);
+#else
+	time_t result = timegm(&tv);
+#endif
+	if (value.length() > 19 && value[19] != 'Z') {
+		bool subtract = value[19] == '+';
+		long tz_hour = std::stoi(value.substr(20, 2));
+		long tz_min = std::stoi(value.substr(23, 2));
+		double seconds = (3600.0 * tz_hour) + (60.0 * tz_min);
+		long adjust = (long)(seconds / resolution);
+#ifdef _WIN32
+		// dates pre 1970 return -1
+		if (tv.tm_year < 70) {
+			tv.tm_year += 100;
+			double day_s = 24 * 60 * 60;
+			double cent_s = (100 * 365 + 24) * day_s;
+			result = _mkgmtime(&tv);
+			long long cent_t = cent_s / resolution;
+			result = result - cent_t;
+		}
+#endif
+		if (subtract) {
+			result -= adjust;
+		}
+		else {
+			result += adjust;
+		}
+	}
+	return result;
+}

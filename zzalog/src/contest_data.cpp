@@ -1,13 +1,48 @@
 #include "contest_data.h"
 
-#include "contest_reader.h"
-#include "contest_writer.h"
 #include "status.h"
 
 #include <fstream>
+#include <ctime>
 
 extern std::string default_data_directory_;
 extern status* status_;
+
+//! Conversion of ct_data_ to JSON
+void to_json(json& j, const ct_data_t& s) {
+	j = json{
+		{ "Algorithm", s.algorithm },
+		{ "Dates", s.date }
+	};
+}
+
+//! Conversion of JSON to ct_data_t
+void from_json(const json& j, ct_data_t& s) {
+	j.at("Algorithm").get_to(s.algorithm);
+	j.at("Dates").get_to(s.date);
+}
+
+//! Conversion of ct_date_t to JSON
+void to_json(json& j, const ct_date_t& s) {
+	char temp[64];
+	const std::time_t ts = std::chrono::system_clock::to_time_t(s.start);
+	strftime(temp, sizeof(temp), "%FT%TZ", std::gmtime(&ts));
+	j["Start"] = temp;
+	const std::time_t tf = std::chrono::system_clock::to_time_t(s.finish);
+	strftime(temp, sizeof(temp), "%FT%TZ", std::gmtime(&tf));
+	j["Finish"] = temp;
+}
+
+//! Conversion of JSON to ct_date_t
+void from_json(const json& j, ct_date_t& s) {
+	string temps;
+	j.at("Start").get_to(temps);
+	std::time_t result = convert_iso_datetime(temps);
+	s.start = std::chrono::system_clock::from_time_t(result);
+	j.at("Finish").get_to(temps);
+	result = convert_iso_datetime(temps);
+	s.finish = std::chrono::system_clock::from_time_t(result);
+}
 
 contest_data::contest_data() {
 	load_data();
@@ -70,39 +105,70 @@ ct_entry_t* contest_data::get_contest_info(int number) {
 
 // Load data
 bool contest_data::load_data() {
-	std::string filename = default_data_directory_ + "contests.xml";
+	std::string filename = default_data_directory_ + "contests.json";
 	ifstream is;
 	is.open(filename, std::ios_base::in);
 	if (is.good()) {
-		contest_reader* reader = new contest_reader();
-		if (reader->load_data(this, is)) {
-			status_->misc_status(ST_OK, "CONTEST: XML loaded OK");
-			// Populate the info database
-			for (auto it : contests_) {
-				for (auto iu : it.second) {
-					ct_entry_t* info = new ct_entry_t({ it.first, iu.first, iu.second });
-					contest_infos_.push_back(info);
-				}
-			}
+		if (load_json(is)) {
+			status_->misc_status(ST_OK, "CONTEST: Contest data loaded OK");
 			return true;
 		}
 	}
-	status_->misc_status(ST_WARNING, "CONTEST: XML data failed to load");
+	status_->misc_status(ST_WARNING, "CONTEST: Contest data failed to load");
 	return false;
 
 }
 
 // Save data
 bool contest_data::save_data() {
-	std::string filename = default_data_directory_ + "contests.xml";
+	std::string filename = default_data_directory_ + "contests.json";
 	std::ofstream os;
 	os.open(filename, std::ios_base::out);
 	if (os.good()) {
-		contest_writer* writer = new contest_writer();
-		if (!writer->store_data(this, os)) {
-			status_->misc_status(ST_OK, "CONTEST: Saved XML OK");
+		if (save_json(os)) {
+			status_->misc_status(ST_OK, "CONTEST: Saved data OK");
+			os.close();
 			return true;
 		}
 	}
 	return false;
+}
+
+// Load JSON
+bool contest_data::load_json(std::ifstream& is) {
+	json jall;
+	is >> jall;
+	for (auto itc : jall.at("Contests")) {
+		std::map<std::string, ct_data_t*> contest;
+		for (auto iti : itc.at("Instances")) {
+			ct_data_t* cd = new ct_data_t(iti.at("Definition").template get<ct_data_t>());
+			string index;
+			iti.at("Index").get_to(index);
+			contest[index] = cd;
+		}
+		string name;
+		itc.at("Name").get_to(name);
+		contests_[name] = contest;
+	}
+	if (is.fail()) return false;
+	else return true;
+}
+
+// SAve JSON
+bool contest_data::save_json(std::ofstream& os) {
+	json jall;
+	for (auto itc : contests_) {
+		json jc;
+		jc["Name"] = itc.first;
+		for (auto iti : itc.second) {
+			json ji;
+			ji["Index"] = iti.first;
+			ji["Definition"] = *iti.second;
+			jc["Instances"].push_back(ji);
+		}
+		jall["Contests"].push_back(jc);
+	}
+	os << std::setw(2) << jall << '\n';
+	if (os.fail()) return false;
+	else return true;
 }
