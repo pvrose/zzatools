@@ -74,8 +74,8 @@ CPPFLAGS := $(INC_FLAGS) -MMD -MP
 LINTFLAG := -Wunused -Wswitch 
 # Set ccompile flags
 # include debug data
-CFLAGS += -g $(LINTFLAG)
-CXXFLAGS += -g $(LINTFLAG)
+CFLAGS += -g $(LINTFLAG) -std=c++11
+CXXFLAGS += -g $(LINTFLAG) 
 
 ifeq ($(BUILD_TYPE), Anal)
 CXXFLAGS += -fsanitize=address
@@ -115,9 +115,13 @@ endif
 ./include/timestamp.h: $(SRCS)
 	touch ./include/timestamp.h
 
+# Build all without running
+.PHONY: all
+all: $(EXEC_DIR)/$(TARGET_EXEC) $(TREFS) documents
+
 # Create a target to run the compiled code
 .PHONY: run
-run: $(EXEC_DIR)/$(TARGET_EXEC) $(TREFS) documents
+run: all
 	@$(EXEC_DIR)/$(TARGET_EXEC) $(ARGS) -g ./
 
 # Create a target to run debugger

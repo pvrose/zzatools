@@ -21,7 +21,7 @@ struct range_t {
 	bool operator< (const range_t& rhs) const {
 		return lower < rhs.lower;
 	}
-};   
+};  
 
 //! This class reads in the IARU band-plan in TSV form into a database.
 //! It provides access to this database
@@ -86,4 +86,5 @@ protected:
 	band_map<set<range_t> > bands_;
 
 };
+
 

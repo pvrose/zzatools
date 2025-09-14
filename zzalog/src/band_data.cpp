@@ -2,10 +2,15 @@
 #include "status.h"
 #include "spec_data.h"
 
+#include "nlohmann/json.hpp"
+
 #include <fstream>
+#include <iostream>
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Native_File_Chooser.H>
+
+using json = nlohmann::json;
 
 extern status* status_;
 extern spec_data* spec_data_;
@@ -13,11 +18,51 @@ extern string VENDOR;
 extern string PROGRAM_ID;
 extern string default_data_directory_;
 
+void to_json(json& j, const range_t& r) {
+	j = json {
+		{ "lower", r.lower },
+		{ "upper", r.upper }
+	};
+}
+
+void from_json(const json& j, range_t& r) {
+	j.at("upper").get_to(r.upper);
+	j.at("lower").get_to(r.lower);
+}
+
+
+//! band_entry_t to json convertor
+void to_json(json& j, const band_data::band_entry_t& e) {
+	j = json{
+		{ "range", json(e.range) },
+		{ "bandwidth", e.bandwidth },
+		{ "modes", e.modes },
+		{ "summary", e.summary }
+	};
+}
+void from_json(const json& j, band_data::band_entry_t& e) {
+	j.at("range").get_to(e.range);
+	j.at("bandwidth").get_to(e.bandwidth);
+	j.at("modes").get_to(e.modes);
+	j.at("summary").get_to(e.summary);
+}
+
+
+
 // Constructor 
 band_data::band_data()
 {
 	load_data();
 	create_bands();
+
+	//// Example dumping data to a JSON stream
+	// json j;
+	// for (auto it : entries_ ) {
+	// 	json j1 (*it );
+	// 	j.push_back(j1);
+	// }
+    // std::cout << std::setw(4) << j << '\n';
+
 }
 
 // Destructor
