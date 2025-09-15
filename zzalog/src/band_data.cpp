@@ -16,35 +16,35 @@ extern status* status_;
 extern spec_data* spec_data_;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
-extern std::string default_data_directory_;
+extern std::string default_ref_directory_;
 
 void to_json(json& j, const range_t& r) {
 	j = json {
-		{ "lower", r.lower },
-		{ "upper", r.upper }
+		{ "Lower", r.lower },
+		{ "Upper", r.upper }
 	};
 }
 
 void from_json(const json& j, range_t& r) {
-	j.at("upper").get_to(r.upper);
-	j.at("lower").get_to(r.lower);
+	j.at("Upper").get_to(r.upper);
+	j.at("Lower").get_to(r.lower);
 }
 
 
 //! band_entry_t to json convertor
 void to_json(json& j, const band_data::band_entry_t& e) {
 	j = json{
-		{ "range", json(e.range) },
-		{ "bandwidth", e.bandwidth },
-		{ "modes", e.modes },
-		{ "summary", e.summary }
+		{ "Range", json(e.range) },
+		{ "Bandwidth", e.bandwidth },
+		{ "Modes", e.modes },
+		{ "Summary", e.summary }
 	};
 }
 void from_json(const json& j, band_data::band_entry_t& e) {
-	j.at("range").get_to(e.range);
-	j.at("bandwidth").get_to(e.bandwidth);
-	j.at("modes").get_to(e.modes);
-	j.at("summary").get_to(e.summary);
+	j.at("Range").get_to(e.range);
+	j.at("Bandwidth").get_to(e.bandwidth);
+	j.at("Modes").get_to(e.modes);
+	j.at("Summary").get_to(e.summary);
 }
 
 
@@ -60,7 +60,7 @@ band_data::band_data()
 // Destructor
 band_data::~band_data()
 {
-//	save_json();
+	save_json();
 	for (auto it = entries_.begin(); it != entries_.end(); it++) {
 		delete* it;
 	}
@@ -77,7 +77,7 @@ bool band_data::load_json() {
 	if (i.good()) {
 		i >> j;
 		i.close();
-		for (auto jt : j.at("band plan")) {
+		for (auto jt : j.at("Band plan")) {
 			band_entry_t* e = new band_entry_t(jt.template get<band_entry_t>());
 			entries_.push_back(e);
 		}
@@ -100,52 +100,17 @@ void band_data::save_json() {
 		j.push_back(j1);
 	}
 	json jout;
-	jout["band plan"] = j;
+	jout["Band plan"] = j;
 	// Wrte JSON out to band_plan.json
 	std::string filename = get_path() + "band_plan.json";
 	std::ofstream o(filename);
 	o << std::setw(4) << jout << '\n';
 	o.close();
 }
-// Decode an entry
-band_data::band_entry_t* band_data::get_entry(std::string line) {
-	std::vector<std::string> words;
-	split_line(line, words, '\t');
-	// Create the entry
-	band_entry_t* result = new band_entry_t;
-	// Lower->Upper->Bandwidth->Mode->Notes
-	// First entry lower bound or spot entry
-	result->range.lower = std::stod(words[0]) / 1000.0;
-	// Second entry upper bound - if no entry then it's a spot frequency entry
-	try {
-		result->range.upper = std::stod(words[1]) / 1000.0;
-	}
-	catch (exception&) {
-		result->range.upper = result->range.lower;
-	}
-	// Third entry is bandwidth
-	try {
-		result->bandwidth = std::stod(words[2]);
-	}
-	catch (exception&) {
-		result->bandwidth = 0.0;
-	}
-	// Fourth is mode
-	std::vector<std::string> modes;
-	split_line(words[3], modes, ',');
-	for (auto ix = modes.begin(); ix != modes.end(); ix++) {
-		if (ix->length()) {
-			result->modes.insert(*ix);
-		}
-	}
-	// Fifth is notes
-	result->summary = words[4];
-	return result;
-}
 
 // Get the directory of the reference files
 std::string band_data::get_path() {
-	return default_data_directory_;
+	return default_ref_directory_;
 }
 
 // Get the band plan data entry for the specified frequency

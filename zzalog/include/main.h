@@ -202,27 +202,38 @@ std::list<std::string> recent_files_;
 std::string backup_filename(std::string source);
 //! Restores file from backup location.
 void restore_backup();
+
 //! Callback for main_window and qso_manager.
+
 //! \param w calling widget.
 //! \param v not used.
 static void cb_bn_close(Fl_Widget* w, void* v);
+
 //! Callback used by FLTK when parsing command-line arguments.
+
 //! \param argc count of arguments.
 //! \param argv array of arguments.
 //! \param i index of argument to decode.
 //! \return index of next argumant to decode.
 int cb_args(int argc, char** argv, int& i);
+
 //! Print the help message
 void show_help();
+
 //! Get the specified logbook filename
+
 //! \param arg_filename filename supplied by argument.
 //! \return selected filename: argument if specified otherwise most recently file opened.
 std::string get_file(char* arg_filename);
+
 //! Add some global properties
 void add_properties();
+
 //! Read the recent file std::list from the settings.
 void recent_files();
+
 //! Read the following data items:
+
 //! - ADIF specification.
 //! - Callsign parsing database.
 //! - International character std::set.
@@ -231,10 +242,14 @@ void recent_files();
 //! - Configured rig data.
 //! - Contest specifications.
 void add_data();
+
 //! Read the logbook data.
+
 //! \param arg filename supplied as command-line argument.
 void add_book(char* arg);
+
 //! Instantiate the following external protocol handlers:
+
 //! - Generic HTTP and UDP handler.
 //! - eQSL.cc interface.
 //! - Logbook of the World interface.
@@ -242,87 +257,132 @@ void add_book(char* arg);
 //! - Clublog.org interface.
 //! - WSJT-X interface.
 //! - FlDigi interface (FlLog emulator).
-//! - openweather.org interface.
+//! - openweather.org interface
 void add_qsl_handlers();
+
 //! Instantiate the QSO Manager (Dashboard)
 void add_dashboard();
-//! Label the main_window window as "[PROGRAM_ID] [PROGRAM_VERSION]: \a text". 
+
+//! Label the main_window window as "[PROGRAM_ID] [PROGRAM_VERSION]: \a text".
+
 //! \param text 
 void main_window_label(std::string text);
+
 //! Instantiate main_window.
 void create_window();
+
 //! Add the component widgets to the main_window.
+
 //! \param curr_y Y-coordinate of last widget added plus its height.
 void add_widgets(int& curr_y);
+
 //! Resize and reposition main_window to as it was when last opened or nearest
+
 //! position on current screem.
 void resize_window();
+
 //! Delete all created data items
 void tidy();
+
 //! Set the default icon for all windows.
+
 //! \param arg0 not used.
 void add_icon(const char* arg0);
+
 //! Display the arguments in the status log.
+
 //! \param argc number of arguments
 //! \param argv array of arguments.
 void print_args(int argc, char** argv);
+
 //! Checks the supplied argument \a this_record is within the current session.
+
 //! \param this_record QSO to check.
 //! \return true if the QSO is within the surrent session.
 bool in_current_session(record* this_record);
+
 //! Customises various aspects when using FLTK widgets
 void customise_fltk();
+
 //! Read the sticky switches from the settings.
 void read_saved_switches();
+
 //! Save the sticky switches to the settings file.
 void save_switches();
+
 //! Open the settings file for saved configuration.
+
 //! \return true if file was opened successfully, otherwise false.
 bool open_settings();
+
 //! Initialise hamlib
 void load_rig_data();
+
 //! Open a dialog if a club installation to allow operator to login.
 void club_operator();
+
 //! Main program entry point.
+
 //! \param argc number of command-line arguments
 //! \param argv array of command-line arguments.
 int main(int argc, char** argv);
+
 //! Backs up file to separate location.
 void backup_file();
+
 //! Add the specified file to the recent files std::list.
 void set_recent_file(std::string filename);
+
 //! Open the user-guide at the specified page &lt;\a file&gt;.html.
 void open_html(const char* file);
 
 //! Flag to prevent more than one closure process at the same time.
 bool closing_ = false;
+
 //! Flag to mark everything loaded.
 bool initialised_ = false;
+
 //! Time loaded.
 time_t session_start_ = (time_t)0;
+
 //! Previous frequency.
 double prev_freq_ = 0.0;
+
 //! Filename in arguments.
 char* filename_ = nullptr;
+
 //! File is new (neither in argument or settings.
 bool new_file_ = false;
+
 //! Default station callsign.
 std::string default_station_ = "";
+
 //! Main logo.
 Fl_PNG_Image main_icon_("ZZALOG_ICON", ___rose_png, ___rose_png_len);
+
 //! Using backp.
 bool using_backup_ = false;
+
 //! Sticky switches mesasge.
 std::string sticky_message_ = "";
+
 //! Common seed to use in password encryption - maintaned with sessions.
 uint32_t seed_ = 0;
+
 //! Default location for configuration files.
 std::string default_data_directory_ = "";
-//! Default location for userguide files.
+
+//! Default location for documentatiom files.
 std::string default_html_directory_ = "";
+
+//! Default location for reference data
+std::string default_ref_directory_ = "";
+
 //! Preferences root - system-wide or per-user.
 Fl_Preferences::Root prefs_mode_;
+
 //! Do not close banner. Kept \p false unless banner is not deleted at ZZALOG closure in error cases.
 bool keep_banner_ = false;
+
 //! This run is a new installation
 bool new_installation_ = false;

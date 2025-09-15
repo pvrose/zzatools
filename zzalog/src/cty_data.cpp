@@ -27,7 +27,7 @@
 extern club_handler* club_handler_;
 extern spec_data* spec_data_;
 extern status* status_;
-extern std::string default_data_directory_;
+extern std::string default_ref_directory_;
 extern bool DEBUG_PARSE;
 
 cty_data::cty_data() {
@@ -35,7 +35,7 @@ cty_data::cty_data() {
 	import_ = new all_data;
 	now_ = std::chrono::system_clock::now();
 	bool loaded;
-	std::string rep_fn = default_data_directory_ + "cty_load.rpt";
+	std::string rep_fn = default_ref_directory_ + "cty_load.rpt";
 	os_.open(rep_fn);
 	os_ << "Loading from ADIF\n";
 	// Load all the daat
@@ -380,11 +380,11 @@ bool cty_data::load_data(std::string filename) {
 std::string cty_data::get_filename() {
 	switch (type_) {
 	case COUNTRY_FILES:
-		return default_data_directory_ + "cty.csv";
+		return default_ref_directory_ + "cty.csv";
 	case CLUBLOG:
-		return default_data_directory_ + "cty.xml";
+		return default_ref_directory_ + "cty.xml";
 	case DXATLAS:
-		return default_data_directory_ + "Prefix.lst";
+		return default_ref_directory_ + "Prefix.lst";
 	default:
 		return "";
 	}
