@@ -277,3 +277,6 @@ __pycache__/
 /zzalog/ZZALOG-cache/cacheIndex.txt
 /zzalog/ZZALOG-cache/part1/disk1.cab
 /zzalog/ZZALOG-cache/part1/output-info.ini
+/zzalog/ZZALOG-x64_Release-SetupFiles/ZZALOG.msi
+/zzalog/ZZALOG-cache/part2/disk1.cab
+/zzalog/ZZALOG-cache/part2/output-info.ini
