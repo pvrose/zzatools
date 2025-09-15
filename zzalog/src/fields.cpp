@@ -13,7 +13,21 @@ extern std::string VENDOR;
 extern std::string default_data_directory_;
 extern Fl_Preferences::Root prefs_mode_;
 
+//! Convert field_info_t to JSON object
+void to_json(json& j, const field_info_t& s) {
+    j = json{
+        { "Field", s.field },
+        { "Width", s.width },
+        { "Header", s.header }
+    };
+}
 
+//! Convert JSON object to field_info_t
+void form_json(const json& j, field_info_t& s) {
+    j.at("Field").get_to(s.field);
+    j.at("Width").get_to(s.width);
+    j.at("Header").get_to(s.header);
+}
 
 // Constructor
 fields::fields() {
@@ -152,30 +166,48 @@ bool fields::load_collections() {
 void fields::store_data() {
 	// Delete current settings
     if (filename_.length() == 0) {
-         filename_ = default_data_directory_ + "fields.tsv";
+         filename_ = default_data_directory_ + "fields.json";
         fl_make_path_for_file(filename_.c_str());
     }
     std::ofstream op;
     op.open(filename_.c_str(), std::ios_base::out);
     if (op.good()) {
-        // Then get the field sets for the applications
-        // For each field std::set
-        auto it = coll_map_.begin();
-        for (int i = 0; it != coll_map_.end(); i++, it++) {
-            int num_fields = it->second->size();
-            // For each field in the std::set
-            for (int j = 0; j < num_fields; j++) {
-                field_info_t field = (it->second)->at(j);
-                op << it->first << '\t';
-                op << j << '\t';
-                op << field.field << '\t';
-                op << field.width << '\t';
-                op << field.header << '\n';
-             }
+        json j;
+        for (auto it : coll_map_) {
+            json jc;
+            jc[it.first] = *it.second;
+            j.push_back(jc);
         }
+        json jall;
+        jall["Fields"] = j;
+        op << std::setw(2) << jall << '\n';
+        if (op.fail()) {
+            status_->misc_status(ST_ERROR, "FIELDS: Failed to save data");
+        }
+        else {
+            status_->misc_status(ST_OK, "FIELDS: Saved OK");
+        }
+        //// Then get the field sets for the applications
+        //// For each field std::set
+        //auto it = coll_map_.begin();
+        //for (int i = 0; it != coll_map_.end(); i++, it++) {
+        //    int num_fields = it->second->size();
+        //    // For each field in the std::set
+        //    for (int j = 0; j < num_fields; j++) {
+        //        field_info_t field = (it->second)->at(j);
+        //        op << it->first << '\t';
+        //        op << j << '\t';
+        //        op << field.field << '\t';
+        //        op << field.width << '\t';
+        //        op << field.header << '\n';
+        //     }
+        //}
     }
     op.close();
 }
+
+// Save the data as JSON
+
 
 // Get the std::list of collection names
 std::set<std::string> fields::coll_names() {
