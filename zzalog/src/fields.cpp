@@ -176,11 +176,9 @@ void fields::store_data() {
         for (auto it : coll_map_) {
             json jc;
             jc[it.first] = *it.second;
-            j.push_back(jc);
+            j["Fields"].push_back(jc);
         }
-        json jall;
-        jall["Fields"] = j;
-        op << std::setw(2) << jall << '\n';
+        op << std::setw(2) << j << '\n';
         if (op.fail()) {
             status_->misc_status(ST_ERROR, "FIELDS: Failed to save data");
         }
