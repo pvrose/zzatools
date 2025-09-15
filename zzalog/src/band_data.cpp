@@ -60,7 +60,7 @@ band_data::band_data()
 // Destructor
 band_data::~band_data()
 {
-	save_json();
+//	save_json();
 	for (auto it = entries_.begin(); it != entries_.end(); it++) {
 		delete* it;
 	}
@@ -75,14 +75,23 @@ bool band_data::load_json() {
 	status_->misc_status(ST_NOTE, ("BAND: Loading band-plan data"));
 	ifstream i(filename);
 	if (i.good()) {
-		i >> j;
-		i.close();
-		for (auto jt : j.at("Band plan")) {
-			band_entry_t* e = new band_entry_t(jt.template get<band_entry_t>());
-			entries_.push_back(e);
+		try {
+			i >> j;
+			i.close();
+			for (auto jt : j.at("Band plan")) {
+				band_entry_t* e = new band_entry_t(jt.template get<band_entry_t>());
+				entries_.push_back(e);
+			}
+			status_->misc_status(ST_OK, "BAND: Loaded band-plan data");
+			return true;
 		}
-		status_->misc_status(ST_OK, "BAND: Loaded band-plan data");
-		return true;
+		catch (const json::exception& e) {
+			char msg[128];
+			std::snprintf(msg, sizeof(msg), "BAND: Reading JSON failed %d (%s)\n",
+				e.id, e.what());
+			status_->misc_status(ST_ERROR, msg);
+			return false;
+		}
 	}
 	else {
 		status_->misc_status(ST_ERROR, "BAND: Load band-plan data failed");

@@ -137,18 +137,27 @@ bool contest_data::save_data() {
 // Load JSON
 bool contest_data::load_json(std::ifstream& is) {
 	json jall;
-	is >> jall;
-	for (auto itc : jall.at("Contests")) {
-		std::map<std::string, ct_data_t*> contest;
-		for (auto iti : itc.at("Instances")) {
-			ct_data_t* cd = new ct_data_t(iti.at("Definition").template get<ct_data_t>());
-			string index;
-			iti.at("Index").get_to(index);
-			contest[index] = cd;
+	try {
+		is >> jall;
+		for (auto itc : jall.at("Contests")) {
+			std::map<std::string, ct_data_t*> contest;
+			for (auto iti : itc.at("Instances")) {
+				ct_data_t* cd = new ct_data_t(iti.at("Definition").template get<ct_data_t>());
+				string index;
+				iti.at("Index").get_to(index);
+				contest[index] = cd;
+			}
+			string name;
+			itc.at("Name").get_to(name);
+			contests_[name] = contest;
 		}
-		string name;
-		itc.at("Name").get_to(name);
-		contests_[name] = contest;
+	}
+	catch (const json::exception& e) {
+		char msg[128];
+		std::snprintf(msg, sizeof(msg), "CONTEST: Reading JSON failed %d (%s)\n",
+			e.id, e.what());
+		status_->misc_status(ST_ERROR, msg);
+		return false;
 	}
 	if (is.fail()) return false;
 	else return true;
