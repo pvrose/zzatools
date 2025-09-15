@@ -37,7 +37,7 @@ extern status* status_;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
 extern std::string TARGET_ADIF_VN;
-extern std::string default_data_directory_;
+extern std::string default_ref_directory_;
 extern url_handler* url_handler_;
 
 // Default constructor
@@ -91,7 +91,7 @@ spec_data::~spec_data()
 
 // Get the data path to the files - returns directory name
 std::string spec_data::get_path() {
-	return default_data_directory_;
+	return default_ref_directory_;
 }
 
 // load the data

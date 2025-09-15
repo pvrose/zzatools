@@ -16,7 +16,7 @@ extern std::string CONTACT;
 extern std::string COPYRIGHT;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
-extern std::string default_data_directory_;
+extern std::string default_ref_directory_;
 extern void open_html(const char*);
 
 // Majo
@@ -212,7 +212,7 @@ void intl_dialog::cb_bn_use(Fl_Widget* w, void* v) {
 
 // Get the data path to the files - returns directory name
 std::string intl_dialog::get_path() {
-	return default_data_directory_;
+	return default_ref_directory_;
 }
 
 // Set the widget to receive the pasted character

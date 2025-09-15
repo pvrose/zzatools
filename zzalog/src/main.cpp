@@ -290,11 +290,12 @@ int cb_args(int argc, char** argv, int& i) {
 		NEW_BOOK = true;
 		i+=1;
 	}
-	// HTML Directory
+	// HTML Directory - expecetd to be "-g ./" when run in development 
 	else if (strcmp("-g", argv[i]) == 0 || strcmp("--userguide", argv[i]) == 0) {
 		i += 1;
 		if (i < argc) {
 			default_html_directory_ = argv[i];
+			default_ref_directory_ = argv[i];
 			i += 1;
 		}
 	}
@@ -931,6 +932,12 @@ bool open_settings() {
 		prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	if (settings.getUserdataPath(stemp, sizeof(stemp))) {
 		default_data_directory_ = stemp;
+		if (default_ref_directory_.length()) {
+			default_ref_directory_ += "../reference/";
+		}
+		else {
+			default_ref_directory_ = stemp;
+		}
 	}
 
 	for (char c = '8'; c > '0'; c--) {

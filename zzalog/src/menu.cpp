@@ -76,7 +76,6 @@ extern wsjtx_handler* wsjtx_handler_;
 
 extern bool READ_ONLY;
 extern std::list<std::string> recent_files_;
-extern std::string default_data_directory_;
 extern std::string PROGRAM_ID;
 extern std::string VENDOR;
 extern time_t session_start_;
