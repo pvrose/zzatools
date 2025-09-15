@@ -3,6 +3,7 @@
 #include "status.h"
 
 #include <fstream>
+#include <iostream>
 
 #include <FL/Fl_Preferences.H>
 #include <FL/fl_utf8.h>
@@ -23,7 +24,7 @@ void to_json(json& j, const field_info_t& s) {
 }
 
 //! Convert JSON object to field_info_t
-void form_json(const json& j, field_info_t& s) {
+void from_json(const json& j, field_info_t& s) {
     j.at("Field").get_to(s.field);
     j.at("Width").get_to(s.width);
     j.at("Header").get_to(s.header);
@@ -110,7 +111,6 @@ void fields::load_data() {
 	coll_map_.clear();
     if (!load_collections()) {
         // Read all the field field sets
-        return;
     }
     if (coll_map_.find("Default") == coll_map_.end()) {
         // Create the default collection
@@ -125,7 +125,7 @@ void fields::load_data() {
 
 // Read - <Prefs path>.fields.tsv
 bool fields::load_collections() {
-    filename_ = default_data_directory_ + "fields.tsv";
+    filename_ = default_data_directory_ + "fields.json";
     fl_make_path_for_file(filename_.c_str());
     ifstream ip;
     ip.open(filename_.c_str(), std::ios_base::in);
@@ -137,28 +137,28 @@ bool fields::load_collections() {
         status_->misc_status(ST_WARNING, msg);
         return false;
     }
-    std::string line;
-    while(ip.good()) {
-        getline(ip, line);
-        std::vector<std::string> words;
-        split_line(line, words, '\t');
-        if (words.size() == 5) {
-            collection_t* coll;
-            // Each line consists of <COLL NAME>\t<INDEX\t<NAME>\t<WIDTH>\t<HEADING>
-            if (coll_map_.find(words[0]) == coll_map_.end()) {
-                // New collection
-                coll = new collection_t;
-                coll_map_[words[0]] = coll;
-            } else {
-                coll = coll_map_.at(words[0]);
+
+    json jall;
+    try {
+        ip >> jall;
+        auto temp = jall.at("Fields").get<std::vector<std::map<std::string, json>>>();
+        for (auto& it : temp) {
+            for (auto& ita : it) {
+                collection_t* coll = 
+                    new collection_t(ita.second.template get<collection_t>());
+                coll_map_[ita.first] = coll;
             }
-            int ix = std::stoi(words[1]);
-            field_info_t info(words[2], words[4], std::stoi(words[3]));
-            coll->resize(max((int)coll->size(), ix + 1));
-            (*coll)[ix] = info;
         }
     }
-    ip.close();
+    catch (const json::exception& e) {
+        char msg[128];
+        std::snprintf(msg, sizeof(msg), "Fields: Reading JSON failed %d (%s)\n",
+            e.id, e.what());
+        status_->misc_status(ST_ERROR, msg);
+        ip.close();
+        return false;
+    }
+     ip.close();
     return true;
 }
 
@@ -187,21 +187,6 @@ void fields::store_data() {
         else {
             status_->misc_status(ST_OK, "FIELDS: Saved OK");
         }
-        //// Then get the field sets for the applications
-        //// For each field std::set
-        //auto it = coll_map_.begin();
-        //for (int i = 0; it != coll_map_.end(); i++, it++) {
-        //    int num_fields = it->second->size();
-        //    // For each field in the std::set
-        //    for (int j = 0; j < num_fields; j++) {
-        //        field_info_t field = (it->second)->at(j);
-        //        op << it->first << '\t';
-        //        op << j << '\t';
-        //        op << field.field << '\t';
-        //        op << field.width << '\t';
-        //        op << field.header << '\n';
-        //     }
-        //}
     }
     op.close();
 }
