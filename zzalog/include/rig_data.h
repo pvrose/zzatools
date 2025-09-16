@@ -62,8 +62,6 @@ protected:
     void load_data();
     //! LOad data from JSON
     bool load_json();
-    //! Store data  to rigs,xml.
-    bool store_data();
     //! Store data as JSON
     bool store_json();
     //! Configuration data for all rigs.

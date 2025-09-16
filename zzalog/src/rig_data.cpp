@@ -1,6 +1,5 @@
 #include "rig_data.h"
 #include "rig_reader.h"
-#include "rig_writer.h"
 #include "rig_if.h"
 #include "status.h"
 
@@ -25,7 +24,7 @@ rig_data::rig_data() {
 }
 
 rig_data::~rig_data() {
-    store_data();
+    store_json();
 }
 
 // Get the cat data
@@ -124,23 +123,6 @@ bool rig_data::load_json() {
     return true;
 }
 
-bool rig_data::store_data() {
-    if (!store_json()) {
-        std::string filename = default_data_directory_ + "rigs.xml";
-        std::ofstream os;
-        os.open(filename, std::ios_base::out);
-        if (os.good()) {
-            rig_writer* writer = new rig_writer();
-            if (!writer->store_data(&data_, os)) {
-                status_->misc_status(ST_OK, "RIG DATA: Saved XML OK");
-                return true;
-            }
-        }
-        return false;
-    }
-    else return true;
-}
-
 // Store data as JSON
 bool rig_data::store_json() {
     std::string filename = default_data_directory_ + "rigs.json";
@@ -194,6 +176,7 @@ void to_json(json& j, const cat_data_t& s) {
         { "Port", s.hamlib->port_name },
         { "Baud rate", s.hamlib->baud_rate },
         { "Model ID", s.hamlib->model_id },
+        { "Port type", s.hamlib->port_type }
     };
     json je = json{
         { "Hamlib data", jh},
@@ -236,6 +219,7 @@ void from_json(const json& j, cat_data_t& s) {
     jh.at("Model ID").get_to(s.hamlib->model_id);
     jh.at("Manufacturer").get_to(s.hamlib->mfr);
     jh.at("Baud rate").get_to(s.hamlib->baud_rate);
+    jh.at("Port type").get_to(s.hamlib->port_type);
     // Other data
     j.at("Timeout").get_to(s.hamlib->timeout);
     j.at("Maximum timeout count").get_to(s.hamlib->max_to_count);
