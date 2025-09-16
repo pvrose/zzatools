@@ -1,6 +1,5 @@
 #include "stn_data.h"
 #include "stn_reader.h"
-#include "stn_writer.h"
 #include "status.h"
 
 extern status* status_;
@@ -13,11 +12,15 @@ stn_data::stn_data()
 }
 
 stn_data::~stn_data() {
-	store_data();
+	if (!load_failed_) store_json();
 }
 
 // Load data from station.xml
 void stn_data::load_data() {
+	if (load_json()) {
+		load_failed_ = false;
+		return;
+	}
 	std::string filename = default_data_directory_ + "station.xml";
 	ifstream is;
 	char msg[128];
@@ -25,7 +28,8 @@ void stn_data::load_data() {
 	if (is.good()) {
 		stn_reader* reader = new stn_reader();
 		if (reader->load_data(&qths_, &opers_, &calls_, is)) {
-			status_->misc_status(ST_OK, "STN DATA: XML Loaded OK");
+			std::snprintf(msg, sizeof(msg), "STN DATA: %s Loaded OK", filename.c_str());
+			status_->misc_status(ST_OK, msg);
 		}
 		else {
 			load_failed_ = true;
@@ -39,24 +43,90 @@ void stn_data::load_data() {
 	}
 }
 
-// Store data to station.xml
-void stn_data::store_data() {
-	if (!load_failed_) {
-		std::string filename = default_data_directory_ + "station.xml";
-		std::ofstream os;
-		os.open(filename, std::ios_base::out);
-		if (os.good()) {
-			stn_writer* writer = new stn_writer();
-			if (!writer->store_data(&qths_, &opers_, &calls_, os)) {
-				status_->misc_status(ST_ERROR, "STN DATA: Error writing XML");
+// Load data from station.json
+bool stn_data::load_json() {
+	std::string filename = default_data_directory_ + "station.json";
+	ifstream is;
+	char msg[128];
+	is.open(filename, std::ios_base::in);
+	if (!is.good()) {
+		char msg[128];
+		snprintf(msg, sizeof(msg), "STN DATA: FAiled to open %s", filename.c_str());
+		status_->misc_status(ST_WARNING, msg);
+		return false;
+	}
+	json jall;
+	try {
+		is >> jall;
+		
+		json  j = jall["Station"];
+		auto temp = j.at("Locations").get<std::vector<std::map<std::string, json>>>();
+		for (auto& it : temp) {
+			for (auto& ita : it) {
+				qth_info_t* qi = new qth_info_t(ita.second.template get<qth_info_t>());
+				qths_[ita.first] = qi;
 			}
 		}
-		else {
-			char msg[128];
-			snprintf(msg, sizeof(msg), "STN DATA: Failed to open %s", filename.c_str());
+		temp = j.at("Operators").get<std::vector<std::map<std::string, json>>>();
+		for (auto& it : temp) {
+			for (auto& ita : it) {
+				oper_info_t* oi = new oper_info_t(ita.second.template get<oper_info_t>());
+				opers_[ita.first] = oi;
+			}
+		}
+		auto temp2 = j.at("Station callsigns").get<std::map<std::string, string>>();
+		for (auto& it : temp2) {
+			calls_[it.first] = it.second;
 		}
 	}
+	catch (const json::exception& e) {
+		std::snprintf(msg, sizeof(msg), "STN DATA: Reading JSON failed %d (%s)\n",
+			e.id, e.what());
+		status_->misc_status(ST_ERROR, msg);
+		is.close();
+		return false;
+	}
+	std::snprintf(msg, sizeof(msg), "STN DATA: %s Loaded OK", filename.c_str());
+	status_->misc_status(ST_OK, msg);
+	return true;
 }
+
+// Store data to station.json
+bool stn_data::store_json() {
+	std::string filename = default_data_directory_ + "station.json";
+	std::ofstream os;
+	os.open(filename, std::ios_base::out);
+	if (os.good()) {
+		json jall;
+		for (auto& it : qths_) {
+			if (it.first.length()) {
+				json jq;
+				jq[it.first] = *it.second;
+				jall["Locations"].push_back(jq);
+			}
+		}
+		for (auto& it : opers_) {
+			if (it.first.length()) {
+				json jo;
+				jo[it.first] = *it.second;
+				jall["Operators"].push_back(jo);
+			}
+		}
+		json jc;
+		for (auto& it : calls_) {
+			if (it.first.length()) {
+				jc[it.first] = it.second;
+			}
+		}
+		jall["Station callsigns"] = jc;
+		json j;
+		j["Station"] = jall;
+		os << std::setw(2) << j << endl;
+		return true;
+	}
+	return false;
+}
+
 
 // Add a specific item - returns true if added
 bool stn_data::add_qth_item(std::string id, qth_value_t item, std::string value) {
@@ -214,6 +284,84 @@ std::string stn_data::get_call_descr(std::string id) {
 	}
 	else {
 		return calls_.at(id);
+	}
+}
+
+// Conversion from enum qth_value_t to string
+std::map<qth_value_t, std::string> QTH_VALUE_T_2_STRING = {
+	{ STREET, "Street" },
+	{ CITY, "City" },
+	{ POSTCODE, "Postcode" },
+	{ LOCATOR, "Locator" },
+	{ DXCC_NAME, "Country" },
+	{ DXCC_ID, "DXCC" },
+	{ PRIMARY_SUB, "Primary Subdivision" },
+	{ SECONDARY_SUB, "Secondary Subdivision" },
+	{ CQ_ZONE, "CQ Zone" },
+	{ ITU_ZONE, "ITU Zone" },
+	{ CONTINENT, "Continent" },
+	{ IOTA, "IOTA" },
+	{ WAB, "WAB" }
+};
+
+//! Convert qth_info_t to JSON object
+void to_json(json& j, const qth_info_t& s) {
+	for (auto it : s.data) {
+		if (it.second.length()) {
+			j[QTH_VALUE_T_2_STRING.at(it.first)] = it.second;
+		}
+	}
+}
+
+std::map<std::string, qth_value_t> STRING_2_QTH_INFO_T = {
+	{ "Street", STREET },
+	{ "City", CITY },
+	{ "Postcode", POSTCODE },
+	{ "Locator", LOCATOR },
+	{ "Country", DXCC_NAME },
+	{ "DXCC", DXCC_ID },
+	{ "Primary Subdivision", PRIMARY_SUB },
+	{ "Secondary Subdivision", SECONDARY_SUB },
+	{ "CQ Zone", CQ_ZONE },
+	{ "ITU Zone", ITU_ZONE },
+	{ "Continent", CONTINENT },
+	{ "IOTA", IOTA },
+	{ "WAB", WAB }
+};
+
+//! Convert JSON object to qth_info_t
+void from_json(const json& j, qth_info_t& s) {
+	auto temp = j.get<std::map<std::string, string>>();
+	for (auto it : temp) {
+		s.data[STRING_2_QTH_INFO_T[it.first]] = it.second;
+	}
+}
+
+//
+std::map<oper_value_t, std::string> OPER_VALUE_T_2_STRING = {
+	{ NAME, "Name" },
+	{ CALLSIGN, "Callsign" }
+};
+
+//! Convert oper_info_t to JSON object
+void to_json(json& j, const oper_info_t& s) {
+	for (auto it : s.data) {
+		if (it.second.length()) {
+			j[OPER_VALUE_T_2_STRING.at(it.first)] = it.second;
+		}
+	}
+}
+
+std::map<std::string, oper_value_t> STRING_2_OPER_INFO_T = {
+	{ "Name", NAME },
+	{ "Callsign", CALLSIGN }
+};
+
+//! Convert JSON object to oper_info_t
+void from_json(const json& j, oper_info_t& s) {
+	auto temp = j.get<std::map<std::string, string>>();
+	for (auto it : temp) {
+		s.data[STRING_2_OPER_INFO_T[it.first]] = it.second;
 	}
 }
 

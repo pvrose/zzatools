@@ -1,10 +1,12 @@
 #pragma once
 
+#include "nlohmann/json.hpp"
+
 #include <string>
 #include <map>
 #include <set>
 
-
+using json = nlohmann::json;
 
 //! Identifiers for ADIF fields indicating user's location
 enum qth_value_t : char {
@@ -27,6 +29,11 @@ enum qth_value_t : char {
 struct qth_info_t {
 	std::map<qth_value_t, std::string> data;
 };
+
+//! Convert qth_info_t to JSON object
+void to_json(json& j, const qth_info_t& s);
+//! Convert JSON object to qth_info_t
+void from_json(const json& j, qth_info_t& s);
 
 //! Mapping identifiers to ADIF field names.
 const std::map<qth_value_t, std::string> QTH_ADIF_MAP = {
@@ -56,6 +63,11 @@ struct oper_info_t {
 	std::map< oper_value_t, std::string> data;
 };
 
+//! Convert oper_info_t to JSON object
+void to_json(json& j, const oper_info_t& s);
+//! Convert JSON object to oper_info_t
+void from_json(const json& j, oper_info_t& s);
+
 //! Map of identifiers to ADIF field names
 const std::map<oper_value_t, std::string> OPER_ADIF_MAP = {
 	{ NAME, "MY_NAME" },
@@ -71,11 +83,12 @@ public:
 	stn_data();
 	//! Destructor.
 	~stn_data();
-
 	//! Load data from station.xml
 	void load_data();
-	//! Store data to station.xml
-	void store_data();
+	//! LOad data from station.json
+	bool load_json();
+	//! Store data to station.json
+	bool store_json();
 	//! Add a specific \p item to location \p id, \p value - returns true if added
 	bool add_qth_item(std::string id, qth_value_t item, std::string value);
 	//! Remove \p item from location \p id. 

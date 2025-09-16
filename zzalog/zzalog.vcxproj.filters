@@ -267,9 +267,6 @@
     <ClCompile Include="src\rig_reader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\rig_writer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\rpc_data_item.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -304,9 +301,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\stn_reader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\stn_writer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\symbols.cpp">
@@ -653,9 +647,6 @@
     <ClInclude Include="include\rig_reader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rig_writer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\rpc_data_item.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -693,9 +684,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\stn_reader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\stn_writer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\symbols.h">

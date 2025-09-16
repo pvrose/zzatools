@@ -252,7 +252,6 @@
     <ClCompile Include="src\rig_data.cpp" />
     <ClCompile Include="src\rig_if.cpp" />
     <ClCompile Include="src\rig_reader.cpp" />
-    <ClCompile Include="src\rig_writer.cpp" />
     <ClCompile Include="src\rpc_data_item.cpp" />
     <ClCompile Include="src\rpc_handler.cpp" />
     <ClCompile Include="src\search_dialog.cpp" />
@@ -265,7 +264,6 @@
     <ClCompile Include="src\stn_data.cpp" />
     <ClCompile Include="src\stn_dialog.cpp" />
     <ClCompile Include="src\stn_reader.cpp" />
-    <ClCompile Include="src\stn_writer.cpp" />
     <ClCompile Include="src\symbols.cpp" />
     <ClCompile Include="src\tabbed_forms.cpp" />
     <ClCompile Include="src\ticker.cpp" />
@@ -380,7 +378,6 @@
     <ClInclude Include="include\rig_data.h" />
     <ClInclude Include="include\rig_if.h" />
     <ClInclude Include="include\rig_reader.h" />
-    <ClInclude Include="include\rig_writer.h" />
     <ClInclude Include="include\rpc_data_item.h" />
     <ClInclude Include="include\rpc_handler.h" />
     <ClInclude Include="include\search.h" />
@@ -394,7 +391,6 @@
     <ClInclude Include="include\stn_data.h" />
     <ClInclude Include="include\stn_dialog.h" />
     <ClInclude Include="include\stn_reader.h" />
-    <ClInclude Include="include\stn_writer.h" />
     <ClInclude Include="include\symbols.h" />
     <ClInclude Include="include\tabbed_forms.h" />
     <ClInclude Include="include\ticker.h" />
