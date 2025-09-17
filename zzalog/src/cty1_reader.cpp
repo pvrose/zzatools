@@ -212,12 +212,10 @@ bool cty1_reader::load_data(cty_data* data, std::istream& in, std::string& versi
 	// reposition back to beginning
 	in.seekg(0, std::ios::beg);
 	// Initialsie the progress
-	status_->misc_status(ST_NOTE, "CTY DATA: Started importing data");
-	status_->progress(file_size, OT_PREFIX, "Importing country data from clublog.org", "bytes");
+	status_->progress(file_size, OT_PREFIX, "Loading country data from clublog.org", "bytes");
 	// Call the XML parser - calls back to the overides herein
 	if (parse(in)) {
 		// Read successful - complete progress
-		status_->misc_status(ST_OK, "CTY DATA: Import done!");
 		version = timestamp_;
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return true;
@@ -230,7 +228,7 @@ bool cty1_reader::load_data(cty_data* data, std::istream& in, std::string& versi
 	}
 	else {
 		// Read failed - report failure
-		status_->misc_status(ST_ERROR, "CTY DATA: Import failed");
+		status_->misc_status(ST_ERROR, "CTY DATA: Load failed");
 		status_->progress("Load failed", OT_PREFIX);
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return false;

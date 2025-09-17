@@ -105,6 +105,7 @@ ct_entry_t* contest_data::get_contest_info(int number) {
 
 // Load data
 bool contest_data::load_data() {
+	status_->misc_status(ST_NOTE, "CONTEST: loading contest data");
 	std::string filename = default_data_directory_ + "contests.json";
 	ifstream is;
 	is.open(filename, std::ios_base::in);

@@ -17,6 +17,7 @@ stn_data::~stn_data() {
 
 // Load data from station.xml
 void stn_data::load_data() {
+	status_->misc_status(ST_NOTE, "STN DATA: Loading operation data");
 	if (load_json()) {
 		load_failed_ = false;
 		return;
@@ -51,7 +52,7 @@ bool stn_data::load_json() {
 	is.open(filename, std::ios_base::in);
 	if (!is.good()) {
 		char msg[128];
-		snprintf(msg, sizeof(msg), "STN DATA: FAiled to open %s", filename.c_str());
+		snprintf(msg, sizeof(msg), "STN DATA: Failed to open %s", filename.c_str());
 		status_->misc_status(ST_WARNING, msg);
 		return false;
 	}
@@ -80,13 +81,13 @@ bool stn_data::load_json() {
 		}
 	}
 	catch (const json::exception& e) {
-		std::snprintf(msg, sizeof(msg), "STN DATA: Reading JSON failed %d (%s)\n",
-			e.id, e.what());
+		std::snprintf(msg, sizeof(msg), "STN DATA: Failed to load %s: %d (%s)\n",
+			filename.c_str(), e.id, e.what());
 		status_->misc_status(ST_ERROR, msg);
 		is.close();
 		return false;
 	}
-	std::snprintf(msg, sizeof(msg), "STN DATA: %s Loaded OK", filename.c_str());
+	std::snprintf(msg, sizeof(msg), "STN DATA: File %s Loaded OK", filename.c_str());
 	status_->misc_status(ST_OK, msg);
 	return true;
 }

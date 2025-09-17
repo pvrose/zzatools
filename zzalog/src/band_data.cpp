@@ -70,6 +70,7 @@ band_data::~band_data()
 // Load data from JSON file
 bool band_data::load_json() {
 	json j;
+	char msg[128];
 	// Wrte JSON out to band_plan.json
 	std::string filename = get_path() + "band_plan.json";
 	status_->misc_status(ST_NOTE, ("BAND: Loading band-plan data"));
@@ -82,13 +83,14 @@ bool band_data::load_json() {
 				band_entry_t* e = new band_entry_t(jt.template get<band_entry_t>());
 				entries_.push_back(e);
 			}
-			status_->misc_status(ST_OK, "BAND: Loaded band-plan data");
+			std::snprintf(msg, sizeof(msg), "BAND: File %s loaded OK", filename.c_str());
+			status_->misc_status(ST_OK, msg);
 			return true;
 		}
 		catch (const json::exception& e) {
 			char msg[128];
-			std::snprintf(msg, sizeof(msg), "BAND: Reading JSON failed %d (%s)\n",
-				e.id, e.what());
+			std::snprintf(msg, sizeof(msg), "BAND: Failed to load %s: %d (%s)\n",
+				filename.c_str(), e.id, e.what());
 			status_->misc_status(ST_ERROR, msg);
 			return false;
 		}

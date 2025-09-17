@@ -143,7 +143,7 @@ bool book::load_data(std::string filename)
 				spec_data_->loaded_filename(filename_);
 				// Update status bar
 				char message[128];
-				snprintf(message, sizeof(message), "LOG: %s", filename_.c_str());
+				snprintf(message, sizeof(message), "LOG: Loading log-book %s", filename_.c_str());
 				status_->misc_status(ST_NOTE, message);
 				// Get the filetype suffix from the filename to know which reader to use
 				std::string filetype;
@@ -178,7 +178,7 @@ bool book::load_data(std::string filename)
 					if (!adi_reader_->load_book(this, input_)) {
 						// Error while reading book
 						char message[256];
-						sprintf(message, "LOG: Failed to open %s", filename.c_str());
+						sprintf(message, "LOG: Failed to load %s", filename.c_str());
 						status_->misc_status(closing_ ? ST_WARNING : ST_ERROR, message);
 						if (book_type_ == OT_MAIN) {
 							snprintf(message, sizeof(message), "%s [load failed]", filename.c_str());
@@ -192,6 +192,9 @@ bool book::load_data(std::string filename)
 						ok = false;
 					}
 					else {
+						char msg[128];
+						std::snprintf(msg, sizeof(msg), "LOG: File %s loaded OK", filename.c_str());
+						status_->misc_status(ST_OK, msg);
 						if (book_type_ == OT_MAIN) {
 							main_loading_ = false;
 							// Display filename in title bar and update views there's new data
@@ -283,7 +286,7 @@ bool book::load_data(std::string filename)
 					char* message = new char[filename.length() + 100];
 					size_t num_records = size();
 					if (header()) num_records++;
-					sprintf(message, "LOG: %zu records read from %s", num_records, filename.c_str());
+					sprintf(message, "LOG: %zu records loaded", num_records);
 					status_->misc_status(ST_OK, message);
 					delete[] message;
 				}

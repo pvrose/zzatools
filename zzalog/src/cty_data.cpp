@@ -365,13 +365,13 @@ bool cty_data::load_data(std::string filename) {
 	versions_[type_] = version;
 
 	if (ok) {
-		snprintf(msg, sizeof(msg), "CTY DATA: File %s read OK - version: %s", filename.c_str(), version.c_str());
+		snprintf(msg, sizeof(msg), "CTY DATA: File %s loaded OK - version: %s", filename.c_str(), version.c_str());
 		status_->misc_status(ST_OK, msg);
 
 		return true;
 	}
 	else {
-		snprintf(msg, sizeof(msg), "CTY DATA: Failed to read %s", filename.c_str());
+		snprintf(msg, sizeof(msg), "CTY DATA: Failed to load %s", filename.c_str());
 		status_->misc_status(ST_ERROR, msg);
 		return false;
 	}

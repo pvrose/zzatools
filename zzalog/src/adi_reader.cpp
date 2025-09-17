@@ -272,7 +272,7 @@ bool adi_reader::load_book(book* book, std::istream& in) {
 		status_->misc_status(ST_NOTE, "LOG: New file");
 		return true;
 	}
-	status_->misc_status(ST_NOTE, "LOG: Started reading ADI");
+	status_->misc_status(ST_NOTE, "LOG: Started loading ADI");
 	number_records_ = 10000;
 	bool first = true;
 	// While we have data to read
@@ -314,11 +314,9 @@ bool adi_reader::load_book(book* book, std::istream& in) {
 	// Update progress bar with complete or failed.
 	if (!in.eof()) {
 		status_->progress("Load failed", book->book_type());
-		status_->misc_status(closing_ ? ST_WARNING : ST_ERROR, "LOG: Reading failed");
 		return false;
 	}
 	else {
-		status_->misc_status(ST_OK, "LOG: Reading done!");
 		return true;
 	}
 }

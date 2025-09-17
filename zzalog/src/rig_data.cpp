@@ -70,6 +70,8 @@ rig_data_t* rig_data::get_rig(std::string rig) {
 }
 
 void rig_data::load_data() {
+    char msg[128];
+    status_->misc_status(ST_NOTE, "RIG DATA: Loading rig configuration data");
     if (load_json()) {
         load_failed_ = false;
         return;
@@ -81,22 +83,24 @@ void rig_data::load_data() {
     if (is.good()) {
         rig_reader* reader = new rig_reader();
         if (reader->load_data(&data_, is)) {
-            status_->misc_status(ST_OK, "RIG DATA: XML loaded OK");
+            snprintf(msg, sizeof(msg), "RIG DATA: File %s loaded OK", filename.c_str());
+            status_->misc_status(ST_OK, msg);
             return;
         }
     }
-    status_->misc_status(ST_WARNING, "RIG DATA: XML data failed to load");
+    std::snprintf(msg, sizeof(msg), "RIG DATA: Failed to load %s", filename.c_str());
+    status_->misc_status(ST_WARNING, msg);
     load_failed_ = true;
 }
 
 // Loading datafrom JSON
 bool rig_data::load_json() {
+    char msg[128];
     std::string filename = default_data_directory_ + "rigs.json";
     ifstream is;
     is.open(filename, std::ios_base::in);
     if (!is.good()) {
-        char msg[128];
-        snprintf(msg, sizeof(msg), "RIGS: FAiled to open %s", filename.c_str());
+        snprintf(msg, sizeof(msg), "RIGS: Failed to open %s", filename.c_str());
         status_->misc_status(ST_WARNING, msg);
         return false;
     } 
@@ -112,13 +116,14 @@ bool rig_data::load_json() {
         }
     }
     catch (const json::exception& e) {
-        char msg[128];
-        std::snprintf(msg, sizeof(msg), "RIGS: Reading JSON failed %d (%s)\n",
-            e.id, e.what());
+        std::snprintf(msg, sizeof(msg), "RIG DATA: Failed to load %s: %d (%s)\n",
+            filename.c_str(), e.id, e.what());
         status_->misc_status(ST_ERROR, msg);
         is.close();
         return false;
     }
+    snprintf(msg, sizeof(msg), "RIG DATA: File %s loaded OK", filename.c_str());
+    status_->misc_status(ST_OK, msg);
     is.close();
     return true;
 }

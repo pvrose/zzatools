@@ -30,8 +30,7 @@ bool cty2_reader::load_data(cty_data* data, std::istream& in, std::string& versi
 	// reposition back to beginning
 	in.seekg(0, std::ios::beg);
 	// Initialsie the progress
-	status_->misc_status(ST_NOTE, "CTY DATA: Started importing data");
-	status_->progress(file_size, OT_PREFIX, "Importing country data from country-files.com", "bytes");
+	status_->progress(file_size, OT_PREFIX, "Loading country data from country-files.com", "bytes");
 
 	while (in.good()) {
 		cty_entity* entry = new cty_entity;
