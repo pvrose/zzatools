@@ -34,7 +34,6 @@ extern cty_data* cty_data_;
 extern status* status_;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
-extern std::string TARGET_ADIF_VN;
 extern std::string default_ref_directory_;
 extern url_handler* url_handler_;
 

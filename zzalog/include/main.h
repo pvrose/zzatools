@@ -110,8 +110,6 @@ std::string PROG_ID = "ZLG";
 std::string PROGRAM_VERSION = "3.6.6+";
 //! Program vendor: used for Fl_Preferences.
 std::string VENDOR = "GM3ZZA";
-//! Target ADIF version number
-std::string TARGET_ADIF_VN = "315";
 
 // Debug switches
 //! Print errors - std::set by "-d e"
