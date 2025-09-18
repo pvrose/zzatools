@@ -157,18 +157,3 @@ NLOHMANN_JSON_SERIALIZE_ENUM(qsl_data::time_format, {
     { qsl_data::FMT_HM, "HH:MM"}
 })
 
-//! MAp the basic fonts
-NLOHMANN_JSON_SERIALIZE_ENUM(Fl_Font, {
-    { FL_HELVETICA, "helvetica"},
-    { FL_HELVETICA_ITALIC, "helvetica italic"},
-    { FL_HELVETICA_BOLD, "helvetica bold"},
-    { FL_HELVETICA_BOLD_ITALIC, "helvetica bold italic"},
-    { FL_COURIER, "courier"},
-    { FL_COURIER_ITALIC, "courier italic"},
-    { FL_COURIER_BOLD, "courier bold"},
-    { FL_COURIER_BOLD_ITALIC, "courier bold italic"},
-    { FL_TIMES, "times"},
-    { FL_TIMES_ITALIC, "times italic"},
-    { FL_TIMES_BOLD, "times bold"},
-    { FL_TIMES_BOLD_ITALIC, "times bold italic"}
-})

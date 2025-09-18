@@ -100,6 +100,7 @@ static void to_json(json& j, const qsl_data::item_def& s) {
 		j["Y"] = s.image.dy;
 		break;
 	}
+	default: break;
 	}
 }
 
@@ -216,6 +217,7 @@ static void from_json(const json& j, qsl_data::item_def& s) {
 		j.at("Y").get_to(s.image.dy);
 		break;
 	}
+	default: break;
 	}
 }
 
