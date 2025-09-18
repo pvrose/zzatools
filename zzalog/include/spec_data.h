@@ -154,6 +154,8 @@ typedef size_t qso_num_t;
 
 	// protected methods
 	protected:
+		//! Load data from JSON 
+		bool load_json();
 		//! Returns path to all.xml
 		std::string get_path();
 		//! Sort field names
@@ -190,6 +192,8 @@ typedef size_t qso_num_t;
 		std::string convert_ml_string(const std::string& data);
 		//! Generate report timestamp and fault
 		std::string report_timestamp(std::string field, std::string data);
+		//! Process subdivision datasets
+		void process_subdivision(std::string name);
 		// protected attributes
 	protected:
 		//! ADIF Version

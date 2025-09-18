@@ -15,6 +15,8 @@
 #include "callback.h"
 #include "utils.h"
 
+#include "nlohmann/json.hpp"
+
 #include <fstream>
 #include<ostream>
 #include <sstream>
@@ -27,10 +29,6 @@
 #include <FL/fl_ask.H>
 #include <FL/Fl_Native_File_Chooser.H>
 
-
-
-
-
 extern book* book_;
 extern cty_data* cty_data_;
 extern status* status_;
@@ -39,6 +37,23 @@ extern std::string PROGRAM_ID;
 extern std::string TARGET_ADIF_VN;
 extern std::string default_ref_directory_;
 extern url_handler* url_handler_;
+
+using json = nlohmann::json;
+
+// JSON Deserialisation from JSON object to spec_dataset
+static void from_json(const json& j, spec_dataset& s) {
+	auto header = j.at("Header").get < std::vector<std::string>>();
+	auto records = j.at("Records").get<std::map<std::string, json>>();
+	s.column_names = header;
+	for (auto& itr : records) {
+		auto record = new std::map<std::string, std::string>(itr.second);
+		string name = itr.first;
+		if (record->find("Deleted") != record->end() && record->at("Deleted") == "true") {
+			name += " Deleted";
+		}
+		s.data[name] = record;
+	}
+}
 
 // Default constructor
 spec_data::spec_data()
@@ -105,26 +120,29 @@ bool spec_data::load_data() {
 	this->clear();
 
 	bool ok = true;
-	// Get the directory
-	std::string directory = get_path();
-	// Open an ADIF Specification input interpreter
-	specx_reader* reader = new specx_reader;
-	// Create an input stream from the file
-	std::string file_name = directory + ADIF_FILE;
-	ifstream file;
-	file.open(file_name.c_str(), std::ios_base::in);
-	// Load data from the input stream to the appropriate dataset
-	if (file.good()) {
-		ok = reader->load_data(this, file, adif_version_);
-		file.close();
-		delete reader;
-	} else {
-		ok = false;
-		char* message = new char[30 + file_name.length()];
-		sprintf(message, "ADIF SPEC: Fail to open %s", file_name.c_str());
-		status_->misc_status(ST_WARNING, message);
-		file.close();
-		delete reader;
+	if (!load_json()) {
+		// Get the directory
+		std::string directory = get_path();
+		// Open an ADIF Specification input interpreter
+		specx_reader* reader = new specx_reader;
+		// Create an input stream from the file
+		std::string file_name = directory + ADIF_FILE;
+		ifstream file;
+		file.open(file_name.c_str(), std::ios_base::in);
+		// Load data from the input stream to the appropriate dataset
+		if (file.good()) {
+			ok = reader->load_data(this, file, adif_version_);
+			file.close();
+			delete reader;
+		}
+		else {
+			ok = false;
+			char* message = new char[30 + file_name.length()];
+			sprintf(message, "ADIF SPEC: Fail to open %s", file_name.c_str());
+			status_->misc_status(ST_WARNING, message);
+			file.close();
+			delete reader;
+		}
 	}
 	if (ok) {
 		// File read in OK
@@ -137,6 +155,66 @@ bool spec_data::load_data() {
 		data_loaded_ = false;
 	}
 	return ok;
+}
+
+// Load data from JSON
+bool spec_data::load_json() {
+	// Get the directory
+	std::string directory = get_path();
+	std::string filename = directory + "all.json";
+	char msg[128];
+	status_->misc_status(ST_NOTE, "ADIF SPEC: Loading ADIF Specification");
+	ifstream is;
+	is.open(filename, std::ios_base::in);
+	try {
+		json jall;
+		is >> jall;
+		json j = jall.at("Adif");
+		j.at("Version").get_to(adif_version_);
+		// Ignore Status, Date, Created
+		spec_dataset* ds = new spec_dataset;
+		j.at("DataTypes").get_to(*ds);
+		(*this)["Data Types"] = ds;
+		auto enums = j.at("Enumerations").get<std::map<std::string, json>>();
+		for (auto& it : enums) {
+			ds = new spec_dataset;
+			it.second.get_to(*ds);
+			(*this)[it.first] = ds;
+		}
+		ds = new spec_dataset;
+		j.at("Fields").get_to(*ds);
+		(*this)["Fields"] = ds;
+		process_subdivision("Primary_Administrative_Subdivision");
+		process_subdivision("Secondary_Administrative_Subdivision");
+		process_subdivision("Secondary_Administrative_Subdivision_Alt");
+		std::snprintf(msg, sizeof(msg), "ADIF SPEC: File %s loaded OK", filename.c_str());
+		status_->misc_status(ST_OK, msg);
+		return true;
+	}
+	catch (const json::exception& e) {
+		std::snprintf(msg, sizeof(msg), "ADIF SPEC: Reading JSON failed %d (%s)\n",
+			e.id, e.what());
+		status_->misc_status(ST_ERROR, msg);
+		is.close();
+		return false;
+	}
+}
+
+// Split either PAS or SAS into separate ....[DXCC] datasets.
+void spec_data::process_subdivision(std::string name) {
+	spec_dataset* src = dataset(name);
+	for (auto& it : src->data) {
+		std::string new_name = name + "[" + it.second->at("DXCC Entity Code") + "]";
+		if (this->find(new_name) == this->end()) {
+			(*this)[new_name] = new spec_dataset;
+			(*this)[new_name]->column_names = src->column_names;
+		}
+		string adj_name = it.second->at("Code");
+		if (it.second->find("Deleted") != it.second->end() &&
+			it.second->at("Deleted") == "true") adj_name += " Deleted";
+		this->at(new_name)->data[adj_name] = it.second;
+	}
+	this->erase(name);
 }
 
 // Sort the field names, create custom lookup for datatype_indicators
