@@ -1,6 +1,5 @@
 #pragma once
 
-#include "xml_reader.h"
 #include "utils.h"
 
 #include <string>
@@ -11,33 +10,6 @@
 
 
 class Fl_Image;
-
-//! WX XML elements
-enum wxe_element_t {
-    WXE_NONE,                   //!< No element yste
-    WXE_CURRENT,                //!< Current weather report
-    WXE_CITY,                   //!< City definition
-    WXE_COORD,                  //!< City coordinates
-    WXE_COUNTRY,                //!< ISO Country ID (eg GB)
-    WXE_TIMEZONE,               //!< Timezone difference
-    WXE_SUN,                    //!< City sunrise/sunset
-    WXE_TEMPERATURE,            //!< Temperature values 
-    WXE_FEELS_LIKE,             //!< Subjective temperature
-    WXE_HUMIDITY,               //!< Humidity value
-    WXE_PRESSURE,               //!< Pressure value
-    WXE_WIND,                   //!< Wind value/description
-    WXE_SPEED,                  //!< Wind speed value and beaufort description
-    WXE_GUSTS,                  //!< Gusting wind speed
-    WXE_DIRECTION,              //!< Direction
-    WXE_CLOUDS,                 //!< Cloud cover value, description
-    WXE_VISIBILITY,             //!< Visibility (metres - max 10 km)
-    WXE_PRECIPITATION,          //!< Rain/snow levels
-    WXE_WEATHER,                //!< Weather summary
-    WXE_LASTUPDATE,             //!< Last update time
-    WXE_CLIENTERROR,            //!< Error message
-    WXE_COD,                    //!< Error code
-    WXE_MESSAGE,                //!< Error message
-};
 
 //! The data received in a weather reports
 struct wx_report {
@@ -72,32 +44,7 @@ struct wx_report {
 //! This class decodes a weather report receved from openweathermap.org as an XML file
 
 //! \todo Shut the stable door after the horse has bolted! Keys en-clair.
-/*! \code
-<current>
-  <city id="2656565" name="Ballater">
-    <coord lon="-3" lat="57"/>
-    <country>GB</country>
-    <timezone>3600</timezone>
-    <sun rise="2025-09-10T05:32:49" std::set="2025-09-10T18:45:28"/>
-  </city>
-  <temperature value="282.8" min="282.8" max="282.8" unit="kelvin"/>
-  <feels_like value="280.96" unit="kelvin"/>
-  <humidity value="86" unit="%"/>
-  <pressure value="1003" unit="hPa"/>
-  <wind>
-    <speed value="3.52" unit="m/s" name="Gentle Breeze"/>
-    <gusts value="11.9"/>
-    <direction value="143" code="SE" name="SouthEast"/>
-  </wind>
-  <clouds value="25" name="scattered clouds"/>
-  <visibility value="10000"/>
-  <precipitation mode="no"/>
-  <weather number="802" value="scattered clouds" icon="03d"/>
-  <lastupdate value="2025-09-10T07:24:59"/>
-</current>
-\endcode
-*/
-class wx_handler : public xml_reader {
+class wx_handler {
 
 public:
     //! Constructor.
@@ -110,19 +57,6 @@ public:
     const char* key_ = "0b2145b6b923a9561f4b4831f5d6d66f";
     //! \endcond
     
-    // XML reader overloads
-    // Overloadable XML handlers
-    //! Start Element 
-    virtual bool start_element(std::string name, std::map<std::string, std::string>* attributes);
-    //! End Element
-    virtual bool end_element(std::string name);
-    //! Special element
-    virtual bool declaration(xml_element::element_t element_type, std::string name, std::string content);
-    //! Processing instruction
-    virtual bool processing_instr(std::string name, std::string content);
-    //! characters
-    virtual bool characters(std::string content);
-
     //! Update weather report - forecd
     void update();
     //! Implement timer actions 
@@ -166,110 +100,16 @@ public:
     //! Returns atmospheric pressue (in hectopascals)
     float pressure();
 
-protected:
-
-    //! Start The overall XML container CURRENT
-    bool start_current();
-    //! end The overall XML container CURRENT
-    bool end_current();
-    //! Start CITY: Attributes id, name.
-    bool start_city(std::map<std::string, std::string>* attributes);
-    //! End CITY
-    bool end_city();
-    //! Start COORD: Attributes lon, lat.
-    bool start_coord(std::map<std::string, std::string>* attributes);
-    //! End COORD Element
-    bool end_coord();
-    //! Start COUNTRY Element: Data 2-character ISO code.
-    bool start_country();
-    //! End COUNTRY Element
-    bool end_country();
-    //! Start TIMEZONE element: Data Delta from UTC in seconds
-    bool start_timezone();
-    //! End TIMEZONE
-    bool end_timezone();
-    //! Start SUN element: Attributes rise, std::set as XML date/time format (UTC).
-    bool start_sun(std::map<std::string, std::string>* attributes);
-    //! End SUN element
-    bool end_sun();
-    //! Start TEMPERATURE element: Attributes value, min, max, unit.
-    
-    //! Unit is celsius, fahrenheit or kelvin.
-    bool start_temperature(std::map<std::string, std::string>* attributes);
-    //! End TEMPERATURE
-    bool end_temperature();
-    //! Start FEELS_LIKE element: Attrubutes value, unit
-
-    //! Unit is celsius, fahrenheit or kelvin.
-    bool start_subjective(std::map<std::string, std::string>* attributes);
-    //! End FEELS_LIKE 
-    bool end_subjective();
-    //! Start HUMIDITY element: Attributes value, unit
-    
-    //! Unit is percentage
-    bool start_humidity(std::map<std::string, std::string>* attributes);
-    //! End HUMIDITY
-    bool end_humidity();
-    //! Start PRESSURE element : Attributes value unit
-    
-    //! Unit is hPa (hectopascal)
-    bool start_pressure(std::map<std::string, std::string>* attributes);
-    //! End PRESSURE
-    bool end_pressure();
-    //! Start WIND element
-    bool start_wind();
-    //! End WIND
-    bool end_wind();
-    //! Start (WIND)SPEED element: Attributes value, unit name
-     
-    //! Unit is m/s (meters per second) or mph (miles per hour)
-    bool start_wind_speed(std::map<std::string, std::string>* attributes);
-    //! End WIND(SPEED)
-    bool end_wind_speed();
-    //! Start WIND(DIRECTION) element: Attributes value, code, name
-    bool start_wind_dirn(std::map<std::string, std::string>* attributes);
-    //! End WIND(DIRECTION)
-    bool end_wind_dirn();
-    //! Start WIND(GUSTS) element: Attributes value
-    bool start_gusts(std::map<std::string, std::string>* attributes);
-    //! End WIND(GUSTS)
-    bool end_gusts();
-    //! Start CLOUDS element: Attributes value name - value in percentage
-    bool start_clouds(std::map<std::string, std::string>* attributes);
-    //! End CLOUDS
-    bool end_clouds();
-    //! Start VISIBILITY element: attributes value - value in metres (maximum 10 km)
-    bool start_visibility(std::map<std::string, std::string>* attributes);
-    //! End VISIBILITY
-    bool end_visibility();
-    //! Start PRECIPITATION element: attributes mode
-    bool start_precipitation(std::map<std::string, std::string>* attributes);
-    //! End PRECIPITATION
-    bool end_precipitation();
-    //! Start WEATHER element: attributes number, value, icon
-    bool start_weather(std::map<std::string, std::string>* attributes);
-    //! End WEATHER
-    bool end_weather();
-    //! Start LASTUPDATE element: attributes value - value in XML date/time format (UTC)
-    bool start_updated(std::map<std::string, std::string>* attributes);
-    //! End LASTUPDATE
-    bool end_update();
-    //! Start CLIENTEROR element
-    bool start_clienterror();
-    //! End CLIENTERROR
-    bool end_clienterror();
-    //! Start COD element: data error code.
-    bool start_cod();
-    //! End COD
-    bool end_cod();
-    //! Start MESSAGE element: data error message.
-    bool start_message();
-    //! End MESSAGE
-    bool end_message();
-
-
     //! Fetch icon
-    Fl_Image* fetch_icon(std::string name);
+    static Fl_Image* fetch_icon(std::string name);
+
+    //! Returns cardinal direction
+    static std::string wind_cardinal(int dirn);
+    //! Returns beaufort wind description
+    static std::string beaufort(float speed);
+
+
+protected:
 
     //! Run the fetch std::thread
     static void do_thread(wx_handler* that);
@@ -280,9 +120,6 @@ protected:
     //! True start fetching data from weather server.
     std::atomic<bool> wx_fetch_;
 
-
-    //! Stack of elements currently being processed
-    std::list<wxe_element_t> elements_;
     //! Current weather report
     wx_report report_;
     //! Element data
