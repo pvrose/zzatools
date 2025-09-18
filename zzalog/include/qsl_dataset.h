@@ -16,24 +16,24 @@ enum extract_mode_t : uchar;
 // Class to manage QSL designs
 
 struct qsl_call_data {
-	bool used;                      //!< Data is used.
+	bool used;                           //!< Data is used.
 	std::string key;                     //!< logbook access key.
-	unsigned long long last_logid;  //!< Universal QSO record identifier.
+	unsigned long long last_logid;       //!< Universal QSO record identifier.
 	std::string last_download;           //!< Date last downloaded (YYYYMMDD)
 };
 
 struct server_data_t {
-	bool upload_per_qso{false};     //!< Upload per QSO
-	bool enabled{false};            //!< Access enabled
+	bool upload_per_qso{false};          //!< Upload per QSO
+	bool enabled{false};                 //!< Access enabled
 	std::string user{""};                //!< User-name (or e-mail
 	std::string password{""};            //!< Password
 	std::string last_downloaded{""};     //!< Date of last download
-	bool download_confirmed{false}; //!< Download confirmed as well (eqSL)
+	bool download_confirmed{false};      //!< Download confirmed as well (eqSL)
 	std::string qso_message{""};         //!< Message to add to a QSL card (eQSL)
 	std::string swl_message{""};         //!< Message to add to a QSL card - SWL (eQSL)
 	std::string export_file{""};         //!< File for uploading (LotW)
-	bool use_api{false};            //!< Use API (QRZ.com)
-	bool use_xml{false};            //!< Use XML (QRZ.com)
+	bool use_api{false};                 //!< Use API (QRZ.com)
+	bool use_xml{false};                 //!< Use XML (QRZ.com)
 	std::string mail_server{""};         //!< Mail server (eMail)
 	std::string cc_address{""};          //!< cc Address (eMail)
 	std::map<std::string, qsl_call_data*> call_data; //!< API logbook data (QRZ.com)
@@ -63,9 +63,12 @@ public:
 	void save_data();
 	//! Save XML data
 	void save_xml(Fl_Preferences& settings);
+	//! Save JSON file
+	void save_json(Fl_Preferences& settings);
 	//! Create server data
 	bool new_server(std::string server);
-
+	//! Current server name during save
+	static std::string server_name();
 
 protected:
 	//! Read card designs
@@ -74,6 +77,8 @@ protected:
 	bool load_xml(Fl_Preferences& settings);
 	//! Get XML file from settings
 	std::string xml_file(Fl_Preferences& settings);
+	//! Get JSON file from settings
+	std::string json_file(Fl_Preferences& settings);
 
 	//! QSL card data
 	std::map<qsl_data::qsl_type, std::map<std::string, qsl_data*>* > data_;
@@ -83,7 +88,8 @@ protected:
 	std::string qsl_path_;
 	//! Load failed
 	bool load_failed_;
-
+	//! Current server name during save
+	static std::string server_name_;
 };
 
 

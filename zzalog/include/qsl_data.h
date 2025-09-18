@@ -1,11 +1,12 @@
 #pragma once
 
+#include "nlohmann/json.hpp"
 #include <string>
 #include <vector>
 
 #include <FL/Fl.H>
 
-
+using json = nlohmann::json;
 
 //! QSL Card definition data
 struct qsl_data {
@@ -118,5 +119,56 @@ struct qsl_data {
 //! Initialise the text used to describe the card types. 
 const std::string QSL_TYPES[qsl_data::MAX_TYPE] = {"Label", "File"};
 
+//! Map item_type to string for JSON serialisaton
+NLOHMANN_JSON_SERIALIZE_ENUM(qsl_data::item_type, {
+    { qsl_data::NONE, "None"},
+    { qsl_data::FIELD, "Field"},
+    { qsl_data::TEXT, "Text"},
+    { qsl_data::IMAGE, "Image"}
+})
 
+//! Map dim_unit to string for JSON serialisaton
+NLOHMANN_JSON_SERIALIZE_ENUM(qsl_data::dim_unit, {
+    { qsl_data::INCH, "Inch"},
+    { qsl_data::MILLIMETER, "Millimeter"},
+    { qsl_data::POINT, "Point" }
+})
 
+//! Map qsl_type to string for JSON serialisaton
+NLOHMANN_JSON_SERIALIZE_ENUM(qsl_data::qsl_type, {
+    { qsl_data::LABEL, "Label"},
+    { qsl_data::FILE, "File"}
+})
+
+//! Map date_format to string for JSON serialisaton
+NLOHMANN_JSON_SERIALIZE_ENUM(qsl_data::date_format, {
+    { qsl_data::FMT_Y4MD_ADIF, "YYYYMMDD"},
+    { qsl_data::FMT_Y4MD, "YYYY/MM/DD"},
+    { qsl_data::FMT_Y2MD, "YY/MM/DD"},
+    { qsl_data::FMT_DMY2, "DD/MM/YY"},
+    { qsl_data::FMT_MDY2, "MM/DD/YY"}
+})
+
+//! Map time_format to string for JSON serialisaton
+NLOHMANN_JSON_SERIALIZE_ENUM(qsl_data::time_format, {
+    { qsl_data::FMT_HMS_ADIF, "HHMMSS"},
+    { qsl_data::FMT_HMS, "HH:MM:SS"},
+    { qsl_data::FMT_HM_ADIF, "HHMM"},
+    { qsl_data::FMT_HM, "HH:MM"}
+})
+
+//! MAp the basic fonts
+NLOHMANN_JSON_SERIALIZE_ENUM(Fl_Font, {
+    { FL_HELVETICA, "helvetica"},
+    { FL_HELVETICA_ITALIC, "helvetica italic"},
+    { FL_HELVETICA_BOLD, "helvetica bold"},
+    { FL_HELVETICA_BOLD_ITALIC, "helvetica bold italic"},
+    { FL_COURIER, "courier"},
+    { FL_COURIER_ITALIC, "courier italic"},
+    { FL_COURIER_BOLD, "courier bold"},
+    { FL_COURIER_BOLD_ITALIC, "courier bold italic"},
+    { FL_TIMES, "times"},
+    { FL_TIMES_ITALIC, "times italic"},
+    { FL_TIMES_BOLD, "times bold"},
+    { FL_TIMES_BOLD_ITALIC, "times bold italic"}
+})

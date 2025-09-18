@@ -6,6 +6,8 @@
 #include "status.h"
 #include "utils.h"
 
+#include "nlohmann/json.hpp"
+
 #include <string>
 #include <vector>
 #include <fstream>
@@ -17,6 +19,11 @@ extern status* status_;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
+extern uint32_t seed_;
+
+using json = nlohmann::json;
+
+std::string qsl_dataset::server_name_ = "";
 
 const qsl_data LABEL_QSL_DATA =
 { 
@@ -54,6 +61,193 @@ const std::map<qsl_data::qsl_type, qsl_data> DEFAULT_QSL_DATA = {
 	{ qsl_data::LABEL, LABEL_QSL_DATA },
 	{ qsl_data::FILE, FILE_QSL_DATA }
 };
+
+static void to_json(json& j, const qsl_data::style_def& s) {
+	j = json{
+		{ "Font", s.font },
+		{ "Size", s.size },
+		{ "Colour", (unsigned)s.colour }
+	};
+}
+
+// Convert qsl_data::item_def to JSON object
+static void to_json(json& j, const qsl_data::item_def& s) {
+	j["Type"] = s.type;
+	switch (s.type) {
+	case qsl_data::FIELD: {
+		j["Name"] = s.field.field;
+		j["Label"] = s.field.label;
+		j["Label style"] = s.field.l_style;
+		j["Text style"] = s.field.t_style;
+		j["X"] = s.field.dx;
+		j["Y"] = s.field.dy;
+		j["Vertical alignment"] = s.field.vertical;
+		j["Boxed"] = s.field.box;
+		j["Multiple QSOs"] = s.field.multi_qso;
+		j["Display if empty"] = s.field.display_empty;
+		break;
+	}
+	case qsl_data::TEXT: {
+		j["Text"] = s.text.text;
+		j["Text Style"] = s.text.t_style;
+		j["X"] = s.text.dx;
+		j["Y"] = s.text.dy;
+		j["Vertical alignment"] = s.text.vertical;
+		break;
+	}
+	case qsl_data::IMAGE: {
+		j["Filename"] = s.image.filename;
+		j["X"] = s.image.dx;
+		j["Y"] = s.image.dy;
+		break;
+	}
+	}
+}
+
+// Convert qsl_data to JSON object
+static void to_json(json& j, const qsl_data& s) {
+	j = json{
+		{ "Unit", s.unit },
+		{ "Width", s.width },
+		{ "Height", s.height },
+		{ "Rows", s.rows},
+		{ "Columns", s.columns },
+		{ "Column spacing", s.col_width },
+		{ "Row spacing", s.row_height },
+		{ "Row top", s.row_top },
+		{ "Column left", s.col_left},
+		{ "QSOs per card", s.max_qsos},
+		{ "Date format", s.f_date},
+		{ "Time format", s.f_time}
+	};
+	json jitems;
+	for (auto& it : s.items) {
+		jitems.push_back(*it);
+	}
+	j["Items"] = jitems;
+}
+
+// Convert qsl_call_data to JSON object
+static void to_json(json& j, const qsl_call_data& s) {
+	uchar offset = hash8(qsl_dataset::server_name().c_str());
+	if (s.used) {
+		j["In use"] = true;
+		j["Last downloaded"] = s.last_download;
+		j["Key"] = string_to_hex(xor_crypt(s.key, seed_, offset));
+	}
+	else {
+		j["In use"] = false;
+	}
+}
+
+// Convert server_data_t to JSON object
+static void to_json(json& j, const server_data_t& s) {
+	uchar offset = hash8(qsl_dataset::server_name().c_str());
+	// Common items
+	j["User"] = s.user;
+	j["Password"] = string_to_hex(xor_crypt(s.password, seed_, offset));
+	if (qsl_dataset::server_name() != "eMail") {
+		j["Enable"] = s.enabled;
+		j["Upload per QSO"] = s.upload_per_qso;
+		j["Last downloaded"] = s.last_downloaded;
+	}
+	else {
+		j["eMail server"] = s.mail_server;
+		j["CC address"] = s.cc_address;
+	}
+	if (qsl_dataset::server_name() == "eQSL") {
+		j["Download confirmed"] = s.download_confirmed;
+		j["QSO message"] = s.qso_message;
+		j["SWL message"] = s.swl_message;
+		json jlog;
+		for (auto& it : s.call_data) {
+			jlog[it.first] = *it.second;
+		}
+		j["Logbooks"] = jlog;
+	}
+	if (qsl_dataset::server_name() == "lotW") {
+		j["Export file"] = s.export_file;
+	}
+	if (qsl_dataset::server_name() == "QRZ") {
+		j["Use XML database"] = s.use_xml;
+		j["Use API"] = s.use_api;
+		json jlog;
+		for (auto& it : s.call_data) {
+			jlog[it.first] = *it.second;
+		}
+		j["Logbooks"] = jlog;
+	}
+}
+
+// Convert JSON object to qsl_data::style_def
+static void from_json(const json& j, qsl_data::style_def& s) {
+	j.at("Font").get_to(s.font);
+	j.at("Size").get_to(s.size);
+	j.at("Colour").get_to(s.colour);
+}
+
+// Convert JSON object to qsl_data::item_def
+static void from_json(const json& j, qsl_data::item_def& s) {
+	j.at("Type").get_to(s.type);
+	switch (s.type) {
+	case qsl_data::FIELD: {
+		j.at("Name").get_to(s.field.field);
+		j.at("Label").get_to(s.field.label);
+		j.at("Label style").get_to(s.field.l_style);
+		j.at("Text style").get_to(s.field.t_style);
+		j.at("X").get_to(s.field.dx);
+		j.at("Y").get_to(s.field.dy);
+		j.at("Vertical alignment").get_to(s.field.vertical);
+		j.at("Boxed").get_to(s.field.box);
+		j.at("Multiple QSOs").get_to(s.field.multi_qso);
+		j.at("Display if empty").get_to(s.field.display_empty);
+		break;
+	}
+	case qsl_data::TEXT: {
+		j.at("Text").get_to(s.text.text);
+		j.at("Text style").get_to(s.text.t_style);
+		j.at("X").get_to(s.text.dx);
+		j.at("Y").get_to(s.text.dy);
+		j.at("Vertical alignment").get_to(s.text.vertical);
+		break;
+	}
+	case qsl_data::IMAGE: {
+		j.at("Filename").get_to(s.image.filename);
+		j.at("X").get_to(s.image.dx);
+		j.at("Y").get_to(s.image.dy);
+		break;
+	}
+	}
+}
+
+static void from_json(const json& j, qsl_data& s) {
+	j.at("Unit").get_to(s.unit);
+	j.at("Width").get_to(s.width);
+	j.at("Height").get_to(s.height);
+	j.at("Rows").get_to(s.rows);
+	j.at("Columns").get_to(s.columns);
+	j.at("Column spacing").get_to(s.col_width);
+	j.at("Row spacing").get_to(s.row_height);
+	j.at("Row top").get_to(s.row_top);
+	j.at("Column left").get_to(s.col_left);
+	j.at("QSOs per card").get_to(s.max_qsos);
+	j.at("Date format").get_to(s.f_date);
+	j.at("Time format").get_to(s.f_time);
+	auto jitems = j.at("Items").get<std::vector<json>>();
+	for (auto& it : jitems) {
+		qsl_data::item_def* item;
+		it.get_to(*item);
+		s.items.push_back(item);
+	}
+}
+
+static void from_json(const json& j, const qsl_call_data& s) {
+
+}
+
+static void from_json(const json& j, const server_data_t& s) {
+
+}
 
 qsl_dataset::qsl_dataset() {
 	load_failed_ = false;
@@ -125,7 +319,7 @@ void qsl_dataset::load_data() {
 std::string qsl_dataset::xml_file(Fl_Preferences& settings) {
 	char* temp;
 	Fl_Preferences data_settings(settings, "Datapath");
-	data_settings.get("QSLs", temp,"");
+	data_settings.get("QSLs", temp, "");
 	qsl_path_ = temp;
 	if (qsl_path_.length() == 0) {
 		status_->misc_status(ST_WARNING, "QSL: No directory in settings - please search");
@@ -138,6 +332,26 @@ std::string qsl_dataset::xml_file(Fl_Preferences& settings) {
 		data_settings.set("QSLs", qsl_path_.c_str());
 	}
 	std::string filename = qsl_path_ + "/config.xml";
+	free(temp);
+	return filename;
+}
+
+std::string qsl_dataset::json_file(Fl_Preferences& settings) {
+	char* temp;
+	Fl_Preferences data_settings(settings, "Datapath");
+	data_settings.get("QSLs", temp, "");
+	qsl_path_ = temp;
+	if (qsl_path_.length() == 0) {
+		status_->misc_status(ST_WARNING, "QSL: No directory in settings - please search");
+		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
+		chooser->title("Select QSL Directory");
+		if (chooser->show() == 0) {
+			qsl_path_ = chooser->filename();
+		}
+		delete chooser;
+		data_settings.set("QSLs", qsl_path_.c_str());
+	}
+	std::string filename = qsl_path_ + "/config.json";
 	free(temp);
 	return filename;
 }
@@ -162,7 +376,7 @@ void qsl_dataset::save_data() {
 	if (!load_failed_) {
 		Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 		settings.delete_group("QSL Design");
-		save_xml(settings);
+		save_json(settings);
 	}
 }
 
@@ -173,10 +387,55 @@ void qsl_dataset::save_xml(Fl_Preferences& settings) {
 	if (os.good()) {
 		qsl_writer* writer = new qsl_writer();
 		if (!writer->store_data(&data_, &server_data_, os)) {
-			status_->misc_status(ST_OK, "RIG DATA: Saved XML OK");
+			status_->misc_status(ST_OK, "QSL: Saved XML OK");
 		}
 	}
 }
+
+void qsl_dataset::save_json(Fl_Preferences& settings) {
+	char msg[128];
+	std::string filename = json_file(settings);
+	status_->misc_status(ST_NOTE, "QSL: Saving QSL designs and servers");
+	std::ofstream os;
+	os.open(filename, std::ios_base::out);
+	if (os.good()) {
+		json jall;
+		json jqsls;
+		for (auto& it_type : data_) {
+			json jt;
+			json jcalls;
+			for (auto& it_call : *(it_type.second)) {
+				jcalls[it_call.first] = *it_call.second;
+			}
+			jt["Design type"] = it_type.first;
+			jt["Designs"] = jcalls;
+			jqsls.push_back(jt);
+		}
+		jall["QSL Designs"] = jqsls;
+		json jsvrs;
+		for (auto& it_svr : server_data_) {
+			server_name_ = it_svr.first;
+			jsvrs[it_svr.first] = *it_svr.second;
+		}
+		jsvrs["Seed"] = seed_;
+		jall["Servers"] = jsvrs;
+		os << std::setw(2) << jall;
+		if (os.fail()) {
+			status_->misc_status(ST_ERROR, "QSL: Failed to save data");
+		}
+		else {
+			std::snprintf(msg, sizeof(msg), "QSL: File %s saved OK", filename.c_str());
+			status_->misc_status(ST_OK, msg);
+		}
+		os.close();
+	}
+	else {
+		status_->misc_status(ST_ERROR, "QSL: Failed to open file for saving");
+	}
+}
+
+// Return serevr name
+std::string qsl_dataset::server_name() { return server_name_; }
 
 // Get path to QSL data
 std::string qsl_dataset::get_path() {
