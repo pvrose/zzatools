@@ -1,15 +1,17 @@
 /** \page release_notes Revision History
 
-\section rev_366plus Revision 3.6.6+
+\section rev_367 Revision 3.6.7
 
 - Save a copy of the latest data before each save. Upto 8 copies are saved.
 - Add further acknowledgments of third-party data and libraries.
 - Refinements to callsign parsing algorithm.
-- Added Doxygen comments to all header files. This identified a number
+- Add Doxygen comments to all header files. This identified a number
 of redundancies in the code that have been removed.
-- Included hamlib v4.6.5 in Windows build.
+- Include hamlib v4.6.5 in Windows build.
 - Address performance issues in sorting extracted data.
 - Move eQSL image download progress display to main progress dial.
+- Migrate configuration files and WX download to JSON.
+- Include ADIF 3.1.6.
 - Cosmetic changes.
 - Bug fixes:
   - Errors in callsign parsing algorithm.
