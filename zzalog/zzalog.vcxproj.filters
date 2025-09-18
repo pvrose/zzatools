@@ -183,9 +183,6 @@
     <ClCompile Include="src\qsl_widget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\qsl_writer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\qso_apps.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -558,9 +555,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\qsl_widget.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\qsl_writer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\qso_apps.h">

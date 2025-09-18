@@ -109,6 +109,7 @@ void fields::load_data() {
         }
     }
 	coll_map_.clear();
+    status_->misc_status(ST_NOTE, "FIELDS: Loading fields displayed");
     if (!load_collections()) {
         // Read all the field field sets
     }
@@ -128,6 +129,7 @@ bool fields::load_collections() {
     filename_ = default_data_directory_ + "fields.json";
     fl_make_path_for_file(filename_.c_str());
     ifstream ip;
+    char msg[128];
     ip.open(filename_.c_str(), std::ios_base::in);
     if (!ip.good()) {
         char msg[128];
@@ -149,16 +151,18 @@ bool fields::load_collections() {
                 coll_map_[ita.first] = coll;
             }
         }
+        std::snprintf(msg, sizeof(msg), "FIELDS: File %s loaded OK", filename_.c_str());
+        status_->misc_status(ST_OK, msg);
     }
     catch (const json::exception& e) {
         char msg[128];
-        std::snprintf(msg, sizeof(msg), "Fields: Reading JSON failed %d (%s)\n",
-            e.id, e.what());
+        std::snprintf(msg, sizeof(msg), "FIELDS: Failed to load %s: %d (%s)\n",
+            filename_.c_str(), e.id, e.what());
         status_->misc_status(ST_ERROR, msg);
         ip.close();
         return false;
     }
-     ip.close();
+    ip.close();
     return true;
 }
 

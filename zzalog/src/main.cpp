@@ -772,7 +772,8 @@ void print_args(int argc, char** argv) {
 	}
 	strcat(message, "Started");
 	status_->misc_status(ST_NOTE, message);
-	snprintf(message, sizeof(message), "ZZALOG: %s", main_window_->label());
+	snprintf(message, sizeof(message), "ZZALOG: %s %s", 
+		PROGRAM_ID.c_str(), PROGRAM_VERSION.c_str());
 	status_->misc_status(ST_NOTE, message);
 	snprintf(message, sizeof(message), "ZZALOG: Compiled %s", TIMESTAMP.c_str());
 	status_->misc_status(ST_NOTE, message);
@@ -1047,11 +1048,12 @@ int main(int argc, char** argv)
 	std::string title = PROGRAM_ID + " " + PROGRAM_VERSION;
 	banner_->copy_label(title.c_str());
 
-	// Read the fields data
-	fields_ = new fields;
-
 	// Now display sticky switch message
 	status_->misc_status(ST_NOTE, sticky_message_.c_str());	
+	print_args(argc, argv);
+
+	// Read the fields data
+	fields_ = new fields;
 
 	// Create window
 	create_window();
@@ -1061,7 +1063,6 @@ int main(int argc, char** argv)
 	// add the various drawn items
 	int curr_y = 0;
 	add_widgets(curr_y);
-	print_args(argc, argv);
 	// Resize the window
 	resize_window();
 	// Read in reference data - uses progress

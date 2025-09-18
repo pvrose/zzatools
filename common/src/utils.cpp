@@ -969,6 +969,7 @@ std::string string_to_hex(std::string data, bool escape /*=true*/) {
 // Convert hex representation to std::string
 std::string hex_to_string(std::string data) {
 	std::string result;
+	result.reserve(data.length());
 	int ix = 0;
 	// For the length of the source striing
 	while ((unsigned)ix < data.length()) {

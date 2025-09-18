@@ -224,7 +224,6 @@
     <ClCompile Include="src\qsl_image.cpp" />
     <ClCompile Include="src\qsl_reader.cpp" />
     <ClCompile Include="src\qsl_widget.cpp" />
-    <ClCompile Include="src\qsl_writer.cpp" />
     <ClCompile Include="src\qso_apps.cpp" />
     <ClCompile Include="src\qso_bands.cpp" />
     <ClCompile Include="src\qso_buttons.cpp" />
@@ -349,7 +348,6 @@
     <ClInclude Include="include\qsl_image.h" />
     <ClInclude Include="include\qsl_reader.h" />
     <ClInclude Include="include\qsl_widget.h" />
-    <ClInclude Include="include\qsl_writer.h" />
     <ClInclude Include="include\qso_apps.h" />
     <ClInclude Include="include\qso_bands.h" />
     <ClInclude Include="include\qso_buttons.h" />

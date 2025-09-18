@@ -61,8 +61,6 @@ public:
 	void dirty(qsl_data* card);
 	//! Store carddesigns
 	void save_data();
-	//! Save XML data
-	void save_xml(Fl_Preferences& settings);
 	//! Save JSON file
 	void save_json(Fl_Preferences& settings);
 	//! Create server data
@@ -75,6 +73,8 @@ protected:
 	void load_data();
 	//! Read from XML fiel
 	bool load_xml(Fl_Preferences& settings);
+	//! Read from JSON
+	bool load_json(Fl_Preferences& settings);
 	//! Get XML file from settings
 	std::string xml_file(Fl_Preferences& settings);
 	//! Get JSON file from settings
