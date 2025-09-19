@@ -258,7 +258,9 @@
     <ClCompile Include="src\spec_tree.cpp" />
     <ClCompile Include="src\status.cpp" />
     <ClCompile Include="src\stn_data.cpp" />
-    <ClCompile Include="src\stn_dialog.cpp" />
+    <ClCompile Include="src\stn_dialog.cpp">
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|x64'">EditAndContinue</DebugInformationFormat>
+    </ClCompile>
     <ClCompile Include="src\symbols.cpp" />
     <ClCompile Include="src\tabbed_forms.cpp" />
     <ClCompile Include="src\ticker.cpp" />

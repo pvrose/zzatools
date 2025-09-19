@@ -127,6 +127,9 @@ void stn_dialog::enable_widgets() {
 			wx->deactivate();
 		}
 	}
+	g_qth_->load_data();
+	g_oper_->load_data();
+	g_call_->load_data();
 	g_qth_->enable_widgets();
 	g_oper_->enable_widgets();
 	g_call_->enable_widgets();
@@ -233,9 +236,13 @@ void stn_dialog::single_tab::create_form() {
 		bn_update_->tooltip("If checked, selecting a call will update DXCC etc");
 
 		curr_x += HBUTTON;
-		ch_call_ = new Fl_Input_Choice(curr_x, curr_y, WBUTTON, HBUTTON);
-		ch_call_->callback(cb_ch_call);
+		ch_call_ = new Fl_Input_Choice(curr_x, curr_y, WSMEDIT, HBUTTON);
 		ch_call_->tooltip("Selecting a call will update DXCC etc");
+
+		curr_x += WSMEDIT;
+		bn_do_update_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Update");
+		bn_do_update_->callback(cb_ch_call);
+		bn_do_update_->tooltip("Update fields from callsign");
 	}
 
 	curr_x = x() + GAP + WLABEL;
@@ -302,6 +309,10 @@ void stn_dialog::single_tab::create_form() {
 }
 
 void stn_dialog::single_tab::enable_widgets() {
+	populate_choice(ch_id_, (tab_type)type());
+	if (type() == QTH) {
+		populate_choice(ch_call_, CALLSIGN);
+	}
 	if (visible()) {
 		switch (type()) {
 		case QTH:
@@ -372,6 +383,7 @@ void stn_dialog::single_tab::enable_widgets() {
 			ch_id_->value(current_id_.c_str());
 			break;
 		}
+		redraw();
 		show();
 	}
 }
@@ -553,15 +565,21 @@ void stn_dialog::single_tab::populate_choice(Fl_Input_Choice* ch, tab_type t) {
 void stn_dialog::single_tab::update_from_call() {
 	switch (type()) {
 	case QTH: {
-		record* dummy_qso = qso_manager_->dummy_qso();
-		dummy_qso->item("CALL", std::string(ch_call_->value()));
-		cty_data_->update_qso(dummy_qso, true);
-		for (auto it : QTH_ADIF_MAP) {
-			if (dummy_qso->item(it.second).length()) {
-				stn_data_->add_qth_item(current_id_, it.first, dummy_qso->item(it.second));
-			}
+		if (current_id_.length() == 0) {
+			fl_alert("Please enter a name for the location");
 		}
-		enable_widgets();
+		else {
+			record* dummy_qso = qso_manager_->dummy_qso();
+			dummy_qso->item("CALL", std::string(ch_call_->value()));
+			cty_data_->update_qso(dummy_qso, true);
+			for (auto it : QTH_ADIF_MAP) {
+				if (dummy_qso->item(it.second).length()) {
+					stn_data_->add_qth_item(current_id_, it.first, dummy_qso->item(it.second));
+				}
+			}
+			load_data();
+			enable_widgets();
+		}
 	}
 	}
 }

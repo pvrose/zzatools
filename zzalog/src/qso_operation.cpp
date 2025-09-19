@@ -23,6 +23,7 @@ extern std::string PROGRAM_ID;
 extern std::string VENDOR;
 extern void open_html(const char*);
 extern Fl_Preferences::Root prefs_mode_;
+extern std::string default_station_;
 
 qso_operation::qso_operation(int X, int Y, int W, int H, const char *L) : Fl_Group(X, Y, W, H, L),
 																		  current_qth_(""),
@@ -131,12 +132,24 @@ void qso_operation::load_data() {
 	char* temp;
 	station_settings.get("Operator", temp, "");
 	current_oper_ = temp;
+	if (current_oper_.length() == 0) {
+		auto opers = stn_data_->get_opers();
+		if (opers->size()) current_oper_ = (*opers->begin()).first;
+	}
 	free(temp);
 	station_settings.get("Callsign", temp, "");
 	current_call_ = to_upper(std::string(temp));
+	if (current_oper_.length() == 0) {
+		auto calls = stn_data_->get_calls();
+		if (calls->size()) current_call_ = (*calls->begin()).first;
+	}
 	free(temp);
 	station_settings.get("Location", temp, "");
 	current_qth_ = temp;
+	if (current_qth_.length() == 0) {
+		auto qths = stn_data_->get_qths();
+		if (qths->size()) current_qth_ = (*qths->begin()).first;
+	}
 	free(temp);
 }
 

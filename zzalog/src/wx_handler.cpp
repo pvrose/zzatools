@@ -136,7 +136,13 @@ void wx_handler::update() {
     if (qth_id.length()) {
         const qth_info_t* info = stn_data_->get_qth(qth_id);
         if (info != nullptr) {
-            dummy->item("MY_GRIDSQUARE", info->data.at(LOCATOR));
+            if (info->data.find(LOCATOR) != info->data.end()) {
+                dummy->item("MY_GRIDSQUARE", info->data.at(LOCATOR));
+            } 
+            if (info->data.find(DXCC_ID) != info->data.end()) {
+                dummy->item("DXCC", info->data.at(DXCC_ID));
+            }
+            dummy->item("CALL", qso_manager_->get_default(qso_manager::CALLSIGN));
             location = dummy->location(true);
         }
     }

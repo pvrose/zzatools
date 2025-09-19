@@ -797,7 +797,7 @@ bool spec_data::add_user_enum(std::string field, std::string value) {
 				field.c_str(),
 				it_field->second->at("Data Type").c_str(),
 				enumeration_name);
-				status_->misc_status(ST_WARNING, message);
+				status_->misc_status(ST_NOTE, message);
 			// Enumeration won't exist
 			spec_dataset* original_data = dataset("Original Fields");
 			if (original_data == nullptr) {

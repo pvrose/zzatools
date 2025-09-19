@@ -532,8 +532,8 @@ lat_long_t record::location(bool my_station, location_t& source) {
 			value_1 = item("MY_GRIDSQUARE", false);
 			// No gridsquare for user. 
 			if (value_1.length() == 0) {
-				source = LOC_NONE;
-				return lat_long;
+				source = LOC_PREFIX;
+				return cty_data_->location(this);
 			}
 		}
 		else {

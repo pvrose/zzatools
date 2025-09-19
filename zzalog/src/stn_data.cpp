@@ -90,10 +90,13 @@ stn_data::stn_data()
 {
 	load_failed_ = false;
 	load_data();
+	if (load_failed_) {
+		
+	}
 }
 
 stn_data::~stn_data() {
-	if (!load_failed_) store_json();
+	store_json();
 }
 
 // Load data from station.xml

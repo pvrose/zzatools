@@ -548,6 +548,19 @@ void add_book(char* arg) {
 			// Get filename and load the data
 			std::string log_file = get_file(arg);
 
+			if (new_installation_) {
+				char message[128];
+				size_t last_slash = log_file.find_last_of("/\\");
+				size_t start = last_slash == std::string::npos ? 0 : last_slash + 1;
+				size_t last_period = log_file.find_last_of('.');
+				if (last_period == std::string::npos)
+					default_station_ = to_upper(log_file.substr(start));
+				else
+					default_station_ = to_upper(log_file.substr(start, last_period - start));
+				snprintf(message, sizeof(message), "LOG: Default callsign %s",
+					default_station_.c_str());
+				status_->misc_status(ST_LOG, message);
+			}
 
 			if (!new_installation_ && !book_->load_data(log_file)) {
 				Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
@@ -996,6 +1009,20 @@ void club_operator() {
 	while (dlg->visible()) Fl::check();
 }
 
+// Initialise location
+void locate_station() {
+	// Add the default callsign based on log file name
+	if (!stn_data_->known_call(default_station_)) {
+		stn_data_->add_call(default_station_);
+	}
+	if (qso_manager_->get_default(qso_manager::QTH) == "") {
+		config_->show();
+		stn_dialog* dlg = (stn_dialog*)config_->get_tab(config::DLG_STATION);
+		dlg->set_tab(stn_dialog::QTH, "");
+		while (config_->visible()) Fl::check();
+	}
+}
+
 // The main app entry point
 int main(int argc, char** argv)
 {
@@ -1083,6 +1110,8 @@ int main(int argc, char** argv)
 		config_ = new config(WCONFIG, HCONFIG, "Configuration");
 		config_->hide();
 	}
+	// Now check if we've got a default location
+	locate_station();
 	// Now ask for club operator
 	if (prefs_mode_ == Fl_Preferences::SYSTEM_L) club_operator();
 	// Add qsl_handlers - note add_rig_if() may have added URL handler
