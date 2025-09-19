@@ -72,7 +72,7 @@ protected:
     
 };
 
-//! This class displays a dialog that allows the user to select and order fields that are to be used
+//! \brief This class displays a dialog that allows the user to select and order fields that are to be used
 //! in the various different views of the log
 class fields_dialog :
     public page_dialog

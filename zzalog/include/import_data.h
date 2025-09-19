@@ -11,7 +11,7 @@
 
 class book;
 
-	//! This class inherits book and provides the additional functionality required
+	//! \brief This class inherits book and provides the additional functionality required
 	//! for importing additional data to the main log. 
 	
 	//! Pointers to imported Records are initially held in this book

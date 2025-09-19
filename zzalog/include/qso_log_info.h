@@ -9,7 +9,7 @@ class Fl_Button;
 class Fl_Check_Button;
 
 //! This class displays the current state of the log.
-//! 
+
 //! It indicates whether it is dirty and provides basic controls.
 class qso_log_info :
 	public Fl_Group

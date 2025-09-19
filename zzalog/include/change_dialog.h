@@ -14,8 +14,8 @@ class Fl_Widget;
 		CHANGE_FIELD = 3    //!< Add, and change existing fields with this name.
 	};
 
-	//! This class implements a dialog that asks a user how to make similar
-	//! changes to all records in the log
+	//! \brief This class implements a dialog that asks a user how to make similar
+	//! changes to all records in the log.
 	class change_dialog :
 		public win_dialog
 	{

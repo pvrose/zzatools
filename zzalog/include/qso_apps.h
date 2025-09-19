@@ -41,7 +41,7 @@ struct app_data_t {
     int port_num{ 0 };           //!< Network port number.
 };
 
-//! The class displays and controls the status of a single modem application using
+//! \brief The class displays and controls the status of a single modem application using
 //! ZZALOG as a log server
 class app_grp :
     public Fl_Group 
@@ -125,7 +125,7 @@ class app_grp :
 };
 
 //! This class displays and controls all the interfaces to the modem apps.
-//! 
+ 
 //! It has a number of common controls and a setof tabs one for each app_grp.
 class qso_apps:
     public Fl_Group

@@ -2,8 +2,8 @@
 
 #include "button_input.h"
 
-//! This class is a widget that combines a button and input
-//! widget.
+//! \brief This class is a widget that combines a button that opens a calendar browser 
+//! and input widget.
 
 //! The button opens a calendar widget to select a date.
 //! The input allows the date to be typed in (and displays that selected by the calendar).

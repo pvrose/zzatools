@@ -7,7 +7,7 @@
 class Fl_Button;
 
 //! This class provides an input plus a button combination that are connected.
-//! 
+
 //! The button will affect the input is some way, either opening up some browser 
 //! or affecting its format.
 class button_input :

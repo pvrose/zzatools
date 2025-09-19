@@ -15,7 +15,7 @@ struct qth_info_t;
 // List of fields
 typedef std::vector <std::string> field_list;
 
-//!* Basic contest scoring element
+//! Basic contest scoring element
 struct score_result {
     //! Points scored from the QSO
     int qso_points;

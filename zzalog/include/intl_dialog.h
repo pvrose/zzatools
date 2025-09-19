@@ -11,7 +11,7 @@
 class Fl_Widget;
 class Fl_Group;
 
-	//! This class provides a window that can be used to paste non-ASCII 
+	//! \brief This class provides a window that can be used to paste non-ASCII 
 	//! characters into the specified editor widget.
 	
 	//! The editor widget tells this dialog when it opens.

@@ -47,8 +47,8 @@ struct spec_dataset;
 	};
 
 
-	//! This class provides an extension to Fl_Input_Choice to add the menu
-	//! if the field is an enumeration
+	//! \brief This class provides an extension to Fl_Input_Choice to add the menu
+	//! if the field is an enumeration.
 	class field_input : public Fl_Input_Choice
 	{
 	public:

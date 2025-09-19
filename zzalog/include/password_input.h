@@ -2,7 +2,7 @@
 #include "button_input.h"
 
 //! This class implements a combined input and button.
-//! 
+
 //! The button chnages the display mode of the input between clear text and hidden text. 
 class password_input :
     public button_input

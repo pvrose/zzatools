@@ -42,7 +42,7 @@ static const field_list STN_FIELDS = {
 };
 
 
-// This class contains the various QSO viewer and editor views.
+//! This class contains the various QSO viewer and editor views.
 class qso_data :
     public Fl_Group
 {

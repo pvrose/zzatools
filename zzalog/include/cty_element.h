@@ -12,7 +12,7 @@
 
 class cty_filter;
 
-//! This is the base class for all cty_data elements
+//! This is the base class for all cty_data elements.
 class cty_element
 {
 public:
@@ -129,7 +129,7 @@ public:
 //! Output streaming operator "<<" for a cty_prefix.
 std::ostream& operator<<(std::ostream& os, const cty_prefix& elem);
 
-// Version of cty_exception to be used for exceptions
+//! Version of cty_exception to be used for exceptions
 class cty_exception : public cty_element {
 
 public:
@@ -152,7 +152,7 @@ public:
 //! Output streaming operator "<<" for a cty_exception.
 std::ostream& operator<<(std::ostream& os, const cty_exception& rhs);
 
-// Version of cty_element to be used in geographic or usage filter
+//! Version of cty_element to be used in geographic or usage filter
 class cty_filter : public cty_element {
 
 public:

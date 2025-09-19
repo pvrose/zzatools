@@ -7,7 +7,7 @@
 class record;
 
 
-//! This class provides an emulation for fllog software, the logging application
+//! \brief This class provides an emulation for fllog software, the logging application
 //! for the fldigi suite of applications. 
 
 //! It allows the log to be updated 

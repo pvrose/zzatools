@@ -11,7 +11,7 @@
 
 
 	//! This class reads the XML cty.xml file obtained from Clublog.org
-	//! 
+	
 	/** XML structure
 	\code
 

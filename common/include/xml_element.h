@@ -10,6 +10,8 @@
 
 
 	//! This class provides the basic constituents of an XML element
+	
+	//! \todo Look at a third party library to improve XML read/write performnace.
 	class xml_element
 	{
 	public:

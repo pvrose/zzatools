@@ -21,7 +21,7 @@ class Fl_Value_Input;
 class Fl_Widget;
 class Fl_Window;
 
-//! This class provides the dialog to edit the card label parameters
+//! \brief This class provides the dialog to edit the card label parameters
 //! and define the items used in drawing the card label
 class qsl_editor : public page_dialog
 {

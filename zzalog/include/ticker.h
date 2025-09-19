@@ -7,9 +7,9 @@
 
 
 //! This class provides a central timer to control all the real time activity.
-//! 
+
 //! It is clocked every 100 milliseconds. Any object that wants a regular tick
-//! register a callback and period.
+//! registers a callback and period.
 class ticker {
 
     //! Ticker callback.

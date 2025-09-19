@@ -62,7 +62,7 @@ public:
 };
 
 //! This class provides the means of changing station credentials.
-//! 
+
 //! It allows the station location, station operator and station to be selected.
 class qso_operation :
     public Fl_Group

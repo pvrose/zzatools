@@ -42,7 +42,7 @@ const uchar DAMAGE_AUTOS = 8;      //!< Update the "Auto" tab.
 const uchar DAMAGE_ALL = 0xFF;     //!< Update everything.
 
 
-// This class displays and controls the status of a single rig connection.
+//! This class displays and controls the status of a single rig connection.
 class qso_rig :
     public Fl_Group
 {

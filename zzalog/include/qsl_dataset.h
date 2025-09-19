@@ -15,6 +15,7 @@ enum extract_mode_t : uchar;
 
 // Class to manage QSL designs
 
+//! Contains data needed to access logbooks by call on QSL server sites.
 struct qsl_call_data {
 	bool used;                           //!< Data is used.
 	std::string key;                     //!< logbook access key.
@@ -22,6 +23,7 @@ struct qsl_call_data {
 	std::string last_download;           //!< Date last downloaded (YYYYMMDD)
 };
 
+//! Contains data needed to access QSL server sites.
 struct server_data_t {
 	bool upload_per_qso{false};          //!< Upload per QSO
 	bool enabled{false};                 //!< Access enabled
@@ -39,6 +41,7 @@ struct server_data_t {
 	std::map<std::string, qsl_call_data*> call_data; //!< API logbook data (QRZ.com)
 };
 
+//! The container for all data pertinant to QSL card designs and QSL server sites.
 class qsl_dataset
 {
 public:

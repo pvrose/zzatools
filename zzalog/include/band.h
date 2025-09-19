@@ -11,7 +11,7 @@
 
 extern spec_data* spec_data_;
 
-//! Structure to provide a special means of sorting bands known by their
+//! \brief Structure to provide a special means of sorting bands known by their
 //! wavelength to be sorted on their frequency.
 struct band_lt {
     //! Special &lt; operator.
