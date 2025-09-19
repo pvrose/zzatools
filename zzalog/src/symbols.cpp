@@ -145,17 +145,29 @@ void draw_vertical(int i, bool shrt) {
 void draw_calendar(Fl_Color c) {
 	Fl_Color save = fl_color();
 	fl_color(c);
-	// Draw horizontal lines
-	draw_horizontal(0);
-	for (int i = 2; i < 8; i++) {
-		draw_horizontal(i);
-	}
-	// Draw vertical lines
-	draw_vertical(0, false);
-	for (int i = 1; i < 7; i++) {
-		draw_vertical(i, true);
-	}
-	draw_vertical(7, false);
+
+	// Draw outer box +/- 0.9
+	fl_begin_loop();
+	fl_vertex(-1.0, -1.0);
+	fl_vertex(1.0, -1.0);
+	fl_vertex(1.0, 1.0);
+	fl_vertex(-1.0, 1.0);
+	fl_end_loop();
+	// Draw top filled box
+	fl_begin_polygon();
+	fl_vertex(-1.0, -1.0);
+	fl_vertex(1.0, -1.0);
+	fl_vertex(1.0, -0.5);
+	fl_vertex(-1.0, -0.5);
+	fl_end_polygon();
+
+	// Attempt to draw "1"
+	fl_begin_line();
+	fl_vertex(-0.2, -0.1);
+	fl_vertex(0.1, -0.3);
+	fl_vertex(0.1, 0.7);
+	fl_end_line();
+
 	fl_color(save);
 }
 
