@@ -220,7 +220,6 @@ rig_data_t* rig_data::get_rig(std::string rig) {
 }
 
 void rig_data::load_data() {
-    char msg[128];
     load_failed_ = true;
     status_->misc_status(ST_NOTE, "RIG DATA: Loading rig configuration data");
     if (load_json()) {
