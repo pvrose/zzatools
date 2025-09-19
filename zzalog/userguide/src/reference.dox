@@ -41,7 +41,7 @@ It is not often updated.
 
 \section adif ADIF Specification
 
-The ADIF specification is provided in XML format. This is updated occasionally. It 
+The ADIF specification is provided in JSON format. This is updated occasionally. It 
 contains the detailed description of the ADIF fields and types - 
 see \ref spec_tree. It is provided
 for reference, though some use is made of the data to validate that data has

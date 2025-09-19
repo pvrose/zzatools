@@ -10,7 +10,7 @@ of redundancies in the code that have been removed.
 - Include hamlib v4.6.5 in Windows build.
 - Address performance issues in sorting extracted data.
 - Move eQSL image download progress display to main progress dial.
-- Migrate configuration files and WX download to JSON.
+- Migrate configuration files and WX download from XML to JSON.
 - Include ADIF 3.1.6.
 - Cosmetic changes.
 - Bug fixes:

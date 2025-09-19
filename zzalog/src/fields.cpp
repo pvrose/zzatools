@@ -15,7 +15,7 @@ extern std::string default_data_directory_;
 extern Fl_Preferences::Root prefs_mode_;
 
 //! Convert field_info_t to JSON object
-void to_json(json& j, const field_info_t& s) {
+static void to_json(json& j, const field_info_t& s) {
     j = json{
         { "Field", s.field },
         { "Width", s.width },
@@ -24,7 +24,7 @@ void to_json(json& j, const field_info_t& s) {
 }
 
 //! Convert JSON object to field_info_t
-void from_json(const json& j, field_info_t& s) {
+static void from_json(const json& j, field_info_t& s) {
     j.at("Field").get_to(s.field);
     j.at("Width").get_to(s.width);
     j.at("Header").get_to(s.header);

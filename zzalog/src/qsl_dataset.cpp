@@ -1,5 +1,4 @@
 #include "qsl_dataset.h"
-#include "qsl_reader.h"
 #include "extract_data.h"
 #include "qrz_handler.h"
 #include "status.h"
@@ -23,6 +22,44 @@ extern uint32_t seed_;
 using json = nlohmann::json;
 
 std::string qsl_dataset::server_name_ = "";
+
+//! Map dim_unit to string for JSON serialisaton
+NLOHMANN_JSON_SERIALIZE_ENUM(qsl_data::dim_unit, {
+	{ qsl_data::INCH, "Inch"},
+	{ qsl_data::MILLIMETER, "Millimeter"},
+	{ qsl_data::POINT, "Point" }
+	})
+
+//! Map qsl_type to string for JSON serialisaton
+NLOHMANN_JSON_SERIALIZE_ENUM(qsl_data::qsl_type, {
+	{ qsl_data::LABEL, "Label"},
+	{ qsl_data::FILE, "File"}
+	})
+
+//! Map date_format to string for JSON serialisaton
+NLOHMANN_JSON_SERIALIZE_ENUM(qsl_data::date_format, {
+	{ qsl_data::FMT_Y4MD_ADIF, "YYYYMMDD"},
+	{ qsl_data::FMT_Y4MD, "YYYY/MM/DD"},
+	{ qsl_data::FMT_Y2MD, "YY/MM/DD"},
+	{ qsl_data::FMT_DMY2, "DD/MM/YY"},
+	{ qsl_data::FMT_MDY2, "MM/DD/YY"}
+	})
+
+//! Map time_format to string for JSON serialisaton
+NLOHMANN_JSON_SERIALIZE_ENUM(qsl_data::time_format, {
+	{ qsl_data::FMT_HMS_ADIF, "HHMMSS"},
+	{ qsl_data::FMT_HMS, "HH:MM:SS"},
+	{ qsl_data::FMT_HM_ADIF, "HHMM"},
+	{ qsl_data::FMT_HM, "HH:MM"}
+	})
+
+//! Map item_type to string for JSON serialisaton
+NLOHMANN_JSON_SERIALIZE_ENUM(qsl_data::item_type, {
+	{ qsl_data::NONE, "None"},
+	{ qsl_data::FIELD, "Field"},
+	{ qsl_data::TEXT, "Text"},
+	{ qsl_data::IMAGE, "Image"}
+	})
 
 const qsl_data LABEL_QSL_DATA =
 { 
@@ -351,32 +388,8 @@ void qsl_dataset::load_data() {
 	data_.clear();
 	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 	if (!load_json(settings)) {
-		if (!load_xml(settings)) {
-			load_failed_ = true;
-			status_->misc_status(ST_ERROR, "QSL: No QSl data loaded");
-			//load_prefs(settings);
-		}
+		status_->misc_status(ST_ERROR, "QSL: No QSl data loaded");
 	}
-}
-
-std::string qsl_dataset::xml_file(Fl_Preferences& settings) {
-	char* temp;
-	Fl_Preferences data_settings(settings, "Datapath");
-	data_settings.get("QSLs", temp, "");
-	qsl_path_ = temp;
-	if (qsl_path_.length() == 0) {
-		status_->misc_status(ST_WARNING, "QSL: No directory in settings - please search");
-		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
-		chooser->title("Select QSL Directory");
-		if (chooser->show() == 0) {
-			qsl_path_ = chooser->filename();
-		}
-		delete chooser;
-		data_settings.set("QSLs", qsl_path_.c_str());
-	}
-	std::string filename = qsl_path_ + "/config.xml";
-	free(temp);
-	return filename;
 }
 
 std::string qsl_dataset::json_file(Fl_Preferences& settings) {
@@ -397,21 +410,6 @@ std::string qsl_dataset::json_file(Fl_Preferences& settings) {
 	std::string filename = qsl_path_ + "/config.json";
 	free(temp);
 	return filename;
-}
-
-bool qsl_dataset::load_xml(Fl_Preferences& settings) {
-	ifstream is;
-	is.open(xml_file(settings), std::ios_base::in);
-	if (is.good()) {
-		qsl_reader* reader = new qsl_reader();
-		if (reader->load_data(&data_, &server_data_, is)) {
-			status_->misc_status(ST_OK, "QSL: XML loaded OK");
-			return true;
-		}
-	}
-	// else
-	status_->misc_status(ST_WARNING, "QSL: XML data failed to load - defaulting to prefernces");
-	return false;
 }
 
 bool qsl_dataset::load_json(Fl_Preferences& settings) {

@@ -1,15 +1,11 @@
 #pragma once
 
-#include "nlohmann/json.hpp"
-
 #include <string>
 #include <set>
 #include <map>
 #include <vector>
 
 #include <FL/Fl_Preferences.H>
-
-using json = nlohmann::json;
 
 struct hamlib_data_t;
 
@@ -24,10 +20,6 @@ struct cat_data_t {
     bool auto_connect = false;         //!< Automatically connect to app after starting it.
     double connect_delay = 1.0;        //!< Delay between starting app and connecting (in seconds).
 };
-//! Convert cat_data_t to JSON structure
-void to_json(json& j, const cat_data_t& s);
-//! Convert JSON structure to cat_data_t
-void from_json(const json& j, cat_data_t& s);
 
 //! This structure configures the use of the rig interface.
 struct rig_data_t {          
@@ -36,10 +28,6 @@ struct rig_data_t {
     bool use_instant_values = false;   //!< Use values just radfrom rig rather than smoothed ones.
     std::vector<cat_data_t*> cat_data; //!< Methods of accessing this particular rig.
 };
-//! Convert rig_data_t to JSON structure
-void to_json(json& j, const rig_data_t& s);
-//! Convert JSON structure to rig_data_t
-void from_json(const json& j, rig_data_t& s);
 
 //! This class provides the data required for configuring, accessing and using each rig.
 class rig_data {

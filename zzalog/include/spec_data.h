@@ -10,8 +10,6 @@
 
 #include <FL/Fl_Choice.H>
 
-
-
 class band_set;
 class record;
 typedef size_t qso_num_t;

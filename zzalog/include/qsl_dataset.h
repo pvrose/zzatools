@@ -71,12 +71,8 @@ public:
 protected:
 	//! Read card designs
 	void load_data();
-	//! Read from XML fiel
-	bool load_xml(Fl_Preferences& settings);
 	//! Read from JSON
 	bool load_json(Fl_Preferences& settings);
-	//! Get XML file from settings
-	std::string xml_file(Fl_Preferences& settings);
 	//! Get JSON file from settings
 	std::string json_file(Fl_Preferences& settings);
 

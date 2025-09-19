@@ -177,9 +177,6 @@
     <ClCompile Include="src\qsl_image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\qsl_reader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\qsl_widget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -261,9 +258,6 @@
     <ClCompile Include="src\rig_if.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\rig_reader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\rpc_data_item.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -285,9 +279,6 @@
     <ClCompile Include="src\spec_tree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\specx_reader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\status.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -295,9 +286,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\stn_dialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\stn_reader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\symbols.cpp">
@@ -331,9 +319,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\wx_handler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\xml_wreader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\common\src\utils.cpp">
@@ -551,9 +536,6 @@
     <ClInclude Include="include\qsl_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\qsl_reader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\qsl_widget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -638,9 +620,6 @@
     <ClInclude Include="include\rig_if.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rig_reader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\rpc_data_item.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -665,9 +644,6 @@
     <ClInclude Include="include\spec_tree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\specx_reader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\status.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -675,9 +651,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\stn_dialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\stn_reader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\symbols.h">
@@ -711,9 +684,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\wx_handler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\xml_wreader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\common\include\utils.h">

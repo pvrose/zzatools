@@ -222,7 +222,6 @@
     <ClCompile Include="src\qsl_editor.cpp" />
     <ClCompile Include="src\qsl_emailer.cpp" />
     <ClCompile Include="src\qsl_image.cpp" />
-    <ClCompile Include="src\qsl_reader.cpp" />
     <ClCompile Include="src\qsl_widget.cpp" />
     <ClCompile Include="src\qso_apps.cpp" />
     <ClCompile Include="src\qso_bands.cpp" />
@@ -250,19 +249,16 @@
     <ClCompile Include="src\report_tree.cpp" />
     <ClCompile Include="src\rig_data.cpp" />
     <ClCompile Include="src\rig_if.cpp" />
-    <ClCompile Include="src\rig_reader.cpp" />
     <ClCompile Include="src\rpc_data_item.cpp" />
     <ClCompile Include="src\rpc_handler.cpp" />
     <ClCompile Include="src\search_dialog.cpp" />
     <ClCompile Include="src\serial.cpp" />
     <ClCompile Include="src\socket_server.cpp" />
-    <ClCompile Include="src\specx_reader.cpp" />
     <ClCompile Include="src\spec_data.cpp" />
     <ClCompile Include="src\spec_tree.cpp" />
     <ClCompile Include="src\status.cpp" />
     <ClCompile Include="src\stn_data.cpp" />
     <ClCompile Include="src\stn_dialog.cpp" />
-    <ClCompile Include="src\stn_reader.cpp" />
     <ClCompile Include="src\symbols.cpp" />
     <ClCompile Include="src\tabbed_forms.cpp" />
     <ClCompile Include="src\ticker.cpp" />
@@ -274,7 +270,6 @@
     <ClCompile Include="src\win_dialog.cpp" />
     <ClCompile Include="src\wsjtx_handler.cpp" />
     <ClCompile Include="src\wx_handler.cpp" />
-    <ClCompile Include="src\xml_wreader.cpp" />
     <ClCompile Include="..\widgets\src\filename_input.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -346,7 +341,6 @@
     <ClInclude Include="include\qsl_editor.h" />
     <ClInclude Include="include\qsl_emailer.h" />
     <ClInclude Include="include\qsl_image.h" />
-    <ClInclude Include="include\qsl_reader.h" />
     <ClInclude Include="include\qsl_widget.h" />
     <ClInclude Include="include\qso_apps.h" />
     <ClInclude Include="include\qso_bands.h" />
@@ -375,20 +369,17 @@
     <ClInclude Include="include\report_tree.h" />
     <ClInclude Include="include\rig_data.h" />
     <ClInclude Include="include\rig_if.h" />
-    <ClInclude Include="include\rig_reader.h" />
     <ClInclude Include="include\rpc_data_item.h" />
     <ClInclude Include="include\rpc_handler.h" />
     <ClInclude Include="include\search.h" />
     <ClInclude Include="include\search_dialog.h" />
     <ClInclude Include="include\serial.h" />
     <ClInclude Include="include\socket_server.h" />
-    <ClInclude Include="include\specx_reader.h" />
     <ClInclude Include="include\spec_data.h" />
     <ClInclude Include="include\spec_tree.h" />
     <ClInclude Include="include\status.h" />
     <ClInclude Include="include\stn_data.h" />
     <ClInclude Include="include\stn_dialog.h" />
-    <ClInclude Include="include\stn_reader.h" />
     <ClInclude Include="include\symbols.h" />
     <ClInclude Include="include\tabbed_forms.h" />
     <ClInclude Include="include\ticker.h" />
@@ -401,7 +392,6 @@
     <ClInclude Include="include\win_dialog.h" />
     <ClInclude Include="include\wsjtx_handler.h" />
     <ClInclude Include="include\wx_handler.h" />
-    <ClInclude Include="include\xml_wreader.h" />
     <ClInclude Include="packages\pthreads.2.9.1.4\build\native\include\pthread.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="..\widgets\include\button_input.h" />

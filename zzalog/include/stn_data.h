@@ -1,12 +1,8 @@
 #pragma once
 
-#include "nlohmann/json.hpp"
-
 #include <string>
 #include <map>
 #include <set>
-
-using json = nlohmann::json;
 
 //! Identifiers for ADIF fields indicating user's location
 enum qth_value_t : char {
@@ -29,11 +25,6 @@ enum qth_value_t : char {
 struct qth_info_t {
 	std::map<qth_value_t, std::string> data;
 };
-
-//! Convert qth_info_t to JSON object
-void to_json(json& j, const qth_info_t& s);
-//! Convert JSON object to qth_info_t
-void from_json(const json& j, qth_info_t& s);
 
 //! Mapping identifiers to ADIF field names.
 const std::map<qth_value_t, std::string> QTH_ADIF_MAP = {
@@ -62,11 +53,6 @@ enum oper_value_t : char {
 struct oper_info_t {
 	std::map< oper_value_t, std::string> data;
 };
-
-//! Convert oper_info_t to JSON object
-void to_json(json& j, const oper_info_t& s);
-//! Convert JSON object to oper_info_t
-void from_json(const json& j, oper_info_t& s);
 
 //! Map of identifiers to ADIF field names
 const std::map<oper_value_t, std::string> OPER_ADIF_MAP = {

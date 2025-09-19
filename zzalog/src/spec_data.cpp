@@ -8,7 +8,6 @@
 #include "files.h"
 #include "record.h"
 #include "regices.h"
-#include "specx_reader.h"
 #include "status.h"
 #include "url_handler.h"
 
@@ -118,32 +117,7 @@ bool spec_data::load_data() {
 	datatype_indicators_.clear();
 	this->clear();
 
-	bool ok = true;
-	if (!load_json()) {
-		// Get the directory
-		std::string directory = get_path();
-		// Open an ADIF Specification input interpreter
-		specx_reader* reader = new specx_reader;
-		// Create an input stream from the file
-		std::string file_name = directory + ADIF_FILE;
-		ifstream file;
-		file.open(file_name.c_str(), std::ios_base::in);
-		// Load data from the input stream to the appropriate dataset
-		if (file.good()) {
-			ok = reader->load_data(this, file, adif_version_);
-			file.close();
-			delete reader;
-		}
-		else {
-			ok = false;
-			char* message = new char[30 + file_name.length()];
-			sprintf(message, "ADIF SPEC: Fail to open %s", file_name.c_str());
-			status_->misc_status(ST_WARNING, message);
-			file.close();
-			delete reader;
-		}
-	}
-	if (ok) {
+	if (load_json()) {
 		// File read in OK
 		process_fieldnames();
 		process_modes();
@@ -153,7 +127,7 @@ bool spec_data::load_data() {
 	else {
 		data_loaded_ = false;
 	}
-	return ok;
+	return data_loaded_;
 }
 
 // Load data from JSON

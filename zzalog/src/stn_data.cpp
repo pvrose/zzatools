@@ -1,9 +1,90 @@
 #include "stn_data.h"
-#include "stn_reader.h"
 #include "status.h"
+
+#include "nlohmann/json.hpp"
 
 extern status* status_;
 extern std::string default_data_directory_;
+
+using json = nlohmann::json;
+
+// Conversion from enum qth_value_t to string
+static std::map<qth_value_t, std::string> QTH_VALUE_T_2_STRING = {
+	{ STREET, "Street" },
+	{ CITY, "City" },
+	{ POSTCODE, "Postcode" },
+	{ LOCATOR, "Locator" },
+	{ DXCC_NAME, "Country" },
+	{ DXCC_ID, "DXCC" },
+	{ PRIMARY_SUB, "Primary Subdivision" },
+	{ SECONDARY_SUB, "Secondary Subdivision" },
+	{ CQ_ZONE, "CQ Zone" },
+	{ ITU_ZONE, "ITU Zone" },
+	{ CONTINENT, "Continent" },
+	{ IOTA, "IOTA" },
+	{ WAB, "WAB" }
+};
+
+//! Convert qth_info_t to JSON object
+static void to_json(json& j, const qth_info_t& s) {
+	for (auto it : s.data) {
+		if (it.second.length()) {
+			j[QTH_VALUE_T_2_STRING.at(it.first)] = it.second;
+		}
+	}
+}
+
+static std::map<std::string, qth_value_t> STRING_2_QTH_INFO_T = {
+	{ "Street", STREET },
+	{ "City", CITY },
+	{ "Postcode", POSTCODE },
+	{ "Locator", LOCATOR },
+	{ "Country", DXCC_NAME },
+	{ "DXCC", DXCC_ID },
+	{ "Primary Subdivision", PRIMARY_SUB },
+	{ "Secondary Subdivision", SECONDARY_SUB },
+	{ "CQ Zone", CQ_ZONE },
+	{ "ITU Zone", ITU_ZONE },
+	{ "Continent", CONTINENT },
+	{ "IOTA", IOTA },
+	{ "WAB", WAB }
+};
+
+//! Convert JSON object to qth_info_t
+static void from_json(const json& j, qth_info_t& s) {
+	auto temp = j.get<std::map<std::string, string>>();
+	for (auto it : temp) {
+		s.data[STRING_2_QTH_INFO_T[it.first]] = it.second;
+	}
+}
+
+//
+static std::map<oper_value_t, std::string> OPER_VALUE_T_2_STRING = {
+	{ NAME, "Name" },
+	{ CALLSIGN, "Callsign" }
+};
+
+//! Convert oper_info_t to JSON object
+static void to_json(json& j, const oper_info_t& s) {
+	for (auto it : s.data) {
+		if (it.second.length()) {
+			j[OPER_VALUE_T_2_STRING.at(it.first)] = it.second;
+		}
+	}
+}
+
+static std::map<std::string, oper_value_t> STRING_2_OPER_INFO_T = {
+	{ "Name", NAME },
+	{ "Callsign", CALLSIGN }
+};
+
+//! Convert JSON object to oper_info_t
+static void from_json(const json& j, oper_info_t& s) {
+	auto temp = j.get<std::map<std::string, string>>();
+	for (auto it : temp) {
+		s.data[STRING_2_OPER_INFO_T[it.first]] = it.second;
+	}
+}
 
 stn_data::stn_data()
 {
@@ -17,30 +98,11 @@ stn_data::~stn_data() {
 
 // Load data from station.xml
 void stn_data::load_data() {
+	load_failed_ = true;
 	status_->misc_status(ST_NOTE, "STN DATA: Loading operation data");
 	if (load_json()) {
 		load_failed_ = false;
 		return;
-	}
-	std::string filename = default_data_directory_ + "station.xml";
-	ifstream is;
-	char msg[128];
-	is.open(filename, std::ios_base::in);
-	if (is.good()) {
-		stn_reader* reader = new stn_reader();
-		if (reader->load_data(&qths_, &opers_, &calls_, is)) {
-			std::snprintf(msg, sizeof(msg), "STN DATA: %s Loaded OK", filename.c_str());
-			status_->misc_status(ST_OK, msg);
-		}
-		else {
-			load_failed_ = true;
-			snprintf(msg, sizeof(msg), "STN DATA: File %s did not load correctly", filename.c_str());
-			status_->misc_status(ST_ERROR, msg);
-		}
-	}
-	else {
-		snprintf(msg, sizeof(msg), "STN DATA: File %s may not exist", filename.c_str());
-		status_->misc_status(ST_WARNING, msg);
 	}
 }
 
@@ -287,83 +349,4 @@ std::string stn_data::get_call_descr(std::string id) {
 		return calls_.at(id);
 	}
 }
-
-// Conversion from enum qth_value_t to string
-std::map<qth_value_t, std::string> QTH_VALUE_T_2_STRING = {
-	{ STREET, "Street" },
-	{ CITY, "City" },
-	{ POSTCODE, "Postcode" },
-	{ LOCATOR, "Locator" },
-	{ DXCC_NAME, "Country" },
-	{ DXCC_ID, "DXCC" },
-	{ PRIMARY_SUB, "Primary Subdivision" },
-	{ SECONDARY_SUB, "Secondary Subdivision" },
-	{ CQ_ZONE, "CQ Zone" },
-	{ ITU_ZONE, "ITU Zone" },
-	{ CONTINENT, "Continent" },
-	{ IOTA, "IOTA" },
-	{ WAB, "WAB" }
-};
-
-//! Convert qth_info_t to JSON object
-void to_json(json& j, const qth_info_t& s) {
-	for (auto it : s.data) {
-		if (it.second.length()) {
-			j[QTH_VALUE_T_2_STRING.at(it.first)] = it.second;
-		}
-	}
-}
-
-std::map<std::string, qth_value_t> STRING_2_QTH_INFO_T = {
-	{ "Street", STREET },
-	{ "City", CITY },
-	{ "Postcode", POSTCODE },
-	{ "Locator", LOCATOR },
-	{ "Country", DXCC_NAME },
-	{ "DXCC", DXCC_ID },
-	{ "Primary Subdivision", PRIMARY_SUB },
-	{ "Secondary Subdivision", SECONDARY_SUB },
-	{ "CQ Zone", CQ_ZONE },
-	{ "ITU Zone", ITU_ZONE },
-	{ "Continent", CONTINENT },
-	{ "IOTA", IOTA },
-	{ "WAB", WAB }
-};
-
-//! Convert JSON object to qth_info_t
-void from_json(const json& j, qth_info_t& s) {
-	auto temp = j.get<std::map<std::string, string>>();
-	for (auto it : temp) {
-		s.data[STRING_2_QTH_INFO_T[it.first]] = it.second;
-	}
-}
-
-//
-std::map<oper_value_t, std::string> OPER_VALUE_T_2_STRING = {
-	{ NAME, "Name" },
-	{ CALLSIGN, "Callsign" }
-};
-
-//! Convert oper_info_t to JSON object
-void to_json(json& j, const oper_info_t& s) {
-	for (auto it : s.data) {
-		if (it.second.length()) {
-			j[OPER_VALUE_T_2_STRING.at(it.first)] = it.second;
-		}
-	}
-}
-
-std::map<std::string, oper_value_t> STRING_2_OPER_INFO_T = {
-	{ "Name", NAME },
-	{ "Callsign", CALLSIGN }
-};
-
-//! Convert JSON object to oper_info_t
-void from_json(const json& j, oper_info_t& s) {
-	auto temp = j.get<std::map<std::string, string>>();
-	for (auto it : temp) {
-		s.data[STRING_2_OPER_INFO_T[it.first]] = it.second;
-	}
-}
-
 

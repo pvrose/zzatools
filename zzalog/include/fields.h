@@ -36,11 +36,6 @@ struct field_info_t {
 	{}
 };
 
-//! Convert field_info_t to JSON object
-void to_json(json& j, const field_info_t& s);
-//! Convert JSON object to field_info_t
-void from_json(const json& j, field_info_t& s);
-
 //! ADIF field ordering applications - order 
 enum field_app_t : char {
 	FO_NONE,             //!< No application
