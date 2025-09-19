@@ -82,6 +82,8 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		// Stop the ticker
 		ticker_->stop_all();
 		banner_->show();
+		banner_->redraw();
+		Fl::check();
 		status_->misc_status(ST_NOTE, "ZZALOG: Closing...");
 		// Currently modifying a (potentially new) record
 		if (book_ && (book_->is_dirty_record(book_->get_record()) || book_->new_record()) ) {

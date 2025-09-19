@@ -4,6 +4,7 @@
 #include "utils.h"
 
 #include "about_dialog.h"
+#include "banner.h"
 #include "book.h"
 #include "calendar.h"
 #include "change_dialog.h"
@@ -54,7 +55,7 @@
 
 
 
-
+extern banner* banner_;
 extern book* book_;
 extern book* navigation_book_;
 extern config* config_;
@@ -545,15 +546,15 @@ void menu::cb_mi_windows_all(Fl_Widget* w, void* v) {
 	if (show_all) {
 		main_window_->show();
 		qso_manager_->show();
-		// status_->file_viewer()->show();
 		intl_dialog_->show();
+		banner_->show();
 	}
 	else {
 		// Minimise the main window rather than hide it. When all windows are hidden we end the app
 		main_window_->iconize();
 		qso_manager_->hide();
-		// status_->file_viewer()->hide();
 		intl_dialog_->hide();
+		banner_->hide();
 	}
 	that->update_windows_items();
 }
