@@ -427,18 +427,7 @@ std::string qso_manager::get_default(stn_item_t item) {
 		}
 	}
 	else {
-		switch (item) {
-		case RIG:
-			return "";
-		case ANTENNA:
-			return "";
-		case CALLSIGN:
-		case QTH:
-		case OP:
-			return data()->get_default_station(item);
-		default:
-			return "";
-		}
+		return "";
 	}
 }
 

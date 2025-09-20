@@ -387,7 +387,9 @@ qsl_call_data* qsl_dataset::get_qrz_api(std::string callsign) {
 void qsl_dataset::load_data() {
 	data_.clear();
 	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
-	load_json(settings);
+	if (!load_json(settings)) {
+		status_->misc_status(ST_ERROR, "QSL: No QSl data loaded");
+	}
 }
 
 std::string qsl_dataset::json_file(Fl_Preferences& settings) {
@@ -448,17 +450,15 @@ bool qsl_dataset::load_json(Fl_Preferences& settings) {
 			return true;
 		}
 		catch (const json::exception& e) {
-			std::snprintf(msg, sizeof(msg), "QSL: Failed to load %s: %d (%s)\n",
-				filename.c_str(), e.id, e.what());
-			status_->misc_status(ST_WARNING, msg);
+			std::snprintf(msg, sizeof(msg), "QSL: Reading JSON failed %d (%s)\n",
+				e.id, e.what());
+			status_->misc_status(ST_ERROR, msg);
 			is.close();
 			return false;
 		}
 	}
 	else {
-		std::snprintf(msg, sizeof(msg), "QSL: Failed to open %s\n",
-			filename.c_str());
-		status_->misc_status(ST_WARNING, msg);
+		status_->misc_status(ST_ERROR, "QSL: Load QSL data failed");
 		return false;
 	}
 }

@@ -130,14 +130,12 @@ protected:
 		//! Update from call
 		bool update_from_call_;
 
-		//! Choice: identifier
+		// Choice: identifier
 		Fl_Input_Choice* ch_id_;
-		//! Check: Update items form call.
+		// Check: Update items form call.
 		Fl_Check_Button* bn_update_;
-		//! Choice: Separate callsign choice to be used for priming location data.
+		// Choice: Separate callsign choice to be used for priming location data.
 		Fl_Input_Choice* ch_call_;
-		//! Button: Update from call
-		Fl_Button* bn_do_update_;
 		// Button: Clear all.
 		Fl_Button* bn_clear_;
 		// Array of inputs: Individual items for specific type.

@@ -319,9 +319,6 @@ void load_rig_data();
 //! Open a dialog if a club installation to allow operator to login.
 void club_operator();
 
-//! If there is no default location, open the station dialog to get one.
-void locate_station();
-
 //! Main program entry point.
 
 //! \param argc number of command-line arguments
