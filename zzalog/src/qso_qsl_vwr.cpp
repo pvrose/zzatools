@@ -1,4 +1,5 @@
 #include "qso_qsl_vwr.h"
+
 #include "qso_data.h"
 #include "qso_manager.h"
 #include "eqsl_handler.h"
@@ -8,6 +9,7 @@
 #include "qsl_display.h"
 #include "qsl_widget.h"
 #include "qsl_dataset.h"
+#include "stn_data.h"
 #include "callback.h"
 #include "drawing.h"
 #include "tabbed_forms.h"
@@ -27,9 +29,9 @@
 extern eqsl_handler* eqsl_handler_;
 extern status* status_;
 extern book* book_;
-extern std::string default_station_;
 extern tabbed_forms* tabbed_forms_;
 extern qsl_dataset* qsl_dataset_;
+extern stn_default station_defaults_;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
@@ -682,7 +684,7 @@ void qso_qsl_vwr::set_image() {
 						std::string testname = filename;
 						if (ia == 1) {
 							size_t pos = testname.find(station);
-							testname.replace(pos, station.length(), default_station_);
+							testname.replace(pos, station.length(), station_defaults_.callsign);
 							use_default = true;
 						}
 						for (int i = 0; i < num_types && !found_image; i++) {
@@ -752,7 +754,7 @@ void qso_qsl_vwr::set_image() {
 			if (found_image && use_default) {
 				char message[200];
 				switch(fl_choice("Image for station call: %s found looking for %s - Replace?", 
-					"no", "yes", nullptr, default_station_.c_str(),
+					"no", "yes", nullptr, station_defaults_.callsign.c_str(),
 					current_qso_->item("STATION_CALLSIGN").c_str())) {
 				case 0:
 					snprintf(message, sizeof(message), 

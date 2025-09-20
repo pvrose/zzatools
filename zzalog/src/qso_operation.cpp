@@ -18,6 +18,7 @@
 extern config *config_;
 extern status *status_;
 extern stn_data *stn_data_;
+extern stn_default station_defaults_;
 
 extern std::string PROGRAM_ID;
 extern std::string VENDOR;
@@ -131,12 +132,21 @@ void qso_operation::load_data() {
 	char* temp;
 	station_settings.get("Operator", temp, "");
 	current_oper_ = temp;
+	if (current_oper_.length() == 0 && station_defaults_.type != CLUB) {
+		current_oper_ = station_defaults_.name;
+	}
 	free(temp);
 	station_settings.get("Callsign", temp, "");
 	current_call_ = to_upper(std::string(temp));
+	if (current_call_.length() == 0) {
+		current_call_ = station_defaults_.callsign;
+	}
 	free(temp);
 	station_settings.get("Location", temp, "");
 	current_qth_ = temp;
+	if (current_qth_.length() == 0) {
+		current_qth_ = station_defaults_.location;
+	}
 	free(temp);
 }
 

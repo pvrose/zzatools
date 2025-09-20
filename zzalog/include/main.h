@@ -20,6 +20,7 @@
 #include "fields.h"
 #include "fllog_emul.h"
 #include "import_data.h"
+#include "init_dialog.h"
 #include "intl_dialog.h"
 #include "logo.h"
 #include "lotw_handler.h"
@@ -334,6 +335,9 @@ void set_recent_file(std::string filename);
 //! Open the user-guide at the specified page &lt;\a file&gt;.html.
 void open_html(const char* file);
 
+//! Save club settings
+void save_station_settings();
+
 //! Flag to prevent more than one closure process at the same time.
 bool closing_ = false;
 
@@ -351,9 +355,6 @@ char* filename_ = nullptr;
 
 //! File is new (neither in argument or settings.
 bool new_file_ = false;
-
-//! Default station callsign.
-std::string default_station_ = "";
 
 //! Main logo.
 Fl_PNG_Image main_icon_("ZZALOG_ICON", ___rose_png, ___rose_png_len);
@@ -384,3 +385,6 @@ bool keep_banner_ = false;
 
 //! This run is a new installation
 bool new_installation_ = false;
+
+//! Default values of a station
+stn_default station_defaults_;

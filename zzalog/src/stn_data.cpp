@@ -1,10 +1,13 @@
 #include "stn_data.h"
+
+#include "init_dialog.h"
 #include "status.h"
 
 #include "nlohmann/json.hpp"
 
 extern status* status_;
 extern std::string default_data_directory_;
+extern stn_default station_defaults_;
 
 using json = nlohmann::json;
 
@@ -86,23 +89,79 @@ static void from_json(const json& j, oper_info_t& s) {
 	}
 }
 
+// JSON conversion for stn_type
+NLOHMANN_JSON_SERIALIZE_ENUM(stn_type, {
+	{ NOT_USED, "Not used" },
+	{ CLUB, "Club" },
+	{ INDIVIDUAL, "Individual "}
+})
+
+// Convert stn_default to JSON object
+static void to_json(json& j, const stn_default& s) {
+	j = json{
+		{ "Station type", s.type },
+		{ "Callsign", s.callsign},
+		{ "Location", s.location },
+		{ "Gridsquare", s.grid },
+		{ "Name", s.name }
+	};
+}
+
+// Convert stn_default to JSON object
+static void from_json(const json& j, stn_default& s) {
+	j.at("Station type").get_to(s.type);
+	j.at("Callsign").get_to(s.callsign);
+	j.at("Location").get_to(s.location);
+	j.at("Gridsquare").get_to(s.grid);
+	j.at("Name").get_to(s.name);
+}
+
 stn_data::stn_data()
 {
-	load_failed_ = false;
 	load_data();
 }
 
 stn_data::~stn_data() {
-	if (!load_failed_) store_json();
+    store_json();
 }
 
 // Load data from station.xml
 void stn_data::load_data() {
-	load_failed_ = true;
+	char msg[128];
 	status_->misc_status(ST_NOTE, "STN DATA: Loading operation data");
-	if (load_json()) {
-		load_failed_ = false;
-		return;
+	bool loaded = load_json();
+	if (loaded_stn_defaults_.type == NOT_USED && (
+		station_defaults_.type == NOT_USED || station_defaults_.callsign.length() == 0)) {
+		status_->misc_status(ST_ERROR, "STN DATA: We have no default callsign etc.");
+		// First use - open dialog to get station defaults.
+		init_dialog* dlg = new init_dialog();
+		while (dlg->visible()) Fl::check();
+		station_defaults_ = dlg->get_default();
+
+	}
+	else if (loaded_stn_defaults_.type != NOT_USED && station_defaults_.type == NOT_USED) {
+		// Use saved station defaults
+		station_defaults_ = loaded_stn_defaults_;
+		status_->misc_status(ST_NOTE, "STN DATA: Using saved station defaults");
+	}
+	else {
+		status_->misc_status(ST_NOTE, "STN DATA: Using initial station defaults");
+	}
+	snprintf(msg, sizeof(msg), "STN DATA: Station defaults: Call=%s, Location=%s(%s), Name=%s",
+		station_defaults_.callsign.c_str(),
+		station_defaults_.location.c_str(),
+		station_defaults_.grid.c_str(),
+		station_defaults_.name.c_str());
+	status_->misc_status(ST_NOTE, msg);
+	// If no data loaded
+	if (!loaded) {
+		// Create a set of initial values from input defaults.
+		qth_info_t* qth_info = new qth_info_t;
+		(qth_info->data)[LOCATOR] = station_defaults_.grid;
+		add_qth(station_defaults_.location, qth_info);
+		oper_info_t* oper_info = new oper_info_t;
+		add_oper(station_defaults_.name, oper_info);
+		add_call(station_defaults_.callsign);
 	}
 }
 
@@ -140,6 +199,9 @@ bool stn_data::load_json() {
 		auto temp2 = j.at("Station callsigns").get<std::map<std::string, string>>();
 		for (auto& it : temp2) {
 			calls_[it.first] = it.second;
+		}
+		if (j.find("Defaults") != j.end()) {
+			j.at("Defaults").get_to(loaded_stn_defaults_);
 		}
 	}
 	catch (const json::exception& e) {
@@ -182,7 +244,9 @@ bool stn_data::store_json() {
 			}
 		}
 		jall["Station callsigns"] = jc;
+		jall["Defaults"] = station_defaults_;
 		json j;
+
 		j["Station"] = jall;
 		os << std::setw(2) << j << endl;
 		return true;

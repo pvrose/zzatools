@@ -419,7 +419,7 @@ void show_help() {
 std::string get_file(char * arg_filename) {
 	std::string result = "";
 	if (!arg_filename || !(*arg_filename)) {
-		// null argument or empty std::string - get the most recent file. (Recent Files->File1 in settings)
+		// null argument or empty cstring - get the most recent file. (Recent Files->File1 in settings)
 		Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 		Fl_Preferences recent_settings(settings, "Recent Files");
 		char *filename;
@@ -429,11 +429,12 @@ std::string get_file(char * arg_filename) {
 			free(filename);
 		}
 		else {
-			new_installation_ = true;
 			status_->misc_status(ST_WARNING, "ZZALOG: No log file - assuming a new installation.");
 			free(filename);
+			string def_filename = to_lower(station_defaults_.callsign) + ".adi";
 			Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
 			chooser->title("Select log file name");
+			chooser->preset_file(def_filename.c_str());
 			chooser->filter("ADI Files\t*.adi\nADX Files\t*.adx");
 			if (chooser->show() == 0) {
 				result = chooser->filename();
@@ -902,33 +903,35 @@ bool open_settings() {
 		default_html_directory_ += "userguide/html/";
 	}
 
-	char* temp;
-	if (!sys_settings.get("Preferences Mode", temp, "")) {
-		new_installation_ = true;
-		// First use
-		switch (fl_choice("ZZALOG: New installation - please select club or individual use?", "Club", "Individual", nullptr)) {
-		case 0:
-			prefs_mode_ = Fl_Preferences::SYSTEM_L;
-			sys_settings.set("Preferences Mode", "Club");
-			break;
-		case 1:
-			prefs_mode_ = Fl_Preferences::USER_L;
-			sys_settings.set("Preferences Mode", "Individual");
-			break;
-		}
-	}
-	else if (strcmp(temp, "Club") == 0) {
-		prefs_mode_ = Fl_Preferences::SYSTEM_L;
-	}
-	else if (strcmp(temp, "Individual") == 0) {
-		prefs_mode_ = Fl_Preferences::USER_L;
+	int temp;
+	if (sys_settings.get("Installation Type", temp, stn_type::NOT_USED)) {
+		station_defaults_.type = (stn_type)temp;
+		new_installation_ = false;
 	}
 	else {
-		fl_alert("ZZALOG: Invalid use mode %s - abandoning", temp);
-		return false;
+		new_installation_ = true;
+		// First use - open dialog to get station defaults.
+		init_dialog* dlg = new init_dialog();
+		while (dlg->visible()) Fl::check();
+		station_defaults_ = dlg->get_default();
+		sys_settings.set("Installation Type", (int)station_defaults_.type);
 	}
 
+	switch (station_defaults_.type) {
+	case stn_type::NOT_USED: 
+		break;
+	case stn_type::CLUB:
+		prefs_mode_ = Fl_Preferences::SYSTEM_L;
+		break;
+	case stn_type::INDIVIDUAL:
+		prefs_mode_ = Fl_Preferences::USER_L;
+		break;
+	}
+
+	// SAve the staion defaults
+		// Get club details from settings
 	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+
 	// Now std::set the default app data directory
 	char buffer[128];
 	settings.filename(buffer, sizeof(buffer),
@@ -977,7 +980,32 @@ bool open_settings() {
 		out.close();
 
 	}
+
+
 	return true;
+}
+
+void save_station_settings() {
+	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences station_settings(settings, "Station");
+	char* temp;
+	station_settings.get("Callsign", temp, "");
+	if (strlen(temp) == 0) {
+		// First use - open dialog to get station defaults.
+		init_dialog* dlg = new init_dialog();
+		while (dlg->visible()) Fl::check();
+		station_defaults_ = dlg->get_default();
+	}
+	if (station_defaults_.type == CLUB) {
+		station_settings.set("Club Name", station_defaults_.name.c_str());
+	}
+	station_settings.set("Callsign", station_defaults_.callsign.c_str());
+	station_settings.set("Location", station_defaults_.location.c_str());
+	if (station_defaults_.type != CLUB) {
+		station_settings.set("Operator", station_defaults_.name.c_str());
+	}
+	settings.flush();
+
 }
 
 // Load all the hamlib data, and then the rig connection details
@@ -1011,6 +1039,7 @@ int main(int argc, char** argv)
 	if (!open_settings()) {
 		return 255;
 	}
+	save_station_settings();
 
 	// Create the ticker first of all
 	ticker_ = new ticker();

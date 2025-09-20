@@ -59,7 +59,6 @@ extern time_t session_start_;
 extern bool AUTO_SAVE;
 extern bool AUTO_UPLOAD;
 extern bool RESUME_SESSION;
-extern std::string default_station_;
 extern bool closing_;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
@@ -159,13 +158,6 @@ bool book::load_data(std::string filename)
 					datapath_settings.set("Log Directory", file_directory.c_str());
 				}
 				size_t start = last_slash == std::string::npos ? 0 : last_slash + 1;
-				if (last_period == std::string::npos) 
-					default_station_ = to_upper(filename.substr(start));
-				else 
-					default_station_ = to_upper(filename.substr(start, last_period - start));
-				snprintf(message, sizeof(message), "LOG: Default callsign %s",
-					default_station_.c_str());
-				status_->misc_status(ST_LOG, message);
 				// Check for .adi or .adif format
 				if (filetype == ".adi" || filetype == ".adif") {
 					// Use ADI reader to read from an input stream connected to thefile

@@ -205,6 +205,7 @@
     <ClCompile Include="src\fllog_emul.cpp" />
     <ClCompile Include="src\font_dialog.cpp" />
     <ClCompile Include="src\import_data.cpp" />
+    <ClCompile Include="src\init_dialog.cpp" />
     <ClCompile Include="src\intl_dialog.cpp" />
     <ClCompile Include="src\intl_widgets.cpp" />
     <ClCompile Include="src\log_table.cpp" />
@@ -322,6 +323,7 @@
     <ClInclude Include="include\font_dialog.h" />
     <ClInclude Include="include\icons.h" />
     <ClInclude Include="include\import_data.h" />
+    <ClInclude Include="include\init_dialog.h" />
     <ClInclude Include="include\intl_dialog.h" />
     <ClInclude Include="include\intl_widgets.h" />
     <ClInclude Include="include\logo.h" />

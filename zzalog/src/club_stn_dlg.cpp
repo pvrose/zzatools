@@ -20,7 +20,7 @@ extern config* config_;
 extern qso_manager* qso_manager_;
 extern stn_data* stn_data_;
 extern bool new_installation_;
-extern std::string default_station_;
+extern stn_default station_defaults_;
 extern std::string PROGRAM_ID;
 extern std::string VENDOR;
 extern Fl_Preferences::Root prefs_mode_;
@@ -110,7 +110,7 @@ void club_stn_dlg::load_data() {
 	free(temp);
 	if (club_call_.length() == 0) {
 		// No call in seettings - use default from log
-		club_call_ = default_station_;
+		club_call_ = station_defaults_.callsign;
 	}
 	station_settings.get("Location", temp, "");
 	club_location_ = temp;
@@ -150,8 +150,18 @@ void club_stn_dlg::enable_widgets() {
 	const oper_info_t* info = stn_data_->get_oper(nickname_);
 	w_operator_->value(nickname_.c_str());
 	if (info) {
-		w_name_->value(info->data.at(NAME).c_str());
-		w_call_->value(info->data.at(CALLSIGN).c_str());
+		if (info->data.find(NAME) == info->data.end()) {
+			w_name_->value("");
+		}
+		else {
+			w_name_->value(info->data.at(NAME).c_str());
+		}
+		if (info->data.find(CALLSIGN) == info->data.end()) {
+			w_call_->value("");
+		}
+		else {
+			w_call_->value(info->data.at(CALLSIGN).c_str());
+		}
 	}
 	else {
 		w_name_->value("");

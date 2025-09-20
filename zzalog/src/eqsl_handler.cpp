@@ -8,6 +8,7 @@
 #include "qso_qsl.h"
 #include "record.h"
 #include "status.h"
+#include "stn_data.h"
 #include "ticker.h"
 #include "url_handler.h"
 
@@ -35,13 +36,13 @@ extern qso_manager* qso_manager_;
 extern ticker* ticker_;
 extern url_handler* url_handler_;
 extern bool DEBUG_THREADS;
-extern std::string default_station_;
 extern fields* fields_;
 // extern uint32_t seed_;
 extern qsl_dataset* qsl_dataset_;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
+extern stn_default station_defaults_;
 
 // Constructor
 eqsl_handler::eqsl_handler()
@@ -306,7 +307,8 @@ std::string eqsl_handler::card_filename_l(record* record, bool use_default) {
 	std::string time_on = record->item("TIME_ON");
 	std::string mode = record->item("MODE");
 	std::string band = record->item("BAND");
-	std::string station = use_default ? default_station_ : record->item("STATION_CALLSIGN");
+	std::string station = use_default ? 
+		station_defaults_.callsign : record->item("STATION_CALLSIGN");
 	de_slash(station);
 	// Location of top-directory for QSL card images
 	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());

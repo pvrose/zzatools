@@ -24,6 +24,7 @@
 #include "qrz_handler.h"
 #include "main_window.h"
 #include "adi_writer.h"
+#include "stn_data.h"
 
 #include <set>
 #include <iostream>
@@ -65,6 +66,7 @@ extern std::string CONTACT;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
 extern Fl_Preferences::Root prefs_mode_;
+extern stn_default station_defaults_;
 
 
 // The main dialog constructor
@@ -427,6 +429,19 @@ std::string qso_manager::get_default(stn_item_t item) {
 		}
 	}
 	else {
+		switch (item) {
+		case CALLSIGN:
+			return station_defaults_.callsign;
+		case QTH:
+			return station_defaults_.location;
+		case OP:
+			if (station_defaults_.type == stn_type::INDIVIDUAL)
+				return station_defaults_.name;
+			else
+				return "";
+		default:
+			return "";
+		}
 		return "";
 	}
 }

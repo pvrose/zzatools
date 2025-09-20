@@ -4,6 +4,22 @@
 #include <map>
 #include <set>
 
+//! Station type
+enum stn_type : uint8_t {
+	NOT_USED,                         //!< Default - not valid
+	INDIVIDUAL,                       //!< Individual licensee
+	CLUB                              //!< Club station
+};
+
+//! Default station data
+struct stn_default {
+	stn_type type{ NOT_USED };        //!< Station type: individual or club
+	std::string callsign{ "" };       //!< Station callsign
+	std::string location{ "" };       //!< Location identifier
+	std::string grid{ "" };           //!< Grid square locator
+	std::string name{ "" };           //!< Club or individual name
+};
+
 //! Identifiers for ADIF fields indicating user's location
 enum qth_value_t : char {
 	STREET,                //!< MY_STREET
@@ -113,7 +129,7 @@ protected:
 	std::map<std::string, oper_info_t*> opers_;
 	//! Station callsign data
 	std::map<std::string, std::string> calls_;
-	//! Load failed
-	bool load_failed_;
+	//! Loaded station defaults
+	stn_default loaded_stn_defaults_;
 };
 
