@@ -52,12 +52,17 @@ make install
 
 \section initial_run First-time Run
 
-The first time ZZALOG is run, a dialog opens asking whether the
-imstallation id for a club or individual.
-Please select which version the installation is for. A dialog then opens 
-asking for a directory to store QSL card images. Cancel this if this
-feature is not required, otherwise navigate to where the images should be
-stored and select "OK". 
+The first time ZZALOG is run, a dialog opens asking for station details. 
+The selection can be either for a club station or an individual station.
+Select one or the other, then fill in the form.
+
+<IMG SRC="../images/init_1.png">
+- Callsign: the default station callsign to be used.
+- Location: an identifier to know the main station address by.
+- Gridsquare: the Maidenhead gridsquare locator - used for initially locatong the station.
+- name: the name of the usual operator.
+
+Select "Accept" to proceed.
 
 <IMG SRC="../images/init_2.png">
 

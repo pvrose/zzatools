@@ -57,12 +57,12 @@
     <ROW Component="NewFolder" ComponentId="{2253813D-1548-4C05-94FB-753321AEBDCA}" Directory_="NewFolder_1_Dir" Attributes="0"/>
     <ROW Component="ProductInformation" ComponentId="{E180E30E-16B6-4506-97ED-6FEB327E79BE}" Directory_="APPDIR" Attributes="260" KeyPath="Version"/>
     <ROW Component="SHORTCUTDIR" ComponentId="{04DB559B-3E2C-4C23-BE71-B8D21A9EC47B}" Directory_="SHORTCUTDIR" Attributes="0"/>
-    <ROW Component="about__dialog_8h.html" ComponentId="{6B2D542B-7374-4EF1-941F-0D894186D778}" Directory_="html_1_Dir" Attributes="0" KeyPath="about__dialog_8h.html" Type="0"/>
-    <ROW Component="adding.html" ComponentId="{4D61833F-C631-4444-AE49-C6814602ECC5}" Directory_="html_Dir" Attributes="0" KeyPath="adding.html" Type="0"/>
+    <ROW Component="about__dialog_8h.html" ComponentId="{62C9209B-2263-4C2D-95C3-85EDDCD0A238}" Directory_="html_1_Dir" Attributes="0" KeyPath="about__dialog_8h.html" Type="0"/>
+    <ROW Component="adding.html" ComponentId="{1D53FE55-ABE2-4C95-8506-D33663FE35AC}" Directory_="html_Dir" Attributes="0" KeyPath="adding.html" Type="0"/>
     <ROW Component="adding_1.png" ComponentId="{7B250233-1085-4399-9144-71220D20432A}" Directory_="images_Dir" Attributes="0" KeyPath="adding_1.png" Type="0"/>
     <ROW Component="all.xml" ComponentId="{73F3094C-518F-4F63-A62E-F36CE2D1CE64}" Directory_="ZZALOG_Dir" Attributes="0" KeyPath="cty.csv" Type="0"/>
-    <ROW Component="all_0.js" ComponentId="{F4AB4C2B-C980-48ED-8256-06FE1065CA4F}" Directory_="search_Dir" Attributes="0" KeyPath="all_0.js" Type="0"/>
-    <ROW Component="all_0.js_1" ComponentId="{A38702EF-DE45-4133-8740-76D2E0B53626}" Directory_="search_1_Dir" Attributes="0" KeyPath="all_0.js_1" Type="0"/>
+    <ROW Component="all_0.js" ComponentId="{84378801-D22C-4253-8E0A-7C33F9E390D0}" Directory_="search_Dir" Attributes="0" KeyPath="all_0.js" Type="0"/>
+    <ROW Component="all_0.js_1" ComponentId="{69FD7002-6A7E-4D67-921C-0A2C163D31F8}" Directory_="search_1_Dir" Attributes="0" KeyPath="all_0.js_1" Type="0"/>
     <ROW Component="docs" ComponentId="{FDEEE471-BBD5-4DC1-813E-0A509EA2C271}" Directory_="docs_Dir" Attributes="0"/>
     <ROW Component="documents" ComponentId="{BBE82F3B-88E2-4F2F-9105-CABD724D8EEF}" Directory_="NewFolder_Dir" Attributes="0"/>
     <ROW Component="libcurl.dll" ComponentId="{AF97FDAA-0EB1-4F49-9BCF-97AE0A24D0EC}" Directory_="APPDIR" Attributes="256" KeyPath="libcurl.dll"/>
@@ -555,22 +555,26 @@
     <ROW File="classimport__data.html" Component_="about__dialog_8h.html" FileName="CLASSI~2.HTM|classimport__data.html" Attributes="0" SourcePath="docs\html\classimport__data.html" SelfReg="false"/>
     <ROW File="classimport__data.js" Component_="about__dialog_8h.html" FileName="CLASSI~1.JS|classimport__data.js" Attributes="0" SourcePath="docs\html\classimport__data.js" SelfReg="false"/>
     <ROW File="classimport__data.png" Component_="about__dialog_8h.html" FileName="CLASSI~1.PNG|classimport__data.png" Attributes="0" SourcePath="docs\html\classimport__data.png" SelfReg="false"/>
-    <ROW File="classinput__hierchmembers.html" Component_="about__dialog_8h.html" FileName="CLASSI~3.HTM|classinput__hierch-members.html" Attributes="0" SourcePath="docs\html\classinput__hierch-members.html" SelfReg="false"/>
-    <ROW File="classinput__hierch.html" Component_="about__dialog_8h.html" FileName="CLASSI~4.HTM|classinput__hierch.html" Attributes="0" SourcePath="docs\html\classinput__hierch.html" SelfReg="false"/>
-    <ROW File="classinput__hierch.js" Component_="about__dialog_8h.html" FileName="CLASSI~2.JS|classinput__hierch.js" Attributes="0" SourcePath="docs\html\classinput__hierch.js" SelfReg="false"/>
-    <ROW File="classinput__hierch.png" Component_="about__dialog_8h.html" FileName="CLASSI~2.PNG|classinput__hierch.png" Attributes="0" SourcePath="docs\html\classinput__hierch.png" SelfReg="false"/>
-    <ROW File="classintl__dialogmembers.html" Component_="about__dialog_8h.html" FileName="CLASSI~5.HTM|classintl__dialog-members.html" Attributes="0" SourcePath="docs\html\classintl__dialog-members.html" SelfReg="false"/>
-    <ROW File="classintl__dialog.html" Component_="about__dialog_8h.html" FileName="CLASSI~6.HTM|classintl__dialog.html" Attributes="0" SourcePath="docs\html\classintl__dialog.html" SelfReg="false"/>
-    <ROW File="classintl__dialog.js" Component_="about__dialog_8h.html" FileName="CLASSI~3.JS|classintl__dialog.js" Attributes="0" SourcePath="docs\html\classintl__dialog.js" SelfReg="false"/>
-    <ROW File="classintl__dialog.png" Component_="about__dialog_8h.html" FileName="CLASSI~3.PNG|classintl__dialog.png" Attributes="0" SourcePath="docs\html\classintl__dialog.png" SelfReg="false"/>
-    <ROW File="classintl__editormembers.html" Component_="about__dialog_8h.html" FileName="CLASSI~7.HTM|classintl__editor-members.html" Attributes="0" SourcePath="docs\html\classintl__editor-members.html" SelfReg="false"/>
-    <ROW File="classintl__editor.html" Component_="about__dialog_8h.html" FileName="CLASSI~8.HTM|classintl__editor.html" Attributes="0" SourcePath="docs\html\classintl__editor.html" SelfReg="false"/>
-    <ROW File="classintl__editor.js" Component_="about__dialog_8h.html" FileName="CLASSI~4.JS|classintl__editor.js" Attributes="0" SourcePath="docs\html\classintl__editor.js" SelfReg="false"/>
-    <ROW File="classintl__editor.png" Component_="about__dialog_8h.html" FileName="CLASSI~4.PNG|classintl__editor.png" Attributes="0" SourcePath="docs\html\classintl__editor.png" SelfReg="false"/>
-    <ROW File="classintl__inputmembers.html" Component_="about__dialog_8h.html" FileName="CLASSI~9.HTM|classintl__input-members.html" Attributes="0" SourcePath="docs\html\classintl__input-members.html" SelfReg="false"/>
-    <ROW File="classintl__input.html" Component_="about__dialog_8h.html" FileName="CLASS~76.HTM|classintl__input.html" Attributes="0" SourcePath="docs\html\classintl__input.html" SelfReg="false"/>
-    <ROW File="classintl__input.js" Component_="about__dialog_8h.html" FileName="CLASSI~5.JS|classintl__input.js" Attributes="0" SourcePath="docs\html\classintl__input.js" SelfReg="false"/>
-    <ROW File="classintl__input.png" Component_="about__dialog_8h.html" FileName="CLASSI~5.PNG|classintl__input.png" Attributes="0" SourcePath="docs\html\classintl__input.png" SelfReg="false"/>
+    <ROW File="classinit__dialogmembers.html" Component_="about__dialog_8h.html" FileName="CLASSI~3.HTM|classinit__dialog-members.html" Attributes="0" SourcePath="docs\html\classinit__dialog-members.html" SelfReg="false"/>
+    <ROW File="classinit__dialog.html" Component_="about__dialog_8h.html" FileName="CLASSI~4.HTM|classinit__dialog.html" Attributes="0" SourcePath="docs\html\classinit__dialog.html" SelfReg="false"/>
+    <ROW File="classinit__dialog.js" Component_="about__dialog_8h.html" FileName="CLASSI~2.JS|classinit__dialog.js" Attributes="0" SourcePath="docs\html\classinit__dialog.js" SelfReg="false"/>
+    <ROW File="classinit__dialog.png" Component_="about__dialog_8h.html" FileName="CLASSI~2.PNG|classinit__dialog.png" Attributes="0" SourcePath="docs\html\classinit__dialog.png" SelfReg="false"/>
+    <ROW File="classinput__hierchmembers.html" Component_="about__dialog_8h.html" FileName="CLASSI~5.HTM|classinput__hierch-members.html" Attributes="0" SourcePath="docs\html\classinput__hierch-members.html" SelfReg="false"/>
+    <ROW File="classinput__hierch.html" Component_="about__dialog_8h.html" FileName="CLASSI~6.HTM|classinput__hierch.html" Attributes="0" SourcePath="docs\html\classinput__hierch.html" SelfReg="false"/>
+    <ROW File="classinput__hierch.js" Component_="about__dialog_8h.html" FileName="CLASSI~3.JS|classinput__hierch.js" Attributes="0" SourcePath="docs\html\classinput__hierch.js" SelfReg="false"/>
+    <ROW File="classinput__hierch.png" Component_="about__dialog_8h.html" FileName="CLASSI~3.PNG|classinput__hierch.png" Attributes="0" SourcePath="docs\html\classinput__hierch.png" SelfReg="false"/>
+    <ROW File="classintl__dialogmembers.html" Component_="about__dialog_8h.html" FileName="CLASSI~7.HTM|classintl__dialog-members.html" Attributes="0" SourcePath="docs\html\classintl__dialog-members.html" SelfReg="false"/>
+    <ROW File="classintl__dialog.html" Component_="about__dialog_8h.html" FileName="CLASSI~8.HTM|classintl__dialog.html" Attributes="0" SourcePath="docs\html\classintl__dialog.html" SelfReg="false"/>
+    <ROW File="classintl__dialog.js" Component_="about__dialog_8h.html" FileName="CLASSI~4.JS|classintl__dialog.js" Attributes="0" SourcePath="docs\html\classintl__dialog.js" SelfReg="false"/>
+    <ROW File="classintl__dialog.png" Component_="about__dialog_8h.html" FileName="CLASSI~4.PNG|classintl__dialog.png" Attributes="0" SourcePath="docs\html\classintl__dialog.png" SelfReg="false"/>
+    <ROW File="classintl__editormembers.html" Component_="about__dialog_8h.html" FileName="CLASSI~9.HTM|classintl__editor-members.html" Attributes="0" SourcePath="docs\html\classintl__editor-members.html" SelfReg="false"/>
+    <ROW File="classintl__editor.html" Component_="about__dialog_8h.html" FileName="CLASS~76.HTM|classintl__editor.html" Attributes="0" SourcePath="docs\html\classintl__editor.html" SelfReg="false"/>
+    <ROW File="classintl__editor.js" Component_="about__dialog_8h.html" FileName="CLASSI~5.JS|classintl__editor.js" Attributes="0" SourcePath="docs\html\classintl__editor.js" SelfReg="false"/>
+    <ROW File="classintl__editor.png" Component_="about__dialog_8h.html" FileName="CLASSI~5.PNG|classintl__editor.png" Attributes="0" SourcePath="docs\html\classintl__editor.png" SelfReg="false"/>
+    <ROW File="classintl__inputmembers.html" Component_="about__dialog_8h.html" FileName="CLASS~77.HTM|classintl__input-members.html" Attributes="0" SourcePath="docs\html\classintl__input-members.html" SelfReg="false"/>
+    <ROW File="classintl__input.html" Component_="about__dialog_8h.html" FileName="CLASS~78.HTM|classintl__input.html" Attributes="0" SourcePath="docs\html\classintl__input.html" SelfReg="false"/>
+    <ROW File="classintl__input.js" Component_="about__dialog_8h.html" FileName="CLASSI~6.JS|classintl__input.js" Attributes="0" SourcePath="docs\html\classintl__input.js" SelfReg="false"/>
+    <ROW File="classintl__input.png" Component_="about__dialog_8h.html" FileName="CLASSI~6.PNG|classintl__input.png" Attributes="0" SourcePath="docs\html\classintl__input.png" SelfReg="false"/>
     <ROW File="classlog__tablemembers.html" Component_="about__dialog_8h.html" FileName="CLASSL~1.HTM|classlog__table-members.html" Attributes="0" SourcePath="docs\html\classlog__table-members.html" SelfReg="false"/>
     <ROW File="classlog__table.html" Component_="about__dialog_8h.html" FileName="CLASSL~2.HTM|classlog__table.html" Attributes="0" SourcePath="docs\html\classlog__table.html" SelfReg="false"/>
     <ROW File="classlog__table.js" Component_="about__dialog_8h.html" FileName="CLASSL~1.JS|classlog__table.js" Attributes="0" SourcePath="docs\html\classlog__table.js" SelfReg="false"/>
@@ -615,117 +619,117 @@
     <ROW File="classqsl__editor.js" Component_="about__dialog_8h.html" FileName="CLASSQ~4.JS|classqsl__editor.js" Attributes="0" SourcePath="docs\html\classqsl__editor.js" SelfReg="false"/>
     <ROW File="classqsl__editor.png" Component_="about__dialog_8h.html" FileName="CLASSQ~1.PNG|classqsl__editor.png" Attributes="0" SourcePath="docs\html\classqsl__editor.png" SelfReg="false"/>
     <ROW File="classqsl__emailermembers.html" Component_="about__dialog_8h.html" FileName="CLASSQ~9.HTM|classqsl__emailer-members.html" Attributes="0" SourcePath="docs\html\classqsl__emailer-members.html" SelfReg="false"/>
-    <ROW File="classqsl__emailer.html" Component_="about__dialog_8h.html" FileName="CLASS~77.HTM|classqsl__emailer.html" Attributes="0" SourcePath="docs\html\classqsl__emailer.html" SelfReg="false"/>
+    <ROW File="classqsl__emailer.html" Component_="about__dialog_8h.html" FileName="CLASS~79.HTM|classqsl__emailer.html" Attributes="0" SourcePath="docs\html\classqsl__emailer.html" SelfReg="false"/>
     <ROW File="classqsl__emailer.js" Component_="about__dialog_8h.html" FileName="CLASSQ~5.JS|classqsl__emailer.js" Attributes="0" SourcePath="docs\html\classqsl__emailer.js" SelfReg="false"/>
-    <ROW File="classqsl__imagemembers.html" Component_="about__dialog_8h.html" FileName="CLASS~78.HTM|classqsl__image-members.html" Attributes="0" SourcePath="docs\html\classqsl__image-members.html" SelfReg="false"/>
-    <ROW File="classqsl__image.html" Component_="about__dialog_8h.html" FileName="CLASS~79.HTM|classqsl__image.html" Attributes="0" SourcePath="docs\html\classqsl__image.html" SelfReg="false"/>
+    <ROW File="classqsl__imagemembers.html" Component_="about__dialog_8h.html" FileName="CLASS~80.HTM|classqsl__image-members.html" Attributes="0" SourcePath="docs\html\classqsl__image-members.html" SelfReg="false"/>
+    <ROW File="classqsl__image.html" Component_="about__dialog_8h.html" FileName="CLASS~81.HTM|classqsl__image.html" Attributes="0" SourcePath="docs\html\classqsl__image.html" SelfReg="false"/>
     <ROW File="classqsl__image.js" Component_="about__dialog_8h.html" FileName="CLASSQ~6.JS|classqsl__image.js" Attributes="0" SourcePath="docs\html\classqsl__image.js" SelfReg="false"/>
-    <ROW File="classqsl__readermembers.html" Component_="about__dialog_8h.html" FileName="CLASS~80.HTM|classqsl__reader-members.html" Attributes="0" SourcePath="docs\html\classqsl__reader-members.html" SelfReg="false"/>
-    <ROW File="classqsl__reader.html" Component_="about__dialog_8h.html" FileName="CLASS~81.HTM|classqsl__reader.html" Attributes="0" SourcePath="docs\html\classqsl__reader.html" SelfReg="false"/>
+    <ROW File="classqsl__readermembers.html" Component_="about__dialog_8h.html" FileName="CLASS~82.HTM|classqsl__reader-members.html" Attributes="0" SourcePath="docs\html\classqsl__reader-members.html" SelfReg="false"/>
+    <ROW File="classqsl__reader.html" Component_="about__dialog_8h.html" FileName="CLASS~83.HTM|classqsl__reader.html" Attributes="0" SourcePath="docs\html\classqsl__reader.html" SelfReg="false"/>
     <ROW File="classqsl__reader.js" Component_="about__dialog_8h.html" FileName="CLASSQ~7.JS|classqsl__reader.js" Attributes="0" SourcePath="docs\html\classqsl__reader.js" SelfReg="false"/>
     <ROW File="classqsl__reader.png" Component_="about__dialog_8h.html" FileName="CLASSQ~2.PNG|classqsl__reader.png" Attributes="0" SourcePath="docs\html\classqsl__reader.png" SelfReg="false"/>
-    <ROW File="classqsl__widgetmembers.html" Component_="about__dialog_8h.html" FileName="CLASS~82.HTM|classqsl__widget-members.html" Attributes="0" SourcePath="docs\html\classqsl__widget-members.html" SelfReg="false"/>
-    <ROW File="classqsl__widget.html" Component_="about__dialog_8h.html" FileName="CLASS~83.HTM|classqsl__widget.html" Attributes="0" SourcePath="docs\html\classqsl__widget.html" SelfReg="false"/>
+    <ROW File="classqsl__widgetmembers.html" Component_="about__dialog_8h.html" FileName="CLASS~84.HTM|classqsl__widget-members.html" Attributes="0" SourcePath="docs\html\classqsl__widget-members.html" SelfReg="false"/>
+    <ROW File="classqsl__widget.html" Component_="about__dialog_8h.html" FileName="CLASS~85.HTM|classqsl__widget.html" Attributes="0" SourcePath="docs\html\classqsl__widget.html" SelfReg="false"/>
     <ROW File="classqsl__widget.js" Component_="about__dialog_8h.html" FileName="CLASSQ~8.JS|classqsl__widget.js" Attributes="0" SourcePath="docs\html\classqsl__widget.js" SelfReg="false"/>
     <ROW File="classqsl__widget.png" Component_="about__dialog_8h.html" FileName="CLASSQ~3.PNG|classqsl__widget.png" Attributes="0" SourcePath="docs\html\classqsl__widget.png" SelfReg="false"/>
-    <ROW File="classqsl__writermembers.html" Component_="about__dialog_8h.html" FileName="CLASS~84.HTM|classqsl__writer-members.html" Attributes="0" SourcePath="docs\html\classqsl__writer-members.html" SelfReg="false"/>
-    <ROW File="classqsl__writer.html" Component_="about__dialog_8h.html" FileName="CLASS~85.HTM|classqsl__writer.html" Attributes="0" SourcePath="docs\html\classqsl__writer.html" SelfReg="false"/>
+    <ROW File="classqsl__writermembers.html" Component_="about__dialog_8h.html" FileName="CLASS~86.HTM|classqsl__writer-members.html" Attributes="0" SourcePath="docs\html\classqsl__writer-members.html" SelfReg="false"/>
+    <ROW File="classqsl__writer.html" Component_="about__dialog_8h.html" FileName="CLASS~87.HTM|classqsl__writer.html" Attributes="0" SourcePath="docs\html\classqsl__writer.html" SelfReg="false"/>
     <ROW File="classqsl__writer.js" Component_="about__dialog_8h.html" FileName="CLASSQ~9.JS|classqsl__writer.js" Attributes="0" SourcePath="docs\html\classqsl__writer.js" SelfReg="false"/>
     <ROW File="classqsl__writer.png" Component_="about__dialog_8h.html" FileName="CLASSQ~4.PNG|classqsl__writer.png" Attributes="0" SourcePath="docs\html\classqsl__writer.png" SelfReg="false"/>
-    <ROW File="classqso__appsmembers.html" Component_="about__dialog_8h.html" FileName="CLASS~86.HTM|classqso__apps-members.html" Attributes="0" SourcePath="docs\html\classqso__apps-members.html" SelfReg="false"/>
-    <ROW File="classqso__apps.html" Component_="about__dialog_8h.html" FileName="CLASS~87.HTM|classqso__apps.html" Attributes="0" SourcePath="docs\html\classqso__apps.html" SelfReg="false"/>
+    <ROW File="classqso__appsmembers.html" Component_="about__dialog_8h.html" FileName="CLASS~88.HTM|classqso__apps-members.html" Attributes="0" SourcePath="docs\html\classqso__apps-members.html" SelfReg="false"/>
+    <ROW File="classqso__apps.html" Component_="about__dialog_8h.html" FileName="CLASS~89.HTM|classqso__apps.html" Attributes="0" SourcePath="docs\html\classqso__apps.html" SelfReg="false"/>
     <ROW File="classqso__apps.js" Component_="about__dialog_8h.html" FileName="CLASS~29.JS|classqso__apps.js" Attributes="0" SourcePath="docs\html\classqso__apps.js" SelfReg="false"/>
     <ROW File="classqso__apps.png" Component_="about__dialog_8h.html" FileName="CLASSQ~5.PNG|classqso__apps.png" Attributes="0" SourcePath="docs\html\classqso__apps.png" SelfReg="false"/>
-    <ROW File="classqso__bandsmembers.html" Component_="about__dialog_8h.html" FileName="CLASS~88.HTM|classqso__bands-members.html" Attributes="0" SourcePath="docs\html\classqso__bands-members.html" SelfReg="false"/>
-    <ROW File="classqso__bands.html" Component_="about__dialog_8h.html" FileName="CLASS~89.HTM|classqso__bands.html" Attributes="0" SourcePath="docs\html\classqso__bands.html" SelfReg="false"/>
+    <ROW File="classqso__bandsmembers.html" Component_="about__dialog_8h.html" FileName="CLASS~90.HTM|classqso__bands-members.html" Attributes="0" SourcePath="docs\html\classqso__bands-members.html" SelfReg="false"/>
+    <ROW File="classqso__bands.html" Component_="about__dialog_8h.html" FileName="CLASS~91.HTM|classqso__bands.html" Attributes="0" SourcePath="docs\html\classqso__bands.html" SelfReg="false"/>
     <ROW File="classqso__bands.js" Component_="about__dialog_8h.html" FileName="CLASS~30.JS|classqso__bands.js" Attributes="0" SourcePath="docs\html\classqso__bands.js" SelfReg="false"/>
     <ROW File="classqso__bands.png" Component_="about__dialog_8h.html" FileName="CLASSQ~6.PNG|classqso__bands.png" Attributes="0" SourcePath="docs\html\classqso__bands.png" SelfReg="false"/>
-    <ROW File="classqso__buttonsmembers.html" Component_="about__dialog_8h.html" FileName="CLASS~90.HTM|classqso__buttons-members.html" Attributes="0" SourcePath="docs\html\classqso__buttons-members.html" SelfReg="false"/>
-    <ROW File="classqso__buttons.html" Component_="about__dialog_8h.html" FileName="CLASS~91.HTM|classqso__buttons.html" Attributes="0" SourcePath="docs\html\classqso__buttons.html" SelfReg="false"/>
+    <ROW File="classqso__buttonsmembers.html" Component_="about__dialog_8h.html" FileName="CLASS~92.HTM|classqso__buttons-members.html" Attributes="0" SourcePath="docs\html\classqso__buttons-members.html" SelfReg="false"/>
+    <ROW File="classqso__buttons.html" Component_="about__dialog_8h.html" FileName="CLASS~93.HTM|classqso__buttons.html" Attributes="0" SourcePath="docs\html\classqso__buttons.html" SelfReg="false"/>
     <ROW File="classqso__buttons.js" Component_="about__dialog_8h.html" FileName="CLASS~31.JS|classqso__buttons.js" Attributes="0" SourcePath="docs\html\classqso__buttons.js" SelfReg="false"/>
     <ROW File="classqso__buttons.png" Component_="about__dialog_8h.html" FileName="CLASSQ~7.PNG|classqso__buttons.png" Attributes="0" SourcePath="docs\html\classqso__buttons.png" SelfReg="false"/>
-    <ROW File="classqso__clockmembers.html" Component_="about__dialog_8h.html" FileName="CLASS~92.HTM|classqso__clock-members.html" Attributes="0" SourcePath="docs\html\classqso__clock-members.html" SelfReg="false"/>
-    <ROW File="classqso__clock.html" Component_="about__dialog_8h.html" FileName="CLASS~93.HTM|classqso__clock.html" Attributes="0" SourcePath="docs\html\classqso__clock.html" SelfReg="false"/>
+    <ROW File="classqso__clockmembers.html" Component_="about__dialog_8h.html" FileName="CLASS~94.HTM|classqso__clock-members.html" Attributes="0" SourcePath="docs\html\classqso__clock-members.html" SelfReg="false"/>
+    <ROW File="classqso__clock.html" Component_="about__dialog_8h.html" FileName="CLASS~95.HTM|classqso__clock.html" Attributes="0" SourcePath="docs\html\classqso__clock.html" SelfReg="false"/>
     <ROW File="classqso__clock.js" Component_="about__dialog_8h.html" FileName="CLASS~32.JS|classqso__clock.js" Attributes="0" SourcePath="docs\html\classqso__clock.js" SelfReg="false"/>
     <ROW File="classqso__clock.png" Component_="about__dialog_8h.html" FileName="CLASSQ~8.PNG|classqso__clock.png" Attributes="0" SourcePath="docs\html\classqso__clock.png" SelfReg="false"/>
-    <ROW File="classqso__clocksmembers.html" Component_="about__dialog_8h.html" FileName="CLASS~94.HTM|classqso__clocks-members.html" Attributes="0" SourcePath="docs\html\classqso__clocks-members.html" SelfReg="false"/>
-    <ROW File="classqso__clocks.html" Component_="about__dialog_8h.html" FileName="CLASS~95.HTM|classqso__clocks.html" Attributes="0" SourcePath="docs\html\classqso__clocks.html" SelfReg="false"/>
+    <ROW File="classqso__clocksmembers.html" Component_="about__dialog_8h.html" FileName="CLASS~96.HTM|classqso__clocks-members.html" Attributes="0" SourcePath="docs\html\classqso__clocks-members.html" SelfReg="false"/>
+    <ROW File="classqso__clocks.html" Component_="about__dialog_8h.html" FileName="CLASS~97.HTM|classqso__clocks.html" Attributes="0" SourcePath="docs\html\classqso__clocks.html" SelfReg="false"/>
     <ROW File="classqso__clocks.js" Component_="about__dialog_8h.html" FileName="CLASS~33.JS|classqso__clocks.js" Attributes="0" SourcePath="docs\html\classqso__clocks.js" SelfReg="false"/>
     <ROW File="classqso__clocks.png" Component_="about__dialog_8h.html" FileName="CLASSQ~9.PNG|classqso__clocks.png" Attributes="0" SourcePath="docs\html\classqso__clocks.png" SelfReg="false"/>
-    <ROW File="classqso__datamembers.html" Component_="about__dialog_8h.html" FileName="CLASS~96.HTM|classqso__data-members.html" Attributes="0" SourcePath="docs\html\classqso__data-members.html" SelfReg="false"/>
-    <ROW File="classqso__data.html" Component_="about__dialog_8h.html" FileName="CLASS~97.HTM|classqso__data.html" Attributes="0" SourcePath="docs\html\classqso__data.html" SelfReg="false"/>
+    <ROW File="classqso__datamembers.html" Component_="about__dialog_8h.html" FileName="CLASS~98.HTM|classqso__data-members.html" Attributes="0" SourcePath="docs\html\classqso__data-members.html" SelfReg="false"/>
+    <ROW File="classqso__data.html" Component_="about__dialog_8h.html" FileName="CLASS~99.HTM|classqso__data.html" Attributes="0" SourcePath="docs\html\classqso__data.html" SelfReg="false"/>
     <ROW File="classqso__data.js" Component_="about__dialog_8h.html" FileName="CLASS~34.JS|classqso__data.js" Attributes="0" SourcePath="docs\html\classqso__data.js" SelfReg="false"/>
     <ROW File="classqso__data.png" Component_="about__dialog_8h.html" FileName="CLASS~24.PNG|classqso__data.png" Attributes="0" SourcePath="docs\html\classqso__data.png" SelfReg="false"/>
-    <ROW File="classqso__detailsmembers.html" Component_="about__dialog_8h.html" FileName="CLASS~98.HTM|classqso__details-members.html" Attributes="0" SourcePath="docs\html\classqso__details-members.html" SelfReg="false"/>
-    <ROW File="classqso__details.html" Component_="about__dialog_8h.html" FileName="CLASS~99.HTM|classqso__details.html" Attributes="0" SourcePath="docs\html\classqso__details.html" SelfReg="false"/>
+    <ROW File="classqso__detailsmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~100.HTM|classqso__details-members.html" Attributes="0" SourcePath="docs\html\classqso__details-members.html" SelfReg="false"/>
+    <ROW File="classqso__details.html" Component_="about__dialog_8h.html" FileName="CLAS~101.HTM|classqso__details.html" Attributes="0" SourcePath="docs\html\classqso__details.html" SelfReg="false"/>
     <ROW File="classqso__details.js" Component_="about__dialog_8h.html" FileName="CLASS~35.JS|classqso__details.js" Attributes="0" SourcePath="docs\html\classqso__details.js" SelfReg="false"/>
     <ROW File="classqso__details.png" Component_="about__dialog_8h.html" FileName="CLASS~25.PNG|classqso__details.png" Attributes="0" SourcePath="docs\html\classqso__details.png" SelfReg="false"/>
-    <ROW File="classqso__details_1_1table__dmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~100.HTM|classqso__details_1_1table__d-members.html" Attributes="0" SourcePath="docs\html\classqso__details_1_1table__d-members.html" SelfReg="false"/>
-    <ROW File="classqso__details_1_1table__d.html" Component_="about__dialog_8h.html" FileName="CLAS~101.HTM|classqso__details_1_1table__d.html" Attributes="0" SourcePath="docs\html\classqso__details_1_1table__d.html" SelfReg="false"/>
+    <ROW File="classqso__details_1_1table__dmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~102.HTM|classqso__details_1_1table__d-members.html" Attributes="0" SourcePath="docs\html\classqso__details_1_1table__d-members.html" SelfReg="false"/>
+    <ROW File="classqso__details_1_1table__d.html" Component_="about__dialog_8h.html" FileName="CLAS~103.HTM|classqso__details_1_1table__d.html" Attributes="0" SourcePath="docs\html\classqso__details_1_1table__d.html" SelfReg="false"/>
     <ROW File="classqso__details_1_1table__d.js" Component_="about__dialog_8h.html" FileName="CLASS~36.JS|classqso__details_1_1table__d.js" Attributes="0" SourcePath="docs\html\classqso__details_1_1table__d.js" SelfReg="false"/>
     <ROW File="classqso__details_1_1table__d.png" Component_="about__dialog_8h.html" FileName="CLASS~26.PNG|classqso__details_1_1table__d.png" Attributes="0" SourcePath="docs\html\classqso__details_1_1table__d.png" SelfReg="false"/>
-    <ROW File="classqso__details_1_1table__qmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~102.HTM|classqso__details_1_1table__q-members.html" Attributes="0" SourcePath="docs\html\classqso__details_1_1table__q-members.html" SelfReg="false"/>
-    <ROW File="classqso__details_1_1table__q.html" Component_="about__dialog_8h.html" FileName="CLAS~103.HTM|classqso__details_1_1table__q.html" Attributes="0" SourcePath="docs\html\classqso__details_1_1table__q.html" SelfReg="false"/>
+    <ROW File="classqso__details_1_1table__qmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~104.HTM|classqso__details_1_1table__q-members.html" Attributes="0" SourcePath="docs\html\classqso__details_1_1table__q-members.html" SelfReg="false"/>
+    <ROW File="classqso__details_1_1table__q.html" Component_="about__dialog_8h.html" FileName="CLAS~105.HTM|classqso__details_1_1table__q.html" Attributes="0" SourcePath="docs\html\classqso__details_1_1table__q.html" SelfReg="false"/>
     <ROW File="classqso__details_1_1table__q.js" Component_="about__dialog_8h.html" FileName="CLASS~37.JS|classqso__details_1_1table__q.js" Attributes="0" SourcePath="docs\html\classqso__details_1_1table__q.js" SelfReg="false"/>
     <ROW File="classqso__details_1_1table__q.png" Component_="about__dialog_8h.html" FileName="CLASS~27.PNG|classqso__details_1_1table__q.png" Attributes="0" SourcePath="docs\html\classqso__details_1_1table__q.png" SelfReg="false"/>
-    <ROW File="classqso__dxccmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~104.HTM|classqso__dxcc-members.html" Attributes="0" SourcePath="docs\html\classqso__dxcc-members.html" SelfReg="false"/>
-    <ROW File="classqso__dxcc.html" Component_="about__dialog_8h.html" FileName="CLAS~105.HTM|classqso__dxcc.html" Attributes="0" SourcePath="docs\html\classqso__dxcc.html" SelfReg="false"/>
+    <ROW File="classqso__dxccmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~106.HTM|classqso__dxcc-members.html" Attributes="0" SourcePath="docs\html\classqso__dxcc-members.html" SelfReg="false"/>
+    <ROW File="classqso__dxcc.html" Component_="about__dialog_8h.html" FileName="CLAS~107.HTM|classqso__dxcc.html" Attributes="0" SourcePath="docs\html\classqso__dxcc.html" SelfReg="false"/>
     <ROW File="classqso__dxcc.js" Component_="about__dialog_8h.html" FileName="CLASS~38.JS|classqso__dxcc.js" Attributes="0" SourcePath="docs\html\classqso__dxcc.js" SelfReg="false"/>
     <ROW File="classqso__dxcc.png" Component_="about__dialog_8h.html" FileName="CLASS~28.PNG|classqso__dxcc.png" Attributes="0" SourcePath="docs\html\classqso__dxcc.png" SelfReg="false"/>
-    <ROW File="classqso__entrymembers.html" Component_="about__dialog_8h.html" FileName="CLAS~106.HTM|classqso__entry-members.html" Attributes="0" SourcePath="docs\html\classqso__entry-members.html" SelfReg="false"/>
-    <ROW File="classqso__entry.html" Component_="about__dialog_8h.html" FileName="CLAS~107.HTM|classqso__entry.html" Attributes="0" SourcePath="docs\html\classqso__entry.html" SelfReg="false"/>
+    <ROW File="classqso__entrymembers.html" Component_="about__dialog_8h.html" FileName="CLAS~108.HTM|classqso__entry-members.html" Attributes="0" SourcePath="docs\html\classqso__entry-members.html" SelfReg="false"/>
+    <ROW File="classqso__entry.html" Component_="about__dialog_8h.html" FileName="CLAS~109.HTM|classqso__entry.html" Attributes="0" SourcePath="docs\html\classqso__entry.html" SelfReg="false"/>
     <ROW File="classqso__entry.js" Component_="about__dialog_8h.html" FileName="CLASS~39.JS|classqso__entry.js" Attributes="0" SourcePath="docs\html\classqso__entry.js" SelfReg="false"/>
     <ROW File="classqso__entry.png" Component_="about__dialog_8h.html" FileName="CLASS~29.PNG|classqso__entry.png" Attributes="0" SourcePath="docs\html\classqso__entry.png" SelfReg="false"/>
-    <ROW File="classqso__logmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~108.HTM|classqso__log-members.html" Attributes="0" SourcePath="docs\html\classqso__log-members.html" SelfReg="false"/>
-    <ROW File="classqso__log.html" Component_="about__dialog_8h.html" FileName="CLAS~109.HTM|classqso__log.html" Attributes="0" SourcePath="docs\html\classqso__log.html" SelfReg="false"/>
+    <ROW File="classqso__logmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~110.HTM|classqso__log-members.html" Attributes="0" SourcePath="docs\html\classqso__log-members.html" SelfReg="false"/>
+    <ROW File="classqso__log.html" Component_="about__dialog_8h.html" FileName="CLAS~111.HTM|classqso__log.html" Attributes="0" SourcePath="docs\html\classqso__log.html" SelfReg="false"/>
     <ROW File="classqso__log.js" Component_="about__dialog_8h.html" FileName="CLASS~40.JS|classqso__log.js" Attributes="0" SourcePath="docs\html\classqso__log.js" SelfReg="false"/>
     <ROW File="classqso__log.png" Component_="about__dialog_8h.html" FileName="CLASS~30.PNG|classqso__log.png" Attributes="0" SourcePath="docs\html\classqso__log.png" SelfReg="false"/>
-    <ROW File="classqso__log__infomembers.html" Component_="about__dialog_8h.html" FileName="CLAS~110.HTM|classqso__log__info-members.html" Attributes="0" SourcePath="docs\html\classqso__log__info-members.html" SelfReg="false"/>
-    <ROW File="classqso__log__info.html" Component_="about__dialog_8h.html" FileName="CLAS~111.HTM|classqso__log__info.html" Attributes="0" SourcePath="docs\html\classqso__log__info.html" SelfReg="false"/>
+    <ROW File="classqso__log__infomembers.html" Component_="about__dialog_8h.html" FileName="CLAS~112.HTM|classqso__log__info-members.html" Attributes="0" SourcePath="docs\html\classqso__log__info-members.html" SelfReg="false"/>
+    <ROW File="classqso__log__info.html" Component_="about__dialog_8h.html" FileName="CLAS~113.HTM|classqso__log__info.html" Attributes="0" SourcePath="docs\html\classqso__log__info.html" SelfReg="false"/>
     <ROW File="classqso__log__info.js" Component_="about__dialog_8h.html" FileName="CLASS~41.JS|classqso__log__info.js" Attributes="0" SourcePath="docs\html\classqso__log__info.js" SelfReg="false"/>
     <ROW File="classqso__log__info.png" Component_="about__dialog_8h.html" FileName="CLASS~31.PNG|classqso__log__info.png" Attributes="0" SourcePath="docs\html\classqso__log__info.png" SelfReg="false"/>
-    <ROW File="classqso__managermembers.html" Component_="about__dialog_8h.html" FileName="CLAS~112.HTM|classqso__manager-members.html" Attributes="0" SourcePath="docs\html\classqso__manager-members.html" SelfReg="false"/>
-    <ROW File="classqso__manager.html" Component_="about__dialog_8h.html" FileName="CLAS~113.HTM|classqso__manager.html" Attributes="0" SourcePath="docs\html\classqso__manager.html" SelfReg="false"/>
+    <ROW File="classqso__managermembers.html" Component_="about__dialog_8h.html" FileName="CLAS~114.HTM|classqso__manager-members.html" Attributes="0" SourcePath="docs\html\classqso__manager-members.html" SelfReg="false"/>
+    <ROW File="classqso__manager.html" Component_="about__dialog_8h.html" FileName="CLAS~115.HTM|classqso__manager.html" Attributes="0" SourcePath="docs\html\classqso__manager.html" SelfReg="false"/>
     <ROW File="classqso__manager.js" Component_="about__dialog_8h.html" FileName="CLASS~42.JS|classqso__manager.js" Attributes="0" SourcePath="docs\html\classqso__manager.js" SelfReg="false"/>
     <ROW File="classqso__manager.png" Component_="about__dialog_8h.html" FileName="CLASS~32.PNG|classqso__manager.png" Attributes="0" SourcePath="docs\html\classqso__manager.png" SelfReg="false"/>
-    <ROW File="classqso__miscmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~114.HTM|classqso__misc-members.html" Attributes="0" SourcePath="docs\html\classqso__misc-members.html" SelfReg="false"/>
-    <ROW File="classqso__misc.html" Component_="about__dialog_8h.html" FileName="CLAS~115.HTM|classqso__misc.html" Attributes="0" SourcePath="docs\html\classqso__misc.html" SelfReg="false"/>
+    <ROW File="classqso__miscmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~116.HTM|classqso__misc-members.html" Attributes="0" SourcePath="docs\html\classqso__misc-members.html" SelfReg="false"/>
+    <ROW File="classqso__misc.html" Component_="about__dialog_8h.html" FileName="CLAS~117.HTM|classqso__misc.html" Attributes="0" SourcePath="docs\html\classqso__misc.html" SelfReg="false"/>
     <ROW File="classqso__misc.js" Component_="about__dialog_8h.html" FileName="CLASS~43.JS|classqso__misc.js" Attributes="0" SourcePath="docs\html\classqso__misc.js" SelfReg="false"/>
     <ROW File="classqso__misc.png" Component_="about__dialog_8h.html" FileName="CLASS~33.PNG|classqso__misc.png" Attributes="0" SourcePath="docs\html\classqso__misc.png" SelfReg="false"/>
-    <ROW File="classqso__net__entrymembers.html" Component_="about__dialog_8h.html" FileName="CLAS~116.HTM|classqso__net__entry-members.html" Attributes="0" SourcePath="docs\html\classqso__net__entry-members.html" SelfReg="false"/>
-    <ROW File="classqso__net__entry.html" Component_="about__dialog_8h.html" FileName="CLAS~117.HTM|classqso__net__entry.html" Attributes="0" SourcePath="docs\html\classqso__net__entry.html" SelfReg="false"/>
+    <ROW File="classqso__net__entrymembers.html" Component_="about__dialog_8h.html" FileName="CLAS~118.HTM|classqso__net__entry-members.html" Attributes="0" SourcePath="docs\html\classqso__net__entry-members.html" SelfReg="false"/>
+    <ROW File="classqso__net__entry.html" Component_="about__dialog_8h.html" FileName="CLAS~119.HTM|classqso__net__entry.html" Attributes="0" SourcePath="docs\html\classqso__net__entry.html" SelfReg="false"/>
     <ROW File="classqso__net__entry.js" Component_="about__dialog_8h.html" FileName="CLASS~44.JS|classqso__net__entry.js" Attributes="0" SourcePath="docs\html\classqso__net__entry.js" SelfReg="false"/>
     <ROW File="classqso__net__entry.png" Component_="about__dialog_8h.html" FileName="CLASS~34.PNG|classqso__net__entry.png" Attributes="0" SourcePath="docs\html\classqso__net__entry.png" SelfReg="false"/>
-    <ROW File="classqso__operationmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~118.HTM|classqso__operation-members.html" Attributes="0" SourcePath="docs\html\classqso__operation-members.html" SelfReg="false"/>
-    <ROW File="classqso__operation.html" Component_="about__dialog_8h.html" FileName="CLAS~119.HTM|classqso__operation.html" Attributes="0" SourcePath="docs\html\classqso__operation.html" SelfReg="false"/>
+    <ROW File="classqso__operationmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~120.HTM|classqso__operation-members.html" Attributes="0" SourcePath="docs\html\classqso__operation-members.html" SelfReg="false"/>
+    <ROW File="classqso__operation.html" Component_="about__dialog_8h.html" FileName="CLAS~121.HTM|classqso__operation.html" Attributes="0" SourcePath="docs\html\classqso__operation.html" SelfReg="false"/>
     <ROW File="classqso__operation.js" Component_="about__dialog_8h.html" FileName="CLASS~45.JS|classqso__operation.js" Attributes="0" SourcePath="docs\html\classqso__operation.js" SelfReg="false"/>
     <ROW File="classqso__operation.png" Component_="about__dialog_8h.html" FileName="CLASS~35.PNG|classqso__operation.png" Attributes="0" SourcePath="docs\html\classqso__operation.png" SelfReg="false"/>
-    <ROW File="classqso__qslmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~120.HTM|classqso__qsl-members.html" Attributes="0" SourcePath="docs\html\classqso__qsl-members.html" SelfReg="false"/>
-    <ROW File="classqso__qsl.html" Component_="about__dialog_8h.html" FileName="CLAS~121.HTM|classqso__qsl.html" Attributes="0" SourcePath="docs\html\classqso__qsl.html" SelfReg="false"/>
+    <ROW File="classqso__qslmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~122.HTM|classqso__qsl-members.html" Attributes="0" SourcePath="docs\html\classqso__qsl-members.html" SelfReg="false"/>
+    <ROW File="classqso__qsl.html" Component_="about__dialog_8h.html" FileName="CLAS~123.HTM|classqso__qsl.html" Attributes="0" SourcePath="docs\html\classqso__qsl.html" SelfReg="false"/>
     <ROW File="classqso__qsl.js" Component_="about__dialog_8h.html" FileName="CLASS~46.JS|classqso__qsl.js" Attributes="0" SourcePath="docs\html\classqso__qsl.js" SelfReg="false"/>
     <ROW File="classqso__qsl.png" Component_="about__dialog_8h.html" FileName="CLASS~36.PNG|classqso__qsl.png" Attributes="0" SourcePath="docs\html\classqso__qsl.png" SelfReg="false"/>
-    <ROW File="classqso__qsl__vwrmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~122.HTM|classqso__qsl__vwr-members.html" Attributes="0" SourcePath="docs\html\classqso__qsl__vwr-members.html" SelfReg="false"/>
-    <ROW File="classqso__qsl__vwr.html" Component_="about__dialog_8h.html" FileName="CLAS~123.HTM|classqso__qsl__vwr.html" Attributes="0" SourcePath="docs\html\classqso__qsl__vwr.html" SelfReg="false"/>
+    <ROW File="classqso__qsl__vwrmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~124.HTM|classqso__qsl__vwr-members.html" Attributes="0" SourcePath="docs\html\classqso__qsl__vwr-members.html" SelfReg="false"/>
+    <ROW File="classqso__qsl__vwr.html" Component_="about__dialog_8h.html" FileName="CLAS~125.HTM|classqso__qsl__vwr.html" Attributes="0" SourcePath="docs\html\classqso__qsl__vwr.html" SelfReg="false"/>
     <ROW File="classqso__qsl__vwr.js" Component_="about__dialog_8h.html" FileName="CLASS~47.JS|classqso__qsl__vwr.js" Attributes="0" SourcePath="docs\html\classqso__qsl__vwr.js" SelfReg="false"/>
     <ROW File="classqso__qsl__vwr.png" Component_="about__dialog_8h.html" FileName="CLASS~37.PNG|classqso__qsl__vwr.png" Attributes="0" SourcePath="docs\html\classqso__qsl__vwr.png" SelfReg="false"/>
-    <ROW File="classqso__querymembers.html" Component_="about__dialog_8h.html" FileName="CLAS~124.HTM|classqso__query-members.html" Attributes="0" SourcePath="docs\html\classqso__query-members.html" SelfReg="false"/>
-    <ROW File="classqso__query.html" Component_="about__dialog_8h.html" FileName="CLAS~125.HTM|classqso__query.html" Attributes="0" SourcePath="docs\html\classqso__query.html" SelfReg="false"/>
+    <ROW File="classqso__querymembers.html" Component_="about__dialog_8h.html" FileName="CLAS~126.HTM|classqso__query-members.html" Attributes="0" SourcePath="docs\html\classqso__query-members.html" SelfReg="false"/>
+    <ROW File="classqso__query.html" Component_="about__dialog_8h.html" FileName="CLAS~127.HTM|classqso__query.html" Attributes="0" SourcePath="docs\html\classqso__query.html" SelfReg="false"/>
     <ROW File="classqso__query.js" Component_="about__dialog_8h.html" FileName="CLASS~48.JS|classqso__query.js" Attributes="0" SourcePath="docs\html\classqso__query.js" SelfReg="false"/>
     <ROW File="classqso__query.png" Component_="about__dialog_8h.html" FileName="CLASS~38.PNG|classqso__query.png" Attributes="0" SourcePath="docs\html\classqso__query.png" SelfReg="false"/>
-    <ROW File="classqso__rigmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~126.HTM|classqso__rig-members.html" Attributes="0" SourcePath="docs\html\classqso__rig-members.html" SelfReg="false"/>
-    <ROW File="classqso__rig.html" Component_="about__dialog_8h.html" FileName="CLAS~127.HTM|classqso__rig.html" Attributes="0" SourcePath="docs\html\classqso__rig.html" SelfReg="false"/>
+    <ROW File="classqso__rigmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~128.HTM|classqso__rig-members.html" Attributes="0" SourcePath="docs\html\classqso__rig-members.html" SelfReg="false"/>
+    <ROW File="classqso__rig.html" Component_="about__dialog_8h.html" FileName="CLAS~129.HTM|classqso__rig.html" Attributes="0" SourcePath="docs\html\classqso__rig.html" SelfReg="false"/>
     <ROW File="classqso__rig.js" Component_="about__dialog_8h.html" FileName="CLASS~49.JS|classqso__rig.js" Attributes="0" SourcePath="docs\html\classqso__rig.js" SelfReg="false"/>
     <ROW File="classqso__rig.png" Component_="about__dialog_8h.html" FileName="CLASS~39.PNG|classqso__rig.png" Attributes="0" SourcePath="docs\html\classqso__rig.png" SelfReg="false"/>
-    <ROW File="classqso__tabbed__rigsmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~128.HTM|classqso__tabbed__rigs-members.html" Attributes="0" SourcePath="docs\html\classqso__tabbed__rigs-members.html" SelfReg="false"/>
-    <ROW File="classqso__tabbed__rigs.html" Component_="about__dialog_8h.html" FileName="CLAS~129.HTM|classqso__tabbed__rigs.html" Attributes="0" SourcePath="docs\html\classqso__tabbed__rigs.html" SelfReg="false"/>
+    <ROW File="classqso__tabbed__rigsmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~130.HTM|classqso__tabbed__rigs-members.html" Attributes="0" SourcePath="docs\html\classqso__tabbed__rigs-members.html" SelfReg="false"/>
+    <ROW File="classqso__tabbed__rigs.html" Component_="about__dialog_8h.html" FileName="CLAS~131.HTM|classqso__tabbed__rigs.html" Attributes="0" SourcePath="docs\html\classqso__tabbed__rigs.html" SelfReg="false"/>
     <ROW File="classqso__tabbed__rigs.js" Component_="about__dialog_8h.html" FileName="CLASS~50.JS|classqso__tabbed__rigs.js" Attributes="0" SourcePath="docs\html\classqso__tabbed__rigs.js" SelfReg="false"/>
     <ROW File="classqso__tabbed__rigs.png" Component_="about__dialog_8h.html" FileName="CLASS~40.PNG|classqso__tabbed__rigs.png" Attributes="0" SourcePath="docs\html\classqso__tabbed__rigs.png" SelfReg="false"/>
-    <ROW File="classqso__wxmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~130.HTM|classqso__wx-members.html" Attributes="0" SourcePath="docs\html\classqso__wx-members.html" SelfReg="false"/>
-    <ROW File="classqso__wx.html" Component_="about__dialog_8h.html" FileName="CLAS~131.HTM|classqso__wx.html" Attributes="0" SourcePath="docs\html\classqso__wx.html" SelfReg="false"/>
+    <ROW File="classqso__wxmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~132.HTM|classqso__wx-members.html" Attributes="0" SourcePath="docs\html\classqso__wx-members.html" SelfReg="false"/>
+    <ROW File="classqso__wx.html" Component_="about__dialog_8h.html" FileName="CLAS~133.HTM|classqso__wx.html" Attributes="0" SourcePath="docs\html\classqso__wx.html" SelfReg="false"/>
     <ROW File="classqso__wx.js" Component_="about__dialog_8h.html" FileName="CLASS~51.JS|classqso__wx.js" Attributes="0" SourcePath="docs\html\classqso__wx.js" SelfReg="false"/>
     <ROW File="classqso__wx.png" Component_="about__dialog_8h.html" FileName="CLASS~41.PNG|classqso__wx.png" Attributes="0" SourcePath="docs\html\classqso__wx.png" SelfReg="false"/>
-    <ROW File="classqth__dialogmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~132.HTM|classqth__dialog-members.html" Attributes="0" SourcePath="docs\html\classqth__dialog-members.html" SelfReg="false"/>
-    <ROW File="classqth__dialog.html" Component_="about__dialog_8h.html" FileName="CLAS~133.HTM|classqth__dialog.html" Attributes="0" SourcePath="docs\html\classqth__dialog.html" SelfReg="false"/>
+    <ROW File="classqth__dialogmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~134.HTM|classqth__dialog-members.html" Attributes="0" SourcePath="docs\html\classqth__dialog-members.html" SelfReg="false"/>
+    <ROW File="classqth__dialog.html" Component_="about__dialog_8h.html" FileName="CLAS~135.HTM|classqth__dialog.html" Attributes="0" SourcePath="docs\html\classqth__dialog.html" SelfReg="false"/>
     <ROW File="classqth__dialog.js" Component_="about__dialog_8h.html" FileName="CLASS~52.JS|classqth__dialog.js" Attributes="0" SourcePath="docs\html\classqth__dialog.js" SelfReg="false"/>
     <ROW File="classqth__dialog.png" Component_="about__dialog_8h.html" FileName="CLASS~42.PNG|classqth__dialog.png" Attributes="0" SourcePath="docs\html\classqth__dialog.png" SelfReg="false"/>
     <ROW File="classrecordmembers.html" Component_="about__dialog_8h.html" FileName="CLASSR~1.HTM|classrecord-members.html" Attributes="0" SourcePath="docs\html\classrecord-members.html" SelfReg="false"/>
@@ -744,21 +748,21 @@
     <ROW File="classrig__data.html" Component_="about__dialog_8h.html" FileName="CLASSR~8.HTM|classrig__data.html" Attributes="0" SourcePath="docs\html\classrig__data.html" SelfReg="false"/>
     <ROW File="classrig__data.js" Component_="about__dialog_8h.html" FileName="CLASSR~4.JS|classrig__data.js" Attributes="0" SourcePath="docs\html\classrig__data.js" SelfReg="false"/>
     <ROW File="classrig__ifmembers.html" Component_="about__dialog_8h.html" FileName="CLASSR~9.HTM|classrig__if-members.html" Attributes="0" SourcePath="docs\html\classrig__if-members.html" SelfReg="false"/>
-    <ROW File="classrig__if.html" Component_="about__dialog_8h.html" FileName="CLAS~134.HTM|classrig__if.html" Attributes="0" SourcePath="docs\html\classrig__if.html" SelfReg="false"/>
+    <ROW File="classrig__if.html" Component_="about__dialog_8h.html" FileName="CLAS~136.HTM|classrig__if.html" Attributes="0" SourcePath="docs\html\classrig__if.html" SelfReg="false"/>
     <ROW File="classrig__if.js" Component_="about__dialog_8h.html" FileName="CLASSR~5.JS|classrig__if.js" Attributes="0" SourcePath="docs\html\classrig__if.js" SelfReg="false"/>
-    <ROW File="classrig__readermembers.html" Component_="about__dialog_8h.html" FileName="CLAS~135.HTM|classrig__reader-members.html" Attributes="0" SourcePath="docs\html\classrig__reader-members.html" SelfReg="false"/>
-    <ROW File="classrig__reader.html" Component_="about__dialog_8h.html" FileName="CLAS~136.HTM|classrig__reader.html" Attributes="0" SourcePath="docs\html\classrig__reader.html" SelfReg="false"/>
+    <ROW File="classrig__readermembers.html" Component_="about__dialog_8h.html" FileName="CLAS~137.HTM|classrig__reader-members.html" Attributes="0" SourcePath="docs\html\classrig__reader-members.html" SelfReg="false"/>
+    <ROW File="classrig__reader.html" Component_="about__dialog_8h.html" FileName="CLAS~138.HTM|classrig__reader.html" Attributes="0" SourcePath="docs\html\classrig__reader.html" SelfReg="false"/>
     <ROW File="classrig__reader.js" Component_="about__dialog_8h.html" FileName="CLASSR~6.JS|classrig__reader.js" Attributes="0" SourcePath="docs\html\classrig__reader.js" SelfReg="false"/>
     <ROW File="classrig__reader.png" Component_="about__dialog_8h.html" FileName="CLASSR~4.PNG|classrig__reader.png" Attributes="0" SourcePath="docs\html\classrig__reader.png" SelfReg="false"/>
-    <ROW File="classrig__writermembers.html" Component_="about__dialog_8h.html" FileName="CLAS~137.HTM|classrig__writer-members.html" Attributes="0" SourcePath="docs\html\classrig__writer-members.html" SelfReg="false"/>
-    <ROW File="classrig__writer.html" Component_="about__dialog_8h.html" FileName="CLAS~138.HTM|classrig__writer.html" Attributes="0" SourcePath="docs\html\classrig__writer.html" SelfReg="false"/>
+    <ROW File="classrig__writermembers.html" Component_="about__dialog_8h.html" FileName="CLAS~139.HTM|classrig__writer-members.html" Attributes="0" SourcePath="docs\html\classrig__writer-members.html" SelfReg="false"/>
+    <ROW File="classrig__writer.html" Component_="about__dialog_8h.html" FileName="CLAS~140.HTM|classrig__writer.html" Attributes="0" SourcePath="docs\html\classrig__writer.html" SelfReg="false"/>
     <ROW File="classrig__writer.js" Component_="about__dialog_8h.html" FileName="CLASSR~7.JS|classrig__writer.js" Attributes="0" SourcePath="docs\html\classrig__writer.js" SelfReg="false"/>
     <ROW File="classrig__writer.png" Component_="about__dialog_8h.html" FileName="CLASSR~5.PNG|classrig__writer.png" Attributes="0" SourcePath="docs\html\classrig__writer.png" SelfReg="false"/>
-    <ROW File="classrpc__data__itemmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~139.HTM|classrpc__data__item-members.html" Attributes="0" SourcePath="docs\html\classrpc__data__item-members.html" SelfReg="false"/>
-    <ROW File="classrpc__data__item.html" Component_="about__dialog_8h.html" FileName="CLAS~140.HTM|classrpc__data__item.html" Attributes="0" SourcePath="docs\html\classrpc__data__item.html" SelfReg="false"/>
+    <ROW File="classrpc__data__itemmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~141.HTM|classrpc__data__item-members.html" Attributes="0" SourcePath="docs\html\classrpc__data__item-members.html" SelfReg="false"/>
+    <ROW File="classrpc__data__item.html" Component_="about__dialog_8h.html" FileName="CLAS~142.HTM|classrpc__data__item.html" Attributes="0" SourcePath="docs\html\classrpc__data__item.html" SelfReg="false"/>
     <ROW File="classrpc__data__item.js" Component_="about__dialog_8h.html" FileName="CLASSR~8.JS|classrpc__data__item.js" Attributes="0" SourcePath="docs\html\classrpc__data__item.js" SelfReg="false"/>
-    <ROW File="classrpc__handlermembers.html" Component_="about__dialog_8h.html" FileName="CLAS~141.HTM|classrpc__handler-members.html" Attributes="0" SourcePath="docs\html\classrpc__handler-members.html" SelfReg="false"/>
-    <ROW File="classrpc__handler.html" Component_="about__dialog_8h.html" FileName="CLAS~142.HTM|classrpc__handler.html" Attributes="0" SourcePath="docs\html\classrpc__handler.html" SelfReg="false"/>
+    <ROW File="classrpc__handlermembers.html" Component_="about__dialog_8h.html" FileName="CLAS~143.HTM|classrpc__handler-members.html" Attributes="0" SourcePath="docs\html\classrpc__handler-members.html" SelfReg="false"/>
+    <ROW File="classrpc__handler.html" Component_="about__dialog_8h.html" FileName="CLAS~144.HTM|classrpc__handler.html" Attributes="0" SourcePath="docs\html\classrpc__handler.html" SelfReg="false"/>
     <ROW File="classrpc__handler.js" Component_="about__dialog_8h.html" FileName="CLASSR~9.JS|classrpc__handler.js" Attributes="0" SourcePath="docs\html\classrpc__handler.js" SelfReg="false"/>
     <ROW File="classsearch__dialogmembers.html" Component_="about__dialog_8h.html" FileName="CLASSS~1.HTM|classsearch__dialog-members.html" Attributes="0" SourcePath="docs\html\classsearch__dialog-members.html" SelfReg="false"/>
     <ROW File="classsearch__dialog.html" Component_="about__dialog_8h.html" FileName="CLASSS~2.HTM|classsearch__dialog.html" Attributes="0" SourcePath="docs\html\classsearch__dialog.html" SelfReg="false"/>
@@ -775,33 +779,33 @@
     <ROW File="classspecx__reader.js" Component_="about__dialog_8h.html" FileName="CLASSS~4.JS|classspecx__reader.js" Attributes="0" SourcePath="docs\html\classspecx__reader.js" SelfReg="false"/>
     <ROW File="classspecx__reader.png" Component_="about__dialog_8h.html" FileName="CLASSS~2.PNG|classspecx__reader.png" Attributes="0" SourcePath="docs\html\classspecx__reader.png" SelfReg="false"/>
     <ROW File="classspec__datamembers.html" Component_="about__dialog_8h.html" FileName="CLASSS~9.HTM|classspec__data-members.html" Attributes="0" SourcePath="docs\html\classspec__data-members.html" SelfReg="false"/>
-    <ROW File="classspec__data.html" Component_="about__dialog_8h.html" FileName="CLAS~143.HTM|classspec__data.html" Attributes="0" SourcePath="docs\html\classspec__data.html" SelfReg="false"/>
+    <ROW File="classspec__data.html" Component_="about__dialog_8h.html" FileName="CLAS~145.HTM|classspec__data.html" Attributes="0" SourcePath="docs\html\classspec__data.html" SelfReg="false"/>
     <ROW File="classspec__data.js" Component_="about__dialog_8h.html" FileName="CLASSS~5.JS|classspec__data.js" Attributes="0" SourcePath="docs\html\classspec__data.js" SelfReg="false"/>
     <ROW File="classspec__data.png" Component_="about__dialog_8h.html" FileName="CLASSS~3.PNG|classspec__data.png" Attributes="0" SourcePath="docs\html\classspec__data.png" SelfReg="false"/>
-    <ROW File="classspec__treemembers.html" Component_="about__dialog_8h.html" FileName="CLAS~144.HTM|classspec__tree-members.html" Attributes="0" SourcePath="docs\html\classspec__tree-members.html" SelfReg="false"/>
-    <ROW File="classspec__tree.html" Component_="about__dialog_8h.html" FileName="CLAS~145.HTM|classspec__tree.html" Attributes="0" SourcePath="docs\html\classspec__tree.html" SelfReg="false"/>
+    <ROW File="classspec__treemembers.html" Component_="about__dialog_8h.html" FileName="CLAS~146.HTM|classspec__tree-members.html" Attributes="0" SourcePath="docs\html\classspec__tree-members.html" SelfReg="false"/>
+    <ROW File="classspec__tree.html" Component_="about__dialog_8h.html" FileName="CLAS~147.HTM|classspec__tree.html" Attributes="0" SourcePath="docs\html\classspec__tree.html" SelfReg="false"/>
     <ROW File="classspec__tree.js" Component_="about__dialog_8h.html" FileName="CLASSS~6.JS|classspec__tree.js" Attributes="0" SourcePath="docs\html\classspec__tree.js" SelfReg="false"/>
     <ROW File="classspec__tree.png" Component_="about__dialog_8h.html" FileName="CLASSS~4.PNG|classspec__tree.png" Attributes="0" SourcePath="docs\html\classspec__tree.png" SelfReg="false"/>
-    <ROW File="classstatusmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~146.HTM|classstatus-members.html" Attributes="0" SourcePath="docs\html\classstatus-members.html" SelfReg="false"/>
-    <ROW File="classstatus.html" Component_="about__dialog_8h.html" FileName="CLAS~147.HTM|classstatus.html" Attributes="0" SourcePath="docs\html\classstatus.html" SelfReg="false"/>
+    <ROW File="classstatusmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~148.HTM|classstatus-members.html" Attributes="0" SourcePath="docs\html\classstatus-members.html" SelfReg="false"/>
+    <ROW File="classstatus.html" Component_="about__dialog_8h.html" FileName="CLAS~149.HTM|classstatus.html" Attributes="0" SourcePath="docs\html\classstatus.html" SelfReg="false"/>
     <ROW File="classstatus.js" Component_="about__dialog_8h.html" FileName="CLASSS~7.JS|classstatus.js" Attributes="0" SourcePath="docs\html\classstatus.js" SelfReg="false"/>
-    <ROW File="classstn__datamembers.html" Component_="about__dialog_8h.html" FileName="CLAS~148.HTM|classstn__data-members.html" Attributes="0" SourcePath="docs\html\classstn__data-members.html" SelfReg="false"/>
-    <ROW File="classstn__data.html" Component_="about__dialog_8h.html" FileName="CLAS~149.HTM|classstn__data.html" Attributes="0" SourcePath="docs\html\classstn__data.html" SelfReg="false"/>
+    <ROW File="classstn__datamembers.html" Component_="about__dialog_8h.html" FileName="CLAS~150.HTM|classstn__data-members.html" Attributes="0" SourcePath="docs\html\classstn__data-members.html" SelfReg="false"/>
+    <ROW File="classstn__data.html" Component_="about__dialog_8h.html" FileName="CLAS~151.HTM|classstn__data.html" Attributes="0" SourcePath="docs\html\classstn__data.html" SelfReg="false"/>
     <ROW File="classstn__data.js" Component_="about__dialog_8h.html" FileName="CLASSS~8.JS|classstn__data.js" Attributes="0" SourcePath="docs\html\classstn__data.js" SelfReg="false"/>
-    <ROW File="classstn__dialogmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~150.HTM|classstn__dialog-members.html" Attributes="0" SourcePath="docs\html\classstn__dialog-members.html" SelfReg="false"/>
-    <ROW File="classstn__dialog.html" Component_="about__dialog_8h.html" FileName="CLAS~151.HTM|classstn__dialog.html" Attributes="0" SourcePath="docs\html\classstn__dialog.html" SelfReg="false"/>
+    <ROW File="classstn__dialogmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~152.HTM|classstn__dialog-members.html" Attributes="0" SourcePath="docs\html\classstn__dialog-members.html" SelfReg="false"/>
+    <ROW File="classstn__dialog.html" Component_="about__dialog_8h.html" FileName="CLAS~153.HTM|classstn__dialog.html" Attributes="0" SourcePath="docs\html\classstn__dialog.html" SelfReg="false"/>
     <ROW File="classstn__dialog.js" Component_="about__dialog_8h.html" FileName="CLASSS~9.JS|classstn__dialog.js" Attributes="0" SourcePath="docs\html\classstn__dialog.js" SelfReg="false"/>
     <ROW File="classstn__dialog.png" Component_="about__dialog_8h.html" FileName="CLASSS~5.PNG|classstn__dialog.png" Attributes="0" SourcePath="docs\html\classstn__dialog.png" SelfReg="false"/>
-    <ROW File="classstn__dialog_1_1single__tabmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~152.HTM|classstn__dialog_1_1single__tab-members.html" Attributes="0" SourcePath="docs\html\classstn__dialog_1_1single__tab-members.html" SelfReg="false"/>
-    <ROW File="classstn__dialog_1_1single__tab.html" Component_="about__dialog_8h.html" FileName="CLAS~153.HTM|classstn__dialog_1_1single__tab.html" Attributes="0" SourcePath="docs\html\classstn__dialog_1_1single__tab.html" SelfReg="false"/>
+    <ROW File="classstn__dialog_1_1single__tabmembers.html" Component_="about__dialog_8h.html" FileName="CLAS~154.HTM|classstn__dialog_1_1single__tab-members.html" Attributes="0" SourcePath="docs\html\classstn__dialog_1_1single__tab-members.html" SelfReg="false"/>
+    <ROW File="classstn__dialog_1_1single__tab.html" Component_="about__dialog_8h.html" FileName="CLAS~155.HTM|classstn__dialog_1_1single__tab.html" Attributes="0" SourcePath="docs\html\classstn__dialog_1_1single__tab.html" SelfReg="false"/>
     <ROW File="classstn__dialog_1_1single__tab.js" Component_="about__dialog_8h.html" FileName="CLASS~53.JS|classstn__dialog_1_1single__tab.js" Attributes="0" SourcePath="docs\html\classstn__dialog_1_1single__tab.js" SelfReg="false"/>
     <ROW File="classstn__dialog_1_1single__tab.png" Component_="about__dialog_8h.html" FileName="CLASSS~6.PNG|classstn__dialog_1_1single__tab.png" Attributes="0" SourcePath="docs\html\classstn__dialog_1_1single__tab.png" SelfReg="false"/>
-    <ROW File="classstn__readermembers.html" Component_="about__dialog_8h.html" FileName="CLAS~154.HTM|classstn__reader-members.html" Attributes="0" SourcePath="docs\html\classstn__reader-members.html" SelfReg="false"/>
-    <ROW File="classstn__reader.html" Component_="about__dialog_8h.html" FileName="CLAS~155.HTM|classstn__reader.html" Attributes="0" SourcePath="docs\html\classstn__reader.html" SelfReg="false"/>
+    <ROW File="classstn__readermembers.html" Component_="about__dialog_8h.html" FileName="CLAS~156.HTM|classstn__reader-members.html" Attributes="0" SourcePath="docs\html\classstn__reader-members.html" SelfReg="false"/>
+    <ROW File="classstn__reader.html" Component_="about__dialog_8h.html" FileName="CLAS~157.HTM|classstn__reader.html" Attributes="0" SourcePath="docs\html\classstn__reader.html" SelfReg="false"/>
     <ROW File="classstn__reader.js" Component_="about__dialog_8h.html" FileName="CLASS~54.JS|classstn__reader.js" Attributes="0" SourcePath="docs\html\classstn__reader.js" SelfReg="false"/>
     <ROW File="classstn__reader.png" Component_="about__dialog_8h.html" FileName="CLASSS~7.PNG|classstn__reader.png" Attributes="0" SourcePath="docs\html\classstn__reader.png" SelfReg="false"/>
-    <ROW File="classstn__writermembers.html" Component_="about__dialog_8h.html" FileName="CLAS~156.HTM|classstn__writer-members.html" Attributes="0" SourcePath="docs\html\classstn__writer-members.html" SelfReg="false"/>
-    <ROW File="classstn__writer.html" Component_="about__dialog_8h.html" FileName="CLAS~157.HTM|classstn__writer.html" Attributes="0" SourcePath="docs\html\classstn__writer.html" SelfReg="false"/>
+    <ROW File="classstn__writermembers.html" Component_="about__dialog_8h.html" FileName="CLAS~158.HTM|classstn__writer-members.html" Attributes="0" SourcePath="docs\html\classstn__writer-members.html" SelfReg="false"/>
+    <ROW File="classstn__writer.html" Component_="about__dialog_8h.html" FileName="CLAS~159.HTM|classstn__writer.html" Attributes="0" SourcePath="docs\html\classstn__writer.html" SelfReg="false"/>
     <ROW File="classstn__writer.js" Component_="about__dialog_8h.html" FileName="CLASS~55.JS|classstn__writer.js" Attributes="0" SourcePath="docs\html\classstn__writer.js" SelfReg="false"/>
     <ROW File="classstn__writer.png" Component_="about__dialog_8h.html" FileName="CLASSS~8.PNG|classstn__writer.png" Attributes="0" SourcePath="docs\html\classstn__writer.png" SelfReg="false"/>
     <ROW File="classtabbed__formsmembers.html" Component_="about__dialog_8h.html" FileName="CLASST~1.HTM|classtabbed__forms-members.html" Attributes="0" SourcePath="docs\html\classtabbed__forms-members.html" SelfReg="false"/>
@@ -1152,6 +1156,9 @@
     <ROW File="import__data_8h_source.html" Component_="about__dialog_8h.html" FileName="IMPORT~2.HTM|import__data_8h_source.html" Attributes="0" SourcePath="docs\html\import__data_8h_source.html" SelfReg="false"/>
     <ROW File="index.html_1" Component_="about__dialog_8h.html" FileName="INDEX~1.HTM|index.html" Attributes="0" SourcePath="docs\html\index.html" SelfReg="false"/>
     <ROW File="index.js_1" Component_="about__dialog_8h.html" FileName="index.js" Attributes="0" SourcePath="docs\html\index.js" SelfReg="false"/>
+    <ROW File="init__dialog_8h.html" Component_="about__dialog_8h.html" FileName="INIT__~1.HTM|init__dialog_8h.html" Attributes="0" SourcePath="docs\html\init__dialog_8h.html" SelfReg="false"/>
+    <ROW File="init__dialog_8h.js" Component_="about__dialog_8h.html" FileName="INIT__~1.JS|init__dialog_8h.js" Attributes="0" SourcePath="docs\html\init__dialog_8h.js" SelfReg="false"/>
+    <ROW File="init__dialog_8h_source.html" Component_="about__dialog_8h.html" FileName="INIT__~2.HTM|init__dialog_8h_source.html" Attributes="0" SourcePath="docs\html\init__dialog_8h_source.html" SelfReg="false"/>
     <ROW File="input__hierch_8h.html" Component_="about__dialog_8h.html" FileName="INPUT_~1.HTM|input__hierch_8h.html" Attributes="0" SourcePath="docs\html\input__hierch_8h.html" SelfReg="false"/>
     <ROW File="input__hierch_8h.js" Component_="about__dialog_8h.html" FileName="INPUT_~1.JS|input__hierch_8h.js" Attributes="0" SourcePath="docs\html\input__hierch_8h.js" SelfReg="false"/>
     <ROW File="input__hierch_8h_source.html" Component_="about__dialog_8h.html" FileName="INPUT_~2.HTM|input__hierch_8h_source.html" Attributes="0" SourcePath="docs\html\input__hierch_8h_source.html" SelfReg="false"/>
@@ -1713,27 +1720,30 @@
     <ROW File="structspec__datasetmembers.html" Component_="about__dialog_8h.html" FileName="STRUC~91.HTM|structspec__dataset-members.html" Attributes="0" SourcePath="docs\html\structspec__dataset-members.html" SelfReg="false"/>
     <ROW File="structspec__dataset.html" Component_="about__dialog_8h.html" FileName="STRUC~92.HTM|structspec__dataset.html" Attributes="0" SourcePath="docs\html\structspec__dataset.html" SelfReg="false"/>
     <ROW File="structspec__dataset.js" Component_="about__dialog_8h.html" FileName="STRUC~46.JS|structspec__dataset.js" Attributes="0" SourcePath="docs\html\structspec__dataset.js" SelfReg="false"/>
-    <ROW File="structtabbed__forms_1_1view__ptrsmembers.html" Component_="about__dialog_8h.html" FileName="STRUC~93.HTM|structtabbed__forms_1_1view__ptrs-members.html" Attributes="0" SourcePath="docs\html\structtabbed__forms_1_1view__ptrs-members.html" SelfReg="false"/>
-    <ROW File="structtabbed__forms_1_1view__ptrs.html" Component_="about__dialog_8h.html" FileName="STRUC~94.HTM|structtabbed__forms_1_1view__ptrs.html" Attributes="0" SourcePath="docs\html\structtabbed__forms_1_1view__ptrs.html" SelfReg="false"/>
-    <ROW File="structtabbed__forms_1_1view__ptrs.js" Component_="about__dialog_8h.html" FileName="STRUC~47.JS|structtabbed__forms_1_1view__ptrs.js" Attributes="0" SourcePath="docs\html\structtabbed__forms_1_1view__ptrs.js" SelfReg="false"/>
-    <ROW File="structurl__handler_1_1field__pairmembers.html" Component_="about__dialog_8h.html" FileName="STRUC~95.HTM|structurl__handler_1_1field__pair-members.html" Attributes="0" SourcePath="docs\html\structurl__handler_1_1field__pair-members.html" SelfReg="false"/>
-    <ROW File="structurl__handler_1_1field__pair.html" Component_="about__dialog_8h.html" FileName="STRUC~96.HTM|structurl__handler_1_1field__pair.html" Attributes="0" SourcePath="docs\html\structurl__handler_1_1field__pair.html" SelfReg="false"/>
-    <ROW File="structurl__handler_1_1field__pair.js" Component_="about__dialog_8h.html" FileName="STRUC~48.JS|structurl__handler_1_1field__pair.js" Attributes="0" SourcePath="docs\html\structurl__handler_1_1field__pair.js" SelfReg="false"/>
-    <ROW File="structwsjtx__handler_1_1decoded__msgmembers.html" Component_="about__dialog_8h.html" FileName="STRUC~97.HTM|structwsjtx__handler_1_1decoded__msg-members.html" Attributes="0" SourcePath="docs\html\structwsjtx__handler_1_1decoded__msg-members.html" SelfReg="false"/>
-    <ROW File="structwsjtx__handler_1_1decoded__msg.html" Component_="about__dialog_8h.html" FileName="STRUC~98.HTM|structwsjtx__handler_1_1decoded__msg.html" Attributes="0" SourcePath="docs\html\structwsjtx__handler_1_1decoded__msg.html" SelfReg="false"/>
-    <ROW File="structwsjtx__handler_1_1decoded__msg.js" Component_="about__dialog_8h.html" FileName="STRUC~49.JS|structwsjtx__handler_1_1decoded__msg.js" Attributes="0" SourcePath="docs\html\structwsjtx__handler_1_1decoded__msg.js" SelfReg="false"/>
-    <ROW File="structwsjtx__handler_1_1decode__dgmembers.html" Component_="about__dialog_8h.html" FileName="STRUC~99.HTM|structwsjtx__handler_1_1decode__dg-members.html" Attributes="0" SourcePath="docs\html\structwsjtx__handler_1_1decode__dg-members.html" SelfReg="false"/>
-    <ROW File="structwsjtx__handler_1_1decode__dg.html" Component_="about__dialog_8h.html" FileName="STRU~100.HTM|structwsjtx__handler_1_1decode__dg.html" Attributes="0" SourcePath="docs\html\structwsjtx__handler_1_1decode__dg.html" SelfReg="false"/>
-    <ROW File="structwsjtx__handler_1_1decode__dg.js" Component_="about__dialog_8h.html" FileName="STRUC~50.JS|structwsjtx__handler_1_1decode__dg.js" Attributes="0" SourcePath="docs\html\structwsjtx__handler_1_1decode__dg.js" SelfReg="false"/>
-    <ROW File="structwsjtx__handler_1_1status__dgmembers.html" Component_="about__dialog_8h.html" FileName="STRU~101.HTM|structwsjtx__handler_1_1status__dg-members.html" Attributes="0" SourcePath="docs\html\structwsjtx__handler_1_1status__dg-members.html" SelfReg="false"/>
-    <ROW File="structwsjtx__handler_1_1status__dg.html" Component_="about__dialog_8h.html" FileName="STRU~102.HTM|structwsjtx__handler_1_1status__dg.html" Attributes="0" SourcePath="docs\html\structwsjtx__handler_1_1status__dg.html" SelfReg="false"/>
-    <ROW File="structwsjtx__handler_1_1status__dg.js" Component_="about__dialog_8h.html" FileName="STRUC~51.JS|structwsjtx__handler_1_1status__dg.js" Attributes="0" SourcePath="docs\html\structwsjtx__handler_1_1status__dg.js" SelfReg="false"/>
-    <ROW File="structwx__reportmembers.html" Component_="about__dialog_8h.html" FileName="STRU~103.HTM|structwx__report-members.html" Attributes="0" SourcePath="docs\html\structwx__report-members.html" SelfReg="false"/>
-    <ROW File="structwx__report.html" Component_="about__dialog_8h.html" FileName="STRU~104.HTM|structwx__report.html" Attributes="0" SourcePath="docs\html\structwx__report.html" SelfReg="false"/>
-    <ROW File="structwx__report.js" Component_="about__dialog_8h.html" FileName="STRUC~52.JS|structwx__report.js" Attributes="0" SourcePath="docs\html\structwx__report.js" SelfReg="false"/>
-    <ROW File="structxml__wreader_1_1methodsmembers.html" Component_="about__dialog_8h.html" FileName="STRU~105.HTM|structxml__wreader_1_1methods-members.html" Attributes="0" SourcePath="docs\html\structxml__wreader_1_1methods-members.html" SelfReg="false"/>
-    <ROW File="structxml__wreader_1_1methods.html" Component_="about__dialog_8h.html" FileName="STRU~106.HTM|structxml__wreader_1_1methods.html" Attributes="0" SourcePath="docs\html\structxml__wreader_1_1methods.html" SelfReg="false"/>
-    <ROW File="structxml__wreader_1_1methods.js" Component_="about__dialog_8h.html" FileName="STRUC~53.JS|structxml__wreader_1_1methods.js" Attributes="0" SourcePath="docs\html\structxml__wreader_1_1methods.js" SelfReg="false"/>
+    <ROW File="structstn__defaultmembers.html" Component_="about__dialog_8h.html" FileName="STRUC~93.HTM|structstn__default-members.html" Attributes="0" SourcePath="docs\html\structstn__default-members.html" SelfReg="false"/>
+    <ROW File="structstn__default.html" Component_="about__dialog_8h.html" FileName="STRUC~94.HTM|structstn__default.html" Attributes="0" SourcePath="docs\html\structstn__default.html" SelfReg="false"/>
+    <ROW File="structstn__default.js" Component_="about__dialog_8h.html" FileName="STRUC~47.JS|structstn__default.js" Attributes="0" SourcePath="docs\html\structstn__default.js" SelfReg="false"/>
+    <ROW File="structtabbed__forms_1_1view__ptrsmembers.html" Component_="about__dialog_8h.html" FileName="STRUC~95.HTM|structtabbed__forms_1_1view__ptrs-members.html" Attributes="0" SourcePath="docs\html\structtabbed__forms_1_1view__ptrs-members.html" SelfReg="false"/>
+    <ROW File="structtabbed__forms_1_1view__ptrs.html" Component_="about__dialog_8h.html" FileName="STRUC~96.HTM|structtabbed__forms_1_1view__ptrs.html" Attributes="0" SourcePath="docs\html\structtabbed__forms_1_1view__ptrs.html" SelfReg="false"/>
+    <ROW File="structtabbed__forms_1_1view__ptrs.js" Component_="about__dialog_8h.html" FileName="STRUC~48.JS|structtabbed__forms_1_1view__ptrs.js" Attributes="0" SourcePath="docs\html\structtabbed__forms_1_1view__ptrs.js" SelfReg="false"/>
+    <ROW File="structurl__handler_1_1field__pairmembers.html" Component_="about__dialog_8h.html" FileName="STRUC~97.HTM|structurl__handler_1_1field__pair-members.html" Attributes="0" SourcePath="docs\html\structurl__handler_1_1field__pair-members.html" SelfReg="false"/>
+    <ROW File="structurl__handler_1_1field__pair.html" Component_="about__dialog_8h.html" FileName="STRUC~98.HTM|structurl__handler_1_1field__pair.html" Attributes="0" SourcePath="docs\html\structurl__handler_1_1field__pair.html" SelfReg="false"/>
+    <ROW File="structurl__handler_1_1field__pair.js" Component_="about__dialog_8h.html" FileName="STRUC~49.JS|structurl__handler_1_1field__pair.js" Attributes="0" SourcePath="docs\html\structurl__handler_1_1field__pair.js" SelfReg="false"/>
+    <ROW File="structwsjtx__handler_1_1decoded__msgmembers.html" Component_="about__dialog_8h.html" FileName="STRUC~99.HTM|structwsjtx__handler_1_1decoded__msg-members.html" Attributes="0" SourcePath="docs\html\structwsjtx__handler_1_1decoded__msg-members.html" SelfReg="false"/>
+    <ROW File="structwsjtx__handler_1_1decoded__msg.html" Component_="about__dialog_8h.html" FileName="STRU~100.HTM|structwsjtx__handler_1_1decoded__msg.html" Attributes="0" SourcePath="docs\html\structwsjtx__handler_1_1decoded__msg.html" SelfReg="false"/>
+    <ROW File="structwsjtx__handler_1_1decoded__msg.js" Component_="about__dialog_8h.html" FileName="STRUC~50.JS|structwsjtx__handler_1_1decoded__msg.js" Attributes="0" SourcePath="docs\html\structwsjtx__handler_1_1decoded__msg.js" SelfReg="false"/>
+    <ROW File="structwsjtx__handler_1_1decode__dgmembers.html" Component_="about__dialog_8h.html" FileName="STRU~101.HTM|structwsjtx__handler_1_1decode__dg-members.html" Attributes="0" SourcePath="docs\html\structwsjtx__handler_1_1decode__dg-members.html" SelfReg="false"/>
+    <ROW File="structwsjtx__handler_1_1decode__dg.html" Component_="about__dialog_8h.html" FileName="STRU~102.HTM|structwsjtx__handler_1_1decode__dg.html" Attributes="0" SourcePath="docs\html\structwsjtx__handler_1_1decode__dg.html" SelfReg="false"/>
+    <ROW File="structwsjtx__handler_1_1decode__dg.js" Component_="about__dialog_8h.html" FileName="STRUC~51.JS|structwsjtx__handler_1_1decode__dg.js" Attributes="0" SourcePath="docs\html\structwsjtx__handler_1_1decode__dg.js" SelfReg="false"/>
+    <ROW File="structwsjtx__handler_1_1status__dgmembers.html" Component_="about__dialog_8h.html" FileName="STRU~103.HTM|structwsjtx__handler_1_1status__dg-members.html" Attributes="0" SourcePath="docs\html\structwsjtx__handler_1_1status__dg-members.html" SelfReg="false"/>
+    <ROW File="structwsjtx__handler_1_1status__dg.html" Component_="about__dialog_8h.html" FileName="STRU~104.HTM|structwsjtx__handler_1_1status__dg.html" Attributes="0" SourcePath="docs\html\structwsjtx__handler_1_1status__dg.html" SelfReg="false"/>
+    <ROW File="structwsjtx__handler_1_1status__dg.js" Component_="about__dialog_8h.html" FileName="STRUC~52.JS|structwsjtx__handler_1_1status__dg.js" Attributes="0" SourcePath="docs\html\structwsjtx__handler_1_1status__dg.js" SelfReg="false"/>
+    <ROW File="structwx__reportmembers.html" Component_="about__dialog_8h.html" FileName="STRU~105.HTM|structwx__report-members.html" Attributes="0" SourcePath="docs\html\structwx__report-members.html" SelfReg="false"/>
+    <ROW File="structwx__report.html" Component_="about__dialog_8h.html" FileName="STRU~106.HTM|structwx__report.html" Attributes="0" SourcePath="docs\html\structwx__report.html" SelfReg="false"/>
+    <ROW File="structwx__report.js" Component_="about__dialog_8h.html" FileName="STRUC~53.JS|structwx__report.js" Attributes="0" SourcePath="docs\html\structwx__report.js" SelfReg="false"/>
+    <ROW File="structxml__wreader_1_1methodsmembers.html" Component_="about__dialog_8h.html" FileName="STRU~107.HTM|structxml__wreader_1_1methods-members.html" Attributes="0" SourcePath="docs\html\structxml__wreader_1_1methods-members.html" SelfReg="false"/>
+    <ROW File="structxml__wreader_1_1methods.html" Component_="about__dialog_8h.html" FileName="STRU~108.HTM|structxml__wreader_1_1methods.html" Attributes="0" SourcePath="docs\html\structxml__wreader_1_1methods.html" SelfReg="false"/>
+    <ROW File="structxml__wreader_1_1methods.js" Component_="about__dialog_8h.html" FileName="STRUC~54.JS|structxml__wreader_1_1methods.js" Attributes="0" SourcePath="docs\html\structxml__wreader_1_1methods.js" SelfReg="false"/>
     <ROW File="symbols_8h.html" Component_="about__dialog_8h.html" FileName="SYMBOL~1.HTM|symbols_8h.html" Attributes="0" SourcePath="docs\html\symbols_8h.html" SelfReg="false"/>
     <ROW File="symbols_8h.js" Component_="about__dialog_8h.html" FileName="SYMBOL~1.JS|symbols_8h.js" Attributes="0" SourcePath="docs\html\symbols_8h.js" SelfReg="false"/>
     <ROW File="symbols_8h_source.html" Component_="about__dialog_8h.html" FileName="SYMBOL~2.HTM|symbols_8h_source.html" Attributes="0" SourcePath="docs\html\symbols_8h_source.html" SelfReg="false"/>
@@ -1990,7 +2000,7 @@
     <ROW File="_revision.js" Component_="adding.html" FileName="_REVIS~1.JS|_revision.js" Attributes="0" SourcePath="userguide\html\_revision.js" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
-    <ROW BuildKey="x64_Release" BuildName="x64_Release" BuildOrder="1" BuildType="0" Languages="en_GB" InstallationType="4" SummInfoMetadata="Page Count:450" UseLargeSchema="true" MsiPackageType="x64"/>
+    <ROW BuildKey="x64_Release" BuildName="x64_Release" BuildOrder="1" BuildType="0" PackageFileName="ZZALIB-3.6.7-beta4" Languages="en_GB" InstallationType="4" SummInfoMetadata="Page Count:450" UseLargeSchema="true" MsiPackageType="x64"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
     <ROW Path="&lt;AI_DICTS&gt;ui.ail"/>
@@ -2080,10 +2090,10 @@
     <ROW Feature_="MainFeature" Component_="libgcc_s_seh1.dll"/>
     <ROW Feature_="MainFeature" Component_="adding_1.png"/>
     <ROW Feature_="MainFeature" Component_="docs"/>
-    <ROW Feature_="MainFeature" Component_="adding.html"/>
-    <ROW Feature_="MainFeature" Component_="all_0.js"/>
     <ROW Feature_="MainFeature" Component_="about__dialog_8h.html"/>
     <ROW Feature_="MainFeature" Component_="all_0.js_1"/>
+    <ROW Feature_="MainFeature" Component_="adding.html"/>
+    <ROW Feature_="MainFeature" Component_="all_0.js"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
     <ROW Action="AI_DOWNGRADE" Condition="AI_NEWERPRODUCTFOUND AND (UILevel &lt;&gt; 5)" Sequence="210"/>
