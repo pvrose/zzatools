@@ -130,7 +130,7 @@ void stn_data::load_data() {
 	char msg[128];
 	status_->misc_status(ST_NOTE, "STN DATA: Loading operation data");
 	bool loaded = load_json();
-	if (loaded_stn_defaults_.type == NOT_USED && (
+	if (loaded_stn_defaults_.callsign.length() ==0 && (
 		station_defaults_.type == NOT_USED || station_defaults_.callsign.length() == 0)) {
 		status_->misc_status(ST_ERROR, "STN DATA: We have no default callsign etc.");
 		// First use - open dialog to get station defaults.
@@ -139,9 +139,12 @@ void stn_data::load_data() {
 		station_defaults_ = dlg->get_default();
 
 	}
-	else if (loaded_stn_defaults_.type != NOT_USED && station_defaults_.type == NOT_USED) {
-		// Use saved station defaults
+	else if (loaded_stn_defaults_.callsign.length() && (
+		station_defaults_.type == NOT_USED || station_defaults_.callsign.length() == 0)) {
+		stn_type save_type = station_defaults_.type;
 		station_defaults_ = loaded_stn_defaults_;
+		station_defaults_.type = save_type;
+	
 		status_->misc_status(ST_NOTE, "STN DATA: Using saved station defaults");
 	}
 	else {

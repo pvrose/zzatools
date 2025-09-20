@@ -314,6 +314,9 @@ void save_switches();
 //! \return true if file was opened successfully, otherwise false.
 bool open_settings();
 
+//! Check whether system or user config (club or individual).
+void check_settings();
+
 //! Initialise hamlib
 void load_rig_data();
 
@@ -334,9 +337,6 @@ void set_recent_file(std::string filename);
 
 //! Open the user-guide at the specified page &lt;\a file&gt;.html.
 void open_html(const char* file);
-
-//! Save club settings
-void save_station_settings();
 
 //! Flag to prevent more than one closure process at the same time.
 bool closing_ = false;

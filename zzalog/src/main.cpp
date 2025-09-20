@@ -550,7 +550,7 @@ void add_book(char* arg) {
 			std::string log_file = get_file(arg);
 
 
-			if (!new_installation_ && !book_->load_data(log_file)) {
+			if (!book_->load_data(log_file)) {
 				Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
 				Fl_Preferences backup_settings(settings, "Backup");
 				char * temp;
@@ -887,10 +887,9 @@ void save_switches() {
 	switch_settings.set("Auto Save QSOs", (bool)AUTO_SAVE);
 }
 
-// Open preferences and save them - it is possible to corrupt the settings
-// file if an exception occurs while they are being saved.
-bool open_settings() {
-	// Open the settings file 
+// Open system settings to see if it's a club or individual installation
+void check_settings() {
+	// Open the system settings file 
 	Fl_Preferences sys_settings(Fl_Preferences::SYSTEM_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 
 	char stemp[128];
@@ -915,6 +914,7 @@ bool open_settings() {
 		while (dlg->visible()) Fl::check();
 		station_defaults_ = dlg->get_default();
 		sys_settings.set("Installation Type", (int)station_defaults_.type);
+		sys_settings.flush();
 	}
 
 	switch (station_defaults_.type) {
@@ -927,6 +927,13 @@ bool open_settings() {
 		prefs_mode_ = Fl_Preferences::USER_L;
 		break;
 	}
+
+}
+
+// Open preferences and save them - it is possible to corrupt the settings
+// file if an exception occurs while they are being saved.
+bool open_settings() {
+	char stemp[128];
 
 	// SAve the staion defaults
 		// Get club details from settings
@@ -995,17 +1002,16 @@ void save_station_settings() {
 		init_dialog* dlg = new init_dialog();
 		while (dlg->visible()) Fl::check();
 		station_defaults_ = dlg->get_default();
+		if (station_defaults_.type == CLUB) {
+			station_settings.set("Club Name", station_defaults_.name.c_str());
+		}
+		station_settings.set("Callsign", station_defaults_.callsign.c_str());
+		station_settings.set("Location", station_defaults_.location.c_str());
+		if (station_defaults_.type != CLUB) {
+			station_settings.set("Operator", station_defaults_.name.c_str());
+		}
+		settings.flush();
 	}
-	if (station_defaults_.type == CLUB) {
-		station_settings.set("Club Name", station_defaults_.name.c_str());
-	}
-	station_settings.set("Callsign", station_defaults_.callsign.c_str());
-	station_settings.set("Location", station_defaults_.location.c_str());
-	if (station_defaults_.type != CLUB) {
-		station_settings.set("Operator", station_defaults_.name.c_str());
-	}
-	settings.flush();
-
 }
 
 // Load all the hamlib data, and then the rig connection details
@@ -1036,6 +1042,7 @@ int main(int argc, char** argv)
 	Fl::args(argc, argv, i, cb_args);
 	customise_fltk();
 	// Create the settings before anything else 
+	check_settings();
 	if (!open_settings()) {
 		return 255;
 	}
