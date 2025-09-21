@@ -5,7 +5,8 @@ as GMT or Zulu) and in local time as defined by the operating system. To select 
 click on the time display. \note Time is ALWAYS 
 logged in UTC regardless of the timezone displayed here.
 
-<IMG SRC="../images/qso_clocks_1.png">
+\image html qso_clocks_1.png
+\image latex qso_clocks_1.png
 
 How local time is named is dependent on the operating system.
 

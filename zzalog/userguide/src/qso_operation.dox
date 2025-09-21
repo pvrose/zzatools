@@ -5,7 +5,8 @@
 This provides the information for the location of the operation, the operator 
 and the callsign being used.
 
-<IMG SRC="../images/qso_operation_1.png">
+\image html qso_operation_1.png
+\image latex qso_operation_1.png
 
 \section features_11 Features
 The same features are used for the three attributes. 
@@ -18,20 +19,23 @@ the details currently entered.
 
 \subsection qth QTH
 
-<IMG SRC="../images/qso_operation_2.png">
+\image html qso_operation_2.png
+\image latex qso_operation_2.png
 
 The QTH (or location) attribute provides a quick way of adding location information 
 such as MY_CITY, MY_GRIDSQUARE etc to the record.
 
 \subsection operator Operator
 
-<IMG SRC="../images/qso_operation_3.png">
+\image html qso_operation_3.png
+\image latex qso_operation_3.png
 
 The operator attribute allows the addition of MY_NAME and OPERATOR fields to the record.
 
 \subsection callsign Station Callsign
 
-<IMG SRC="../images/qso_operation_4.png">
+\image html qso_operation_4.png
+\image latex qso_operation_4.png
 
 This allows the STATION_CALLSIGN field to be specified if the logbook is being used 
 for operations using different callsigns - eg different RSIs within the UK or /P operation.

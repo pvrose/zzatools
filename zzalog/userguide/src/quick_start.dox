@@ -9,7 +9,8 @@ terminal by advanced users. On Linux, ZZALOG may be started by typing
 On starting, a banner window is
 displayed:
 
-<IMG SRC="../images/UserGuide_html_414f707a.png">
+\image html UserGuide_html_414f707a.png
+\image latex UserGuide_html_414f707a.png
 
 The above image shows the
 progress of the application as it is loading all the data needed to
@@ -25,7 +26,8 @@ Once ZZALOG has loaded then two
 or three more windows are displayed. Firstly there is a log-book
 style view of the log data:
 
-<IMG SRC="../images/UserGuide_html_4a79518e.png">
+\image html UserGuide_html_4a79518e.png
+\image latex UserGuide_html_4a79518e.png
 
 In the above image
 a page of the log-book showing the most recent entries is
@@ -64,14 +66,16 @@ See \ref qso_buttons.
 More details for each pane is
 provided in the links above.
 
-<IMG SRC="../images/qso_manager_1.png">
+\image html qso_manager_1.png
+\image latex qso_manager_1.png
 
 Finally, if ZZALOG is so
 configured, a third window is displayed. This is used
 for a club operation where individual log-in
 is required:
 
-<IMG SRC="../images/init_5.png">
+\image html init_5.png
+\image latex init_5.png
 
 In the above image
 the user is being asked to identify themselves. The field labeled

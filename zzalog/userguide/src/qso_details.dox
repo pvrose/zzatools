@@ -2,7 +2,8 @@
 
 This pane shows previous contacts with the callsign of the selected record.
 
-<IMG SRC="../images/qso_details_1.png">
+\image html qso_details_1.png
+\image latex qso_details_1.png
 
 The label of the pane, circled red in the image below, indicates whether there has been any 
 previous contact. A cross indicates there has been no previous contact. A bare tick indicates
@@ -18,6 +19,7 @@ The data circled in green shows the previous contacts with this call. Informatio
 station or the callsign used by the logging station differs in a slight way. This
 is likely to be use of /P or /A or a different RSI (for UK Stations).
 
-<IMG SRC="../images/qso_details_2.png">
+\image html qso_details_2.png
+\image latex qso_details_2.png
 
 */

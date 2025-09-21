@@ -4,7 +4,8 @@
 Provides access to general application functions. The menu bar is situated at the
 top of the Main Window.
 
-<IMG SRC="../images/menu_1.png">
+\image html menu_1.png
+\image latex menu_1.png
 
 \section features_2 Features
 \subsection Menu Items

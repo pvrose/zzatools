@@ -34,7 +34,8 @@ at this location. If the user clicks the check box "Update from call" a drop-dow
 of callsigns current used in the log is presented. If the user selects a callsign then the following
 fields: Country, DXCC, CQ Zone and Continent are entered automatically.
 
-<IMG SRC="./images/stn_dialog_1.png">
+\image html stn_dialog_1.png
+\image latex stn_dialog_1.png
 
 \section sd_oper Specifying an Operator
 
@@ -48,7 +49,8 @@ The user can then enter as much or as little information about the location in t
 - <B>Name</B> The name of the operator as can be exchanged in the QSO (QSO field MY_NAME).
 - <B>Callsign</B> The callsign of the operator (QSO field OPERATOR).
 
-<IMG SRC="../images/stn_dialog_2.png">
+\image html stn_dialog_2.png
+\image latex stn_dialog_2.png
 
 \section sd_call Specifying the station callsign
 
@@ -58,7 +60,8 @@ which share the log-book.
 The user can enter a callsign into the control labeled "Call", or select a call from the drop-down
 list. 
 
-<IMG SRC="../images/stn_dialog_3.png">
+\image html stn_dialog_3.png
+\image latex stn_dialog_3.png
 
 */
 

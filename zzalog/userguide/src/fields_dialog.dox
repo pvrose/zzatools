@@ -5,7 +5,8 @@ instances of \ref log_table log table. It also includes the fields used
 in the various \ref contest_scorer contest algorithms and the \ref qso_entry
 QSO entry view.
 
-<IMG SRC="../images/fields_dialog_1.png">
+\image html fields_dialog_1.png
+\image latex fields_dialog_1.png
 
 \section fd_modify Modifying an existing set of fields
 

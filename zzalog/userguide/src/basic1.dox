@@ -11,7 +11,8 @@ obtained from the rig: frequency, mode and transmit power.
 This page assumes that ZZALOG has already has the rig connection defined and the means of 
 launching any CAT control application (the script) specified. See \ref new_rig.
 
-<IMG SRC="../images/basic1_1.png">
+\image html basic1_1.png
+\image latex basic1_1.png
 
 ZZALOG will usually start with the previous rig selected, and if active will connect to it. 
 Select the tab for the rig you want to use,
@@ -23,7 +24,8 @@ external app after a period of time. If it doesn't, the clicking the "Connect" b
 will cause the rig to be connected. ZZALOG will then display information received from the 
 rig.
 
-<IMG SRC="../images/basic1_2.png">
+\image html basic1_2.png
+\image latex basic1_2.png
 
 \section b1_prepare Before the QSO
 
@@ -33,7 +35,8 @@ any callsigns to be reviewed before logging them. Type the call in the box besid
 (red arrow) and where the call is (blue) and whether it has beem worked before
 (green) is now shown.
 
-<IMG SRC="../images/basic1_3.png">
+\image html basic1_3.png
+\image latex basic1_3.png
 
 In this case the call UR3AHF is shown to be a Ukrainian call and has been worked before,
 although not on this band or mode.
@@ -77,7 +80,8 @@ do not follow the "rules". Examples are:
 
 \section b1_log_qso Logging the QSO
 
-<IMG SRC="../images/basic1_4.png">
+\image html basic1_4.png
+\image latex basic1_4.png
 
 When the QSO is started the QSO date and time fields are frozen (yellow) and the frequency,
 mode and transmit power (red) are read from the rig. Note, that these latter are continually 

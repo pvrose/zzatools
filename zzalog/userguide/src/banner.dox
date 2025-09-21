@@ -3,7 +3,8 @@
 \section description_8 Description
 Displays any status messages and progress reports output by ZZALOG.
 
-<IMG SRC="../images/banner_1.png">
+\image html banner_1.png
+\image latex banner_1.png
 
 \section features_8 Features
 This window comprises from top to bottom.
@@ -11,25 +12,29 @@ This window comprises from top to bottom.
 This displays the status messages output by ZZALOG that are at most of warning severity.
 Only the last message output is displayed here.
 
-<IMG SRC="../images/banner_2.png">
+\image html banner_2.png
+\image latex banner_2.png
 
 The second displays status messages that are of error severity or higher.
 Again only the last such message is output here.
 
-<IMG SRC="../images/banner_3.png">
+\image html banner_3.png
+\image latex banner_3.png
 
 The third comprises three items. Firstly a text output showing a progress message output by ZZALOG.
 Below this is a numeric representation of progress
 On the left is a graphical representation in the form of a clock dial, showing 
 proportion complete. The clock-dial is colour-coded indicating the activity being progressed.
 
-<IMG SRC="../images/banner_4.png">
+\image html banner_4.png
+\image latex banner_4.png
 
 \subsection full Displaying the whole report.
 Bottom left of the window is the button marked "Full"
 Clicking this toggles the display of the full status.
 
-<IMG SRC="../images/banner_5.png">
+\image html banner_5.png
+\image latex banner_5.png
 
 Messages are colour-coded according to severity.
 - <B>Blue</B> Lowest severity.

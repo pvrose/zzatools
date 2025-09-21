@@ -22,7 +22,8 @@ allows the user to override this.
 The ability to use the QSO_MSG field is provided. Different messages may be added for SWL
 and QSO QSL records.
 
-<IMG SRC="../images/web_dialog_1.png">
+\image html web_dialog_1.png
+\image latex web_dialog_1.png
 
 \section web_lotw Logbook of the World
 
@@ -37,7 +38,8 @@ ZZALOG remembers the last download date: the field "Last accessed"
 allows the user to override this.
 
 
-<IMG SRC="../images/web_dialog_2.png">
+\image html web_dialog_2.png
+\image latex web_dialog_2.png
 
 \section wrb_qrx QRZ.com
 
@@ -58,7 +60,8 @@ log-book. This key is typed into the "Key" field. ZZALOG remembers the last down
 the "Last Downloaded" field
 allows the user to override this.
 
-<IMG SRC="../images/web_dialog_3.png">
+\image html web_dialog_3.png
+\image latex web_dialog_3.png
 
 \section web_clublog Clublog.com
 
@@ -75,14 +78,16 @@ check box. This feature is also available in \ref qso_qsl.
 Clublog also provide the database of callsigns that ZZALOG uses. For this feature the API key
 enabling this is hard-coded within ZZALOG.
 
-<IMG SRC="../images/web_dialog_4.png">
+\image html web_dialog_4.png
+\image latex web_dialog_4.png
 
 \section web_network Log client addresses
 
 This tab allows the user to configure ZZALOG to act as a log-book server for the
 applications WSJT-X and FlDigi. See \ref qso_apps.
 
-<IMG SRC="../images/web_dialog_5.png">
+\image html web_dialog_5.png
+\image latex web_dialog_5.png
 
 ZZALOG listens to requests from WSJT-X. The address and port eneterd here should match that set
 in WSJT-X (see below). Note that other applications also make use of this feature. In this case 
@@ -90,14 +95,16 @@ rather than using the localhost address (127.0.0.1), a multicast address (such a
 be used. This allows more than one application to receive a data packet sent out on this port. 
 WSJT-X sends completed QSO records to ZZALOG for automatic logging.
 
-<IMG SRC="../images/web_dialog_7.png">
+\image html web_dialog_7.png
+\image latex web_dialog_7.png
 
 ZZALOG can emulate the application FlLog. This is an application which is part of the FlDigi
 suite of programs and is used by FlDigi to check worked-before status and log completed QSOs.
 The address and port that FlDigi uses appears to be hardwired as 127.0.0.1:8421. To enable
 FlDigi to use this, FlDigi must be told to use a log server - see below.
 
-<IMG SRC="../images/web_dialog_8.png">
+\image html web_dialog_8.png
+\image latex web_dialog_8.png
 
 \section web_email E-Mail server
 
@@ -105,7 +112,8 @@ ZZALOG can send QSLs by e-mail. This tab allows the user to enter their e-mail s
 details. The user should enter the server address (eg mail.btinternet.com) and the user and password
 they use. An additional e-mail address can be specified to receive the e-mail as a CC recipient. 
 
-<IMG SRC="../images/web_dialog_6.png">
+\image html web_dialog_6.png
+\image latex web_dialog_6.png
 
 
 */

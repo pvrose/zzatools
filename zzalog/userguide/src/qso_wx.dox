@@ -3,7 +3,8 @@
 This pane displays the latest weather report from openweather.com. The report is
 read when ZZALOG is launched and every 30 minutes thereafter.
 
-<IMG SRC="../images/qso_wx_1.png">
+\image html qso_wx_1.png
+\image latex qso_wx_1.png
 
 The above image shows from top to bottom:
 - <B>Location</B> Place and latitude and longitude provided by the report server.

@@ -1,6 +1,7 @@
 /** \page log_table Log Book Viewer
  
-<IMG SRC="../images/log_table_1.png">
+\image html log_table_1.png
+\image latex log_table_1.png
 
 \section description_4 Description
 
@@ -18,19 +19,22 @@ This will make this record the current record being worked on in all views.
 Double-clicking on an entry will open an edit box that allows for the 
 data within the field of the record to be edited.
 
-<IMG SRC="../images/log_table_2.png">
+\image html log_table_2.png
+\image latex log_table_2.png
 
 Clicking the drop-down arrow while the edit box is acive will show the 
 allowable data to be entered.
 
-<IMG SRC="../images/log_table_3.png">
+\image html log_table_3.png
+\image latex log_table_3.png
 
 \subsection tooltip Displaying details
 
 Right-clicking on a field within a record will display a 
 tooltip explaining what the field is for, and whether the current data within is valid.
 
-<IMG SRC="../images/log_table_4.png">
+\image html log_table_4.png
+\image latex log_table_4.png
 
 \subsection widths Adjusting column widths
 
@@ -50,14 +54,16 @@ column. Double-clicking it again will display in reverse alphabetical order.
 The second instance of the Log-book view is to present the contents of a file or data 
 being imported. The image below shows the import of a log produced from WSJT-X.
 
-<IMG SRC="../images/log_table_5.png">
+\image html log_table_5.png
+\image latex log_table_5.png
 
 \subsection extract Extracted records
 
 The third instance of the log-book view shows a list of extracted records. 
 The image below shows an extraction of all records with stations in Denmark.
 
-<IMG SRC="../images/log_table_6.png">
+\image html log_table_6.png
+\image latex log_table_6.png
 
 \page spec_tree ADIF Information
 
@@ -68,16 +74,19 @@ It shows all the data types used in the specification.
 It shows all the enumeration values used.
 It lists all the fields available in an ADIF record.
 
-<IMG SRC="../images/spec_tree_1.png">
+\image html spec_tree_1.png
+\image latex spec_tree_1.png
 
 \section features_5 Features
 
 Clicking on a "+" opens up one level of the hierarchy beneath that entry.
 
-<IMG SRC="../images/spec_tree_2.png">
+\image html spec_tree_2.png
+\image latex spec_tree_2.png
 
 Clicking on the text of an entry fully opens up the hierarchy beneath that entry.
 
-<IMG SRC="../images/spec_tree_3.png">
+\image html spec_tree_3.png
+\image latex spec_tree_3.png
 
 */

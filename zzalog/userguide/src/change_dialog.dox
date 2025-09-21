@@ -5,7 +5,8 @@ a single field within each record. If a set of extracted records exists then
 this function will act only on the records that have been extracted. Otherwise
 it will act on all records in the log-book.
 
-<IMG SRC="../images/change_dialog_1.png">
+\image html change_dialog_1.png
+\image latex change_dialog_1.png
 
 The various elements of this dialog are:
 

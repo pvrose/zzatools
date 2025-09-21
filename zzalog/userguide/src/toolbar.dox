@@ -4,19 +4,22 @@
 Displays a set of iconised buttons linked to main menu action. There are also a limited
  number of search features.
 
- <IMG SRC="../images/toolbar_1.png">
+ \image html toolbar_1.png
+ \image latex toolbar_1.png
 
 \section features_3 Features
 \subsection actions Iconised Menu Actions
 The majority of buttons contain links to the Menu bar.
 
-<IMG SRC="../images/toolbar_set1.png">
+\image html toolbar_set1.png
+\image latex toolbar_set1.png
 -  <B>Closed file icon</B> - File->New.
 -  <B>Open file icon</B> - File->Open.
 -  <B>Floppy disc icon</B> - File->Save.
 -  <B>Floppy disc with pen icon</B> - File->Save As.
 
-<IMG SRC="../images/toolbar_set2.png">
+\image html toolbar_set2.png
+\image latex toolbar_set2.png
 -  <B>Left arrow with bar</B> - Navigate->First.
 -  <B>Left arrow</B> - Navigate->Previous.
 -  <B>Right arrow</B> - Navigate->Next.
@@ -24,14 +27,16 @@ The majority of buttons contain links to the Menu bar.
 -  <B>Blue Magnifying glass</B> - Navigate->Find->New.
 -  <B>Blue double chevron</B> - Navigate->Find->Next.
 
-<IMG SRC="../images/toolbar_set3.png">
+\image html toolbar_set3.png
+\image latex toolbar_set3.png
 -  <B>White open square</B> - Log->New Record.
 -  <B>White square with tick</B> - Log->Save Record.
 -  <B>White square with red cross</B> - Log->Cancel.
 -  <B>Large white square with black cross</B> - Log->Delete Record.
 -  <B>White square containing blue image</B> - Log->Retime Record.
 
-<IMG SRC="../images/toolbar_set4.png">
+\image html toolbar_set4.png
+\image latex toolbar_set4.png
 -  <B>Cyan downward arrow over "eQSL"</B> - Import->Download eQSL.
 -  <B>Cyan downward arrow over "LotW"</B> - Import->Download LotW.
 -  <B>Blue "?" over "eQSL"</B> - Extract->eQSL.
@@ -39,7 +44,8 @@ The majority of buttons contain links to the Menu bar.
 -  <B>Blue "?" over "CL"</B> - Extract->ClubLog.
 -  <B>Upward arrow</B> - Extract->Upload.
 
-<IMG SRC="../images/toolbar_set5.png">
+\image html toolbar_set5.png
+\image latex toolbar_set5.png
 -  <B>Box with three dots</B> - Connect/Disconnect Rig.
 -  <B>Blue "?"</B> - Extract->Criteria.
 -  <B>Blue "?" with red cross</B> - Extract->Clear.
@@ -49,7 +55,8 @@ The majority of buttons contain links to the Menu bar.
 -  <B>&quot;&AElig;&quot;</B> - Windows->International Chars.
 -  <B>Rose icon</B> - Help->User Guide.
 
-<IMG SRC="../images/toolbar_set6.png">
+\image html toolbar_set6.png
+\image latex toolbar_set6.png
 -  <B>Text input</B> - Enter callsign for search features.
 -  <B>Bold downward arrow</B> - Find next occurence of callsign.
 -  <B>Downward chevron and bar</B> - Extract all occurences of callsign.

@@ -7,16 +7,19 @@ to manually add QSO records.
 
 When ZZALOG starts it is in view mode. Click either "Cancel" to go to inactive mode or "Activate" to go to active mode.
 
-<IMG SRC="../images/adding_1.png">
+\image html adding_1.png "View mode"
+\image latex adding_1.png "ZZALOG in view mode"
 
 The image below shows the inactive mode. Click "Add QSO" to go to manual entry mode.
 
-<IMG SRC="../images/adding_2.png">
+\image html adding_2.png "Inactive mode"
+\image latex adding_2.png "Inactive mode"
 
 In manual entry mode, the entry form is prepopulated with data from the selected QSO record. This makes it easier to
 enter a sequence of QSOs. 
 
-<IMG SRC="../images/adding_3.png">
+\image html adding_3.png "Starting to manually add a QSO"
+\image latex adding_3.png "Starting to manually add a QSO"
 
 Data may now be entered into the form as required. When complete the user can then save the record with one of the 
 save buttons:

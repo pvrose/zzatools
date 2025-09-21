@@ -23,7 +23,8 @@ that provides the following functionality:
 This document can be opened at
 any time from the menu or the toolbar:
 
-<IMG SRC="../images/index_1.png">
+\image html index_1.png
+\image latex index_1.png
 
 \section contents Contents
 

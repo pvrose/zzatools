@@ -3,7 +3,8 @@
 Currently QSLs are managed in a number of ways. Amateur Radio is transitioning away from the 
 exchange of physical QSL cards to electronic cards. ZZALOG supports both these.
 
-<IMG SRC="../images/qsls_1.png">
+\image html qsls_1.png
+\image latex qsls_1.png
 
 \section qsl_website Internet QSL agents
 
@@ -34,7 +35,8 @@ logging a QSO. This is the recommended method.
 
 Sometimes, it would be more convenient to upload in batches at the end of a session.
 
-<IMG SRC="../images/qsls_5.png">
+\image html qsls_5.png
+\image latex qsls_5.png
 
 In the above image, to extract all the records that have yet to be uploaded to a website,
 click the appropriate button boxed in red. Once the data has been extracted, the buttons
@@ -46,7 +48,8 @@ the website.
 There is no automatic download feature from these websites. To download from a specific 
 website, click a button boxed in green in the image below.
 
-<IMG SRC="../images/qsls_6.png">
+\image html qsls_6.png
+\image latex qsls_6.png
 
 Once downloaded, the data will be compared with the existing logbook, and any records
 that do not match, usually from eQSL.cc, are presented to the user for action.
@@ -56,7 +59,8 @@ that do not match, usually from eQSL.cc, are presented to the user for action.
 When downloading data from eQSL.cc, ZZALOG will refer a record to the user if
 it cannot find a match.
 
-<IMG SRC="../images/qsls_2.png">
+\image html qsls_2.png
+\image latex qsls_2.png
 
 In this example, the two search buttons are highlighted. The button with just a search
 icon, will allow the user to step backwards and forwards through the log around the 
@@ -64,20 +68,23 @@ time of the reported QSO. This image shows the result of clicking this button. I
 a comparison with the reported QSO and the logged one immediately after the time of that
 QSO.
 
-<IMG SRC="../images/qsls_4.png">
+\image html qsls_4.png
+\image latex qsls_4.png
 
 The button also labeled "ALL.TXT" will look at the 
 file produced by WSJT-X logging activity. This image shows that the callsign of the
 reported QSO was not found in the WSJT-X log around the time of the reported QSO.
 
-<IMG SRC="../images/qsls_3.png">
+\image html qsls_3.png
+\image latex qsls_3.png
 
 For all QSLs that match, ZZALOG then sends a request to eQSL.cc for the  image that goes with the
 record. The image received will be stored in filestore if this has been set up. The image
 below shows the filstore structure used by ZZALOG in storing QSL images received from eQSL.cc.
 To view these images, refer to \ref qso_qsl_vwr.
 
-<IMG SRC="../images/qsls_8.png">
+\image html qsls_8.png
+\image latex qsls_8.png
 
 <code>
 .../[Station Callsign]/[band]/[mode]/[call]__[timestamp].png\n
@@ -93,7 +100,8 @@ the bureau. In both cases the reported QSO may be checked in the logbook.
 To find the QSO in the logbook follow the procedure in \ref search_qso. The image below
 shows the result of searching for a QSO on a particular date with a particular callsign.
 
-<IMG SRC="../images/qsls_7.png">
+\image html qsls_7.png
+\image latex qsls_7.png
 
 In the "QSL/Edit" tab on the right of the image, there are buttons marked "Bureau", "e-mail" and "Direct".
 Click the button that is appropriate for how the card was received, and the QSO record will be updated
@@ -125,7 +133,8 @@ For physical cards, you can scan the front and back of the card to:
 
 \subsection qsl_sendemail Sending QSLs by e-mail
 
-<IMG SRC="../images/qsls_9.png">
+\image html qsls_9.png
+\image latex qsls_9.png
 
 ZZALOG provides the capability to create a design for an e-mail QSL card. See \ref qsl_editor. It is possible to 
 process more than one card. Clicking the "Search" button will extract all records, for which an e-mail card
@@ -140,7 +149,8 @@ sure the e-mail has been sent.
 
 \subsection qsl_labels Sending physical QSLs
 
-<IMG SRC="../images/qsls_10.png">
+\image html qsls_10.png
+\image latex qsls_10.png
 
 ZZALOG provides the capability to create a design for a print label. See \ref qsl_editor.
 It is expected to process a batch of cards at one time, to optimise the use of printer

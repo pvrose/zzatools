@@ -12,13 +12,17 @@ the report is ordered
 - Bands 
 - Modes
 
-<IMG SRC="../images/analysis_1.png"> 
-<IMG SRC="../images/analysis_2.png"> 
-<IMG SRC="../images/analysis_3.png"> 
+\image html analysis_1.png  
+\image html analysis_2.png  
+\image html analysis_3.png  
+\image latex analysis_1.png  
+\image latex analysis_2.png  
+\image latex analysis_3.png  
 
 This produces the listing as such:
 
-<IMG SRC="../images/analysis_4.png">
+\image html analysis_4.png
+\image latex analysis_4.png
 
 Clicking on any line will open that QSO record in the view pane in the Dashboard.
 
@@ -28,5 +32,6 @@ The DXCC Status tab provides a tabular view. See \ref dxcc_view for details of t
 to filter the view. This view is listing mode classes (as used in DXCC awards) worked for
 each entity and verified either on Logbook of the World or by physical card.
 
-<IMG SRC="../images/analysis_5.png">
+\image html analysis_5.png
+\image latex analysis_5.png
 */

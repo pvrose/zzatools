@@ -5,7 +5,8 @@ This pane allows the editing (or viewing) of the QSO fields. It comprises a numb
 of pull-down choices and an associated text input widget. In viewing mode (i.e. 
 read-only) the text input widgets are inactive - and shown greyed out.
 
-<IMG SRC="../images/qso_entry_1.png">
+\image html qso_entry_1.png
+\image latex qso_entry_1.png
 
 \section features_12 Features
 
@@ -14,24 +15,28 @@ read-only) the text input widgets are inactive - and shown greyed out.
 It is possible to change the fields that are being displayed by clicking the pull-down 
 arrow next to the field name display.
 
-<IMG SRC="../images/qso_entry_2.png">
+\image html qso_entry_2.png
+\image latex qso_entry_2.png
 
 \subsection data Entering Data
 
 Data may be typed into the text input box.
 
-<IMG SRC="../images/qso_entry_3.png">
+\image html qso_entry_3.png
+\image latex qso_entry_3.png
 
 Certain fields have a limited choice of
 data that may be entered. In these cases there is a drop-down arrow next 
 to the text input, which offers the values available.
 
-<IMG SRC="../images/qso_entry_4.png">
+\image html qso_entry_4.png
+\image latex qso_entry_4.png
 
 Fields that contain strings may also have a drop-down arrow next to the text input.
 This allows limited case correction: all upper-case, all lower-case or each word with
 their initial letter capitalised (mixed-case).
 
-<IMG SRC="../images/qso_entry_5.png">
+\image html qso_entry_5.png
+\image latex qso_entry_5.png
 
 */

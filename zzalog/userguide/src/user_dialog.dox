@@ -2,7 +2,8 @@
 
 This pane allows the user to configure fonts on a number of windows and panes.
 
-<IMG SRC="../images/user_dialog_1.png">
+\image html user_dialog_1.png
+\image latex user_dialog_1.png
 
 \section ud_logtable Configuring log-book view.
 

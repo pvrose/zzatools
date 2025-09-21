@@ -4,7 +4,8 @@ This pane displays a summary of the bandplan for the current band. This is eithe
 rig's transmit frequency of, when no rig is connected, the frequency of the
 selected QSO record.
 
-<IMG SRC="../images/qso_bands_1.png">
+\image html qso_bands_1.png
+\image latex qso_bands_1.png
 
 This pane shows only the band segments as allocated in the band-plan, with text in black
 showing the lower frequency of the segment, the recommended maximum bandwidth and use. 
@@ -15,7 +16,8 @@ Note that no indication is given about the availability of any frequency accordi
 level of license of the operator or station. Some frequencies may also only be available
 under special conditions from the licensing authority.
 
-<IMG SRC="../images/qso_bands_2.png">
+\image html qso_bands_2.png
+\image latex qso_bands_2.png
 
 This now provides more detail for each band segment. It now includes selected
 spot frequencies for recommended centres of activity and similar. More visible on this

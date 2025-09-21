@@ -6,7 +6,8 @@ This view shows an analysis of the log broken down into a hierarchy based on DXC
 entities bands and modes worked.
 The format is controlled by the "Report->" set of items in the main menu.
 
-<IMG SRC="../images/report_tree_1.png">
+\image html report_tree_1.png
+\image latex report_tree_1.png
 
 /section features_6 Features
 
@@ -21,11 +22,13 @@ The tree may be ordered by DXCC, band and mode in any order.
 
 Clicking on a "+" opens up one level of the hierarchy beneath that entry.
 
-<IMG SRC="../images/report_tree_2.png">
+\image html report_tree_2.png
+\image latex report_tree_2.png
 
 Clicking on the text of an entry fully opens up the hierarchy beneath that entry.
 
-<IMG SRC="../images/report_tree_3.png">
+\image html report_tree_3.png
+\image latex report_tree_3.png
 
 The entries are colour-coded.
 

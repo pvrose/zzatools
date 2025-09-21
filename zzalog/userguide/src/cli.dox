@@ -5,12 +5,11 @@ typically used on Linux, but it is possible to do so with Windows. They are used
 diagnostic analysis, but some may be used to define default behaviour and are remebered from
 one call of ZZALOG to the next (called 'sticky' switches and noted below).
 
-<IMG SRC="../images/cli_1.png">
+\image html cli_1.png
+\image latex cli_1.png
 
 - <B>-a|--auto_save</B> With this switch the log is automatically saved after each change to the log,
 although some changes are aggregated by ZZALOG to prevent unnecessary updates (sticky).
-- <B>-c|--club_mode</B> Launches ZZALOG in club mode. This requires the operator to log in to the application 
-whenever it is started (sticky).
 - <B>-d|--debug [mode...]</B> 
   Applies a debug feature to be invoked for the run. Mode has the values:
   - <B>c|curl</B>

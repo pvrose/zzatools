@@ -3,12 +3,15 @@
 This dialog enables the user to produce QSL designs. The images below 
 show the dialog and the design it describes.
 
-<IMG SRC="../images/qsl_editor_1.png">
-<IMG SRC="../images/qsl_editor_3.png">
+\image html qsl_editor_1.png
+\image latex qsl_editor_1.png
+\image html qsl_editor_3.png
+\image latex qsl_editor_3.png
 
 The dialog has three parts highlighted below.
 
-<IMG SRC="../images/qsl_editor_2.png">
+\image html qsl_editor_2.png
+\image latex qsl_editor_2.png
 
 \section qd_call Specifying target call and usage.
 
@@ -61,8 +64,10 @@ The bottom section, encased in green above, allows the user to specify the objec
 on the QSL design. Below are three such objects in the specification and as they appear in
 the design.
 
-<IMG SRC="../images/qsl_editor_5.png">
-<IMG SRC="../images/qsl_editor_4.png">
+\image html qsl_editor_5.png
+\image latex qsl_editor_5.png
+\image html qsl_editor_4.png
+\image latex qsl_editor_4.png
 
 There are three types of object that can be placed in the design. Each as a number of parameters
 whose labels are across the top.

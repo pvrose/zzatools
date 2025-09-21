@@ -13,7 +13,8 @@ and the list of fields that are shown can be configured.
 arrangment is configurable.
 - <B>DXCC Status</B> A tabular view of the number of stations worked per DXCC, band and mode. The view is configurable.
 
-  <IMG SRC="../images/main_window_1.png">
+  \image html main_window_1.png
+  \image latex main_window_1.png
 
   - \subpage menu
   - \subpage toolbar

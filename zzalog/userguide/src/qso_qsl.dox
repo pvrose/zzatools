@@ -6,7 +6,8 @@ This pane allows interaction with the online QSL servers: eQSL.cc,
 Logbook of the World, Clublog.org and QRZ.com. In addition it allows
 processing of e-mail and paper QSLs.
 
-<IMG SRC="../images/qso_qsl_1.png">
+\image html qso_qsl_1.png
+\image latex qso_qsl_1.png
 
 The top check box, labeled "Only handle selected QSO", allows the processing
 of the selected QSO record. Only buttons triggering actions relevant
@@ -18,7 +19,8 @@ QSOs are uploaded automatically after each QSO is complete. This upload
 is started as a background activity, so should not interfere with normal
 logging activity.
 
-<IMG SRC="../images/qso_qsl_2.png">
+\image html qso_qsl_2.png
+\image latex qso_qsl_2.png
 
 \subsection qq_download Downloading data
 
@@ -34,7 +36,8 @@ requests for confirmation are handled by \ref qso_query. The appropriate fields
 are added to the QSO records indicating either the QSL status with respect to the 
 server, or that a QSL request has been received for OQRS.
 
-<IMG SRC="../images/qso_qsl_3.png">
+\image html qso_qsl_3.png
+\image latex qso_qsl_3.png
 
 \subsection qq_extract Extracting QSL data
 
@@ -42,7 +45,8 @@ The third column, shown below, contains buttons that extract data for sending to
 online servers or other processing. The bottom button, labeled with a backward looping
 arrow, remoces the extract.
 
-<IMG SRC="../images/qso_qsl_4.png">
+\image html qso_qsl_4.png
+\image latex qso_qsl_4.png
 
 \subsection qq_processing Processing QSL data
 
@@ -55,7 +59,8 @@ For Cards, a label os printed for each of the records in the extracted data.
 
 Foe e-Mails, an QSL image is generated for each of the records in the extracted data.
 
-<IMG SRC="../images/qso_qsl_5.png">
+\image html qso_qsl_5.png
+\image latex qso_qsl_5.png
 
 \subsection qq_upload Uploading QSL data
 
@@ -69,7 +74,8 @@ For all four online servers individual QSOs can be uploaded.
 For e-Mails, the button will send e-mails with the previously generated images
 for each record in the extracted data.
 
-<IMG SRC="../images/qso_qsl_6.png">
+\image html qso_qsl_6.png
+\image latex qso_qsl_6.png
 
 \subsection qq_done Updating records with "Done"
 
@@ -77,6 +83,7 @@ The last column, shown below, contains buttons, lebaled "Done". For those activi
 that require manual intervention: uploading data; posting cards and sending e-mails, 
 clicking "Done" will update the records that the activity is complete.
 
-<IMG SRC="../images/qso_qsl_7.png">
+\image html qso_qsl_7.png
+\image latex qso_qsl_7.png
 
 */

@@ -4,7 +4,8 @@
 This pane is a highly configured pane that provides the control buttons that are 
 relevant to the current state of the Dashboard.
 
-<IMG SRC="../images/qso_buttons_1.png">
+\image html qso_buttons_1.png
+\image latex qso_buttons_1.png
 
 Only those buttons that are effective in the current state of the Dashboard are shown 
 and some may be inactive for other reasons.
