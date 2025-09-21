@@ -24,7 +24,7 @@ QSO field MY_STATE) - disabled if not relevant to the DXCC entity.
 - <B>Sec'y Sub</B> The secondary administrative subdivision of the DXCC entity (e.g. US county or Russian RDA -
 QSO field MY_CNTY) - disabled if not relevant to the DXCC entity.
 - <B>CQ Zone</B> The zone number for CQ Magazine awards and contests (QSO field MY_CQ_ZONE).
-- <B>TU Zone</B> The zone number alloacted by ITU and used for IARU awards and contests (QSO fiels MY_ITU_ZONE).
+- <B>ITU Zone</B> The zone number alloacted by ITU and used for IARU awards and contests (QSO fiels MY_ITU_ZONE).
 - <B>Continent</B> The abbtreviation of the continent (QSO field APP_ZZA_MY_CONT).
 - <B>IOTA</B> The designation of the island group for Islands on the Air awards (QSO field MY_IOTA).
 - <B>WAB</B> The Ordnance Survey location for Worked all Britain awards (QSO field APP_ZZA_MY_WAB).
@@ -34,8 +34,8 @@ at this location. If the user clicks the check box "Update from call" a drop-dow
 of callsigns current used in the log is presented. If the user selects a callsign then the following
 fields: Country, DXCC, CQ Zone and Continent are entered automatically.
 
-\image html stn_dialog_1.png
-\image latex stn_dialog_1.png
+\image html stn_dialog_1.png "Tab showing specification of QTH details"
+\image latex stn_dialog_1.png "Tab showing specification of QTH details"
 
 \section sd_oper Specifying an Operator
 
@@ -49,8 +49,8 @@ The user can then enter as much or as little information about the location in t
 - <B>Name</B> The name of the operator as can be exchanged in the QSO (QSO field MY_NAME).
 - <B>Callsign</B> The callsign of the operator (QSO field OPERATOR).
 
-\image html stn_dialog_2.png
-\image latex stn_dialog_2.png
+\image html stn_dialog_2.png "Tab showing specification of operator details"
+\image latex stn_dialog_2.png "Tab showing specification of operator details"
 
 \section sd_call Specifying the station callsign
 
@@ -60,8 +60,8 @@ which share the log-book.
 The user can enter a callsign into the control labeled "Call", or select a call from the drop-down
 list. 
 
-\image html stn_dialog_3.png
-\image latex stn_dialog_3.png
+\image html stn_dialog_3.png "Tab allowing the choice of a differnt station callsign"
+\image latex stn_dialog_3.png "Tab allowing the choice of a differnt station callsign"
 
 */
 

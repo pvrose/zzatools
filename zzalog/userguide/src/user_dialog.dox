@@ -2,8 +2,8 @@
 
 This pane allows the user to configure fonts on a number of windows and panes.
 
-\image html user_dialog_1.png
-\image latex user_dialog_1.png
+\image html user_dialog_1.png "Tab allowing configuration of the display fonts"
+\image latex user_dialog_1.png "Tab allowing configuration of the display fonts"
 
 \section ud_logtable Configuring log-book view.
 

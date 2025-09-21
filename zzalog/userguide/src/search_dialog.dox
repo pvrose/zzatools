@@ -3,8 +3,8 @@
 This window allows the specification of the criteria by which to
 extract data. 
 
-\image html search_dialog_1.png
-\image latex search_dialog_1.png
+\image html search_dialog_1.png "Search criteria window"
+\image latex search_dialog_1.png "Search criteria window" width=8cm
 
 \section search_crit Specifying match condition
 
@@ -44,8 +44,8 @@ The next row of buttons selects the condition used:
 Except when "CQ Zone" or "ITU Zone" are selected, comparisons are based on string comparisons - 
 i.e. "11" is greater than "100". 
 
-\image html search_dialog_2.png
-\image latex search_dialog_2.png
+\image html search_dialog_2.png "Detail showing match condition"
+\image latex search_dialog_2.png "Detail showing match condition" width=8cm
 
 \section search_refine Refining the search
 
@@ -63,8 +63,8 @@ or "Card" will then only select QSOs confirmed by eQSL.cc, Logbook of the World 
 
 Note that all the refinements are accumulative. 
 
-\image html search_dialog_3.png
-\image latex search_dialog_3.png
+\image html search_dialog_3.png "Detail showing match refinement"
+\image latex search_dialog_3.png "Detail showing match refinement" width=8cm
 
 \section search_combine Combining searches
 

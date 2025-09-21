@@ -3,7 +3,8 @@
 This pane provides details of the current or most recent contest. It is currently 
 under development, awaiting "road" testing.
 
-<IMG SRC = "../images/contest_scorer_1.png
+\image html contest_scorer_1.png "Position of contest monitor pane within dashboard window"
+\image latex contest_scorer_1.png "Position of contest monitor pane within dashboard window"
 
 The pane comprises three section. The top section, encased in red, allows the choice
 of the contest. The drop-down list will indicate the specific contest and its
@@ -21,8 +22,8 @@ In columns, it shows QSO-points, multiplier and total. In rows it shows the scor
 accumulated so far; the delta that the current QSO will add; and the total as a
 result of that.
 
-\image html contest_scorer_2.png
-\image latex contest_scorer_2.png
+\image html contest_scorer_2.png "Details of contest monitor"
+\image latex contest_scorer_2.png "Details of contest monitor" width=5cm
 
 Support for individual contests needs to be coded separately. This code needs to 
 implement an algorithm for parsing and generating exchanges. It also needs to

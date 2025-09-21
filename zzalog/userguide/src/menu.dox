@@ -4,8 +4,8 @@
 Provides access to general application functions. The menu bar is situated at the
 top of the Main Window.
 
-\image html menu_1.png
-\image latex menu_1.png
+\image html menu_1.png "Position of menu bar within main window"
+\image latex menu_1.png "Position of menu bar within main window"
 
 \section features_2 Features
 \subsection Menu Items
@@ -25,8 +25,8 @@ top of the Main Window.
 
   - <B>Settings</B> - Access to configuration settings.
   
-    - <B>Files</B> - Locations of pertinant files.
-    - <B>Web/Network</B> - Access to internet-connected features.
+    - <B>Files</B> - Locations of pertinent files.
+    - <B>Web sites</B> - Access to internet-connected features.
     - <B>Fields</B> - Specification of which fields are used in the various features.
     - <B>Station</B> - Define the various station locations, operators and callsigns used in the log.
     - <B>User Config</B> - Allows limited user configuration of look and feel.
@@ -107,8 +107,8 @@ top of the Main Window.
     - <B>Download QRZ.com</B> - Download an update file from QRZ.com.
     - <B>Clipboard</B> - Import records pastedto the clipboard (as ADIF text).
     - <B>WSJT-X UDP</B> - Start importing records sent from WSJT-X.
-    - <B>Merge (New QSOs)</B> - Merge imported records into current log - new records.
-    - <B>Merge (Update QSOs)</B> - Merge imported records into current log - existing records.
+    - <B>Merge (New QSOs)</B> - Merge imported records into current log - add new records.
+    - <B>Merge (Update QSOs)</B> - Merge imported records into current log - merge with existing records.
     - <B>Cancel</B> - Remove separate import data.
   - <B>Report</B> - Configure the report view.
     - <B>Clear</B> - Remove data from analysis report.

@@ -1,7 +1,7 @@
 /** \page log_table Log Book Viewer
  
-\image html log_table_1.png
-\image latex log_table_1.png
+\image html log_table_1.png "Position of logbook view within main window"
+\image latex log_table_1.png "Position of logbook view within main window"
 
 \section description_4 Description
 
@@ -19,22 +19,22 @@ This will make this record the current record being worked on in all views.
 Double-clicking on an entry will open an edit box that allows for the 
 data within the field of the record to be edited.
 
-\image html log_table_2.png
-\image latex log_table_2.png
+\image html log_table_2.png "Editing a field in the logbook view"
+\image latex log_table_2.png "Editing a field in the logbook view"
 
 Clicking the drop-down arrow while the edit box is acive will show the 
 allowable data to be entered.
 
-\image html log_table_3.png
-\image latex log_table_3.png
+\image html log_table_3.png "Entering pre-defined values"
+\image latex log_table_3.png "Entering pre-defined values"
 
 \subsection tooltip Displaying details
 
 Right-clicking on a field within a record will display a 
 tooltip explaining what the field is for, and whether the current data within is valid.
 
-\image html log_table_4.png
-\image latex log_table_4.png
+\image html log_table_4.png "Displaying information about a field"
+\image latex log_table_4.png "Displaying information about a field"
 
 \subsection widths Adjusting column widths
 
@@ -47,23 +47,22 @@ Double clicking on the header of a column containing QSO_DATE, TIME_ON, QSO_DATE
 order to reverse-chronological order or vice-versa. Double clicking on the header of other columns is only enabled in the
 "Extracted Records" tab. In that case the data will be displayed in alphabetical order of the entries in that
 column. Double-clicking it again will display in reverse alphabetical order. 
-<B>NB</B> Switching order like this on the same field will take a long time.
 
 \subsection import Records for import
 
 The second instance of the Log-book view is to present the contents of a file or data 
 being imported. The image below shows the import of a log produced from WSJT-X.
 
-\image html log_table_5.png
-\image latex log_table_5.png
+\image html log_table_5.png "Display of records awaiting import"
+\image latex log_table_5.png "Display of records awaiting import"
 
 \subsection extract Extracted records
 
 The third instance of the log-book view shows a list of extracted records. 
 The image below shows an extraction of all records with stations in Denmark.
 
-\image html log_table_6.png
-\image latex log_table_6.png
+\image html log_table_6.png "Display of extracted records"
+\image latex log_table_6.png "Display of extracted records"
 
 \page spec_tree ADIF Information
 
@@ -74,19 +73,19 @@ It shows all the data types used in the specification.
 It shows all the enumeration values used.
 It lists all the fields available in an ADIF record.
 
-\image html spec_tree_1.png
-\image latex spec_tree_1.png
+\image html spec_tree_1.png "ADIF Specification in tree-view"
+\image latex spec_tree_1.png "ADIF Specification in tree-view"
 
 \section features_5 Features
 
 Clicking on a "+" opens up one level of the hierarchy beneath that entry.
 
-\image html spec_tree_2.png
-\image latex spec_tree_2.png
+\image html spec_tree_2.png "Diving into a featured item"
+\image latex spec_tree_2.png "Diving into a featured item"
 
 Clicking on the text of an entry fully opens up the hierarchy beneath that entry.
 
-\image html spec_tree_3.png
-\image latex spec_tree_3.png
+\image html spec_tree_3.png "Deep dive on a specification item"
+\image latex spec_tree_3.png "Deep dive on a specification item"
 
 */

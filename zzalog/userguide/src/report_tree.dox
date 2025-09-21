@@ -4,17 +4,17 @@
 
 This view shows an analysis of the log broken down into a hierarchy based on DXCC 
 entities bands and modes worked.
-The format is controlled by the "Report->" set of items in the main menu.
+The format is controlled by the "Report/" set of items in the main menu.
 
-\image html report_tree_1.png
-\image latex report_tree_1.png
+\image html report_tree_1.png "Log analysis within main window"
+\image latex report_tree_1.png "Log analysis within main window"
 
-/section features_6 Features
+\section features_6 Features
 
 The report may select the following:
 
 - All records in the log.
-- All records using the current sttaion callsign.
+- All records using the current station callsign.
 - All extracted records.
 - The selected record.
 
@@ -22,18 +22,18 @@ The tree may be ordered by DXCC, band and mode in any order.
 
 Clicking on a "+" opens up one level of the hierarchy beneath that entry.
 
-\image html report_tree_2.png
-\image latex report_tree_2.png
+\image html report_tree_2.png "Diving into the analysis report"
+\image latex report_tree_2.png "Diving into the analysis report"
 
 Clicking on the text of an entry fully opens up the hierarchy beneath that entry.
 
-\image html report_tree_3.png
-\image latex report_tree_3.png
+\image html report_tree_3.png "Deep diving into the analysis report"
+\image latex report_tree_3.png "Deep diving into the analysis report"
 
 The entries are colour-coded.
 
-- Green - indicates that at least one QSO has been verified with Logbook of the World.
-- Blue - indicates that at least one QSO has been verified with eQSL.cc.
-- Red - indicates no QSOs have been verified on LotW or eQSL.cc.
+- <B>Green</B> indicates that at least one QSO has been verified with Logbook of the World.
+- <B>Blue</B> indicates that at least one QSO has been verified with eQSL.cc.
+- <B>Red</B> indicates no QSOs have been verified on LotW or eQSL.cc.
 
 */

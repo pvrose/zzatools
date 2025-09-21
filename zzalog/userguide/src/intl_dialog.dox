@@ -4,8 +4,8 @@
 This dialog provides a virtual keyboard for a selection on Latin-based 
 non-ASCII characters.
 
-\image html intl_dialog_1.png
-\image latex intl_dialog_1.png
+\image html intl_dialog_1.png "Virtual keyboard window"
+\image latex intl_dialog_1.png "Virtual keyboard window" width=8cm
 
 \section features_9 Features
 \subsection paste Entering a character

@@ -6,32 +6,33 @@ for numbers of DXCC entities worked.
 \section anal_loga Using Log Analysis
 
 The Log Analysis tab provides a breakdown of stations worked. It is controlled
-from the Menu "Report" drop-down list. See \ref menu for more information. In this example,
+from the Menu "Report" drop-down list. See \ref menu for more information.
+
+\image html analysis_1.png "Selecting report data"
+\image latex analysis_1.png "Selecting report data" width=5cm
+
+In this example,
 the report is ordered
 - DXCC entities
 - Bands 
 - Modes
 
-\image html analysis_1.png  
-\image html analysis_2.png  
-\image html analysis_3.png  
-\image latex analysis_1.png  
-\image latex analysis_2.png  
-\image latex analysis_3.png  
-
 This produces the listing as such:
 
-\image html analysis_4.png
-\image latex analysis_4.png
+\image html analysis_4.png "Detailed analysis report"
+\image latex analysis_4.png "Detailed analysis report"
 
 Clicking on any line will open that QSO record in the view pane in the Dashboard.
 
 \section anal_dxcc  Using DXCC Status
 
 The DXCC Status tab provides a tabular view. See \ref dxcc_view for details of the controls used
-to filter the view. This view is listing mode classes (as used in DXCC awards) worked for
+to filter the view.
+
+\image html analysis_5.png "Displaying DXCC table"
+\image latex analysis_5.png "Displaying DXCC table"
+
+This view is listing mode classes (as used in DXCC awards) worked for
 each entity and verified either on Logbook of the World or by physical card.
 
-\image html analysis_5.png
-\image latex analysis_5.png
 */

@@ -3,8 +3,8 @@
 This pane displays the latest weather report from openweather.com. The report is
 read when ZZALOG is launched and every 30 minutes thereafter.
 
-\image html qso_wx_1.png
-\image latex qso_wx_1.png
+\image html qso_wx_1.png "Weather display"
+\image latex qso_wx_1.png "Weather display" width=5cm
 
 The above image shows from top to bottom:
 - <B>Location</B> Place and latitude and longitude provided by the report server.
@@ -17,7 +17,7 @@ kilometres per hour and knots.
 	- <B>Atmospheric pressure</B> clicking cycles between hectopascals, millimetres of mercury, inches of mercury and
 millibars.
 	- <B>Cloud coverage</B> clicking cycles between a chart symbol, percentage cloud cover and okta values.
-- <B>Sun rise and sun set</B> Times in the timezone selected in the system clock.
-- <B>Last update</B> Time in the timezone selected in the system clock.
+- <B>Sun rise and sun set</B> Times in the timezone selected in the clock display.
+- <B>Last update</B> Time in the timezone selected in the clock display.
 
 */

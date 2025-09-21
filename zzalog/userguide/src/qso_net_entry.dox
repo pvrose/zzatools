@@ -4,7 +4,7 @@
 
 This pane enables the entry of concurrent QSOs. For individual record editing see \ref qso_entry.
 
-\image html qso_net_entry_1.png
-\image latex qso_net_entry_1.png
+\image html qso_net_entry_1.png "Multiple entry panes"
+\image latex qso_net_entry_1.png "Multiple entry panes"
 
 */

@@ -2,8 +2,8 @@
 
 This pane shows the DXCC status for the callsign in the selected record.
 
-\image html qso_dxcc_1.png
-\image latex qso_dxcc_1.png
+\image html qso_dxcc_1.png "Position of DXCC status pane within dashboard window"
+\image latex qso_dxcc_1.png "Position of DXCC status pane within dashboard window"
 
 In the image below the information encased in red is based on the decode on the callsign.
 In this case it has decoded the callsign IK4LZH as belonging to Italy, whose usual prefix
@@ -16,15 +16,15 @@ The information shows the worked-before status of that DXCC entity for the curre
 station callsign. It shows that Italy, CQ zone 15, ITU zone 28 and Europe have all been worked before,
 but not on the current band (2m).
 
-\image html qso_dxcc_2.png
-\image latex qso_dxcc_2.png
+\image html qso_dxcc_2.png "Details of the DXCC status pane"
+\image latex qso_dxcc_2.png "Details of the DXCC status pane" width=5cm
 
 There are a few cases where it is not possible to decode the DXCC entity from the callsign.
 One such example is the use of the GB prefix. By default this decodes to "G: England", but
 it is possible to temporarily override this by use of an exception applied in one
 of the on-line directories as shown in \ref page_6.
 
-\image html qso_dxcc_3.png
-\image latex qso_dxcc_3.png
+\image html qso_dxcc_3.png "Example of a callsign exception"
+\image latex qso_dxcc_3.png "Example of a callsign exception" width=5cm
 
 */

@@ -13,8 +13,8 @@ and the list of fields that are shown can be configured.
 arrangment is configurable.
 - <B>DXCC Status</B> A tabular view of the number of stations worked per DXCC, band and mode. The view is configurable.
 
-  \image html main_window_1.png
-  \image latex main_window_1.png
+  \image html main_window_1.png "ZZALOG - main window"
+  \image latex main_window_1.png "ZZALOG - main window"
 
   - \subpage menu
   - \subpage toolbar

@@ -4,8 +4,8 @@
 
 This pane allows the user to specify how to connect a rig to ZZALOG. 
 
-\image html qso_rig_1.png
-\image latex qso_rig_1.png
+\image html qso_rig_1.png "Position of rig control pane within dashboard window"
+\image latex qso_rig_1.png "Position of rig control pane within dashboard window"
 
 \section features_rig Features
 \subsection rig_1 Selecting the Rig
@@ -14,7 +14,7 @@ Most modern rigs have computer control (CAT <I>Computer Aided Transceiver</I>).
 Each major manufacturer has its proprietary protocols and each rig has a unique
 set of features that require additional decodes within those protocols. Like 
 many other applications, ZZALOG uses a standard library <B>hamlib</B>. This library
-provides a standard programming interface (API) to access the features of all
+provides a standard programming interface (API) to access the features for all
 but the most recent rigs. Rigs are grouped according to their manufacturer 
 with a couple of miscellaneous interfaces. There are number of other 
 applications that provide rig access - some of these can also be connected
@@ -26,8 +26,8 @@ applications. Click the button next to the rig input to open a drop-down
 menu. As can be seen the menu is grouped by manufacturer. In the image below,
 the Icom IC-705 transceiver has been selected.
 
-\image html qso_rig_2.png
-\image latex qso_rig_2.png
+\image html qso_rig_2.png "Selecting one rig among many"
+\image latex qso_rig_2.png "Selecting one rig among many"
 
 \subsection rig_ports Defining connection
 
@@ -38,21 +38,21 @@ connection speed (baud rate) need to be specified. This can be done using drop-d
 menus which are opened up by the buttons next to the inputs. In the images below the port
 and baud-rate menus have been opened.
 
-\image html qso_rig_3.png
-\image latex qso_rig_3.png
-\image html qso_rig_4.png
-\image latex qso_rig_4.png
+\image html qso_rig_3.png "Selecting a serial port"
+\image latex qso_rig_3.png "Selecting a serial port" width=5cm
+\image html qso_rig_4.png "Selecting baud-rate"
+\image latex qso_rig_4.png "Selecting baud-rate" width=5cm
 
 An example using the application FlRig is shown below. In this case communication 
-between ZZALIB and FlRig uses a protocol known as XML-RPC (Remote procedure call using
+between ZZALOG and FlRig uses a protocol known as XML-RPC (Remote procedure call using
 XML) over an HTTP link. In the case below, this HTTP link is within the same computer
 (localhost - green pointer) but it can be over a network. ZZALOG can start the other application
 using scripts (blue pointer), but the other application can have been started by invoking its command
 or clicking its icon. In
 the case below a script is available as indicated by the indicated "Use" button (red pointer).
 
-\image html qso_rig_5.png
-\image latex qso_rig_5.png
+\image html qso_rig_5.png "Selecting a network connection"
+\image latex qso_rig_5.png "Selecting a network connection" width=5cm
 
 \subsection rig_auto Starting and connecting automatically
 
@@ -63,8 +63,8 @@ when ZZALOG starts, but ZZALOG will then attempt to connect after a delay of 2.5
 the application has been started. The value for this delay is obtained through a process of "trial and
 error" to see when the application will accept the first command after being started.
 
-\image html qso_rig_6.png
-\image latex qso_rig_6.png
+\image html qso_rig_6.png "Specifying connect delay"
+\image latex qso_rig_6.png "Specifying connect delay" width=5cm
 
 \subsection rig_defaults No CAT? Specify power and frequency 
 
@@ -73,8 +73,8 @@ cannot be read using CAT. In the image below, the user has decided to override t
 default CAT mechanism of reading power, by clicking the "O/R" check box and opening
 the drop-down menu that has been enabled.
 
-\image html qso_rig_7.png
-\image latex qso_rig_7.png
+\image html qso_rig_7.png "Specifying fixed power"
+\image latex qso_rig_7.png "Specifying fixed power" width=5cm
 
 \subsection rig_accessories Specify amplifier or transceiver
 
@@ -85,8 +85,8 @@ before being logged. In the image below left, the two check boxes for "Amplifier
 its gain should be specified in dB. For a transverter its frequency shift should be specified in MHz 
 and its power output in W. 
 
-\image html qso_rig_8.png
-\image latex qso_rig_8.png
+\image html qso_rig_8.png "Specifying a transverter and amplifier"
+\image latex qso_rig_8.png "Specifying a transverter and amplifier" width=5cm
 
 \subsection rig_misc Miscellaneous features
 
@@ -98,8 +98,8 @@ in its stack of readings. This input allows the depth of the stack to be configu
 - <B>TO Count</B> This soecifies the number of timeouts allowed before ZZALOG decides that
 the rig does not support the function.
 
-\image html qso_rig_9.png
-\image latex qso_rig_9.png
+\image html qso_rig_9.png "Specifying miscellaneous features"
+\image latex qso_rig_9.png "Specifying miscellaneous features" width=5cm
 
 \subsection rig_conn Connected
 
@@ -115,7 +115,7 @@ reading is the highest read over the last few readings in the previous receive p
 Arrowed in green is a check box "Display instantaneous". If checked, the power and S-meter 
 readings will be the instantaneous values, rather than the smoothed values described above.
 
-\image html qso_rig_10.png
-\image latex qso_rig_10.png
+\image html qso_rig_10.png "Detail with connected rig"
+\image latex qso_rig_10.png "Detail with connected rig" width=5cm
 
 */

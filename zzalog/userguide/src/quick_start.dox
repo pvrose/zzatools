@@ -9,8 +9,8 @@ terminal by advanced users. On Linux, ZZALOG may be started by typing
 On starting, a banner window is
 displayed:
 
-\image html UserGuide_html_414f707a.png
-\image latex UserGuide_html_414f707a.png
+\image html quick_1.png "Program banner"
+\image latex quick_1.png "Program banner" width=8cm
 
 The above image shows the
 progress of the application as it is loading all the data needed to
@@ -18,71 +18,55 @@ run. This window shows the latest message output, the latest error
 message output and the progress of each stage. In the above image,
 the application is reading in the latest callsign parsing information
 file and the banner shows the progress in numerical form and in a
-clock dial form. The "Full" button, when clicked, expands
-the display to show a scrollable output of all the messages output. 
+clock dial form.
 See \ref banner Banner for more details.
 
 Once ZZALOG has loaded then two
-or three more windows are displayed. Firstly there is a log-book
-style view of the log data:
+or three more windows are displayed. 
+\image html UserGuide_html_4a79518e.png "Logbook view"
+\image latex UserGuide_html_4a79518e.png "Logbook view"
 
-\image html UserGuide_html_4a79518e.png
-\image latex UserGuide_html_4a79518e.png
-
-In the above image
+Firstly, there is a log-book
+style view of the log data. In the above image
 a page of the log-book showing the most recent entries is
 displayed. In this view the data that is presented can be configured
 by selecting different fields to be displayed. The data can be
 displayed either in chronological order or in reverse chronological
 order. More information about this window is provided in \ref main_window
 below.
+
+\image html qso_manager_1.png "Operating dashboard"
+\image latex qso_manager_1.png "Operating dashboard"
+
 Secondly, a dashboard view is
 available: in the image below ZZALOG provides
 the user with the ability to enter new QSOs, edit existing QSOs,
 browse the log and manage all the data exchange functionality.
 Briefly, the various panes in this window show:
-- "Station": Location, operator and callsign of current operation. 
+- <B>Station</B> Location, operator and callsign of current operation. 
 See \ref qso_operation.
-- "QSO Entry": Viewing and editing pane for QSO records.
+- <B>QSO Entry</B> Viewing and editing pane for QSO records.
 See \ref qso_entry In come
 operations this is replaced by a "QSO Query" view.
-- "Previous": Displays any previous QSOs with the entered callsign.
+- <B>Previous</B> Displays any previous QSOs with the entered callsign.
 See \ref qso_details.
-- "DX?": Shows the "worked-before" status of the DXCC entity
+- <B>DX?</B> Shows the "worked-before" status of the DXCC entity
 etc. See \ref qso_dxcc.
-- "QSL": Displays the QSL status for this QSO &ndash; including displaying
+- <B>QSL</B> Displays the QSL status for this QSO &ndash; including displaying
 any card image. See \ref qso_qsl_vwr.
-- "Contest": Is used for contest operating. See \ref contest_scorer.
-- "Controls": Displays all the operations available in the current state.
+- <B>Contest</B> Is used for contest operating. See \ref contest_scorer.
+- <B>Controls</B> Displays all the operations available in the current state.
 See \ref qso_buttons.
-- "Rigs": Displays the status of any connected rigs. See \ref qso_rig.
-- "Clocks": Displays the time in UTC (i.e GMT or Zulu) and local time. See \ref qso_clocks.
-- "Log": Displays the current status of the file. See \ref qso_log_info.
-- "QSLs": Allows the control of data exchange with on-line QSL services. See \ref qso_qsl.
-- "Apps": Provides control of other applications such as digital modems. See \ref qso_apps.
-- "WX": Displays the local weather obtained from openweather.org. See \ref qso_wx.
-- "Bandplan": Displays the local bandplan information. See \ref qso_bands.
+- <B>Rigs</B> Displays the status of any connected rigs. See \ref qso_rig.
+- <B>Time</B> Displays the time in UTC (i.e GMT or Zulu) and local time. See \ref qso_clocks.
+- <B>Weather</B> Displays the local weather obtained from openweather.org. See \ref qso_wx.
+- <B>Log</B> Displays the current status of the file. See \ref qso_log_info.
+- <B>QSLs</B> Allows the control of data exchange with on-line QSL services. See \ref qso_qsl.
+- <B>Apps</B> Provides control of other applications such as digital modems. See \ref qso_apps.
+- <B>Bandplan</B> Displays the local bandplan information. See \ref qso_bands.
 
 More details for each pane is
 provided in the links above.
-
-\image html qso_manager_1.png
-\image latex qso_manager_1.png
-
-Finally, if ZZALOG is so
-configured, a third window is displayed. This is used
-for a club operation where individual log-in
-is required:
-
-\image html init_5.png
-\image latex init_5.png
-
-In the above image
-the user is being asked to identify themselves. The field labeled
-"Operator" has a drop-down menu so that the user can select
-themselves or if not listed type in their initials (or callsign
-suffix). The user can then enter their name and callsign if mandated
-by the station policy. 
 
 For further information about using ZZALOG see \ref page_4.
 

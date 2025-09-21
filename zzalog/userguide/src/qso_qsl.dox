@@ -6,8 +6,8 @@ This pane allows interaction with the online QSL servers: eQSL.cc,
 Logbook of the World, Clublog.org and QRZ.com. In addition it allows
 processing of e-mail and paper QSLs.
 
-\image html qso_qsl_1.png
-\image latex qso_qsl_1.png
+\image html qso_qsl_1.png "Position of QSL controls within dashboard window"
+\image latex qso_qsl_1.png "Position of QSL controls within dashboard window"
 
 The top check box, labeled "Only handle selected QSO", allows the processing
 of the selected QSO record. Only buttons triggering actions relevant
@@ -16,11 +16,11 @@ to an individual QSO record will be activated.
 The first column, enclosed in red below, identifies the various QSL sources.
 The check boxes besides the online servers indicate, when checked, that 
 QSOs are uploaded automatically after each QSO is complete. This upload
-is started as a background activity, so should not interfere with normal
+is run in the background, so should not interfere with normal
 logging activity.
 
-\image html qso_qsl_2.png
-\image latex qso_qsl_2.png
+\image html qso_qsl_2.png "Detail indicating supported QSL sites"
+\image latex qso_qsl_2.png "Detail indicating supported QSL sites" width=5cm
 
 \subsection qq_download Downloading data
 
@@ -36,8 +36,8 @@ requests for confirmation are handled by \ref qso_query. The appropriate fields
 are added to the QSO records indicating either the QSL status with respect to the 
 server, or that a QSL request has been received for OQRS.
 
-\image html qso_qsl_3.png
-\image latex qso_qsl_3.png
+\image html qso_qsl_3.png "Detail showing download controls"
+\image latex qso_qsl_3.png  "Detail showing download controls" width=5cm
 
 \subsection qq_extract Extracting QSL data
 
@@ -45,8 +45,8 @@ The third column, shown below, contains buttons that extract data for sending to
 online servers or other processing. The bottom button, labeled with a backward looping
 arrow, remoces the extract.
 
-\image html qso_qsl_4.png
-\image latex qso_qsl_4.png
+\image html qso_qsl_4.png "Detail showing extract controls"
+\image latex qso_qsl_4.png "Detail showing extract controls" width=5cm
 
 \subsection qq_processing Processing QSL data
 
@@ -59,23 +59,24 @@ For Cards, a label os printed for each of the records in the extracted data.
 
 Foe e-Mails, an QSL image is generated for each of the records in the extracted data.
 
-\image html qso_qsl_5.png
-\image latex qso_qsl_5.png
+\image html qso_qsl_5.png "Detail showing processing controls"
+\image latex qso_qsl_5.png "Detail showing processing controls" width=5cm
 
 \subsection qq_upload Uploading QSL data
 
 The fifth column, shown below, contains buttons that upload data.
 
 For the three online servers that support bulk data upload (eQSL.cc, Logbook of the World
-and Clublog.org) the extracted data is uploaded to the server.
+and Clublog.org) the extracted data is uploaded to the server. For QRZ.com, 
+bulk upload is implemented by multiple single uploads.
 
 For all four online servers individual QSOs can be uploaded.
 
 For e-Mails, the button will send e-mails with the previously generated images
 for each record in the extracted data.
 
-\image html qso_qsl_6.png
-\image latex qso_qsl_6.png
+\image html qso_qsl_6.png "Detail showing upload controls"
+\image latex qso_qsl_6.png "Detail showing upload controls" width=5cm
 
 \subsection qq_done Updating records with "Done"
 
@@ -83,7 +84,7 @@ The last column, shown below, contains buttons, lebaled "Done". For those activi
 that require manual intervention: uploading data; posting cards and sending e-mails, 
 clicking "Done" will update the records that the activity is complete.
 
-\image html qso_qsl_7.png
-\image latex qso_qsl_7.png
+\image html qso_qsl_7.png "Detail showing controls to make a process is complete"
+\image latex qso_qsl_7.png "Detail showing controls to make a process is complete" width=8cm
 
 */

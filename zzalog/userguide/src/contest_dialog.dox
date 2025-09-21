@@ -17,8 +17,8 @@ multiplied by the number of DXCC entities worked on each band.
 
 The user should then specify the start and finish of the contest.
 
-\image html contest_dialog_1.png
-\image latex contest_dialog_1.png
+\image html contest_dialog_1.png "Tab showing contest definition"
+\image latex contest_dialog_1.png "Tab showing contest definition"
 
 */
 

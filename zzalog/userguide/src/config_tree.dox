@@ -2,7 +2,7 @@
 
 This pane displays all the current settings in a tree view. This is for information only.
 
-\image html config_tree_1.png
-\image latex config_tree_1.png
+\image html config_tree_1.png "Tree view of all settings in ZZALOG.prefs"
+\image latex config_tree_1.png "Tree view of all settings in ZZALOG.prefs"
 
 */

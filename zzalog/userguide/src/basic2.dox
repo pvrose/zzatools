@@ -1,4 +1,4 @@
-/** \page basic2 Basic Operating - Digital
+/** \page basic2 Basic operating - digital modes
 
 Operatimg dgital modes require the ues of modem applications. A modem application will
 encode the message into audio tones for transmission and decode received audio tones on
@@ -16,17 +16,17 @@ on completion of the QSO.
 
 \section b2_fldigi Launching and Connecting FlDigi
 
-FlDigi is a modem application for modes such as RTTY, CW and PSK. To launch the application,
+FlDigi is a modem application for modes such as RTTY, CW and PSK. 
+
+\image html basic2_1.png "FDigi control pane"
+\image latex basic2_1.png "FlDigi control pane"
+
+To launch the application,
 select the FlDigi tab and click the "Connect" button. FlDigi should have been configured
-for the specific transceiver type, and its CAT and audio port connections. 
+for the specific transceiver type, and its CAT and audio port connections. Once FLDIGI has been launched it needs to be told to use ZZALOG as its log server.
 
-\image html basic2_1.png
-\image latex basic2_1.png
-
-Once FLDIGI has been launched it needs to be told to use ZZALOG as its log server.
-
-\image html basic2_2.png
-\image latex basic2_2.png
+\image html basic2_2.png "Telling FlDigi to connect to ZZALOG"
+\image latex basic2_2.png "Telling FlDigi to connect to ZZALOG"
 
 From the FlDigi menu, select the "Logbook" drop-down menu and ensure "Connect to Server"
 is checked, as above. Once this is done, FlDigi will access ZZALOG to query the
@@ -35,14 +35,14 @@ of the QSO.
 
 \section b2_wsjtx Launching and Connecting WSJT-X
 
-WSJT-X is a modem application for modes such as JT9 and FT8. To launch the application,
+WSJT-X is a modem application for modes such as JT9 and FT8. 
+
+\image html basic2_3.png "WSJT-X control pane"
+\image latex basic2_3.png "WSJT-X control pane"
+
+To launch the application,
 select the WSJT tab and click the "Connect" button. WSJT-X should have been configured
-for the specific transceiver type, and its CAT and audio port connections. 
-
-\image html basic2_3.png
-\image latex basic2_3.png
-
-The button marked "Listen" is lit as ZZALOG now is now listening for data packets from
+for the specific transceiver type, and its CAT and audio port connections. The button marked "Listen" is lit as ZZALOG now is now listening for data packets from
 WSJT-X. As a QSO progresses, WSJT-X sends information about the contact and ZZALOG updates
 the QSO entry form. On completion of the QSO, WSJT-X sends a command to log the contact.
 

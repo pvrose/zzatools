@@ -43,7 +43,6 @@
     <ROW Directory="docs_Dir" Directory_Parent="ZZALOG_1_Dir" DefaultDir="docs"/>
     <ROW Directory="html_1_Dir" Directory_Parent="docs_Dir" DefaultDir="html"/>
     <ROW Directory="html_Dir" Directory_Parent="userguide_Dir" DefaultDir="html"/>
-    <ROW Directory="images_Dir" Directory_Parent="userguide_Dir" DefaultDir="images"/>
     <ROW Directory="search_1_Dir" Directory_Parent="html_1_Dir" DefaultDir="search"/>
     <ROW Directory="search_Dir" Directory_Parent="html_Dir" DefaultDir="search"/>
     <ROW Directory="userguide_Dir" Directory_Parent="ZZALOG_1_Dir" DefaultDir="USERGU~1|userguide"/>
@@ -57,9 +56,9 @@
     <ROW Component="NewFolder" ComponentId="{2253813D-1548-4C05-94FB-753321AEBDCA}" Directory_="NewFolder_1_Dir" Attributes="0"/>
     <ROW Component="ProductInformation" ComponentId="{E180E30E-16B6-4506-97ED-6FEB327E79BE}" Directory_="APPDIR" Attributes="260" KeyPath="Version"/>
     <ROW Component="SHORTCUTDIR" ComponentId="{04DB559B-3E2C-4C23-BE71-B8D21A9EC47B}" Directory_="SHORTCUTDIR" Attributes="0"/>
+    <ROW Component="ZZALOG.pdf" ComponentId="{91E1D5D9-D514-4146-AAED-BB8D71787770}" Directory_="ZZALOG_1_Dir" Attributes="0" KeyPath="ZZALOG.pdf" Type="0"/>
     <ROW Component="about__dialog_8h.html" ComponentId="{62C9209B-2263-4C2D-95C3-85EDDCD0A238}" Directory_="html_1_Dir" Attributes="0" KeyPath="about__dialog_8h.html" Type="0"/>
     <ROW Component="adding.html" ComponentId="{1D53FE55-ABE2-4C95-8506-D33663FE35AC}" Directory_="html_Dir" Attributes="0" KeyPath="adding.html" Type="0"/>
-    <ROW Component="adding_1.png" ComponentId="{7B250233-1085-4399-9144-71220D20432A}" Directory_="images_Dir" Attributes="0" KeyPath="adding_1.png" Type="0"/>
     <ROW Component="all.xml" ComponentId="{73F3094C-518F-4F63-A62E-F36CE2D1CE64}" Directory_="ZZALOG_Dir" Attributes="0" KeyPath="cty.csv" Type="0"/>
     <ROW Component="all_0.js" ComponentId="{84378801-D22C-4253-8E0A-7C33F9E390D0}" Directory_="search_Dir" Attributes="0" KeyPath="all_0.js" Type="0"/>
     <ROW Component="all_0.js_1" ComponentId="{69FD7002-6A7E-4D67-921C-0A2C163D31F8}" Directory_="search_1_Dir" Attributes="0" KeyPath="all_0.js_1" Type="0"/>
@@ -89,197 +88,6 @@
     <ROW File="Prefix.lst" Component_="all.xml" FileName="Prefix.lst" Attributes="0" SourcePath="..\reference\Prefix.lst" SelfReg="false"/>
     <ROW File="intl_chars.txt" Component_="all.xml" FileName="INTL_C~1.TXT|intl_chars.txt" Attributes="0" SourcePath="..\reference\intl_chars.txt" SelfReg="false"/>
     <ROW File="libgcc_s_seh1.dll" Component_="libgcc_s_seh1.dll" FileName="LIBGCC~2.DLL|libgcc_s_seh-1.dll" Version="65535.65535.65535.65535" Attributes="0" SourcePath="..\x64\Release\libgcc_s_seh-1.dll" SelfReg="false"/>
-    <ROW File="adding_1.png" Component_="adding_1.png" FileName="adding_1.png" Attributes="0" SourcePath="userguide\images\adding_1.png" SelfReg="false"/>
-    <ROW File="adding_2.png" Component_="adding_1.png" FileName="adding_2.png" Attributes="0" SourcePath="userguide\images\adding_2.png" SelfReg="false"/>
-    <ROW File="adding_3.png" Component_="adding_1.png" FileName="adding_3.png" Attributes="0" SourcePath="userguide\images\adding_3.png" SelfReg="false"/>
-    <ROW File="adding_4.png" Component_="adding_1.png" FileName="adding_4.png" Attributes="0" SourcePath="userguide\images\adding_4.png" SelfReg="false"/>
-    <ROW File="analysis_1.png" Component_="adding_1.png" FileName="ANALYS~1.PNG|analysis_1.png" Attributes="0" SourcePath="userguide\images\analysis_1.png" SelfReg="false"/>
-    <ROW File="analysis_2.png" Component_="adding_1.png" FileName="ANALYS~2.PNG|analysis_2.png" Attributes="0" SourcePath="userguide\images\analysis_2.png" SelfReg="false"/>
-    <ROW File="analysis_3.png" Component_="adding_1.png" FileName="ANALYS~3.PNG|analysis_3.png" Attributes="0" SourcePath="userguide\images\analysis_3.png" SelfReg="false"/>
-    <ROW File="analysis_4.png" Component_="adding_1.png" FileName="ANALYS~4.PNG|analysis_4.png" Attributes="0" SourcePath="userguide\images\analysis_4.png" SelfReg="false"/>
-    <ROW File="analysis_5.png" Component_="adding_1.png" FileName="ANALYS~5.PNG|analysis_5.png" Attributes="0" SourcePath="userguide\images\analysis_5.png" SelfReg="false"/>
-    <ROW File="banner_1.png" Component_="adding_1.png" FileName="banner_1.png" Attributes="0" SourcePath="userguide\images\banner_1.png" SelfReg="false"/>
-    <ROW File="banner_2.png" Component_="adding_1.png" FileName="banner_2.png" Attributes="0" SourcePath="userguide\images\banner_2.png" SelfReg="false"/>
-    <ROW File="banner_3.png" Component_="adding_1.png" FileName="banner_3.png" Attributes="0" SourcePath="userguide\images\banner_3.png" SelfReg="false"/>
-    <ROW File="banner_4.png" Component_="adding_1.png" FileName="banner_4.png" Attributes="0" SourcePath="userguide\images\banner_4.png" SelfReg="false"/>
-    <ROW File="banner_5.png" Component_="adding_1.png" FileName="banner_5.png" Attributes="0" SourcePath="userguide\images\banner_5.png" SelfReg="false"/>
-    <ROW File="basic1_1.png" Component_="adding_1.png" FileName="basic1_1.png" Attributes="0" SourcePath="userguide\images\basic1_1.png" SelfReg="false"/>
-    <ROW File="basic1_2.png" Component_="adding_1.png" FileName="basic1_2.png" Attributes="0" SourcePath="userguide\images\basic1_2.png" SelfReg="false"/>
-    <ROW File="basic1_3.png" Component_="adding_1.png" FileName="basic1_3.png" Attributes="0" SourcePath="userguide\images\basic1_3.png" SelfReg="false"/>
-    <ROW File="basic1_4.png" Component_="adding_1.png" FileName="basic1_4.png" Attributes="0" SourcePath="userguide\images\basic1_4.png" SelfReg="false"/>
-    <ROW File="basic2_1.png" Component_="adding_1.png" FileName="basic2_1.png" Attributes="0" SourcePath="userguide\images\basic2_1.png" SelfReg="false"/>
-    <ROW File="basic2_2.png" Component_="adding_1.png" FileName="basic2_2.png" Attributes="0" SourcePath="userguide\images\basic2_2.png" SelfReg="false"/>
-    <ROW File="basic2_3.png" Component_="adding_1.png" FileName="basic2_3.png" Attributes="0" SourcePath="userguide\images\basic2_3.png" SelfReg="false"/>
-    <ROW File="change_dialog_1.png" Component_="adding_1.png" FileName="CHANGE~1.PNG|change_dialog_1.png" Attributes="0" SourcePath="userguide\images\change_dialog_1.png" SelfReg="false"/>
-    <ROW File="cli_1.png" Component_="adding_1.png" FileName="cli_1.png" Attributes="0" SourcePath="userguide\images\cli_1.png" SelfReg="false"/>
-    <ROW File="config_tree_1.png" Component_="adding_1.png" FileName="CONFIG~1.PNG|config_tree_1.png" Attributes="0" SourcePath="userguide\images\config_tree_1.png" SelfReg="false"/>
-    <ROW File="contest_dialog_1.png" Component_="adding_1.png" FileName="CONTES~1.PNG|contest_dialog_1.png" Attributes="0" SourcePath="userguide\images\contest_dialog_1.png" SelfReg="false"/>
-    <ROW File="contest_scorer_1.png" Component_="adding_1.png" FileName="CONTES~2.PNG|contest_scorer_1.png" Attributes="0" SourcePath="userguide\images\contest_scorer_1.png" SelfReg="false"/>
-    <ROW File="contest_scorer_2.png" Component_="adding_1.png" FileName="CONTES~3.PNG|contest_scorer_2.png" Attributes="0" SourcePath="userguide\images\contest_scorer_2.png" SelfReg="false"/>
-    <ROW File="cty_dialog_1.png" Component_="adding_1.png" FileName="CTY_DI~1.PNG|cty_dialog_1.png" Attributes="0" SourcePath="userguide\images\cty_dialog_1.png" SelfReg="false"/>
-    <ROW File="cty_dialog_2.png" Component_="adding_1.png" FileName="CTY_DI~2.PNG|cty_dialog_2.png" Attributes="0" SourcePath="userguide\images\cty_dialog_2.png" SelfReg="false"/>
-    <ROW File="cty_dialog_3.png" Component_="adding_1.png" FileName="CTY_DI~3.PNG|cty_dialog_3.png" Attributes="0" SourcePath="userguide\images\cty_dialog_3.png" SelfReg="false"/>
-    <ROW File="dxcc_view_1.png" Component_="adding_1.png" FileName="DXCC_V~1.PNG|dxcc_view_1.png" Attributes="0" SourcePath="userguide\images\dxcc_view_1.png" SelfReg="false"/>
-    <ROW File="dxcc_view_2.png" Component_="adding_1.png" FileName="DXCC_V~2.PNG|dxcc_view_2.png" Attributes="0" SourcePath="userguide\images\dxcc_view_2.png" SelfReg="false"/>
-    <ROW File="dxcc_view_3.png" Component_="adding_1.png" FileName="DXCC_V~3.PNG|dxcc_view_3.png" Attributes="0" SourcePath="userguide\images\dxcc_view_3.png" SelfReg="false"/>
-    <ROW File="fields_dialog_1.png" Component_="adding_1.png" FileName="FIELDS~1.PNG|fields_dialog_1.png" Attributes="0" SourcePath="userguide\images\fields_dialog_1.png" SelfReg="false"/>
-    <ROW File="index_1.png" Component_="adding_1.png" FileName="index_1.png" Attributes="0" SourcePath="userguide\images\index_1.png" SelfReg="false"/>
-    <ROW File="init_1.png" Component_="adding_1.png" FileName="init_1.png" Attributes="0" SourcePath="userguide\images\init_1.png" SelfReg="false"/>
-    <ROW File="init_2.png" Component_="adding_1.png" FileName="init_2.png" Attributes="0" SourcePath="userguide\images\init_2.png" SelfReg="false"/>
-    <ROW File="init_3.png" Component_="adding_1.png" FileName="init_3.png" Attributes="0" SourcePath="userguide\images\init_3.png" SelfReg="false"/>
-    <ROW File="init_4.png" Component_="adding_1.png" FileName="init_4.png" Attributes="0" SourcePath="userguide\images\init_4.png" SelfReg="false"/>
-    <ROW File="init_5.png" Component_="adding_1.png" FileName="init_5.png" Attributes="0" SourcePath="userguide\images\init_5.png" SelfReg="false"/>
-    <ROW File="intl_dialog_1.png" Component_="adding_1.png" FileName="INTL_D~1.PNG|intl_dialog_1.png" Attributes="0" SourcePath="userguide\images\intl_dialog_1.png" SelfReg="false"/>
-    <ROW File="log_table_1.png" Component_="adding_1.png" FileName="LOG_TA~1.PNG|log_table_1.png" Attributes="0" SourcePath="userguide\images\log_table_1.png" SelfReg="false"/>
-    <ROW File="log_table_2.png" Component_="adding_1.png" FileName="LOG_TA~2.PNG|log_table_2.png" Attributes="0" SourcePath="userguide\images\log_table_2.png" SelfReg="false"/>
-    <ROW File="log_table_3.png" Component_="adding_1.png" FileName="LOG_TA~3.PNG|log_table_3.png" Attributes="0" SourcePath="userguide\images\log_table_3.png" SelfReg="false"/>
-    <ROW File="log_table_4.png" Component_="adding_1.png" FileName="LOG_TA~4.PNG|log_table_4.png" Attributes="0" SourcePath="userguide\images\log_table_4.png" SelfReg="false"/>
-    <ROW File="log_table_5.png" Component_="adding_1.png" FileName="LOG_TA~5.PNG|log_table_5.png" Attributes="0" SourcePath="userguide\images\log_table_5.png" SelfReg="false"/>
-    <ROW File="log_table_6.png" Component_="adding_1.png" FileName="LOG_TA~6.PNG|log_table_6.png" Attributes="0" SourcePath="userguide\images\log_table_6.png" SelfReg="false"/>
-    <ROW File="main_window_1.png" Component_="adding_1.png" FileName="MAIN_W~1.PNG|main_window_1.png" Attributes="0" SourcePath="userguide\images\main_window_1.png" SelfReg="false"/>
-    <ROW File="menu_1.png" Component_="adding_1.png" FileName="menu_1.png" Attributes="0" SourcePath="userguide\images\menu_1.png" SelfReg="false"/>
-    <ROW File="new_apps_1.png" Component_="adding_1.png" FileName="NEW_AP~1.PNG|new_apps_1.png" Attributes="0" SourcePath="userguide\images\new_apps_1.png" SelfReg="false"/>
-    <ROW File="new_apps_2.png" Component_="adding_1.png" FileName="NEW_AP~2.PNG|new_apps_2.png" Attributes="0" SourcePath="userguide\images\new_apps_2.png" SelfReg="false"/>
-    <ROW File="new_apps_3.png" Component_="adding_1.png" FileName="NEW_AP~3.PNG|new_apps_3.png" Attributes="0" SourcePath="userguide\images\new_apps_3.png" SelfReg="false"/>
-    <ROW File="new_apps_4.png" Component_="adding_1.png" FileName="NEW_AP~4.PNG|new_apps_4.png" Attributes="0" SourcePath="userguide\images\new_apps_4.png" SelfReg="false"/>
-    <ROW File="new_rig_1.png" Component_="adding_1.png" FileName="NEW_RI~1.PNG|new_rig_1.png" Attributes="0" SourcePath="userguide\images\new_rig_1.png" SelfReg="false"/>
-    <ROW File="new_rig_10.png" Component_="adding_1.png" FileName="NEW_RI~2.PNG|new_rig_10.png" Attributes="0" SourcePath="userguide\images\new_rig_10.png" SelfReg="false"/>
-    <ROW File="new_rig_11.png" Component_="adding_1.png" FileName="NEW_RI~3.PNG|new_rig_11.png" Attributes="0" SourcePath="userguide\images\new_rig_11.png" SelfReg="false"/>
-    <ROW File="new_rig_12.png" Component_="adding_1.png" FileName="NEW_RI~4.PNG|new_rig_12.png" Attributes="0" SourcePath="userguide\images\new_rig_12.png" SelfReg="false"/>
-    <ROW File="new_rig_2.png" Component_="adding_1.png" FileName="NEW_RI~5.PNG|new_rig_2.png" Attributes="0" SourcePath="userguide\images\new_rig_2.png" SelfReg="false"/>
-    <ROW File="new_rig_3.png" Component_="adding_1.png" FileName="NEW_RI~6.PNG|new_rig_3.png" Attributes="0" SourcePath="userguide\images\new_rig_3.png" SelfReg="false"/>
-    <ROW File="new_rig_4.png" Component_="adding_1.png" FileName="NEW_RI~7.PNG|new_rig_4.png" Attributes="0" SourcePath="userguide\images\new_rig_4.png" SelfReg="false"/>
-    <ROW File="new_rig_5.png" Component_="adding_1.png" FileName="NEW_RI~8.PNG|new_rig_5.png" Attributes="0" SourcePath="userguide\images\new_rig_5.png" SelfReg="false"/>
-    <ROW File="new_rig_6.png" Component_="adding_1.png" FileName="NEW_RI~9.PNG|new_rig_6.png" Attributes="0" SourcePath="userguide\images\new_rig_6.png" SelfReg="false"/>
-    <ROW File="new_rig_7.png" Component_="adding_1.png" FileName="NEW_R~10.PNG|new_rig_7.png" Attributes="0" SourcePath="userguide\images\new_rig_7.png" SelfReg="false"/>
-    <ROW File="new_rig_8.png" Component_="adding_1.png" FileName="NEW_R~11.PNG|new_rig_8.png" Attributes="0" SourcePath="userguide\images\new_rig_8.png" SelfReg="false"/>
-    <ROW File="new_rig_9.png" Component_="adding_1.png" FileName="NEW_R~12.PNG|new_rig_9.png" Attributes="0" SourcePath="userguide\images\new_rig_9.png" SelfReg="false"/>
-    <ROW File="qsls_1.png" Component_="adding_1.png" FileName="qsls_1.png" Attributes="0" SourcePath="userguide\images\qsls_1.png" SelfReg="false"/>
-    <ROW File="qsls_10.png" Component_="adding_1.png" FileName="qsls_10.png" Attributes="0" SourcePath="userguide\images\qsls_10.png" SelfReg="false"/>
-    <ROW File="qsls_2.png" Component_="adding_1.png" FileName="qsls_2.png" Attributes="0" SourcePath="userguide\images\qsls_2.png" SelfReg="false"/>
-    <ROW File="qsls_3.png" Component_="adding_1.png" FileName="qsls_3.png" Attributes="0" SourcePath="userguide\images\qsls_3.png" SelfReg="false"/>
-    <ROW File="qsls_4.png" Component_="adding_1.png" FileName="qsls_4.png" Attributes="0" SourcePath="userguide\images\qsls_4.png" SelfReg="false"/>
-    <ROW File="qsls_5.png" Component_="adding_1.png" FileName="qsls_5.png" Attributes="0" SourcePath="userguide\images\qsls_5.png" SelfReg="false"/>
-    <ROW File="qsls_6.png" Component_="adding_1.png" FileName="qsls_6.png" Attributes="0" SourcePath="userguide\images\qsls_6.png" SelfReg="false"/>
-    <ROW File="qsls_7.png" Component_="adding_1.png" FileName="qsls_7.png" Attributes="0" SourcePath="userguide\images\qsls_7.png" SelfReg="false"/>
-    <ROW File="qsls_8.png" Component_="adding_1.png" FileName="qsls_8.png" Attributes="0" SourcePath="userguide\images\qsls_8.png" SelfReg="false"/>
-    <ROW File="qsls_9.png" Component_="adding_1.png" FileName="qsls_9.png" Attributes="0" SourcePath="userguide\images\qsls_9.png" SelfReg="false"/>
-    <ROW File="qsl_editor_1.png" Component_="adding_1.png" FileName="QSL_ED~1.PNG|qsl_editor_1.png" Attributes="0" SourcePath="userguide\images\qsl_editor_1.png" SelfReg="false"/>
-    <ROW File="qsl_editor_2.png" Component_="adding_1.png" FileName="QSL_ED~2.PNG|qsl_editor_2.png" Attributes="0" SourcePath="userguide\images\qsl_editor_2.png" SelfReg="false"/>
-    <ROW File="qsl_editor_3.png" Component_="adding_1.png" FileName="QSL_ED~3.PNG|qsl_editor_3.png" Attributes="0" SourcePath="userguide\images\qsl_editor_3.png" SelfReg="false"/>
-    <ROW File="qsl_editor_4.png" Component_="adding_1.png" FileName="QSL_ED~4.PNG|qsl_editor_4.png" Attributes="0" SourcePath="userguide\images\qsl_editor_4.png" SelfReg="false"/>
-    <ROW File="qsl_editor_5.png" Component_="adding_1.png" FileName="QSL_ED~5.PNG|qsl_editor_5.png" Attributes="0" SourcePath="userguide\images\qsl_editor_5.png" SelfReg="false"/>
-    <ROW File="qso_apps_1.png" Component_="adding_1.png" FileName="QSO_AP~1.PNG|qso_apps_1.png" Attributes="0" SourcePath="userguide\images\qso_apps_1.png" SelfReg="false"/>
-    <ROW File="qso_apps_2.png" Component_="adding_1.png" FileName="QSO_AP~2.PNG|qso_apps_2.png" Attributes="0" SourcePath="userguide\images\qso_apps_2.png" SelfReg="false"/>
-    <ROW File="qso_apps_3.png" Component_="adding_1.png" FileName="QSO_AP~3.PNG|qso_apps_3.png" Attributes="0" SourcePath="userguide\images\qso_apps_3.png" SelfReg="false"/>
-    <ROW File="qso_apps_4.png" Component_="adding_1.png" FileName="QSO_AP~4.PNG|qso_apps_4.png" Attributes="0" SourcePath="userguide\images\qso_apps_4.png" SelfReg="false"/>
-    <ROW File="qso_apps_5.png" Component_="adding_1.png" FileName="QSO_AP~5.PNG|qso_apps_5.png" Attributes="0" SourcePath="userguide\images\qso_apps_5.png" SelfReg="false"/>
-    <ROW File="qso_apps_6.png" Component_="adding_1.png" FileName="QSO_AP~6.PNG|qso_apps_6.png" Attributes="0" SourcePath="userguide\images\qso_apps_6.png" SelfReg="false"/>
-    <ROW File="qso_apps_7.png" Component_="adding_1.png" FileName="QSO_AP~7.PNG|qso_apps_7.png" Attributes="0" SourcePath="userguide\images\qso_apps_7.png" SelfReg="false"/>
-    <ROW File="qso_apps_8.png" Component_="adding_1.png" FileName="QSO_AP~8.PNG|qso_apps_8.png" Attributes="0" SourcePath="userguide\images\qso_apps_8.png" SelfReg="false"/>
-    <ROW File="qso_bands_1.png" Component_="adding_1.png" FileName="QSO_BA~1.PNG|qso_bands_1.png" Attributes="0" SourcePath="userguide\images\qso_bands_1.png" SelfReg="false"/>
-    <ROW File="qso_bands_2.png" Component_="adding_1.png" FileName="QSO_BA~2.PNG|qso_bands_2.png" Attributes="0" SourcePath="userguide\images\qso_bands_2.png" SelfReg="false"/>
-    <ROW File="qso_buttons_1.png" Component_="adding_1.png" FileName="QSO_BU~1.PNG|qso_buttons_1.png" Attributes="0" SourcePath="userguide\images\qso_buttons_1.png" SelfReg="false"/>
-    <ROW File="qso_clocks_1.png" Component_="adding_1.png" FileName="QSO_CL~1.PNG|qso_clocks_1.png" Attributes="0" SourcePath="userguide\images\qso_clocks_1.png" SelfReg="false"/>
-    <ROW File="qso_details_1.png" Component_="adding_1.png" FileName="QSO_DE~1.PNG|qso_details_1.png" Attributes="0" SourcePath="userguide\images\qso_details_1.png" SelfReg="false"/>
-    <ROW File="qso_details_2.png" Component_="adding_1.png" FileName="QSO_DE~2.PNG|qso_details_2.png" Attributes="0" SourcePath="userguide\images\qso_details_2.png" SelfReg="false"/>
-    <ROW File="qso_dxcc_1.png" Component_="adding_1.png" FileName="QSO_DX~1.PNG|qso_dxcc_1.png" Attributes="0" SourcePath="userguide\images\qso_dxcc_1.png" SelfReg="false"/>
-    <ROW File="qso_dxcc_2.png" Component_="adding_1.png" FileName="QSO_DX~2.PNG|qso_dxcc_2.png" Attributes="0" SourcePath="userguide\images\qso_dxcc_2.png" SelfReg="false"/>
-    <ROW File="qso_dxcc_3.png" Component_="adding_1.png" FileName="QSO_DX~3.PNG|qso_dxcc_3.png" Attributes="0" SourcePath="userguide\images\qso_dxcc_3.png" SelfReg="false"/>
-    <ROW File="qso_entry_1.png" Component_="adding_1.png" FileName="QSO_EN~1.PNG|qso_entry_1.png" Attributes="0" SourcePath="userguide\images\qso_entry_1.png" SelfReg="false"/>
-    <ROW File="qso_entry_2.png" Component_="adding_1.png" FileName="QSO_EN~2.PNG|qso_entry_2.png" Attributes="0" SourcePath="userguide\images\qso_entry_2.png" SelfReg="false"/>
-    <ROW File="qso_entry_3.png" Component_="adding_1.png" FileName="QSO_EN~3.PNG|qso_entry_3.png" Attributes="0" SourcePath="userguide\images\qso_entry_3.png" SelfReg="false"/>
-    <ROW File="qso_entry_4.png" Component_="adding_1.png" FileName="QSO_EN~4.PNG|qso_entry_4.png" Attributes="0" SourcePath="userguide\images\qso_entry_4.png" SelfReg="false"/>
-    <ROW File="qso_entry_5.png" Component_="adding_1.png" FileName="QSO_EN~5.PNG|qso_entry_5.png" Attributes="0" SourcePath="userguide\images\qso_entry_5.png" SelfReg="false"/>
-    <ROW File="qso_log_info_1.png" Component_="adding_1.png" FileName="QSO_LO~1.PNG|qso_log_info_1.png" Attributes="0" SourcePath="userguide\images\qso_log_info_1.png" SelfReg="false"/>
-    <ROW File="qso_log_info_2.png" Component_="adding_1.png" FileName="QSO_LO~2.PNG|qso_log_info_2.png" Attributes="0" SourcePath="userguide\images\qso_log_info_2.png" SelfReg="false"/>
-    <ROW File="qso_manager_1.png" Component_="adding_1.png" FileName="QSO_MA~1.PNG|qso_manager_1.png" Attributes="0" SourcePath="userguide\images\qso_manager_1.png" SelfReg="false"/>
-    <ROW File="qso_net_entry_1.png" Component_="adding_1.png" FileName="QSO_NE~1.PNG|qso_net_entry_1.png" Attributes="0" SourcePath="userguide\images\qso_net_entry_1.png" SelfReg="false"/>
-    <ROW File="qso_operation_1.png" Component_="adding_1.png" FileName="QSO_OP~1.PNG|qso_operation_1.png" Attributes="0" SourcePath="userguide\images\qso_operation_1.png" SelfReg="false"/>
-    <ROW File="qso_operation_2.png" Component_="adding_1.png" FileName="QSO_OP~2.PNG|qso_operation_2.png" Attributes="0" SourcePath="userguide\images\qso_operation_2.png" SelfReg="false"/>
-    <ROW File="qso_operation_3.png" Component_="adding_1.png" FileName="QSO_OP~3.PNG|qso_operation_3.png" Attributes="0" SourcePath="userguide\images\qso_operation_3.png" SelfReg="false"/>
-    <ROW File="qso_operation_4.png" Component_="adding_1.png" FileName="QSO_OP~4.PNG|qso_operation_4.png" Attributes="0" SourcePath="userguide\images\qso_operation_4.png" SelfReg="false"/>
-    <ROW File="qso_qsl_1.png" Component_="adding_1.png" FileName="QSO_QS~1.PNG|qso_qsl_1.png" Attributes="0" SourcePath="userguide\images\qso_qsl_1.png" SelfReg="false"/>
-    <ROW File="qso_qsl_2.png" Component_="adding_1.png" FileName="QSO_QS~2.PNG|qso_qsl_2.png" Attributes="0" SourcePath="userguide\images\qso_qsl_2.png" SelfReg="false"/>
-    <ROW File="qso_qsl_3.png" Component_="adding_1.png" FileName="QSO_QS~3.PNG|qso_qsl_3.png" Attributes="0" SourcePath="userguide\images\qso_qsl_3.png" SelfReg="false"/>
-    <ROW File="qso_qsl_4.png" Component_="adding_1.png" FileName="QSO_QS~4.PNG|qso_qsl_4.png" Attributes="0" SourcePath="userguide\images\qso_qsl_4.png" SelfReg="false"/>
-    <ROW File="qso_qsl_5.png" Component_="adding_1.png" FileName="QSO_QS~5.PNG|qso_qsl_5.png" Attributes="0" SourcePath="userguide\images\qso_qsl_5.png" SelfReg="false"/>
-    <ROW File="qso_qsl_6.png" Component_="adding_1.png" FileName="QSO_QS~6.PNG|qso_qsl_6.png" Attributes="0" SourcePath="userguide\images\qso_qsl_6.png" SelfReg="false"/>
-    <ROW File="qso_qsl_7.png" Component_="adding_1.png" FileName="QSO_QS~7.PNG|qso_qsl_7.png" Attributes="0" SourcePath="userguide\images\qso_qsl_7.png" SelfReg="false"/>
-    <ROW File="qso_qsl_vwr_1.png" Component_="adding_1.png" FileName="QSO_QS~8.PNG|qso_qsl_vwr_1.png" Attributes="0" SourcePath="userguide\images\qso_qsl_vwr_1.png" SelfReg="false"/>
-    <ROW File="qso_qsl_vwr_2.png" Component_="adding_1.png" FileName="QSO_QS~9.PNG|qso_qsl_vwr_2.png" Attributes="0" SourcePath="userguide\images\qso_qsl_vwr_2.png" SelfReg="false"/>
-    <ROW File="qso_qsl_vwr_3.png" Component_="adding_1.png" FileName="QSO_Q~10.PNG|qso_qsl_vwr_3.png" Attributes="0" SourcePath="userguide\images\qso_qsl_vwr_3.png" SelfReg="false"/>
-    <ROW File="qso_qsl_vwr_4.png" Component_="adding_1.png" FileName="QSO_Q~11.PNG|qso_qsl_vwr_4.png" Attributes="0" SourcePath="userguide\images\qso_qsl_vwr_4.png" SelfReg="false"/>
-    <ROW File="qso_qsl_vwr_5.png" Component_="adding_1.png" FileName="QSO_Q~12.PNG|qso_qsl_vwr_5.png" Attributes="0" SourcePath="userguide\images\qso_qsl_vwr_5.png" SelfReg="false"/>
-    <ROW File="qso_query_1.png" Component_="adding_1.png" FileName="QSO_QU~1.PNG|qso_query_1.png" Attributes="0" SourcePath="userguide\images\qso_query_1.png" SelfReg="false"/>
-    <ROW File="qso_query_2.png" Component_="adding_1.png" FileName="QSO_QU~2.PNG|qso_query_2.png" Attributes="0" SourcePath="userguide\images\qso_query_2.png" SelfReg="false"/>
-    <ROW File="qso_query_3.png" Component_="adding_1.png" FileName="QSO_QU~3.PNG|qso_query_3.png" Attributes="0" SourcePath="userguide\images\qso_query_3.png" SelfReg="false"/>
-    <ROW File="qso_query_4.png" Component_="adding_1.png" FileName="QSO_QU~4.PNG|qso_query_4.png" Attributes="0" SourcePath="userguide\images\qso_query_4.png" SelfReg="false"/>
-    <ROW File="qso_query_5.png" Component_="adding_1.png" FileName="QSO_QU~5.PNG|qso_query_5.png" Attributes="0" SourcePath="userguide\images\qso_query_5.png" SelfReg="false"/>
-    <ROW File="qso_rig_1.png" Component_="adding_1.png" FileName="QSO_RI~1.PNG|qso_rig_1.png" Attributes="0" SourcePath="userguide\images\qso_rig_1.png" SelfReg="false"/>
-    <ROW File="qso_rig_10.png" Component_="adding_1.png" FileName="QSO_RI~2.PNG|qso_rig_10.png" Attributes="0" SourcePath="userguide\images\qso_rig_10.png" SelfReg="false"/>
-    <ROW File="qso_rig_2.png" Component_="adding_1.png" FileName="QSO_RI~3.PNG|qso_rig_2.png" Attributes="0" SourcePath="userguide\images\qso_rig_2.png" SelfReg="false"/>
-    <ROW File="qso_rig_3.png" Component_="adding_1.png" FileName="QSO_RI~4.PNG|qso_rig_3.png" Attributes="0" SourcePath="userguide\images\qso_rig_3.png" SelfReg="false"/>
-    <ROW File="qso_rig_4.png" Component_="adding_1.png" FileName="QSO_RI~5.PNG|qso_rig_4.png" Attributes="0" SourcePath="userguide\images\qso_rig_4.png" SelfReg="false"/>
-    <ROW File="qso_rig_5.png" Component_="adding_1.png" FileName="QSO_RI~6.PNG|qso_rig_5.png" Attributes="0" SourcePath="userguide\images\qso_rig_5.png" SelfReg="false"/>
-    <ROW File="qso_rig_6.png" Component_="adding_1.png" FileName="QSO_RI~7.PNG|qso_rig_6.png" Attributes="0" SourcePath="userguide\images\qso_rig_6.png" SelfReg="false"/>
-    <ROW File="qso_rig_7.png" Component_="adding_1.png" FileName="QSO_RI~8.PNG|qso_rig_7.png" Attributes="0" SourcePath="userguide\images\qso_rig_7.png" SelfReg="false"/>
-    <ROW File="qso_rig_8.png" Component_="adding_1.png" FileName="QSO_RI~9.PNG|qso_rig_8.png" Attributes="0" SourcePath="userguide\images\qso_rig_8.png" SelfReg="false"/>
-    <ROW File="qso_rig_9.png" Component_="adding_1.png" FileName="QSO_R~10.PNG|qso_rig_9.png" Attributes="0" SourcePath="userguide\images\qso_rig_9.png" SelfReg="false"/>
-    <ROW File="qso_wx_1.png" Component_="adding_1.png" FileName="qso_wx_1.png" Attributes="0" SourcePath="userguide\images\qso_wx_1.png" SelfReg="false"/>
-    <ROW File="report_tree_1.png" Component_="adding_1.png" FileName="REPORT~1.PNG|report_tree_1.png" Attributes="0" SourcePath="userguide\images\report_tree_1.png" SelfReg="false"/>
-    <ROW File="report_tree_2.png" Component_="adding_1.png" FileName="REPORT~2.PNG|report_tree_2.png" Attributes="0" SourcePath="userguide\images\report_tree_2.png" SelfReg="false"/>
-    <ROW File="report_tree_3.png" Component_="adding_1.png" FileName="REPORT~3.PNG|report_tree_3.png" Attributes="0" SourcePath="userguide\images\report_tree_3.png" SelfReg="false"/>
-    <ROW File="searching_1.png" Component_="adding_1.png" FileName="SEARCH~1.PNG|searching_1.png" Attributes="0" SourcePath="userguide\images\searching_1.png" SelfReg="false"/>
-    <ROW File="searching_2.png" Component_="adding_1.png" FileName="SEARCH~2.PNG|searching_2.png" Attributes="0" SourcePath="userguide\images\searching_2.png" SelfReg="false"/>
-    <ROW File="searching_3.png" Component_="adding_1.png" FileName="SEARCH~3.PNG|searching_3.png" Attributes="0" SourcePath="userguide\images\searching_3.png" SelfReg="false"/>
-    <ROW File="searching_4.png" Component_="adding_1.png" FileName="SEARCH~4.PNG|searching_4.png" Attributes="0" SourcePath="userguide\images\searching_4.png" SelfReg="false"/>
-    <ROW File="searching_5.png" Component_="adding_1.png" FileName="SEARCH~5.PNG|searching_5.png" Attributes="0" SourcePath="userguide\images\searching_5.png" SelfReg="false"/>
-    <ROW File="searching_6.png" Component_="adding_1.png" FileName="SEARCH~6.PNG|searching_6.png" Attributes="0" SourcePath="userguide\images\searching_6.png" SelfReg="false"/>
-    <ROW File="searching_7.png" Component_="adding_1.png" FileName="SEARCH~7.PNG|searching_7.png" Attributes="0" SourcePath="userguide\images\searching_7.png" SelfReg="false"/>
-    <ROW File="searching_8.png" Component_="adding_1.png" FileName="SEARCH~8.PNG|searching_8.png" Attributes="0" SourcePath="userguide\images\searching_8.png" SelfReg="false"/>
-    <ROW File="searching_9.png" Component_="adding_1.png" FileName="SEARCH~9.PNG|searching_9.png" Attributes="0" SourcePath="userguide\images\searching_9.png" SelfReg="false"/>
-    <ROW File="search_dialog_1.png" Component_="adding_1.png" FileName="SEARC~10.PNG|search_dialog_1.png" Attributes="0" SourcePath="userguide\images\search_dialog_1.png" SelfReg="false"/>
-    <ROW File="search_dialog_2.png" Component_="adding_1.png" FileName="SEARC~11.PNG|search_dialog_2.png" Attributes="0" SourcePath="userguide\images\search_dialog_2.png" SelfReg="false"/>
-    <ROW File="search_dialog_3.png" Component_="adding_1.png" FileName="SEARC~12.PNG|search_dialog_3.png" Attributes="0" SourcePath="userguide\images\search_dialog_3.png" SelfReg="false"/>
-    <ROW File="search_dialog_4.png" Component_="adding_1.png" FileName="SEARC~13.PNG|search_dialog_4.png" Attributes="0" SourcePath="userguide\images\search_dialog_4.png" SelfReg="false"/>
-    <ROW File="spec_tree_1.png" Component_="adding_1.png" FileName="SPEC_T~1.PNG|spec_tree_1.png" Attributes="0" SourcePath="userguide\images\spec_tree_1.png" SelfReg="false"/>
-    <ROW File="spec_tree_2.png" Component_="adding_1.png" FileName="SPEC_T~2.PNG|spec_tree_2.png" Attributes="0" SourcePath="userguide\images\spec_tree_2.png" SelfReg="false"/>
-    <ROW File="spec_tree_3.png" Component_="adding_1.png" FileName="SPEC_T~3.PNG|spec_tree_3.png" Attributes="0" SourcePath="userguide\images\spec_tree_3.png" SelfReg="false"/>
-    <ROW File="stn_dialog_1.png" Component_="adding_1.png" FileName="STN_DI~1.PNG|stn_dialog_1.png" Attributes="0" SourcePath="userguide\images\stn_dialog_1.png" SelfReg="false"/>
-    <ROW File="stn_dialog_2.png" Component_="adding_1.png" FileName="STN_DI~2.PNG|stn_dialog_2.png" Attributes="0" SourcePath="userguide\images\stn_dialog_2.png" SelfReg="false"/>
-    <ROW File="stn_dialog_3.png" Component_="adding_1.png" FileName="STN_DI~3.PNG|stn_dialog_3.png" Attributes="0" SourcePath="userguide\images\stn_dialog_3.png" SelfReg="false"/>
-    <ROW File="toolbar_1.png" Component_="adding_1.png" FileName="TOOLBA~1.PNG|toolbar_1.png" Attributes="0" SourcePath="userguide\images\toolbar_1.png" SelfReg="false"/>
-    <ROW File="toolbar_set1.png" Component_="adding_1.png" FileName="TOOLBA~2.PNG|toolbar_set1.png" Attributes="0" SourcePath="userguide\images\toolbar_set1.png" SelfReg="false"/>
-    <ROW File="toolbar_set2.png" Component_="adding_1.png" FileName="TOOLBA~3.PNG|toolbar_set2.png" Attributes="0" SourcePath="userguide\images\toolbar_set2.png" SelfReg="false"/>
-    <ROW File="toolbar_set3.png" Component_="adding_1.png" FileName="TOOLBA~4.PNG|toolbar_set3.png" Attributes="0" SourcePath="userguide\images\toolbar_set3.png" SelfReg="false"/>
-    <ROW File="toolbar_set4.png" Component_="adding_1.png" FileName="TOOLBA~5.PNG|toolbar_set4.png" Attributes="0" SourcePath="userguide\images\toolbar_set4.png" SelfReg="false"/>
-    <ROW File="toolbar_set5.png" Component_="adding_1.png" FileName="TOOLBA~6.PNG|toolbar_set5.png" Attributes="0" SourcePath="userguide\images\toolbar_set5.png" SelfReg="false"/>
-    <ROW File="toolbar_set6.png" Component_="adding_1.png" FileName="TOOLBA~7.PNG|toolbar_set6.png" Attributes="0" SourcePath="userguide\images\toolbar_set6.png" SelfReg="false"/>
-    <ROW File="UserGuide_html_2a85bca3.png" Component_="adding_1.png" FileName="USERGU~1.PNG|UserGuide_html_2a85bca3.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_2a85bca3.png" SelfReg="false"/>
-    <ROW File="UserGuide_html_414f707a.png" Component_="adding_1.png" FileName="USERGU~2.PNG|UserGuide_html_414f707a.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_414f707a.png" SelfReg="false"/>
-    <ROW File="UserGuide_html_4a79518e.png" Component_="adding_1.png" FileName="USERGU~3.PNG|UserGuide_html_4a79518e.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_4a79518e.png" SelfReg="false"/>
-    <ROW File="UserGuide_html_557fd7e5.png" Component_="adding_1.png" FileName="USERGU~4.PNG|UserGuide_html_557fd7e5.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_557fd7e5.png" SelfReg="false"/>
-    <ROW File="UserGuide_html_5e16a7e3.png" Component_="adding_1.png" FileName="USERGU~5.PNG|UserGuide_html_5e16a7e3.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_5e16a7e3.png" SelfReg="false"/>
-    <ROW File="UserGuide_html_ab32828.png" Component_="adding_1.png" FileName="USERGU~6.PNG|UserGuide_html_ab32828.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_ab32828.png" SelfReg="false"/>
-    <ROW File="UserGuide_html_m112f565d.png" Component_="adding_1.png" FileName="USERGU~7.PNG|UserGuide_html_m112f565d.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_m112f565d.png" SelfReg="false"/>
-    <ROW File="UserGuide_html_m26e6c1cd.png" Component_="adding_1.png" FileName="USERGU~8.PNG|UserGuide_html_m26e6c1cd.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_m26e6c1cd.png" SelfReg="false"/>
-    <ROW File="UserGuide_html_m4911387.png" Component_="adding_1.png" FileName="USERGU~9.PNG|UserGuide_html_m4911387.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_m4911387.png" SelfReg="false"/>
-    <ROW File="UserGuide_html_m49d19ab4.png" Component_="adding_1.png" FileName="USERG~10.PNG|UserGuide_html_m49d19ab4.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_m49d19ab4.png" SelfReg="false"/>
-    <ROW File="UserGuide_html_m4c6cfb94.png" Component_="adding_1.png" FileName="USERG~11.PNG|UserGuide_html_m4c6cfb94.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_m4c6cfb94.png" SelfReg="false"/>
-    <ROW File="UserGuide_html_m6ae6db20.png" Component_="adding_1.png" FileName="USERG~12.PNG|UserGuide_html_m6ae6db20.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_m6ae6db20.png" SelfReg="false"/>
-    <ROW File="UserGuide_html_m75dc8f06.png" Component_="adding_1.png" FileName="USERG~13.PNG|UserGuide_html_m75dc8f06.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_m75dc8f06.png" SelfReg="false"/>
-    <ROW File="UserGuide_html_mba730c9.jpg" Component_="adding_1.png" FileName="USERGU~1.JPG|UserGuide_html_mba730c9.jpg" Attributes="0" SourcePath="userguide\images\UserGuide_html_mba730c9.jpg" SelfReg="false"/>
-    <ROW File="UserGuide_html_me4bb4f5.png" Component_="adding_1.png" FileName="USERG~14.PNG|UserGuide_html_me4bb4f5.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_me4bb4f5.png" SelfReg="false"/>
-    <ROW File="user_dialog_1.png" Component_="adding_1.png" FileName="USER_D~1.PNG|user_dialog_1.png" Attributes="0" SourcePath="userguide\images\user_dialog_1.png" SelfReg="false"/>
-    <ROW File="web_dialog_1.png" Component_="adding_1.png" FileName="WEB_DI~1.PNG|web_dialog_1.png" Attributes="0" SourcePath="userguide\images\web_dialog_1.png" SelfReg="false"/>
-    <ROW File="web_dialog_2.png" Component_="adding_1.png" FileName="WEB_DI~2.PNG|web_dialog_2.png" Attributes="0" SourcePath="userguide\images\web_dialog_2.png" SelfReg="false"/>
-    <ROW File="web_dialog_3.png" Component_="adding_1.png" FileName="WEB_DI~3.PNG|web_dialog_3.png" Attributes="0" SourcePath="userguide\images\web_dialog_3.png" SelfReg="false"/>
-    <ROW File="web_dialog_4.png" Component_="adding_1.png" FileName="WEB_DI~4.PNG|web_dialog_4.png" Attributes="0" SourcePath="userguide\images\web_dialog_4.png" SelfReg="false"/>
-    <ROW File="web_dialog_5.png" Component_="adding_1.png" FileName="WEB_DI~5.PNG|web_dialog_5.png" Attributes="0" SourcePath="userguide\images\web_dialog_5.png" SelfReg="false"/>
-    <ROW File="web_dialog_6.png" Component_="adding_1.png" FileName="WEB_DI~6.PNG|web_dialog_6.png" Attributes="0" SourcePath="userguide\images\web_dialog_6.png" SelfReg="false"/>
-    <ROW File="web_dialog_7.png" Component_="adding_1.png" FileName="WEB_DI~7.PNG|web_dialog_7.png" Attributes="0" SourcePath="userguide\images\web_dialog_7.png" SelfReg="false"/>
-    <ROW File="web_dialog_8.png" Component_="adding_1.png" FileName="WEB_DI~8.PNG|web_dialog_8.png" Attributes="0" SourcePath="userguide\images\web_dialog_8.png" SelfReg="false"/>
     <ROW File="band_plan.json" Component_="all.xml" FileName="BAND_P~1.JSO|band_plan.json" Attributes="0" SourcePath="..\reference\band_plan.json" SelfReg="false"/>
     <ROW File="all.json" Component_="all.xml" FileName="ALL~1.JSO|all.json" Attributes="0" SourcePath="..\reference\all.json" SelfReg="false"/>
     <ROW File="about__dialog_8h.html" Component_="about__dialog_8h.html" FileName="ABOUT_~1.HTM|about__dialog_8h.html" Attributes="0" SourcePath="docs\html\about__dialog_8h.html" SelfReg="false"/>
@@ -1998,9 +1806,202 @@
     <ROW File="web_dialog.html" Component_="adding.html" FileName="WEB_DI~1.HTM|web_dialog.html" Attributes="0" SourcePath="userguide\html\web_dialog.html" SelfReg="false"/>
     <ROW File="_revision.html" Component_="adding.html" FileName="_REVIS~1.HTM|_revision.html" Attributes="0" SourcePath="userguide\html\_revision.html" SelfReg="false"/>
     <ROW File="_revision.js" Component_="adding.html" FileName="_REVIS~1.JS|_revision.js" Attributes="0" SourcePath="userguide\html\_revision.js" SelfReg="false"/>
+    <ROW File="ZZALOG.pdf" Component_="ZZALOG.pdf" FileName="ZZALOG.pdf" Attributes="0" SourcePath="ZZALOG.pdf" SelfReg="false"/>
+    <ROW File="adding_1.png" Component_="adding.html" FileName="adding_1.png" Attributes="0" SourcePath="userguide\images\adding_1.png" SelfReg="false"/>
+    <ROW File="adding_2.png" Component_="adding.html" FileName="adding_2.png" Attributes="0" SourcePath="userguide\images\adding_2.png" SelfReg="false"/>
+    <ROW File="adding_3.png" Component_="adding.html" FileName="adding_3.png" Attributes="0" SourcePath="userguide\images\adding_3.png" SelfReg="false"/>
+    <ROW File="adding_4.png" Component_="adding.html" FileName="adding_4.png" Attributes="0" SourcePath="userguide\images\adding_4.png" SelfReg="false"/>
+    <ROW File="analysis_1.png" Component_="adding.html" FileName="ANALYS~1.PNG|analysis_1.png" Attributes="0" SourcePath="userguide\images\analysis_1.png" SelfReg="false"/>
+    <ROW File="analysis_2.png" Component_="adding.html" FileName="ANALYS~2.PNG|analysis_2.png" Attributes="0" SourcePath="userguide\images\analysis_2.png" SelfReg="false"/>
+    <ROW File="analysis_3.png" Component_="adding.html" FileName="ANALYS~3.PNG|analysis_3.png" Attributes="0" SourcePath="userguide\images\analysis_3.png" SelfReg="false"/>
+    <ROW File="analysis_4.png" Component_="adding.html" FileName="ANALYS~4.PNG|analysis_4.png" Attributes="0" SourcePath="userguide\images\analysis_4.png" SelfReg="false"/>
+    <ROW File="analysis_5.png" Component_="adding.html" FileName="ANALYS~5.PNG|analysis_5.png" Attributes="0" SourcePath="userguide\images\analysis_5.png" SelfReg="false"/>
+    <ROW File="banner_1.png" Component_="adding.html" FileName="banner_1.png" Attributes="0" SourcePath="userguide\images\banner_1.png" SelfReg="false"/>
+    <ROW File="banner_2.png" Component_="adding.html" FileName="banner_2.png" Attributes="0" SourcePath="userguide\images\banner_2.png" SelfReg="false"/>
+    <ROW File="banner_3.png" Component_="adding.html" FileName="banner_3.png" Attributes="0" SourcePath="userguide\images\banner_3.png" SelfReg="false"/>
+    <ROW File="banner_4.png" Component_="adding.html" FileName="banner_4.png" Attributes="0" SourcePath="userguide\images\banner_4.png" SelfReg="false"/>
+    <ROW File="banner_5.png" Component_="adding.html" FileName="banner_5.png" Attributes="0" SourcePath="userguide\images\banner_5.png" SelfReg="false"/>
+    <ROW File="basic1_1.png" Component_="adding.html" FileName="basic1_1.png" Attributes="0" SourcePath="userguide\images\basic1_1.png" SelfReg="false"/>
+    <ROW File="basic1_2.png" Component_="adding.html" FileName="basic1_2.png" Attributes="0" SourcePath="userguide\images\basic1_2.png" SelfReg="false"/>
+    <ROW File="basic1_3.png" Component_="adding.html" FileName="basic1_3.png" Attributes="0" SourcePath="userguide\images\basic1_3.png" SelfReg="false"/>
+    <ROW File="basic1_4.png" Component_="adding.html" FileName="basic1_4.png" Attributes="0" SourcePath="userguide\images\basic1_4.png" SelfReg="false"/>
+    <ROW File="basic2_1.png" Component_="adding.html" FileName="basic2_1.png" Attributes="0" SourcePath="userguide\images\basic2_1.png" SelfReg="false"/>
+    <ROW File="basic2_2.png" Component_="adding.html" FileName="basic2_2.png" Attributes="0" SourcePath="userguide\images\basic2_2.png" SelfReg="false"/>
+    <ROW File="basic2_3.png" Component_="adding.html" FileName="basic2_3.png" Attributes="0" SourcePath="userguide\images\basic2_3.png" SelfReg="false"/>
+    <ROW File="change_dialog_1.png" Component_="adding.html" FileName="CHANGE~1.PNG|change_dialog_1.png" Attributes="0" SourcePath="userguide\images\change_dialog_1.png" SelfReg="false"/>
+    <ROW File="cli_1.png" Component_="adding.html" FileName="cli_1.png" Attributes="0" SourcePath="userguide\images\cli_1.png" SelfReg="false"/>
+    <ROW File="config_tree_1.png" Component_="adding.html" FileName="CONFIG~1.PNG|config_tree_1.png" Attributes="0" SourcePath="userguide\images\config_tree_1.png" SelfReg="false"/>
+    <ROW File="contest_dialog_1.png" Component_="adding.html" FileName="CONTES~1.PNG|contest_dialog_1.png" Attributes="0" SourcePath="userguide\images\contest_dialog_1.png" SelfReg="false"/>
+    <ROW File="contest_scorer_1.png" Component_="adding.html" FileName="CONTES~2.PNG|contest_scorer_1.png" Attributes="0" SourcePath="userguide\images\contest_scorer_1.png" SelfReg="false"/>
+    <ROW File="contest_scorer_2.png" Component_="adding.html" FileName="CONTES~3.PNG|contest_scorer_2.png" Attributes="0" SourcePath="userguide\images\contest_scorer_2.png" SelfReg="false"/>
+    <ROW File="cty_dialog_1.png" Component_="adding.html" FileName="CTY_DI~1.PNG|cty_dialog_1.png" Attributes="0" SourcePath="userguide\images\cty_dialog_1.png" SelfReg="false"/>
+    <ROW File="cty_dialog_2.png" Component_="adding.html" FileName="CTY_DI~2.PNG|cty_dialog_2.png" Attributes="0" SourcePath="userguide\images\cty_dialog_2.png" SelfReg="false"/>
+    <ROW File="cty_dialog_3.png" Component_="adding.html" FileName="CTY_DI~3.PNG|cty_dialog_3.png" Attributes="0" SourcePath="userguide\images\cty_dialog_3.png" SelfReg="false"/>
+    <ROW File="dxcc_view_1.png" Component_="adding.html" FileName="DXCC_V~1.PNG|dxcc_view_1.png" Attributes="0" SourcePath="userguide\images\dxcc_view_1.png" SelfReg="false"/>
+    <ROW File="dxcc_view_2.png" Component_="adding.html" FileName="DXCC_V~2.PNG|dxcc_view_2.png" Attributes="0" SourcePath="userguide\images\dxcc_view_2.png" SelfReg="false"/>
+    <ROW File="dxcc_view_3.png" Component_="adding.html" FileName="DXCC_V~3.PNG|dxcc_view_3.png" Attributes="0" SourcePath="userguide\images\dxcc_view_3.png" SelfReg="false"/>
+    <ROW File="fields_dialog_1.png" Component_="adding.html" FileName="FIELDS~1.PNG|fields_dialog_1.png" Attributes="0" SourcePath="userguide\images\fields_dialog_1.png" SelfReg="false"/>
+    <ROW File="index_1.png" Component_="adding.html" FileName="index_1.png" Attributes="0" SourcePath="userguide\images\index_1.png" SelfReg="false"/>
+    <ROW File="init_1.png" Component_="adding.html" FileName="init_1.png" Attributes="0" SourcePath="userguide\images\init_1.png" SelfReg="false"/>
+    <ROW File="init_2.png" Component_="adding.html" FileName="init_2.png" Attributes="0" SourcePath="userguide\images\init_2.png" SelfReg="false"/>
+    <ROW File="init_3.png" Component_="adding.html" FileName="init_3.png" Attributes="0" SourcePath="userguide\images\init_3.png" SelfReg="false"/>
+    <ROW File="init_4.png" Component_="adding.html" FileName="init_4.png" Attributes="0" SourcePath="userguide\images\init_4.png" SelfReg="false"/>
+    <ROW File="init_5.png" Component_="adding.html" FileName="init_5.png" Attributes="0" SourcePath="userguide\images\init_5.png" SelfReg="false"/>
+    <ROW File="intl_dialog_1.png" Component_="adding.html" FileName="INTL_D~1.PNG|intl_dialog_1.png" Attributes="0" SourcePath="userguide\images\intl_dialog_1.png" SelfReg="false"/>
+    <ROW File="log_table_1.png" Component_="adding.html" FileName="LOG_TA~1.PNG|log_table_1.png" Attributes="0" SourcePath="userguide\images\log_table_1.png" SelfReg="false"/>
+    <ROW File="log_table_2.png" Component_="adding.html" FileName="LOG_TA~2.PNG|log_table_2.png" Attributes="0" SourcePath="userguide\images\log_table_2.png" SelfReg="false"/>
+    <ROW File="log_table_3.png" Component_="adding.html" FileName="LOG_TA~3.PNG|log_table_3.png" Attributes="0" SourcePath="userguide\images\log_table_3.png" SelfReg="false"/>
+    <ROW File="log_table_4.png" Component_="adding.html" FileName="LOG_TA~4.PNG|log_table_4.png" Attributes="0" SourcePath="userguide\images\log_table_4.png" SelfReg="false"/>
+    <ROW File="log_table_5.png" Component_="adding.html" FileName="LOG_TA~5.PNG|log_table_5.png" Attributes="0" SourcePath="userguide\images\log_table_5.png" SelfReg="false"/>
+    <ROW File="log_table_6.png" Component_="adding.html" FileName="LOG_TA~6.PNG|log_table_6.png" Attributes="0" SourcePath="userguide\images\log_table_6.png" SelfReg="false"/>
+    <ROW File="main_window_1.png" Component_="adding.html" FileName="MAIN_W~1.PNG|main_window_1.png" Attributes="0" SourcePath="userguide\images\main_window_1.png" SelfReg="false"/>
+    <ROW File="menu_1.png" Component_="adding.html" FileName="menu_1.png" Attributes="0" SourcePath="userguide\images\menu_1.png" SelfReg="false"/>
+    <ROW File="new_apps_1.png" Component_="adding.html" FileName="NEW_AP~1.PNG|new_apps_1.png" Attributes="0" SourcePath="userguide\images\new_apps_1.png" SelfReg="false"/>
+    <ROW File="new_apps_2.png" Component_="adding.html" FileName="NEW_AP~2.PNG|new_apps_2.png" Attributes="0" SourcePath="userguide\images\new_apps_2.png" SelfReg="false"/>
+    <ROW File="new_apps_3.png" Component_="adding.html" FileName="NEW_AP~3.PNG|new_apps_3.png" Attributes="0" SourcePath="userguide\images\new_apps_3.png" SelfReg="false"/>
+    <ROW File="new_apps_4.png" Component_="adding.html" FileName="NEW_AP~4.PNG|new_apps_4.png" Attributes="0" SourcePath="userguide\images\new_apps_4.png" SelfReg="false"/>
+    <ROW File="new_rig_1.png" Component_="adding.html" FileName="NEW_RI~1.PNG|new_rig_1.png" Attributes="0" SourcePath="userguide\images\new_rig_1.png" SelfReg="false"/>
+    <ROW File="new_rig_2.png" Component_="adding.html" FileName="NEW_RI~2.PNG|new_rig_2.png" Attributes="0" SourcePath="userguide\images\new_rig_2.png" SelfReg="false"/>
+    <ROW File="new_rig_3.png" Component_="adding.html" FileName="NEW_RI~3.PNG|new_rig_3.png" Attributes="0" SourcePath="userguide\images\new_rig_3.png" SelfReg="false"/>
+    <ROW File="new_rig_4.png" Component_="adding.html" FileName="NEW_RI~4.PNG|new_rig_4.png" Attributes="0" SourcePath="userguide\images\new_rig_4.png" SelfReg="false"/>
+    <ROW File="new_rig_5.png" Component_="adding.html" FileName="NEW_RI~5.PNG|new_rig_5.png" Attributes="0" SourcePath="userguide\images\new_rig_5.png" SelfReg="false"/>
+    <ROW File="new_rig_6.png" Component_="adding.html" FileName="NEW_RI~6.PNG|new_rig_6.png" Attributes="0" SourcePath="userguide\images\new_rig_6.png" SelfReg="false"/>
+    <ROW File="new_rig_7.png" Component_="adding.html" FileName="NEW_RI~7.PNG|new_rig_7.png" Attributes="0" SourcePath="userguide\images\new_rig_7.png" SelfReg="false"/>
+    <ROW File="new_rig_8.png" Component_="adding.html" FileName="NEW_RI~8.PNG|new_rig_8.png" Attributes="0" SourcePath="userguide\images\new_rig_8.png" SelfReg="false"/>
+    <ROW File="new_rig_9.png" Component_="adding.html" FileName="NEW_RI~9.PNG|new_rig_9.png" Attributes="0" SourcePath="userguide\images\new_rig_9.png" SelfReg="false"/>
+    <ROW File="new_rig_10.png" Component_="adding.html" FileName="NEW_R~10.PNG|new_rig_10.png" Attributes="0" SourcePath="userguide\images\new_rig_10.png" SelfReg="false"/>
+    <ROW File="new_rig_11.png" Component_="adding.html" FileName="NEW_R~11.PNG|new_rig_11.png" Attributes="0" SourcePath="userguide\images\new_rig_11.png" SelfReg="false"/>
+    <ROW File="new_rig_12.png" Component_="adding.html" FileName="NEW_R~12.PNG|new_rig_12.png" Attributes="0" SourcePath="userguide\images\new_rig_12.png" SelfReg="false"/>
+    <ROW File="qsl_editor_1.png" Component_="adding.html" FileName="QSL_ED~1.PNG|qsl_editor_1.png" Attributes="0" SourcePath="userguide\images\qsl_editor_1.png" SelfReg="false"/>
+    <ROW File="qsl_editor_2.png" Component_="adding.html" FileName="QSL_ED~2.PNG|qsl_editor_2.png" Attributes="0" SourcePath="userguide\images\qsl_editor_2.png" SelfReg="false"/>
+    <ROW File="qsl_editor_3.png" Component_="adding.html" FileName="QSL_ED~3.PNG|qsl_editor_3.png" Attributes="0" SourcePath="userguide\images\qsl_editor_3.png" SelfReg="false"/>
+    <ROW File="qsl_editor_4.png" Component_="adding.html" FileName="QSL_ED~4.PNG|qsl_editor_4.png" Attributes="0" SourcePath="userguide\images\qsl_editor_4.png" SelfReg="false"/>
+    <ROW File="qsl_editor_5.png" Component_="adding.html" FileName="QSL_ED~5.PNG|qsl_editor_5.png" Attributes="0" SourcePath="userguide\images\qsl_editor_5.png" SelfReg="false"/>
+    <ROW File="qsls_1.png" Component_="adding.html" FileName="qsls_1.png" Attributes="0" SourcePath="userguide\images\qsls_1.png" SelfReg="false"/>
+    <ROW File="qsls_2.png" Component_="adding.html" FileName="qsls_2.png" Attributes="0" SourcePath="userguide\images\qsls_2.png" SelfReg="false"/>
+    <ROW File="qsls_3.png" Component_="adding.html" FileName="qsls_3.png" Attributes="0" SourcePath="userguide\images\qsls_3.png" SelfReg="false"/>
+    <ROW File="qsls_4.png" Component_="adding.html" FileName="qsls_4.png" Attributes="0" SourcePath="userguide\images\qsls_4.png" SelfReg="false"/>
+    <ROW File="qsls_5.png" Component_="adding.html" FileName="qsls_5.png" Attributes="0" SourcePath="userguide\images\qsls_5.png" SelfReg="false"/>
+    <ROW File="qsls_6.png" Component_="adding.html" FileName="qsls_6.png" Attributes="0" SourcePath="userguide\images\qsls_6.png" SelfReg="false"/>
+    <ROW File="qsls_7.png" Component_="adding.html" FileName="qsls_7.png" Attributes="0" SourcePath="userguide\images\qsls_7.png" SelfReg="false"/>
+    <ROW File="qsls_8.png" Component_="adding.html" FileName="qsls_8.png" Attributes="0" SourcePath="userguide\images\qsls_8.png" SelfReg="false"/>
+    <ROW File="qsls_9.png" Component_="adding.html" FileName="qsls_9.png" Attributes="0" SourcePath="userguide\images\qsls_9.png" SelfReg="false"/>
+    <ROW File="qsls_10.png" Component_="adding.html" FileName="qsls_10.png" Attributes="0" SourcePath="userguide\images\qsls_10.png" SelfReg="false"/>
+    <ROW File="qso_apps_1.png" Component_="adding.html" FileName="QSO_AP~1.PNG|qso_apps_1.png" Attributes="0" SourcePath="userguide\images\qso_apps_1.png" SelfReg="false"/>
+    <ROW File="qso_apps_2.png" Component_="adding.html" FileName="QSO_AP~2.PNG|qso_apps_2.png" Attributes="0" SourcePath="userguide\images\qso_apps_2.png" SelfReg="false"/>
+    <ROW File="qso_apps_3.png" Component_="adding.html" FileName="QSO_AP~3.PNG|qso_apps_3.png" Attributes="0" SourcePath="userguide\images\qso_apps_3.png" SelfReg="false"/>
+    <ROW File="qso_apps_4.png" Component_="adding.html" FileName="QSO_AP~4.PNG|qso_apps_4.png" Attributes="0" SourcePath="userguide\images\qso_apps_4.png" SelfReg="false"/>
+    <ROW File="qso_apps_5.png" Component_="adding.html" FileName="QSO_AP~5.PNG|qso_apps_5.png" Attributes="0" SourcePath="userguide\images\qso_apps_5.png" SelfReg="false"/>
+    <ROW File="qso_apps_6.png" Component_="adding.html" FileName="QSO_AP~6.PNG|qso_apps_6.png" Attributes="0" SourcePath="userguide\images\qso_apps_6.png" SelfReg="false"/>
+    <ROW File="qso_apps_7.png" Component_="adding.html" FileName="QSO_AP~7.PNG|qso_apps_7.png" Attributes="0" SourcePath="userguide\images\qso_apps_7.png" SelfReg="false"/>
+    <ROW File="qso_apps_8.png" Component_="adding.html" FileName="QSO_AP~8.PNG|qso_apps_8.png" Attributes="0" SourcePath="userguide\images\qso_apps_8.png" SelfReg="false"/>
+    <ROW File="qso_bands_1.png" Component_="adding.html" FileName="QSO_BA~1.PNG|qso_bands_1.png" Attributes="0" SourcePath="userguide\images\qso_bands_1.png" SelfReg="false"/>
+    <ROW File="qso_bands_2.png" Component_="adding.html" FileName="QSO_BA~2.PNG|qso_bands_2.png" Attributes="0" SourcePath="userguide\images\qso_bands_2.png" SelfReg="false"/>
+    <ROW File="qso_buttons_1.png" Component_="adding.html" FileName="QSO_BU~1.PNG|qso_buttons_1.png" Attributes="0" SourcePath="userguide\images\qso_buttons_1.png" SelfReg="false"/>
+    <ROW File="qso_clocks_1.png" Component_="adding.html" FileName="QSO_CL~1.PNG|qso_clocks_1.png" Attributes="0" SourcePath="userguide\images\qso_clocks_1.png" SelfReg="false"/>
+    <ROW File="qso_details_1.png" Component_="adding.html" FileName="QSO_DE~1.PNG|qso_details_1.png" Attributes="0" SourcePath="userguide\images\qso_details_1.png" SelfReg="false"/>
+    <ROW File="qso_details_2.png" Component_="adding.html" FileName="QSO_DE~2.PNG|qso_details_2.png" Attributes="0" SourcePath="userguide\images\qso_details_2.png" SelfReg="false"/>
+    <ROW File="qso_dxcc_1.png" Component_="adding.html" FileName="QSO_DX~1.PNG|qso_dxcc_1.png" Attributes="0" SourcePath="userguide\images\qso_dxcc_1.png" SelfReg="false"/>
+    <ROW File="qso_dxcc_2.png" Component_="adding.html" FileName="QSO_DX~2.PNG|qso_dxcc_2.png" Attributes="0" SourcePath="userguide\images\qso_dxcc_2.png" SelfReg="false"/>
+    <ROW File="qso_dxcc_3.png" Component_="adding.html" FileName="QSO_DX~3.PNG|qso_dxcc_3.png" Attributes="0" SourcePath="userguide\images\qso_dxcc_3.png" SelfReg="false"/>
+    <ROW File="qso_entry_1.png" Component_="adding.html" FileName="QSO_EN~1.PNG|qso_entry_1.png" Attributes="0" SourcePath="userguide\images\qso_entry_1.png" SelfReg="false"/>
+    <ROW File="qso_entry_2.png" Component_="adding.html" FileName="QSO_EN~2.PNG|qso_entry_2.png" Attributes="0" SourcePath="userguide\images\qso_entry_2.png" SelfReg="false"/>
+    <ROW File="qso_entry_3.png" Component_="adding.html" FileName="QSO_EN~3.PNG|qso_entry_3.png" Attributes="0" SourcePath="userguide\images\qso_entry_3.png" SelfReg="false"/>
+    <ROW File="qso_entry_4.png" Component_="adding.html" FileName="QSO_EN~4.PNG|qso_entry_4.png" Attributes="0" SourcePath="userguide\images\qso_entry_4.png" SelfReg="false"/>
+    <ROW File="qso_entry_5.png" Component_="adding.html" FileName="QSO_EN~5.PNG|qso_entry_5.png" Attributes="0" SourcePath="userguide\images\qso_entry_5.png" SelfReg="false"/>
+    <ROW File="qso_log_info_1.png" Component_="adding.html" FileName="QSO_LO~1.PNG|qso_log_info_1.png" Attributes="0" SourcePath="userguide\images\qso_log_info_1.png" SelfReg="false"/>
+    <ROW File="qso_log_info_2.png" Component_="adding.html" FileName="QSO_LO~2.PNG|qso_log_info_2.png" Attributes="0" SourcePath="userguide\images\qso_log_info_2.png" SelfReg="false"/>
+    <ROW File="qso_manager_1.png" Component_="adding.html" FileName="QSO_MA~1.PNG|qso_manager_1.png" Attributes="0" SourcePath="userguide\images\qso_manager_1.png" SelfReg="false"/>
+    <ROW File="qso_net_entry_1.png" Component_="adding.html" FileName="QSO_NE~1.PNG|qso_net_entry_1.png" Attributes="0" SourcePath="userguide\images\qso_net_entry_1.png" SelfReg="false"/>
+    <ROW File="qso_operation_1.png" Component_="adding.html" FileName="QSO_OP~1.PNG|qso_operation_1.png" Attributes="0" SourcePath="userguide\images\qso_operation_1.png" SelfReg="false"/>
+    <ROW File="qso_operation_2.png" Component_="adding.html" FileName="QSO_OP~2.PNG|qso_operation_2.png" Attributes="0" SourcePath="userguide\images\qso_operation_2.png" SelfReg="false"/>
+    <ROW File="qso_operation_3.png" Component_="adding.html" FileName="QSO_OP~3.PNG|qso_operation_3.png" Attributes="0" SourcePath="userguide\images\qso_operation_3.png" SelfReg="false"/>
+    <ROW File="qso_operation_4.png" Component_="adding.html" FileName="QSO_OP~4.PNG|qso_operation_4.png" Attributes="0" SourcePath="userguide\images\qso_operation_4.png" SelfReg="false"/>
+    <ROW File="qso_qsl_1.png" Component_="adding.html" FileName="QSO_QS~1.PNG|qso_qsl_1.png" Attributes="0" SourcePath="userguide\images\qso_qsl_1.png" SelfReg="false"/>
+    <ROW File="qso_qsl_2.png" Component_="adding.html" FileName="QSO_QS~2.PNG|qso_qsl_2.png" Attributes="0" SourcePath="userguide\images\qso_qsl_2.png" SelfReg="false"/>
+    <ROW File="qso_qsl_3.png" Component_="adding.html" FileName="QSO_QS~3.PNG|qso_qsl_3.png" Attributes="0" SourcePath="userguide\images\qso_qsl_3.png" SelfReg="false"/>
+    <ROW File="qso_qsl_4.png" Component_="adding.html" FileName="QSO_QS~4.PNG|qso_qsl_4.png" Attributes="0" SourcePath="userguide\images\qso_qsl_4.png" SelfReg="false"/>
+    <ROW File="qso_qsl_5.png" Component_="adding.html" FileName="QSO_QS~5.PNG|qso_qsl_5.png" Attributes="0" SourcePath="userguide\images\qso_qsl_5.png" SelfReg="false"/>
+    <ROW File="qso_qsl_6.png" Component_="adding.html" FileName="QSO_QS~6.PNG|qso_qsl_6.png" Attributes="0" SourcePath="userguide\images\qso_qsl_6.png" SelfReg="false"/>
+    <ROW File="qso_qsl_7.png" Component_="adding.html" FileName="QSO_QS~7.PNG|qso_qsl_7.png" Attributes="0" SourcePath="userguide\images\qso_qsl_7.png" SelfReg="false"/>
+    <ROW File="qso_qsl_vwr_1.png" Component_="adding.html" FileName="QSO_QS~8.PNG|qso_qsl_vwr_1.png" Attributes="0" SourcePath="userguide\images\qso_qsl_vwr_1.png" SelfReg="false"/>
+    <ROW File="qso_qsl_vwr_2.png" Component_="adding.html" FileName="QSO_QS~9.PNG|qso_qsl_vwr_2.png" Attributes="0" SourcePath="userguide\images\qso_qsl_vwr_2.png" SelfReg="false"/>
+    <ROW File="qso_qsl_vwr_3.png" Component_="adding.html" FileName="QSO_Q~10.PNG|qso_qsl_vwr_3.png" Attributes="0" SourcePath="userguide\images\qso_qsl_vwr_3.png" SelfReg="false"/>
+    <ROW File="qso_qsl_vwr_4.png" Component_="adding.html" FileName="QSO_Q~11.PNG|qso_qsl_vwr_4.png" Attributes="0" SourcePath="userguide\images\qso_qsl_vwr_4.png" SelfReg="false"/>
+    <ROW File="qso_qsl_vwr_5.png" Component_="adding.html" FileName="QSO_Q~12.PNG|qso_qsl_vwr_5.png" Attributes="0" SourcePath="userguide\images\qso_qsl_vwr_5.png" SelfReg="false"/>
+    <ROW File="qso_query_1.png" Component_="adding.html" FileName="QSO_QU~1.PNG|qso_query_1.png" Attributes="0" SourcePath="userguide\images\qso_query_1.png" SelfReg="false"/>
+    <ROW File="qso_query_2.png" Component_="adding.html" FileName="QSO_QU~2.PNG|qso_query_2.png" Attributes="0" SourcePath="userguide\images\qso_query_2.png" SelfReg="false"/>
+    <ROW File="qso_query_3.png" Component_="adding.html" FileName="QSO_QU~3.PNG|qso_query_3.png" Attributes="0" SourcePath="userguide\images\qso_query_3.png" SelfReg="false"/>
+    <ROW File="qso_query_4.png" Component_="adding.html" FileName="QSO_QU~4.PNG|qso_query_4.png" Attributes="0" SourcePath="userguide\images\qso_query_4.png" SelfReg="false"/>
+    <ROW File="qso_query_5.png" Component_="adding.html" FileName="QSO_QU~5.PNG|qso_query_5.png" Attributes="0" SourcePath="userguide\images\qso_query_5.png" SelfReg="false"/>
+    <ROW File="qso_rig_1.png" Component_="adding.html" FileName="QSO_RI~1.PNG|qso_rig_1.png" Attributes="0" SourcePath="userguide\images\qso_rig_1.png" SelfReg="false"/>
+    <ROW File="qso_rig_2.png" Component_="adding.html" FileName="QSO_RI~2.PNG|qso_rig_2.png" Attributes="0" SourcePath="userguide\images\qso_rig_2.png" SelfReg="false"/>
+    <ROW File="qso_rig_3.png" Component_="adding.html" FileName="QSO_RI~3.PNG|qso_rig_3.png" Attributes="0" SourcePath="userguide\images\qso_rig_3.png" SelfReg="false"/>
+    <ROW File="qso_rig_4.png" Component_="adding.html" FileName="QSO_RI~4.PNG|qso_rig_4.png" Attributes="0" SourcePath="userguide\images\qso_rig_4.png" SelfReg="false"/>
+    <ROW File="qso_rig_5.png" Component_="adding.html" FileName="QSO_RI~5.PNG|qso_rig_5.png" Attributes="0" SourcePath="userguide\images\qso_rig_5.png" SelfReg="false"/>
+    <ROW File="qso_rig_6.png" Component_="adding.html" FileName="QSO_RI~6.PNG|qso_rig_6.png" Attributes="0" SourcePath="userguide\images\qso_rig_6.png" SelfReg="false"/>
+    <ROW File="qso_rig_7.png" Component_="adding.html" FileName="QSO_RI~7.PNG|qso_rig_7.png" Attributes="0" SourcePath="userguide\images\qso_rig_7.png" SelfReg="false"/>
+    <ROW File="qso_rig_8.png" Component_="adding.html" FileName="QSO_RI~8.PNG|qso_rig_8.png" Attributes="0" SourcePath="userguide\images\qso_rig_8.png" SelfReg="false"/>
+    <ROW File="qso_rig_9.png" Component_="adding.html" FileName="QSO_RI~9.PNG|qso_rig_9.png" Attributes="0" SourcePath="userguide\images\qso_rig_9.png" SelfReg="false"/>
+    <ROW File="qso_rig_10.png" Component_="adding.html" FileName="QSO_R~10.PNG|qso_rig_10.png" Attributes="0" SourcePath="userguide\images\qso_rig_10.png" SelfReg="false"/>
+    <ROW File="qso_wx_1.png" Component_="adding.html" FileName="qso_wx_1.png" Attributes="0" SourcePath="userguide\images\qso_wx_1.png" SelfReg="false"/>
+    <ROW File="quick_1.png" Component_="adding.html" FileName="quick_1.png" Attributes="0" SourcePath="userguide\images\quick_1.png" SelfReg="false"/>
+    <ROW File="report_tree_1.png" Component_="adding.html" FileName="REPORT~1.PNG|report_tree_1.png" Attributes="0" SourcePath="userguide\images\report_tree_1.png" SelfReg="false"/>
+    <ROW File="report_tree_2.png" Component_="adding.html" FileName="REPORT~2.PNG|report_tree_2.png" Attributes="0" SourcePath="userguide\images\report_tree_2.png" SelfReg="false"/>
+    <ROW File="report_tree_3.png" Component_="adding.html" FileName="REPORT~3.PNG|report_tree_3.png" Attributes="0" SourcePath="userguide\images\report_tree_3.png" SelfReg="false"/>
+    <ROW File="search_dialog_1.png" Component_="adding.html" FileName="SEARCH~1.PNG|search_dialog_1.png" Attributes="0" SourcePath="userguide\images\search_dialog_1.png" SelfReg="false"/>
+    <ROW File="search_dialog_2.png" Component_="adding.html" FileName="SEARCH~2.PNG|search_dialog_2.png" Attributes="0" SourcePath="userguide\images\search_dialog_2.png" SelfReg="false"/>
+    <ROW File="search_dialog_3.png" Component_="adding.html" FileName="SEARCH~3.PNG|search_dialog_3.png" Attributes="0" SourcePath="userguide\images\search_dialog_3.png" SelfReg="false"/>
+    <ROW File="search_dialog_4.png" Component_="adding.html" FileName="SEARCH~4.PNG|search_dialog_4.png" Attributes="0" SourcePath="userguide\images\search_dialog_4.png" SelfReg="false"/>
+    <ROW File="searching_1.png" Component_="adding.html" FileName="SEARCH~5.PNG|searching_1.png" Attributes="0" SourcePath="userguide\images\searching_1.png" SelfReg="false"/>
+    <ROW File="searching_2.png" Component_="adding.html" FileName="SEARCH~6.PNG|searching_2.png" Attributes="0" SourcePath="userguide\images\searching_2.png" SelfReg="false"/>
+    <ROW File="searching_3.png" Component_="adding.html" FileName="SEARCH~7.PNG|searching_3.png" Attributes="0" SourcePath="userguide\images\searching_3.png" SelfReg="false"/>
+    <ROW File="searching_4.png" Component_="adding.html" FileName="SEARCH~8.PNG|searching_4.png" Attributes="0" SourcePath="userguide\images\searching_4.png" SelfReg="false"/>
+    <ROW File="searching_5.png" Component_="adding.html" FileName="SEARCH~9.PNG|searching_5.png" Attributes="0" SourcePath="userguide\images\searching_5.png" SelfReg="false"/>
+    <ROW File="searching_6.png" Component_="adding.html" FileName="SEARC~10.PNG|searching_6.png" Attributes="0" SourcePath="userguide\images\searching_6.png" SelfReg="false"/>
+    <ROW File="searching_7.png" Component_="adding.html" FileName="SEARC~11.PNG|searching_7.png" Attributes="0" SourcePath="userguide\images\searching_7.png" SelfReg="false"/>
+    <ROW File="searching_8.png" Component_="adding.html" FileName="SEARC~12.PNG|searching_8.png" Attributes="0" SourcePath="userguide\images\searching_8.png" SelfReg="false"/>
+    <ROW File="searching_9.png" Component_="adding.html" FileName="SEARC~13.PNG|searching_9.png" Attributes="0" SourcePath="userguide\images\searching_9.png" SelfReg="false"/>
+    <ROW File="spec_tree_1.png" Component_="adding.html" FileName="SPEC_T~1.PNG|spec_tree_1.png" Attributes="0" SourcePath="userguide\images\spec_tree_1.png" SelfReg="false"/>
+    <ROW File="spec_tree_2.png" Component_="adding.html" FileName="SPEC_T~2.PNG|spec_tree_2.png" Attributes="0" SourcePath="userguide\images\spec_tree_2.png" SelfReg="false"/>
+    <ROW File="spec_tree_3.png" Component_="adding.html" FileName="SPEC_T~3.PNG|spec_tree_3.png" Attributes="0" SourcePath="userguide\images\spec_tree_3.png" SelfReg="false"/>
+    <ROW File="stn_dialog_1.png" Component_="adding.html" FileName="STN_DI~1.PNG|stn_dialog_1.png" Attributes="0" SourcePath="userguide\images\stn_dialog_1.png" SelfReg="false"/>
+    <ROW File="stn_dialog_2.png" Component_="adding.html" FileName="STN_DI~2.PNG|stn_dialog_2.png" Attributes="0" SourcePath="userguide\images\stn_dialog_2.png" SelfReg="false"/>
+    <ROW File="stn_dialog_3.png" Component_="adding.html" FileName="STN_DI~3.PNG|stn_dialog_3.png" Attributes="0" SourcePath="userguide\images\stn_dialog_3.png" SelfReg="false"/>
+    <ROW File="toolbar_1.png" Component_="adding.html" FileName="TOOLBA~1.PNG|toolbar_1.png" Attributes="0" SourcePath="userguide\images\toolbar_1.png" SelfReg="false"/>
+    <ROW File="toolbar_set1.png" Component_="adding.html" FileName="TOOLBA~2.PNG|toolbar_set1.png" Attributes="0" SourcePath="userguide\images\toolbar_set1.png" SelfReg="false"/>
+    <ROW File="toolbar_set2.png" Component_="adding.html" FileName="TOOLBA~3.PNG|toolbar_set2.png" Attributes="0" SourcePath="userguide\images\toolbar_set2.png" SelfReg="false"/>
+    <ROW File="toolbar_set3.png" Component_="adding.html" FileName="TOOLBA~4.PNG|toolbar_set3.png" Attributes="0" SourcePath="userguide\images\toolbar_set3.png" SelfReg="false"/>
+    <ROW File="toolbar_set4.png" Component_="adding.html" FileName="TOOLBA~5.PNG|toolbar_set4.png" Attributes="0" SourcePath="userguide\images\toolbar_set4.png" SelfReg="false"/>
+    <ROW File="toolbar_set5.png" Component_="adding.html" FileName="TOOLBA~6.PNG|toolbar_set5.png" Attributes="0" SourcePath="userguide\images\toolbar_set5.png" SelfReg="false"/>
+    <ROW File="toolbar_set6.png" Component_="adding.html" FileName="TOOLBA~7.PNG|toolbar_set6.png" Attributes="0" SourcePath="userguide\images\toolbar_set6.png" SelfReg="false"/>
+    <ROW File="user_dialog_1.png" Component_="adding.html" FileName="USER_D~1.PNG|user_dialog_1.png" Attributes="0" SourcePath="userguide\images\user_dialog_1.png" SelfReg="false"/>
+    <ROW File="UserGuide_html_2a85bca3.png" Component_="adding.html" FileName="USERGU~1.PNG|UserGuide_html_2a85bca3.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_2a85bca3.png" SelfReg="false"/>
+    <ROW File="UserGuide_html_4a79518e.png" Component_="adding.html" FileName="USERGU~2.PNG|UserGuide_html_4a79518e.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_4a79518e.png" SelfReg="false"/>
+    <ROW File="UserGuide_html_5e16a7e3.png" Component_="adding.html" FileName="USERGU~3.PNG|UserGuide_html_5e16a7e3.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_5e16a7e3.png" SelfReg="false"/>
+    <ROW File="UserGuide_html_414f707a.png" Component_="adding.html" FileName="USERGU~4.PNG|UserGuide_html_414f707a.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_414f707a.png" SelfReg="false"/>
+    <ROW File="UserGuide_html_557fd7e5.png" Component_="adding.html" FileName="USERGU~5.PNG|UserGuide_html_557fd7e5.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_557fd7e5.png" SelfReg="false"/>
+    <ROW File="UserGuide_html_ab32828.png" Component_="adding.html" FileName="USERGU~6.PNG|UserGuide_html_ab32828.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_ab32828.png" SelfReg="false"/>
+    <ROW File="UserGuide_html_m4c6cfb94.png" Component_="adding.html" FileName="USERGU~7.PNG|UserGuide_html_m4c6cfb94.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_m4c6cfb94.png" SelfReg="false"/>
+    <ROW File="UserGuide_html_m6ae6db20.png" Component_="adding.html" FileName="USERGU~8.PNG|UserGuide_html_m6ae6db20.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_m6ae6db20.png" SelfReg="false"/>
+    <ROW File="UserGuide_html_m26e6c1cd.png" Component_="adding.html" FileName="USERGU~9.PNG|UserGuide_html_m26e6c1cd.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_m26e6c1cd.png" SelfReg="false"/>
+    <ROW File="UserGuide_html_m49d19ab4.png" Component_="adding.html" FileName="USERG~10.PNG|UserGuide_html_m49d19ab4.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_m49d19ab4.png" SelfReg="false"/>
+    <ROW File="UserGuide_html_m75dc8f06.png" Component_="adding.html" FileName="USERG~11.PNG|UserGuide_html_m75dc8f06.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_m75dc8f06.png" SelfReg="false"/>
+    <ROW File="UserGuide_html_m112f565d.png" Component_="adding.html" FileName="USERG~12.PNG|UserGuide_html_m112f565d.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_m112f565d.png" SelfReg="false"/>
+    <ROW File="UserGuide_html_m4911387.png" Component_="adding.html" FileName="USERG~13.PNG|UserGuide_html_m4911387.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_m4911387.png" SelfReg="false"/>
+    <ROW File="UserGuide_html_mba730c9.jpg" Component_="adding.html" FileName="USERGU~1.JPG|UserGuide_html_mba730c9.jpg" Attributes="0" SourcePath="userguide\images\UserGuide_html_mba730c9.jpg" SelfReg="false"/>
+    <ROW File="UserGuide_html_me4bb4f5.png" Component_="adding.html" FileName="USERG~14.PNG|UserGuide_html_me4bb4f5.png" Attributes="0" SourcePath="userguide\images\UserGuide_html_me4bb4f5.png" SelfReg="false"/>
+    <ROW File="web_dialog_1.png" Component_="adding.html" FileName="WEB_DI~1.PNG|web_dialog_1.png" Attributes="0" SourcePath="userguide\images\web_dialog_1.png" SelfReg="false"/>
+    <ROW File="web_dialog_2.png" Component_="adding.html" FileName="WEB_DI~2.PNG|web_dialog_2.png" Attributes="0" SourcePath="userguide\images\web_dialog_2.png" SelfReg="false"/>
+    <ROW File="web_dialog_3.png" Component_="adding.html" FileName="WEB_DI~3.PNG|web_dialog_3.png" Attributes="0" SourcePath="userguide\images\web_dialog_3.png" SelfReg="false"/>
+    <ROW File="web_dialog_4.png" Component_="adding.html" FileName="WEB_DI~4.PNG|web_dialog_4.png" Attributes="0" SourcePath="userguide\images\web_dialog_4.png" SelfReg="false"/>
+    <ROW File="web_dialog_5.png" Component_="adding.html" FileName="WEB_DI~5.PNG|web_dialog_5.png" Attributes="0" SourcePath="userguide\images\web_dialog_5.png" SelfReg="false"/>
+    <ROW File="web_dialog_6.png" Component_="adding.html" FileName="WEB_DI~6.PNG|web_dialog_6.png" Attributes="0" SourcePath="userguide\images\web_dialog_6.png" SelfReg="false"/>
+    <ROW File="web_dialog_7.png" Component_="adding.html" FileName="WEB_DI~7.PNG|web_dialog_7.png" Attributes="0" SourcePath="userguide\images\web_dialog_7.png" SelfReg="false"/>
+    <ROW File="web_dialog_8.png" Component_="adding.html" FileName="WEB_DI~8.PNG|web_dialog_8.png" Attributes="0" SourcePath="userguide\images\web_dialog_8.png" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
-    <ROW BuildKey="x64_Release" BuildName="x64_Release" BuildOrder="1" BuildType="0" PackageFileName="ZZALIB-3.6.7-beta4" Languages="en_GB" InstallationType="4" SummInfoMetadata="Page Count:450" UseLargeSchema="true" MsiPackageType="x64"/>
+    <ROW BuildKey="x64_Release" BuildName="x64_Release" BuildOrder="1" BuildType="0" PackageFileName="ZZALIB-3.6.7" Languages="en_GB" InstallationType="4" SummInfoMetadata="Page Count:450" UseLargeSchema="true" MsiPackageType="x64"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
     <ROW Path="&lt;AI_DICTS&gt;ui.ail"/>
@@ -2088,12 +2089,12 @@
     <ROW Feature_="MainFeature" Component_="all.xml"/>
     <ROW Feature_="MainFeature" Component_="NewFolder"/>
     <ROW Feature_="MainFeature" Component_="libgcc_s_seh1.dll"/>
-    <ROW Feature_="MainFeature" Component_="adding_1.png"/>
     <ROW Feature_="MainFeature" Component_="docs"/>
     <ROW Feature_="MainFeature" Component_="about__dialog_8h.html"/>
     <ROW Feature_="MainFeature" Component_="all_0.js_1"/>
     <ROW Feature_="MainFeature" Component_="adding.html"/>
     <ROW Feature_="MainFeature" Component_="all_0.js"/>
+    <ROW Feature_="MainFeature" Component_="ZZALOG.pdf"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
     <ROW Action="AI_DOWNGRADE" Condition="AI_NEWERPRODUCTFOUND AND (UILevel &lt;&gt; 5)" Sequence="210"/>

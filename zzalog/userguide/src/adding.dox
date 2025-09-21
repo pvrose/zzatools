@@ -5,28 +5,27 @@ to manually add QSO records.
 
 \section add_manual Adding QSOs manually
 
-When ZZALOG starts it is in view mode. Click either "Cancel" to go to inactive mode or "Activate" to go to active mode.
-
 \image html adding_1.png "View mode"
 \image latex adding_1.png "ZZALOG in view mode"
 
-The image below shows the inactive mode. Click "Add QSO" to go to manual entry mode.
+When ZZALOG starts it is in view mode. Click either "Cancel" to go to inactive mode or "Activate" to go to active mode.
 
 \image html adding_2.png "Inactive mode"
 \image latex adding_2.png "Inactive mode"
 
-In manual entry mode, the entry form is prepopulated with data from the selected QSO record. This makes it easier to
-enter a sequence of QSOs. 
+The image above shows the inactive mode. Click "Add QSO" to go to manual entry mode.
 
 \image html adding_3.png "Starting to manually add a QSO"
 \image latex adding_3.png "Starting to manually add a QSO"
 
+In manual entry mode, the entry form is prepopulated with data from the selected QSO record. This makes it easier to
+enter a sequence of QSOs, but new data can be entered.
 Data may now be entered into the form as required. When complete the user can then save the record with one of the 
 save buttons:
 
-- "Save & New" - Save the current record and start a new record.
-- "Save & Exit" - Save the current record and quit adding records.
-- "Save & Edit" - Save the current, but continue editing it.
+- <B>Save & New</B> - Save the current record and start a new record.
+- <B>Save & Exit</B> - Save the current record and quit adding records.
+- <B>Save & Edit</B> - Save the current record, but continue editing it.
 
 \section add_file Adding data from a file
 
@@ -35,9 +34,9 @@ the Main Window. This will open a file selection dialog, and the records in the 
 copied into the current logbook.
 
 Note that there are two other file-related commands in this menu drop-down list:
-- "File (Update QSOs)" - this option merges data between the other file and the current logbook and will query any
+- <B>File (Update QSOs)</B> - this option merges data between the other file and the current logbook and will query any
 discreancy found.
-- "File (QRZ.com)" - this option merges data received from QRZ.com and manipulates the data specifically for QRZ.com use.
+- <B>File (QRZ.com)</B> - this option merges data received from QRZ.com and manipulates the data specifically for QRZ.com use.
 
 \section add_clip Adding data from the clipboard
 

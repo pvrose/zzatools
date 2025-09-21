@@ -1,7 +1,8 @@
 /** \page new_rig Configuring the rig interface
 
-ZZALOG uses hamlib to access the CAT control port of any rig. Hamlib is a free library that provides a 
-common API for most rigs. It is available for both Windows and Linux OSs. Using hamlib, ZZALOG
+ZZALOG uses hamlib to access the CAT control port of any rig. Hamlib is a  library that provides a 
+common API to allow software to access most rigs. It is available for both 
+Windows and Linux Operating systems. Using hamlib, ZZALOG
 is able to directly connect to the CAT port of the rig. However, in most cases, connecting ZZALOG to
 the CAT port precludes any other application from connecting to that port. There are a number of
 third party applications that can connect to a rig's CAT control port and then provide an interface 
@@ -17,47 +18,50 @@ ZZALOG maintains a list of rigs about which the current instance of the applicat
 the user must enter the rig in the QSO edit pane. Navigate to an active view and select the pull-down menu
 next to the MY_RIG entry.
 
-\image html new_rig_1.png
-\image latex new_rig_1.png
+\image html new_rig_1.png "Adding a new rig"
+\image latex new_rig_1.png "Adding a new rig"
 
 If the rig the user wants is not present in the list, then type it into the input box. A new rig pane will be created 
 to allow the user to modify the parameters used.
 
-ZZALOG can remeber the configurations required to access the same rig using a number of different
+ZZALOG can remember the configurations required to access the same rig using a number of different
 applications as well as directly. There is a pull-down menu that allows the user to select
 a particular access method at run time (circled in  the image below).
 
-\image html new_rig_2.png
-\image latex new_rig_2.png
+\image html new_rig_2.png "Selecting rig access method"
+\image latex new_rig_2.png "Selecting rig access method" width=5cm
 
 Click the "New" entry. The user will be prompted for a name for the access method. It is recommended to use
-"Hamlib" or the name of the CAT access application.
+"Hamlib", "Direct" or the name of the CAT access application.
 
 \section rig_direct Connecting directly to a rig
 
 We assume in the previous step we named the access method "Hamlib" or "Direct" or similar. Now the user needs to select
 the rig from the list of supported rigs. Select the pull-down menu list shown below.
 
-\image html new_rig_3.png
-\image latex new_rig_3.png
+\image html new_rig_3.png "Specifying a new rig"
+\image latex new_rig_3.png "Specifying a new rig" width=5cm
 
-This list is a large one, as the rigs are grouped by manufacturer and then rig. Select the rig you are creating
+This list is a large one, as the rigs are grouped by manufacturer and then rig.
+Select the rig that you are creating
 the configuration for. Then click "Select", this will enable the "Connection" tab. It also changes the name of the button
 to "Use". Then open the drop down menu labeled "Port", this will open a list of available serial ports.
 
-\image html new_rig_4.png
-\image latex new_rig_4.png
+\image html new_rig_4.png "Specifying rig access port"
+\image latex new_rig_4.png "Specifying rig access port" width=5cm
 
 This example is taken from a linux installation: ports on Windows installations will be labeled COM<I>n</I>. In a 
 similar manner select the baud-rate. <B>NB</B> the baud-rate must match that of the rig. See the rig's manual for more information. Then
 click "Use" and ZZALOG will attempt to connect to the rig.
 
-\image html new_rig_5.png 
-\image latex new_rig_5.png 
-\image html new_rig_6.png
-\image latex new_rig_6.png
+\image html new_rig_5.png "Using this configuration"
+\image latex new_rig_5.png  "Using this configuration" width=5cm
+\image html new_rig_6.png "Rig connected!"
+\image latex new_rig_6.png "Rig connected!" width=5cm
 
-<B>NB</B> ZZALOG by itself does not attempt to power-on the rig. Ensure that the rig is powered on before connecting.
+<B>NB</B> ZZALOG by itself does not attempt to power-on the rig. 
+Ensure that the rig is powered on before connecting. Some apps that
+ZZALOG can connect to do allow the automatic powering-on of rigs.
 
 \section rig_app Connecting using an application
 
@@ -66,16 +70,16 @@ FlRig. We can select FlRig as a pseudo-rig. FlRig provides an interface known as
 using XML) and is accessed using HTTP. In the "Connection" tab there are now fields for a script (red below) and 
 a host port address (blue below). Let us ignore scripts for now, but to use them see \ref rig_script below.
 
-\image html new_rig_7.png
-\image latex new_rig_7.png
+\image html new_rig_7.png "Specifying network connection"
+\image latex new_rig_7.png "Specifying network connection" width=5cm
 
 In this example, we are actually connecting to a rig on another machine.
 An instance of FlRig is running on machine "chinook" connected to an IC-7300. It is
 presenting its XMLRPC interface on port 12345. If we type in "chinook:12345" and click "Use" we connect to the
 IC-7300 transceiver connected to machine "chinook" from the machine. 
 
-\image html new_rig_8.png
-\image latex new_rig_8.png
+\image html new_rig_8.png "Rig connected over network"
+\image latex new_rig_8.png "Rig connected over network" width=5cm
 
 It is possible to have an instance of FlRig on the local machine and configure it to connect to the 
 instance of FlRig on the remote machine. In that case the host name is "localhost" or its IP address 
@@ -83,22 +87,22 @@ is "127.0.0.1".
 
 \section rig_script Automating application launch
 
-So far, we have looked at connecting to an existing running instance of the access application. With using multiple
+So far, we have looked at connecting to an existing running instance of the access application. When using multiple
 rigs, each instance of the access application must be configured differently. Typically the application relies
 on command-line parameters to supply its configuration. ZZALOG provides the facility to run a script which
 contains a call to the application with its command-line parameters. The "Connection" tab allows this script to be defined. 
 In the case below the script has already been entered. Click "Show" button and a simple file editor window opens displaying
 the script.
 
-\image html new_rig_9.png 
-\image latex new_rig_9.png 
-\image html new_rig_10.png
-\image latex new_rig_10.png
+\image html new_rig_9.png "Specifying a script"
+\image latex new_rig_9.png  "Specifying a script" width=5cm
+\image html new_rig_10.png "Contents of a script"
+\image latex new_rig_10.png "Contents of a script" width=7cm
 
 Here the script is invoking FlRig with the parameter indicating where to find its configuration for the specific
 IC-7300. This will contain details similar to that we used for a direct connection above: port-name and baud-rate.
 
-For information about how to configure the access application refer to that applications's user manual.
+For information about how to configure the applications refer to that applications's user manual.
 
 To launch the application, click the "Start" button. The application will take an indeterminate period of time
 to start and connect itself to the rig. Some applications will automatically power-on the rig as part
@@ -112,8 +116,8 @@ is configurable from immediately (0&nbsp;s) to a delay of 10&nbsp;s in steps of 
 below, ZZALOG waits a period of 10&nbsp;seconds before attempting to connect to FlRig and starting reading
 values from the rig.
 
-\image html new_rig_11.png
-\image latex new_rig_11.png
+\image html new_rig_11.png "Setting connection delay"
+\image latex new_rig_11.png "Setting connection delay" width=5cm
 
 \section rig_addons Additional equipment
 
@@ -126,15 +130,15 @@ value in the entry view of the QSO record.
 \subsection rig_accesssories Specifying accessories
 
 If the rig has accessories, such as an external power amplifier or transverter, then the values
-such as frequency and TX power read from the rig are those of the rif itself. ZZALOG provides the
+such as frequency and TX power read from the rig are usually those of the rig itself. ZZALOG provides the
 means to configure this such that the value read from the rig is modified before entering in the 
 QSO record. 
 
 The "Accessories" tab allows the gain of the amplifier (in blue) or the frequency shift and 
 TX power of a transverter (in red) to be specified.
 
-\image html new_rig_12.png
-\image latex new_rig_12.png
+\image html new_rig_12.png "Specifying accessories"
+\image latex new_rig_12.png "Specifying accessories" width=5cm
 
 \section rig_hamlib Updating hamlib
 
@@ -144,8 +148,7 @@ On Windows, a fixed version of hamlib is supplied with the ZZALOG installation p
 file containing the hamlib binary. It is located in "C:\Program Files\GM3ZZA\ZZALOG\libhamlib-4.dll".
 It is intended that when a new official release of hamlib is made, then ZZALOG will be re-released.
 It is possible
-to overwrite this file with the latest unreleased version of hamlib. Care must be taken to follow the instructions in the
-hamlib installation notes to create a DLL for the MSVC flow.
+to overwrite this file with the latest unreleased version of hamlib. 
 
 On Linux, hamlib is available for compiling from source. Download the latest and follow the instructions for 
 building the hamlib library. Then recompile ZZALOG according to \ref linux_reinstall.

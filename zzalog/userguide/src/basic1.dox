@@ -1,4 +1,4 @@
-/** \page basic1 Basic Operating - Analogue
+/** \page basic1 Basic operating - analogue modes
 
 This page describes the basic use of ZZALOG to start operating and logging QSOs as the user makes the
 contacts.
@@ -11,37 +11,38 @@ obtained from the rig: frequency, mode and transmit power.
 This page assumes that ZZALOG has already has the rig connection defined and the means of 
 launching any CAT control application (the script) specified. See \ref new_rig.
 
-\image html basic1_1.png
-\image latex basic1_1.png
+\image html basic1_1.png "Rig control pane"
+\image latex basic1_1.png "Rig control pane"
 
 ZZALOG will usually start with the previous rig selected, and if active will connect to it. 
 Select the tab for the rig you want to use,
 as shown by the red arrow. If the rig connection is made through an external app then 
 launch it using the script by clicking the "Start" button (blue arrow). 
 
-Depending on how the rig connection has configured ZZALOG may automatically connect to the
-external app after a period of time. If it doesn't, the clicking the "Connect" button (green arrow),
+Depending on how the rig connection has been configured ZZALOG may automatically connect to the
+external app after a period of time. If it doesn't, then clicking the "Connect" button (green arrow),
 will cause the rig to be connected. ZZALOG will then display information received from the 
 rig.
 
-\image html basic1_2.png
-\image latex basic1_2.png
+\image html basic1_2.png "Rig connected"
+\image latex basic1_2.png "Rig connected" width=5cm
 
 \section b1_prepare Before the QSO
 
-ZZALOG will usually start viewing the last QSO made. To prepare ZZALOG, the entry pane 
-must be activated, by clicking the "Activate" button. This then allows
+ZZALOG will usually start by viewing the last QSO made. To prepare ZZALOG
+to log a new QSO, the entry pane 
+must be activated, by clicking the "Activate" button. 
+
+\image html basic1_3.png "Showing 'worked-before' status"
+\image latex basic1_3.png "Showing 'worked-before' status"
+
+This then allows
 any callsigns to be reviewed before logging them. Type the call in the box beside that marked "CALL"
-(red arrow) and where the call is (blue) and whether it has beem worked before
-(green) is now shown.
-
-\image html basic1_3.png
-\image latex basic1_3.png
-
-In this case the call UR3AHF is shown to be a Ukrainian call and has been worked before,
+(circled in red) and the DXCC entity for the call (blue) and whether it has beem worked before
+(green) is now shown. In this case the call UR3AHF is shown to be a Ukrainian call and has been worked before,
 although not on this band or mode.
 
-To start logging a QSO with this station click the "Start QSO". 
+To start logging a QSO with this station click the "Start QSO" (indicated by the yellow arrow). 
 
 \subsection parsing Decoding callsigns
 
@@ -54,7 +55,7 @@ do not follow the "rules". Examples are:
   normally decode as <B>G: England</B>, but can be exceptionally decoded in another 
   DXCC entity such as <B>GM: Scotland</B>.
   - In the US and US administered territories, licensees do not need to obtain a new callsign when
-  moving to a new call area or administered territory. This a station originally from New York, say
+  moving to a new call area or administered territory. Thus a station originally from New York, say
   WZ2XYZ which would normally decode as <B>K: United States of America</B>,
   can use the same callsign operating from <B>KP4: Puerto Rico</B>.
 - Does the callsign contain one or more forward slash '/' characters? 
@@ -69,7 +70,7 @@ do not follow the "rules". Examples are:
   indicate a special operation,
   the first part of the callsign will be decoded to provide the
   DXCC entity, but the final letter will be taken into consideration to decode a call area where 
-  the licensing authority requires it.
+  the licensing authority has required it.
   - If the callsign has one forward slash, then the shorter of the two parts is used first when decoding the 
   DXCC entity. If this fails then the other is used. Examples are:
     - GM9ABC/VP8 will be decoded using <B>/VP8</B> as <B>VP8: Falkland Islands</B>.
@@ -80,8 +81,8 @@ do not follow the "rules". Examples are:
 
 \section b1_log_qso Logging the QSO
 
-\image html basic1_4.png
-\image latex basic1_4.png
+\image html basic1_4.png "Logging a QSO"
+\image latex basic1_4.png "Logging a QSO"
 
 When the QSO is started the QSO date and time fields are frozen (yellow) and the frequency,
 mode and transmit power (red) are read from the rig. Note, that these latter are continually 
@@ -89,12 +90,12 @@ updated from the rig. It is then up to the user to add details from the QSO. In 
 case the name, QTH and reports that were sent and received (blue). 
 
 When the QSO is ended then one of the "Save..." buttons (green) should be clicked.
-- "Save" will save the data entered so far, but not end the QSO.
-- "Save & View" will save the data and enter the end time. The QSO will remain in
+- <B>Save</B> will save the data entered so far, but not end the QSO.
+- <b>Save & View</B> will save the data and enter the end time. The QSO will remain in
 view mode.
-- "Save & New" will save the data and start a new QSO.
-- "Save & Edit" will save the data and enter the end time. The QSO can still be edited.
-- "Quit QSO" will abandon entering the QSO.
+- <B>Save & New</B> will save the data and start a new QSO.
+- <B>Save & Edit</B> will save the data and enter the end time. The QSO can still be edited.
+- <B>Quit QSO</B> will abandon entering the QSO.
 
 You can then continue making more QSOs in the same way.
 

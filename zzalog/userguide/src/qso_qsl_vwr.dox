@@ -3,10 +3,10 @@
 This pane shows the QSL status for the selected QSO record. It has three sub-panes. This 
 image shows the image recieved from eQSL.cc for that QSO.
 
-\image html qso_qsl_vwr_1.png
-\image latex qso_qsl_vwr_1.png
+\image html qso_qsl_vwr_1.png "Position of QSL viewer pane within dashboard window"
+\image latex qso_qsl_vwr_1.png "Position of QSL viewer pane within dashboard window"
 
-This sub-pane "Display" shows images of received QSLs as well as images to be sent. The six 
+This sub-pane "Display" shows images of received QSLs or images to be sent. The six 
 buttons select:
 
 - <B>eQSL</B> the image received from eQSL.cc for that QSO.
@@ -14,13 +14,13 @@ buttons select:
 - <B>Back</B> the image on the back of a physical card received for that QSO.
 - <B>eMail(R)</B> the image received in an e-mail QSL.
 - <B>Label</B> the image to be printed on a label to be applied to an outgoing physical card.
-- <B>eMail(S)</B> the image that coule be sent as an e-mail QSL.
+- <B>eMail(S)</B> the image that could be sent as an e-mail QSL.
 
 In the image below the "Label" button has been clicked and that image is now displayed.
 This image will be used when printing labels to apply to physical QSL cards.
 
-\image html qso_qsl_vwr_2.png
-\image latex qso_qsl_vwr_2.png
+\image html qso_qsl_vwr_2.png "Details of QSL viewer showing display of a print label"
+\image latex qso_qsl_vwr_2.png "Details of QSL viewer showing display of a print label" width=5cm
 
 The second sub-pane "Status" shows the QSL status. It shows whether QSLs have been 
 received (column "R") or sent (column "S") through the various QSL mechanisms: the
@@ -28,8 +28,8 @@ four internet QSL servers (eQSL.cc, Logbook of the World, QRZ.com and Clublog.or
 and by physical card (Bureau or direct) or e-mail. The last cases 
 are distinguished by the letter 'B' or 'E' next to the check boxes.
 
-\image html qso_qsl_vwr_3.png
-\image latex qso_qsl_vwr_3.png
+\image html qso_qsl_vwr_3.png "Details of QSL status"
+\image latex qso_qsl_vwr_3.png "Details of QSL status" width=5cm
 
 The third sub-pane "Edit" is only active if the main QSO entry pane is in edit-mode. 
 It allows the record to be updated when a QSL status changes. The top three buttons,
@@ -44,13 +44,13 @@ feature is provided if a glitch has prevented the automatic download.
 QSL card. Typically this may be a special event station that sends cards out but does
 not want one in return.
 
-\image html qso_qsl_vwr_4.png
-\image latex qso_qsl_vwr_4.png
+\image html qso_qsl_vwr_4.png "Details of update QSL status"
+\image latex qso_qsl_vwr_4.png "Details of update QSL status" width=5cm
 
 To see a full size version of an image, simply click on the image. A separate window will
 open containing that image.
 
-\image html qso_qsl_vwr_5.png
-\image latex qso_qsl_vwr_5.png
+\image html qso_qsl_vwr_5.png "View of full-size image and thumbnail image"
+\image latex qso_qsl_vwr_5.png "View of full-size image and thumbnail image"
 
 */

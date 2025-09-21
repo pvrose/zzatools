@@ -4,8 +4,8 @@
 
 This pane allows the use to monitor the status of the log.
 
-\image html qso_log_info_1.png
-\image latex qso_log_info_1.png
+\image html qso_log_info_1.png "Position of log sttaus within dashboard window"
+\image latex qso_log_info_1.png "Position of log sttaus within dashboard window"
 
 The top line, enclosed in red below, indicates the status of the log. The circle indicates the status
 of the log-book in local memory, and is accompanied by the equivalent text:

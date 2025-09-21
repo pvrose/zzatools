@@ -2,7 +2,7 @@
 
 \section win_install Windows Installation
 
-A file zzalog.msi is available from https://sourceforge.net/projects/zzalog/. Please follow
+A file zzalog-3.6.7.msi is available from https://sourceforge.net/projects/zzalog/. Please follow
 instructions to install this. ZZALOG will be installed in
 "C:\Program Files\GM3ZZA\ZZALOG\". 
 Data used by ZZALOG will be installed in 
@@ -11,7 +11,7 @@ Data used by ZZALOG will be installed in
 \subsection win_source Compiling from source
 
 The source may be cloned from https://github.com/pvrose/zzatools. This includes an MSVC solution containing the project. 
-However this has dependencies on the following libraries: FLTK, HAMLIB and LIBCURL and the flow to install these
+However this has dependencies on the following libraries: FLTK, HAMLIB, LIBCURL and NLOHMANN/JSON and the flow to install these
 libraries has not yet been tested on a clean machine. The documentation also requires the use of Doxygen and again 
 the flow has not yet been tested on a clean machine.
 
@@ -19,7 +19,7 @@ the flow has not yet been tested on a clean machine.
 
 ZZALOG is available in source form. It may be cloned from 
 https://github.com/pvrose/zzatools. It has dependencies on the 
-external libraries: fltk, hamlib and libcurl.
+external libraries: fltk, hamlib, libcurl and nlohmann/json.
 
 To compile:
 
@@ -31,7 +31,7 @@ make
 To generate user guide:
 
 <code>
-make userguide
+make documents
 </code>
 
 To install:
@@ -59,19 +59,17 @@ Select one or the other, then fill in the form.
 \image html init_1.png "New installaton"
 \image latex init_1.png "New installaton" width=5cm
 
-- Callsign: the default station callsign to be used.
-- Location: an identifier to know the main station address by.
-- Gridsquare: the Maidenhead gridsquare locator - used for initially locatong the station.
-- name: the name of the usual operator.
+- <B>Callsign</B> the default station callsign to be used.
+- <B>Location</B> an identifier to know the main station address by.
+- <B>Gridsquare</B> the Maidenhead gridsquare locator - used for initially locatong the station.
+- <B>Name</B> the name of the usual operator.
 
 Select "Accept" to proceed.
 
-\image html init_2.png
-\image latex init_2.png
-
-A dialog then opens asking for the name of the file to use to store 
-the log-book. Navigate to where the log-book is to be located and
-type in the filename.
+Dialogs then open to select:
+- a directory to store QSL card images.
+- a file to store the logbook. The name of the file will default to the 
+staion callsign.
 
 \subsection init_club Club Initialisation.
 
@@ -89,7 +87,9 @@ the operator to enter
 
 The image below shows the completed dialog
 
-\image html init_4.png
-\image latex init_4.png
+\image html init_4.png "Club operator log-in dialog"
+\image latex init_4.png "Club operator log-in dialog" width=5cm
+
+The image above shows the completed dialog.
 
 */

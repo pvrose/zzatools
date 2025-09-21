@@ -7,11 +7,10 @@
 - Refinements to callsign parsing algorithm.
 - Add Doxygen comments to all header files. This identified a number
 of redundancies in the code that have been removed.
-- Include hamlib v4.6.5 in Windows build.
-- Address performance issues in sorting extracted data.
 - Move eQSL image download progress display to main progress dial.
 - Migrate configuration files and WX download from XML to JSON.
 - Include ADIF 3.1.6.
+- Include hamlib v4.6.5 in Windows build.
 - Cosmetic changes.
 - Bug fixes:
   - Errors in callsign parsing algorithm.
@@ -24,6 +23,7 @@ of redundancies in the code that have been removed.
   - Exception adding an image to a QSL design.
   - Timezone label on clock doesn't redraw properly.
   - Removed "using namespace " per modern coding guidelines.
+  - Address performance issues in sorting extracted data.
 
 \section rev_366 Revision 3.6.6
 

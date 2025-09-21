@@ -5,8 +5,8 @@ supports interactions with WSTJT-X and FlDigi. For these ZZALOG acts as a
 log-book server. ZZALOG can be configured to launch and configure other
 applications.
 
-\image html qso_apps_1.png
-\image latex qso_apps_1.png
+\image html qso_apps_1.png "Position of application control within dashboard window"
+\image latex qso_apps_1.png "Position of application control within dashboard window" width=5cm
 
 \section apps_new Selecting an application
 
@@ -14,30 +14,52 @@ Enclosed in red below, the "New App" button allows an application to be
 declared to ZZALOG. The data to entered here shall be a "label" for the 
 application: in the example here GT2 is used as a label for GridTracker v2.
 
-\image html qso_apps_2.png
-\image latex qso_apps_2.png
+\image html qso_apps_2.png "Detail showing specification of a new application"
+\image latex qso_apps_2.png "Detail showing specification of a new application" width=5cm
 
 ZZALOG requires scripts to launch these applications. Applications may require 
 different configuration depending on the rig and how the rig is connected to ZZALOG.
 The buttons circled below are used to control this.
-- ALl rigs: the application has the same configuration for all rigs.
-- Rig: the application needs a different configuration for each rig.
-- Rig+CAT: the application needs a different configuration for each rig and its
-CAT mechanism.
+- <B>Common</B> the application has the same configuration for all rigs.
+- <B>Audio</B> the application needs a different 
+configuration to connect audio to the rig.
+- <B>Aud./CAT</B> the application needs a different configuration for audio 
+CAT for each rig.
 
-\image html qso_apps_3.png
-\image latex qso_apps_3.png
+\image html qso_apps_3.png "Detail showing required rig configuration"
+\image latex qso_apps_3.png "Detail showing required rig configuration" width=5cm
 
 ZZALOG can act as a log server for WSJT-X and FlDigi. To enable this feature click the
-button labeled "Server". This button will light to indicate it is enabled. The
+button labeled "Server". This button will light to indicate it is enabled. 
+Enter the address and port that ZZALOG should listen on for requests. The
 button labeled "Listen" when lit indicates that traffic has been received from the application.
+
+\image html qso_apps_4.png "Detail showing server configuration"
+\image latex qso_apps_4.png "Detail showing server configuration" width=5cm
+
+ZZALOG listens to requests from WSJT-X. The address and port eneterd here should match that set
+in WSJT-X (see below). Note that other applications also make use of this feature. In this case 
+rather than using the localhost address (127.0.0.1), a multicast address (such as 224.0.0.1) should
+be used. This allows more than one application to receive a data packet sent out on this port. 
+WSJT-X sends completed QSO records to ZZALOG for automatic logging.
+
+\image html web_dialog_7.png "Screenshot of WSJT-X"
+\image latex web_dialog_7.png "Screenshot of WSJT-X"
+
+
+ZZALOG can emulate the application FlLog. This is an application which is part of the FlDigi
+suite of programs and is used by FlDigi to check worked-before status and log completed QSOs.
+The address and port that FlDigi uses appears to be hardwired as 127.0.0.1:8421. To enable
+FlDigi to use this, FlDigi must be told to use a log server - see below.
+
+\image html web_dialog_8.png "Screenshot of FlDigi"
+\image latex web_dialog_8.png "Screenshot of FlDigi"
+
 
 The text below the button summarises how the application is configured.
 
-\image html qso_apps_4.png
-\image latex qso_apps_4.png
-\image html qso_apps_5.png
-\image latex qso_apps_5.png
+\image html qso_apps_5.png "Detail showing chosen configuration"
+\image latex qso_apps_5.png "Detail showing chosen configuration" width=5cm
 
 \section apps_script Using scripts
 
@@ -45,22 +67,22 @@ The script is specified as below. The input field has an associated file browse 
 script name can either be typed in or navigated using a file browser opened by that button.
 The "Show" button will open up a text editor allowing the script to be viewed or edited.
 
-\image html qso_apps_6.png
-\image latex qso_apps_6.png
+\image html qso_apps_6.png "Detail showing definition of a script"
+\image latex qso_apps_6.png "Detail showing definition of a script" width=5cm
 
 In some cases a script may be required to undo the action of the above script. In the next image,
 the button labeled with a backward looping arrow can be used to enable this feature. When enabled
 this button will be lit and the other buttons and input enabled.
 
-\image html qso_apps_7.png
-\image latex qso_apps_7.png
+\image html qso_apps_7.png "Detail showing undo script controls"
+\image latex qso_apps_7.png "Detail showing undo script controls" width=5cm
 
 Some scripts may require to be run in administrrator or superuser mode. In the image below,
 the button labeled "Adm" enables this. Enter the password into the input field. Clicking the button 
 labeled with a closed eye will show the password in clear.
 
-\image html qso_apps_8.png
-\image latex qso_apps_8.png
+\image html qso_apps_8.png "Detail showing controls for administrtor level controls"
+\image latex qso_apps_8.png "Detail showing controls for administrtor level controls" width=5cm
 
 To configure a new or existing application see \ref new_app.
 

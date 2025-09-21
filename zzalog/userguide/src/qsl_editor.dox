@@ -1,21 +1,23 @@
 /** \page qsl_editor Editing QSL cards for labels and e-mails
 
-This dialog enables the user to produce QSL designs. The images below 
-show the dialog and the design it describes.
+This dialog enables the user to produce QSL designs. 
 
-\image html qsl_editor_1.png
-\image latex qsl_editor_1.png
-\image html qsl_editor_3.png
-\image latex qsl_editor_3.png
+\image html qsl_editor_1.png "QSL editor"
+\image latex qsl_editor_1.png "QSL editor"
+
+This specifies the design of the print label shown below.
+
+\image html qsl_editor_3.png "Print label design"
+\image latex qsl_editor_3.png "Print label design" width=10cm
 
 The dialog has three parts highlighted below.
 
-\image html qsl_editor_2.png
-\image latex qsl_editor_2.png
+\image html qsl_editor_2.png "Three sections to the editor tab"
+\image latex qsl_editor_2.png "Three sections to the editor tab"
 
 \section qd_call Specifying target call and usage.
 
-The top section, enclosed in red, allows the user to specify the 
+The top section <B>Template File</B>, enclosed in red, allows the user to specify the 
 callsign with which a QSO is made and the use of the design. The uses
 of the design are:
 
@@ -26,7 +28,8 @@ attachment to an e-mail.
 
 \section qd_dims Specifying image dimensions and print layout.
 
-The middle section, enclosed in blue, allows the user to specify the
+The middle section <B>Size & format parameters</B>,
+enclosed in blue, allows the user to specify the
 dimensions of the image, layout of labels on the sheet and a 
 few sundry items.
 
@@ -60,14 +63,17 @@ the window to the specified size.
 
 \section qd_items Specifying the design
 
-The bottom section, encased in green above, allows the user to specify the objects to be placed 
-on the QSL design. Below are three such objects in the specification and as they appear in
+The bottom section <B>Design items</B>, encased in green above, allows the user to specify the objects to be placed 
+on the QSL design. Below are three such objects in the specification.
 the design.
 
-\image html qsl_editor_5.png
-\image latex qsl_editor_5.png
-\image html qsl_editor_4.png
-\image latex qsl_editor_4.png
+\image html qsl_editor_5.png "Three items in the editor"
+\image latex qsl_editor_5.png "Three items in the editor"
+
+This is how they appear in the design.
+
+\image html qsl_editor_4.png "The same three items in the design"
+\image latex qsl_editor_4.png "The same three items in the design"
 
 There are three types of object that can be placed in the design. Each as a number of parameters
 whose labels are across the top.
@@ -91,7 +97,7 @@ by angle brackets, which are replaced by the field value.
   - <B>Y</B> The vertical position of the top-left of the field.
   - <B>Contents data</B> The text to be printed.
   - <B>V</B> When checked, the label is placed above the field value, otherwise to the left of it.
-- Image: an image contained in a file is copied into the design: the supported file formats are
+- <B>Image</B> an image contained in a file is copied into the design: the supported file formats are
 PNG, JPG and BMP.
   - <B>X</B> The horizontal position of the top-left of the field.
   - <B>Y</B> The vertical position of the top-left of the field.

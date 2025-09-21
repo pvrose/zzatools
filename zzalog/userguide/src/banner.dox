@@ -3,8 +3,8 @@
 \section description_8 Description
 Displays any status messages and progress reports output by ZZALOG.
 
-\image html banner_1.png
-\image latex banner_1.png
+\image html banner_1.png "Status banner window"
+\image latex banner_1.png "Status banner window" width=8cm
 
 \section features_8 Features
 This window comprises from top to bottom.
@@ -12,29 +12,29 @@ This window comprises from top to bottom.
 This displays the status messages output by ZZALOG that are at most of warning severity.
 Only the last message output is displayed here.
 
-\image html banner_2.png
-\image latex banner_2.png
+\image html banner_2.png "Showing minor messages"
+\image latex banner_2.png "Showing minor messages" width=8cm
 
 The second displays status messages that are of error severity or higher.
 Again only the last such message is output here.
 
-\image html banner_3.png
-\image latex banner_3.png
+\image html banner_3.png "Showing major messages"
+\image latex banner_3.png "Showing major messages" width=8cm
 
 The third comprises three items. Firstly a text output showing a progress message output by ZZALOG.
 Below this is a numeric representation of progress
 On the left is a graphical representation in the form of a clock dial, showing 
 proportion complete. The clock-dial is colour-coded indicating the activity being progressed.
 
-\image html banner_4.png
-\image latex banner_4.png
+\image html banner_4.png "Showing progress"
+\image latex banner_4.png "Showing progress" width=8cm
 
 \subsection full Displaying the whole report.
-Bottom left of the window is the button marked "Full"
-Clicking this toggles the display of the full status.
+More of the message log can be displayed by enlarging the window. Drag and 
+drop on of the corners of the window to do so.
 
-\image html banner_5.png
-\image latex banner_5.png
+\image html banner_5.png "With message log shown"
+\image latex banner_5.png "With message log shown" width=10cm
 
 Messages are colour-coded according to severity.
 - <B>Blue</B> Lowest severity.
@@ -46,6 +46,6 @@ Messages are colour-coded according to severity.
 - <B>Yellow</B> Messages logged as a warning.
 - <B>Red on black</B> Messages logged as an error - processing can continue.
 - <B>Red on white</B> Messages logged as a severe error - processing is stopped.
-- <B>Black on red</B> Messages logged as a fatal error - processing is stopeed.
+- <B>Black on red</B> Messages logged as a fatal error - processing is stopped.
 
 */

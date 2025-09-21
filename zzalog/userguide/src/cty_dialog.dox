@@ -3,8 +3,8 @@
 Where possible ZZALOG can automatically download files for the Country Data reference. This
 dialog helps to manage the process.
 
-\image html cty_dialog_1.png
-\image latex cty_dialog_1.png
+\image html cty_dialog_1.png "Country Data update wizard"
+\image latex cty_dialog_1.png "Country Data update wizard" width=10cm
 
 This dialog shows the current timestamp of each file and the version advertised by the file.
 
@@ -19,14 +19,14 @@ button.
 The user must download the data from www.country-files.com themselves. Open a browser at 
 <A HREF="https://www.country-files.com">Country-files.com</A>. 
 
-\image html cty_dialog_2.png
-\image latex cty_dialog_2.png
+\image html cty_dialog_2.png "Country-files.com website for Big CTY download"
+\image latex cty_dialog_2.png "Country-files.com website for Big CTY download"
 
 Click on the "[download]" link (as indicated), this will initiaiate a download of a data
 package. Once the package is downloaded, open it and select the file "cty.xml" - indicated.
 
-\image html cty_dialog_3.png
-\image latex cty_dialog_3.png
+\image html cty_dialog_3.png "File browser showing downloaded data"
+\image latex cty_dialog_3.png "File browser showing downloaded data"
 
 Copy and paste this file into the application data directory. Click on the "Open Data" button to
 open a directory viewer at the correct location.

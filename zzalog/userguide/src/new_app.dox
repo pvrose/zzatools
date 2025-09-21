@@ -1,16 +1,18 @@
 /** \page new_app Configuring applications
 
 ZZALOG provides the capability of launching other applications. Applications can either be a client of ZZALOG or not.
-- <B>Client applications.</B> These are typically modem applications that use ZZALOG as a server and access the logbook
+- <B>Client applications.</B> These are typically modem applications that use ZZALOG as a logbook server and access ZZALOG
 to check for any previous QSO with a potential contact and to log QSOs made by that application. Client applications
-require specific code within ZZALOG to handle its logging requirements.
+require specific code within ZZALOG to handle its logging requirements. 
+Currently, such code only exists for FlDigi and WSJT-X.
 
 In addition applications have distinct needs for configuring how they need to access a rig.
 - <B>CAT & Audio applications.</B> These are applications that require access to the rig's audio and CAT ports,
 and so need to be configured for both audio and CAT. An example would be a modem application like FlDigi.
-- <B>Audio applications.</B> These are applications that do not require access to the rig's CAT port, but does require access to its
-audio ports, so needs to be configured for audio. An example would be a helper application for routing audio to
-a remote computer.
+- <B>Audio applications.</B> These are applications that do not require access to the rig's CAT port, 
+but do require access to its
+audio ports, so need to be configured for audio. An example would be a helper application for routing audio to
+a remote computer, such as Mumble.
 - <B>Independent applications.</B> These do not access the rig directly and so do not necessarily need configuration.
 An example would be GridTracker that displays information from other applicatons.
 
@@ -19,17 +21,17 @@ An example would be GridTracker that displays information from other applicatons
 The following image shows the configuration for WSJT-X. This is a client application, so the "Server" button is lit.
 It also requires configuration for both audio and CAT, so the "Aud./CAT" button is lit.
 
-\image html new_apps_1.png
-\image latex new_apps_1.png
+\image html new_apps_1.png "Configuring for WSJT-X"
+\image latex new_apps_1.png "Configuring for wSJT-X" width=5cm
 
 You will see that this choice is reflected in the label below this: "IC-705 FlRig". In the box below, a script is named. To
 view or edit the script click the "Show" button.
 
-\image html new_apps_2.png
-\image latex new_apps_2.png
+\image html new_apps_2.png "Script to launch WSJT-X"
+\image latex new_apps_2.png "Script to launch WSJT-X" width=8cm
 
-As ZZALOG is acting as a server for WSJT-X, it needs to be initialised with the port that WSJT-X will use
-to access ZZALOG.
+As ZZALOG is acting as a server for WSJT-X, ZZALOG needs to be initialised with the port that WSJT-X will use
+to access it.
 In this case, ZZALOG will listen on port 224.0.0.1:2237. ZZALOG is not the only server that WSJT-X uses, so
 the address supplied here is a Multicast address so that both ZZALOG and the other server will receive the
 packets. Otherwise it would be "first come, only serve". <B>NB</B> the Windows version of ZZALOG does not yet
@@ -41,10 +43,10 @@ information on this refer to the application's manual.
 \section app_ex2 Example 2 - GridTracker
 
 The second example shows the configuration for GridTracker2. This application has no interaction with the rigs. It
-listens for data packets sent out by WSJT-X: it is the other server refered to above.
+listens for data packets sent out by WSJT-X.
 
-\image html new_apps_3.png
-\image latex new_apps_3.png
+\image html new_apps_3.png "Configuring for GridTracker2"
+\image latex new_apps_3.png "Configuring for GridTracker2" width=5cm
 
 In this case, and this is particular to the Linux version of ZZALOG, the script is actually the terminal command.
 

@@ -1,24 +1,25 @@
 /** \page qso_bands Bandplan viewer
 
-This pane displays a summary of the bandplan for the current band. This is either the
+This pane displays a summary of the band-plan for the current band. This is either the
 rig's transmit frequency of, when no rig is connected, the frequency of the
 selected QSO record.
 
-\image html qso_bands_1.png
-\image latex qso_bands_1.png
+\image html qso_bands_1.png "Position of band-plan viewer in dashboard window"
+\image latex qso_bands_1.png "Position of band-plan viewer in dashboard window"
 
 This pane shows only the band segments as allocated in the band-plan, with text in black
 showing the lower frequency of the segment, the recommended maximum bandwidth and use. 
 The text in red shows the rig's TX frequency: the text in green shows the selected QSO
-frequency. A more detailed image can be seen by clicking the image on this plane.
+frequency. 
 
 Note that no indication is given about the availability of any frequency according to the 
 level of license of the operator or station. Some frequencies may also only be available
 under special conditions from the licensing authority.
 
-\image html qso_bands_2.png
-\image latex qso_bands_2.png
+\image html qso_bands_2.png "Detailed band-plan view"
+\image latex qso_bands_2.png "Detailed band-plan view"
 
+A more detailed image can be seen by clicking the image on this plane. 
 This now provides more detail for each band segment. It now includes selected
 spot frequencies for recommended centres of activity and similar. More visible on this
 larger image are the coloured bars indicating the frequencies recommended for various

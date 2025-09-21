@@ -3,9 +3,9 @@
 
 This pane is a highly configured pane that provides the control buttons that are 
 relevant to the current state of the Dashboard.
-
-\image html qso_buttons_1.png
-\image latex qso_buttons_1.png
+ 
+\image html qso_buttons_1.png "Position of control buttons within dashboard window"
+\image latex qso_buttons_1.png "Position of control buttons within dashboard window"
 
 Only those buttons that are effective in the current state of the Dashboard are shown 
 and some may be inactive for other reasons.
@@ -22,7 +22,7 @@ The complete list of buttons:
 The browser allows all fields to be displayed rather than the limited selection in the editor.
 - <B>B4?</B> Extract all QSOs with the callsign in the selected QSO.
 - <B>Cancel</B> <I>(Query mode)</I> cancel the query.
-- <B>Cancel</B> <I>(Read-only edit mode)</I> Cancel the current read-omnly viewing of the QSO record.
+- <B>Cancel</B> <I>(Read-only edit mode)</I> Cancel the current read-only viewing of the QSO record.
 - <B>Cancel Edit</B> Cancel the current edit without saving the changes to the QSO record.
 - <B>Check</B> Start the search for the above data.
 - <B>Clone QSO</B> Create a new QSO record copying rig data.

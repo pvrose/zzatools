@@ -6,25 +6,25 @@ that provides the following functionality:
 	database.
 - Allows the database to be
 	searched.
-- Allows the real-time and
+- Allows real-time and
 	off-line entry of QSO records.
 - Allows the user to monitor
 	"worked-before" status in real-time.
 - Exchanges data with QSL
-	web-sites such as eQSL.cc and Logbook of the World.
+	web-sites: eQSL.cc, Logbook of the World, QRZ.com and Clublog.
 - Tracks the status of
 	electronic and paper QSL cards and displaying images of received
 	cards.
 - Includes: a shack clock;
 	weather report and band plan view.
 - Interfaces with a number of
-	modem applications (WSJT-X, FLDIGI etc).
+	modem applications:WSJT-X and FlDigi.
 
 This document can be opened at
 any time from the menu or the toolbar:
 
-\image html index_1.png
-\image latex index_1.png
+\image html index_1.png "Opening Userguide"
+\image latex index_1.png "Opening Userguide"
 
 \section contents Contents
 
@@ -39,8 +39,16 @@ For help on any specific window or panel, click on it and press F1.
 
 \section ack Acknowledgments.
 
-For third-party contributions see <A class="e1" HREF=file:../../docs/html/index.html#ack>Acknowledgments</A>
-in the code documentation.
+ZZALOG uses the following third-party libraries:
+- FLTK (https://www.fltk.org/doc-1.4/index.html): Graphical user interface library.
+- Hamlib (https://github.com/Hamlib/Hamlib/wiki/Hamlib): CAT Interface library.
+- Libcurl (https://curl.se/libcurl/c/libcurl.html): HTTP support library.
+- JSON (https://json.nlohmann.me/nlohmann/json): JSON support library.
+
+ZZALOG uses reference data from the following third-parties
+- Clublog.org (https://clublog.org): Country data.
+- Country-files.com (https://www.country-files.com): Country data.
+- DxAtlas (http://dxatlas.com): Prefix data.
 
 \copyright Philip Rose GM3ZZA 2018-2025. All rights reserved.
 

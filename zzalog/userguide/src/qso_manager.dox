@@ -5,11 +5,11 @@
 This provides all the interaction necessary for running QSOs
 and managing the data within the log-book.
 
-\image html qso_manager_1.png
-\image latex qso_manager_1.png
+\image html qso_manager_1.png "Operating dashboard window"
+\image latex qso_manager_1.png "Operating dashboard window"
 
   - \subpage qso_operation
-  - QSO viewer/editors
+  - QSO fields
     - \subpage qso_entry
     - \subpage qso_query
     - \subpage qso_net_entry
