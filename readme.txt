@@ -5,7 +5,7 @@ I am now making this publicly available.
 Windows Installation
 --------------------
 
-A file zzalog.msi is available from https://sourceforge/projects/zzalog. 
+A file ZZALOG-3.6.7.msi is available from https://sourceforge/projects/zzalog. 
 Please follow instructions to install this. ZZALOG will be installed in "C:\Program Files\GM3ZZA\ZZALOG\". 
 Data used by ZZALOG will be installed in "C:\ProgramData\GM3ZZA\ZZALOG". 
 
@@ -27,10 +27,10 @@ make
 
 To generate documentation:
 
-make userguide
+make documents
 
 To install the application and any necessary data
 
 make install 
 
-Data for the application will be installed in /etc/FLTK/GM3ZZA/ZZALOG.
+Data for the application will be installed in /etc/fltk/GM3ZZA/ZZALOG.
