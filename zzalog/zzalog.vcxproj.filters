@@ -790,6 +790,7 @@
     <None Include="userguide\local_data.dox" />
     <None Include="userguide\release_notes.dox" />
     <None Include="packages.config" />
+    <None Include="ZZALOG.pdf" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="zzalog.ico">
