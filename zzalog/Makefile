@@ -60,6 +60,9 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 # Set up libraries
 FLTK_FLAGS := `fltk-config --use-images --ldflags` 
 
+# Set up working directory
+PWD := `pwd`
+
 # Hamlib flags
 HAMLIB_FLAGS := -L$(LIBRARY_DIR) -lhamlib -Wl,-rpath -Wl,$(LIBRARY_DIR)
 # Curl flags
@@ -135,7 +138,7 @@ clean:
 
 .PHONY: clean_ug
 clean_ug:
-	rm -r $(UG_DIR)/html
+	rm -r $(UG_DIR)/html $(UG_DIR)/latex
 	sudo rm -r $(DOCUMENTS_DIR)
 
 # Copy references
@@ -160,20 +163,32 @@ $(DOCUMENTS_DIR)/docs/html/index.html : $(UG_DIR)/html/index.html ./Doxyfile
 # 	@sudo mkdir -p $(DOCUMENTS_DIR)/docs/images
 # 	@sudo cp $(CDX_DIR)/images/* $(DOCUMENTS_DIR)/docs/images/
 
+# Copy PDF
+$(DOCUMENTS_DIR)/ZZALOG.pdf: $(UG_DIR)/latex/refman.pdf
+	@echo Copying PDF
+	@sudo cp $(UG_DIR)/latex/refman.pdf $(DOCUMENTS_DIR)/ZZALOG.pdf
 
 $(UG_DIR)/html/index.html: ./Doxyfile $(DOXS)
 	@echo Creating User Guide
 	@doxygen
+
+$(UG_DIR)/latex/refman.tex: $(UG_DIR)/html/index.html
+	@echo Making latex documents
 
 $(CDX_DIR)/html/index.html: ./Doxyfile_code $(INCS)
 	@echo Creating Code documentation
 	@doxygen ./Doxyfile_code
 
 .PHONY: documents
-documents: $(UG_DIR)/html/index.html $(CDX_DIR)/html/index.html
+documents: $(UG_DIR)/html/index.html $(CDX_DIR)/html/index.html $(UG_DIR)/latex/refman.pdf
+
+$(UG_DIR)/latex/refman.pdf: $(UG_DIR)/latex/refman.tex
+	@echo Creating PDF
+	@mkdir -p $(UG_DIR)/latex
+	@make -C $(UG_DIR)/latex
 
 .PHONY: install_docs
-install_docs: $(DOCUMENTS_DIR)/userguide/html/index.html $(DOCUMENTS_DIR)/docs/html/index.html
+install_docs: $(DOCUMENTS_DIR)/userguide/html/index.html $(DOCUMENTS_DIR)/docs/html/index.html $(DOCUMENTS_DIR)/ZZALOG.pdf
 
 # # force recompile
 # .PHONY: touch_main
