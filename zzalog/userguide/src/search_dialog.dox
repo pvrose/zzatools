@@ -14,7 +14,7 @@ custom criteria to be set in conjunction with the operators and search text.
 This selection may be refined - see \ref search_refine below.
 
 The criteria are:
-- <B>DXCC</B> Mmatches against the DXCC entered in the search text input. This may
+- <B>DXCC</B> Matches against the DXCC entered in the search text input. This may
 either be an integer representing the ARRL numeric identifier for the DXCC entity
 or its usual prefix.
 - <B>CQ Zone</B> Matches against the "CQZ" field in the ADIF record: a numeric value 
@@ -61,7 +61,8 @@ QSO.
 The search may be refined by QSO confirmation. Clicking on any of the buttons labeled "eQSL", "LotW"
 or "Card" will then only select QSOs confirmed by eQSL.cc, Logbook of the World or paper cards.
 
-Note that all the refinements are accumulative. 
+Note that all the refinements are accumulative, that is the records selected by the 
+first refinement are then further reduced by the next one. 
 
 \image html search_dialog_3.png "Detail showing match refinement"
 \image latex search_dialog_3.png "Detail showing match refinement" width=8cm
@@ -73,6 +74,7 @@ It is possible to specify muliple criteria. Clicking one of the buttons highligh
 - <B>New</B> A new search is started: any previous search results are removed.
 - <B>And</B> The existing search results are further matched against the new condition resulting in a reduced number
 of extracted records.
-- <B>Or</B> A new search is started and the results are combined with the existing search results.
+- <B>Or</B> A new search is started and the results are combined with the
+existing search results.
 
 */

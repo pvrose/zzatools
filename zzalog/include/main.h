@@ -86,6 +86,12 @@
 //! - <A HREF=https://github.com/Hamlib/Hamlib/wiki/Hamlib>hamlib</A>: CAT Interface library.
 //! - <A HREF=https://curl.se/libcurl/c/libcurl.html>libcurl</A>: HTTP support library.
 //! - <A HREF=https://json.nlohmann.me/>nlohmann/json</A>: JSON support library.
+//!
+//! ZZALOG uses reference data from the following third-parties
+//! - Clublog.org (https://clublog.org) Country data.
+//! - Country-files.com (https://www.country-files.com) Country data.
+//! - DxAtlas (http://dxatlas.com) Prefix data.
+//! - ADIF (http://adif.org) ADIF Specification (JSON).
 //! 
 //! \copyright Philip Rose GM3ZZA 2018-2025. All rights reserved.
 //!

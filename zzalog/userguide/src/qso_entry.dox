@@ -6,7 +6,7 @@ of pull-down choices and an associated text input widget. In viewing mode (i.e.
 read-only) the text input widgets are inactive - and shown greyed out.
 
 \image html qso_entry_1.png "Position of entry pane within dashboard window"
-\image latex qso_entry_1.png "Position of entry pane within dashboard window""
+\image latex qso_entry_1.png "Position of entry pane within dashboard window"
 
 \section features_12 Features
 

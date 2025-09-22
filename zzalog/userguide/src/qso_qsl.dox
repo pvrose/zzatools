@@ -43,7 +43,7 @@ server, or that a QSL request has been received for OQRS.
 
 The third column, shown below, contains buttons that extract data for sending to the
 online servers or other processing. The bottom button, labeled with a backward looping
-arrow, remoces the extract.
+arrow, removes the extract.
 
 \image html qso_qsl_4.png "Detail showing extract controls"
 \image latex qso_qsl_4.png "Detail showing extract controls" width=5cm
@@ -55,7 +55,7 @@ The fourth column, shown below, contains buttons that process data.
 For QRZ.com, the extracted data is written to a file for manual upload to QRZ.com as this server
 does not support direct bulk upload from an application.
 
-For Cards, a label os printed for each of the records in the extracted data.
+For Cards, a label is printed for each of the records in the extracted data.
 
 Foe e-Mails, an QSL image is generated for each of the records in the extracted data.
 

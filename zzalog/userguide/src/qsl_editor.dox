@@ -8,7 +8,7 @@ This dialog enables the user to produce QSL designs.
 This specifies the design of the print label shown below.
 
 \image html qsl_editor_3.png "Print label design"
-\image latex qsl_editor_3.png "Print label design" width=10cm
+\image latex qsl_editor_3.png "Print label design" width=8cm
 
 The dialog has three parts highlighted below.
 
@@ -73,7 +73,7 @@ the design.
 This is how they appear in the design.
 
 \image html qsl_editor_4.png "The same three items in the design"
-\image latex qsl_editor_4.png "The same three items in the design"
+\image latex qsl_editor_4.png "The same three items in the design" width=8cm
 
 There are three types of object that can be placed in the design. Each as a number of parameters
 whose labels are across the top.

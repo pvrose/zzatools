@@ -23,7 +23,7 @@ The buttons circled below are used to control this.
 - <B>Common</B> the application has the same configuration for all rigs.
 - <B>Audio</B> the application needs a different 
 configuration to connect audio to the rig.
-- <B>Aud./CAT</B> the application needs a different configuration for audio 
+- <B>Aud./CAT</B> the application needs a different configuration for audio and 
 CAT for each rig.
 
 \image html qso_apps_3.png "Detail showing required rig configuration"
@@ -37,29 +37,35 @@ button labeled "Listen" when lit indicates that traffic has been received from t
 \image html qso_apps_4.png "Detail showing server configuration"
 \image latex qso_apps_4.png "Detail showing server configuration" width=5cm
 
-ZZALOG listens to requests from WSJT-X. The address and port eneterd here should match that set
-in WSJT-X (see below). Note that other applications also make use of this feature. In this case 
-rather than using the localhost address (127.0.0.1), a multicast address (such as 224.0.0.1) should
-be used. This allows more than one application to receive a data packet sent out on this port. 
-WSJT-X sends completed QSO records to ZZALOG for automatic logging.
+The text below the button summarises how the application is configured.
+
+\image html qso_apps_5.png "Detail showing chosen configuration"
+\image latex qso_apps_5.png "Detail showing chosen configuration" width=5cm
+
+\subsection wsjtx Configuring for WSJT-X
+
+ZZALOG listens and responds to requests from WSJT-X. 
+ZZALOG must be configured with the address and port. The address can be an IPv4
+address (such as 192.168.0.1) or a host name (such as localhost). If WSJT-X is also 
+using another application, like Gridtracker, then the address should be
+a multicast address (such as 224.0.0.1). The port number should also be provided.
+
+WSJT-X should also be configured to use this port number (see below).
 
 \image html web_dialog_7.png "Screenshot of WSJT-X"
 \image latex web_dialog_7.png "Screenshot of WSJT-X"
 
+\note Multicast addresses are not yet supported in the Windows version of ZZALOG.
 
-ZZALOG can emulate the application FlLog. This is an application which is part of the FlDigi
+\subsection fldigi Configuring for FlDigi
+
+ZZALOG emulates the application FlLog. This is an application which is part of the FlDigi
 suite of programs and is used by FlDigi to check worked-before status and log completed QSOs.
 The address and port that FlDigi uses appears to be hardwired as 127.0.0.1:8421. To enable
 FlDigi to use this, FlDigi must be told to use a log server - see below.
 
 \image html web_dialog_8.png "Screenshot of FlDigi"
 \image latex web_dialog_8.png "Screenshot of FlDigi"
-
-
-The text below the button summarises how the application is configured.
-
-\image html qso_apps_5.png "Detail showing chosen configuration"
-\image latex qso_apps_5.png "Detail showing chosen configuration" width=5cm
 
 \section apps_script Using scripts
 
@@ -77,7 +83,7 @@ this button will be lit and the other buttons and input enabled.
 \image html qso_apps_7.png "Detail showing undo script controls"
 \image latex qso_apps_7.png "Detail showing undo script controls" width=5cm
 
-Some scripts may require to be run in administrrator or superuser mode. In the image below,
+Some scripts may require to be run in administrator or superuser mode. In the image below,
 the button labeled "Adm" enables this. Enter the password into the input field. Clicking the button 
 labeled with a closed eye will show the password in clear.
 
