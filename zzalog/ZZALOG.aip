@@ -56,7 +56,6 @@
     <ROW Component="NewFolder" ComponentId="{2253813D-1548-4C05-94FB-753321AEBDCA}" Directory_="NewFolder_1_Dir" Attributes="0"/>
     <ROW Component="ProductInformation" ComponentId="{E180E30E-16B6-4506-97ED-6FEB327E79BE}" Directory_="APPDIR" Attributes="260" KeyPath="Version"/>
     <ROW Component="SHORTCUTDIR" ComponentId="{04DB559B-3E2C-4C23-BE71-B8D21A9EC47B}" Directory_="SHORTCUTDIR" Attributes="0"/>
-    <ROW Component="ZZALOG.pdf" ComponentId="{91E1D5D9-D514-4146-AAED-BB8D71787770}" Directory_="ZZALOG_1_Dir" Attributes="0" KeyPath="ZZALOG.pdf" Type="0"/>
     <ROW Component="about__dialog_8h.html" ComponentId="{62C9209B-2263-4C2D-95C3-85EDDCD0A238}" Directory_="html_1_Dir" Attributes="0" KeyPath="about__dialog_8h.html" Type="0"/>
     <ROW Component="adding.html" ComponentId="{1D53FE55-ABE2-4C95-8506-D33663FE35AC}" Directory_="html_Dir" Attributes="0" KeyPath="adding.html" Type="0"/>
     <ROW Component="all.xml" ComponentId="{73F3094C-518F-4F63-A62E-F36CE2D1CE64}" Directory_="ZZALOG_Dir" Attributes="0" KeyPath="cty.csv" Type="0"/>
@@ -70,6 +69,7 @@
     <ROW Component="libhamlib4.dll" ComponentId="{D49D6F51-47A2-41B3-9500-EE71AF462B19}" Directory_="APPDIR" Attributes="256" KeyPath="libhamlib4.dll"/>
     <ROW Component="libusb1.0.dll" ComponentId="{5299D2AA-788C-42CF-90BC-AD1958D70590}" Directory_="APPDIR" Attributes="256" KeyPath="libusb1.0.dll"/>
     <ROW Component="libwinpthread1.dll" ComponentId="{0EB83431-B198-48DE-9813-B485A6181099}" Directory_="APPDIR" Attributes="256" KeyPath="libwinpthread1.dll"/>
+    <ROW Component="refman.pdf" ComponentId="{BE95F3BA-E8DF-4F94-8D68-37E9FBC71005}" Directory_="ZZALOG_1_Dir" Attributes="0" KeyPath="refman.pdf" Type="0"/>
     <ROW Component="zzalog.exe" ComponentId="{480F63B4-F3FE-4905-A069-FEE69889E54C}" Directory_="APPDIR" Attributes="256" KeyPath="zzalog.exe"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
@@ -1806,7 +1806,6 @@
     <ROW File="web_dialog.html" Component_="adding.html" FileName="WEB_DI~1.HTM|web_dialog.html" Attributes="0" SourcePath="userguide\html\web_dialog.html" SelfReg="false"/>
     <ROW File="_revision.html" Component_="adding.html" FileName="_REVIS~1.HTM|_revision.html" Attributes="0" SourcePath="userguide\html\_revision.html" SelfReg="false"/>
     <ROW File="_revision.js" Component_="adding.html" FileName="_REVIS~1.JS|_revision.js" Attributes="0" SourcePath="userguide\html\_revision.js" SelfReg="false"/>
-    <ROW File="ZZALOG.pdf" Component_="ZZALOG.pdf" FileName="ZZALOG.pdf" Attributes="0" SourcePath="ZZALOG.pdf" SelfReg="false"/>
     <ROW File="adding_1.png" Component_="adding.html" FileName="adding_1.png" Attributes="0" SourcePath="userguide\images\adding_1.png" SelfReg="false"/>
     <ROW File="adding_2.png" Component_="adding.html" FileName="adding_2.png" Attributes="0" SourcePath="userguide\images\adding_2.png" SelfReg="false"/>
     <ROW File="adding_3.png" Component_="adding.html" FileName="adding_3.png" Attributes="0" SourcePath="userguide\images\adding_3.png" SelfReg="false"/>
@@ -1999,6 +1998,7 @@
     <ROW File="web_dialog_6.png" Component_="adding.html" FileName="WEB_DI~6.PNG|web_dialog_6.png" Attributes="0" SourcePath="userguide\images\web_dialog_6.png" SelfReg="false"/>
     <ROW File="web_dialog_7.png" Component_="adding.html" FileName="WEB_DI~7.PNG|web_dialog_7.png" Attributes="0" SourcePath="userguide\images\web_dialog_7.png" SelfReg="false"/>
     <ROW File="web_dialog_8.png" Component_="adding.html" FileName="WEB_DI~8.PNG|web_dialog_8.png" Attributes="0" SourcePath="userguide\images\web_dialog_8.png" SelfReg="false"/>
+    <ROW File="refman.pdf" Component_="refman.pdf" FileName="ZZALOG.pdf" Attributes="0" SourcePath="userguide\latex\refman.pdf" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
     <ROW BuildKey="x64_Release" BuildName="x64_Release" BuildOrder="1" BuildType="0" PackageFileName="ZZALIB-3.6.7" Languages="en_GB" InstallationType="4" SummInfoMetadata="Page Count:450" UseLargeSchema="true" MsiPackageType="x64"/>
@@ -2094,7 +2094,7 @@
     <ROW Feature_="MainFeature" Component_="all_0.js_1"/>
     <ROW Feature_="MainFeature" Component_="adding.html"/>
     <ROW Feature_="MainFeature" Component_="all_0.js"/>
-    <ROW Feature_="MainFeature" Component_="ZZALOG.pdf"/>
+    <ROW Feature_="MainFeature" Component_="refman.pdf"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
     <ROW Action="AI_DOWNGRADE" Condition="AI_NEWERPRODUCTFOUND AND (UILevel &lt;&gt; 5)" Sequence="210"/>
