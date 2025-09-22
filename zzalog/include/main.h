@@ -114,7 +114,7 @@ std::string PROGRAM_ID = "ZZALOG";
 //! Short-form program identifier.
 std::string PROG_ID = "ZLG";
 //! Program version. 
-std::string PROGRAM_VERSION = "3.6.7";
+std::string PROGRAM_VERSION = "3.6.7+";
 //! Program vendor: used for Fl_Preferences.
 std::string VENDOR = "GM3ZZA";
 

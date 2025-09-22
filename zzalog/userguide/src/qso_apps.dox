@@ -11,8 +11,10 @@ applications.
 \section apps_new Selecting an application
 
 Enclosed in red below, the "New App" button allows an application to be
-declared to ZZALOG. The data to entered here shall be a "label" for the 
-application: in the example here GT2 is used as a label for GridTracker v2.
+declared to ZZALOG. A name for the application must be entered
+in the associated input control and then click the "New App" button.
+This will then be used as a label for the
+application.
 
 \image html qso_apps_2.png "Detail showing specification of a new application"
 \image latex qso_apps_2.png "Detail showing specification of a new application" width=5cm
