@@ -2,6 +2,7 @@
 
 \section rev_368 Revision 3.6.7+
 
+- Testing proposal to ignore unpaired '<' in reading ADI format
 - Bug fixes:
   - Changing the displayed fields does not get saved.
   - Falsely claims data has been edited when closing ZZALOG
