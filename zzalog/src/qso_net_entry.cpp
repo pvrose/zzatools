@@ -301,3 +301,13 @@ void qso_net_entry::update_fields(Fl_Widget* src) {
 		}
 	}
 }
+
+// Return true if any QSO in net is dirty
+bool qso_net_entry::any_dirty() {
+	int children = entries_->children();
+	for (int ix = 0; ix < children; ix++) {
+		record* qso = ((qso_entry*)entries_->child(ix))->qso();
+		if (book_->is_dirty_record(qso)) return true;
+	}
+	return false;
+}

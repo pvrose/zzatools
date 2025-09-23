@@ -251,22 +251,7 @@ void qso_manager::cb_close(Fl_Widget* w, void* v) {
 
 // Return that we are currently editing or creating ot QSO or net
 bool qso_manager::editing() {
-	record* edit_qso;
-	switch (data_group_->logging_state()) {
-	case qso_data::NET_STARTED:
-	case qso_data::NET_ADDING:
-	case qso_data::NET_EDIT:
-	case qso_data::QSO_WSJTX:
-	case qso_data::QSO_FLDIGI:
-		return true;
-	case qso_data::QSO_EDIT:
-	case qso_data::QSO_STARTED:
-	case qso_data::QSO_ENTER:
-		edit_qso = data_group_->current_qso();
-		return book_->is_dirty_record(edit_qso);
-	default:
-		return false;
-	}
+	return data_group_->has_dirty_records();
 }
 
 // The QSO number being selected is outwith that being edited

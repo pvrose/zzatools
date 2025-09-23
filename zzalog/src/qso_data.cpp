@@ -2130,3 +2130,21 @@ void qso_data::update_station_fields(record* qso) {
 void qso_data::update_station_choices() {
 	g_station_->update_details();
 }
+
+// Returns true if ay records are dirty
+bool qso_data::has_dirty_records() {
+	switch (logging_state_) {
+	case NET_ADDING:
+	case NET_EDIT:
+	case NET_STARTED:
+		return g_net_entry_->any_dirty();
+	default:
+		record* qso = current_qso();
+		if (qso) {
+			return book_->is_dirty_record(qso);
+		}
+		else {
+			return false;
+		}
+	}
+}

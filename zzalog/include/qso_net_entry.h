@@ -78,6 +78,9 @@ public:
 	//! Update the format of all qso_entry objects except \p src.
 	void update_fields(Fl_Widget* src);
 
+	//! Any QSO in net is dirty
+	bool any_dirty();
+
 protected:
 	//! The tabbed qso_entry widgets.
 	Fl_Tabs* entries_;

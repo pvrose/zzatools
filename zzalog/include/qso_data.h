@@ -266,6 +266,9 @@ public:
 	//! Returns true if we can navigate the net
 	bool can_navigate(navigate_t target);
 
+	//! Return true if any records are dirty
+	bool has_dirty_records();
+
 	//! Edit - saved logging state
 	logging_state_t edit_return_state_;
 
