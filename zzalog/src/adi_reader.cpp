@@ -89,7 +89,10 @@ std::istream& adi_reader::load_record(record* in_record, std::istream& in, load_
 		// Until : or > is read
 		in.get(c);
 		while (c != ':' && c != '>' && in.good()) {
-			field += (char)toupper(c);
+			if (c == '<') field = "";
+			else {
+				field += (char)toupper(c);
+			}
 			in.get(c);
 		}
 		if (!in.good()) result = LR_BAD;
