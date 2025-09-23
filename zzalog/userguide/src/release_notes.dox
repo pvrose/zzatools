@@ -1,5 +1,10 @@
 /** \page release_notes Revision History
 
+\section rev_368 Revision 3.6.7+
+
+- Bug fixes:
+  - Changing the displayed fields does not get saved.
+
 \section rev_367 Revision 3.6.7
 
 - Save a copy of the latest data before each save. Upto 8 copies are saved.
@@ -25,7 +30,9 @@ of redundancies in the code that have been removed.
   - Removed "using namespace " per modern coding guidelines.
   - Address performance issues in sorting extracted data.
 
-\section rev_366 Revision 3.6.6
+\section older Older revisions
+
+\subsection rev_366 Revision 3.6.6
 
 - Combine WX tab with Clock tab.
 - Change Clock tab to a single tab, switchable between UTC and local time.
@@ -37,7 +44,7 @@ of redundancies in the code that have been removed.
   - Some input widgets not getting keyboard focus.
   - Wrong call presented in queries.
 
-\section rev_365 Revision 3.6.5
+\subsection rev_365 Revision 3.6.5
 
 - First documented release.
 

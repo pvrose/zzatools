@@ -167,6 +167,8 @@ public:
 	void update_station_fields(record* qso = nullptr);
 	//! Update station choices
 	void update_station_choices();
+	//! Update fields in qso_entry and qso_query except if it originated the change (\p src).
+	void update_fields(Fl_Widget* src);
 
 
 	// State transition actions:-

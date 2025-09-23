@@ -75,6 +75,9 @@ public:
 	//! Set focus on the call of the displayed entry
 	void set_focus_call();
 
+	//! Update the format of all qso_entry objects except \p src.
+	void update_fields(Fl_Widget* src);
+
 protected:
 	//! The tabbed qso_entry widgets.
 	Fl_Tabs* entries_;

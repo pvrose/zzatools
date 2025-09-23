@@ -64,7 +64,7 @@ public:
 	static const int NUMBER_TOTAL = NUMBER_FIXED + 20; //!< Total number of fields that can be displayed.
 
 	//! List of fields that are displayed: this is common for all instances.
-	static field_list* field_map_;
+	field_list* field_map_;
 
 protected:
 	//! Maps fieldname to the index of the input used for its value.
@@ -152,6 +152,8 @@ public:
 	//! Restore focus to saved widget. 
 	void set_focus_saved();
 
+	//! Update fields: either another qso_entry has changed it or fields_dialog has.
+	void update_fields();
 protected:
 	//! Callback from selecting field input value: \p v provides index in field std::list.
 	static void cb_ip_field(Fl_Widget* w, void* v);

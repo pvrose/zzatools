@@ -291,3 +291,13 @@ void qso_net_entry::set_focus_call() {
 	qso_entry* qe = (qso_entry*)entries_->value();
 	qe->set_focus_call();
 }
+
+// Update fields in all children
+void qso_net_entry::update_fields(Fl_Widget* src) {
+	int children = entries_->children();
+	for (int ix = 0; ix < children; ix++) {
+		if (entries_->child(ix) != src) {
+			((qso_entry*)entries_->child(ix))->update_fields();
+		}
+	}
+}

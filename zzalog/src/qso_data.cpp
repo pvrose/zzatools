@@ -572,6 +572,14 @@ void qso_data::update_qso(qso_num_t log_num) {
 	}
 }
 
+// Update fields
+void qso_data::update_fields(Fl_Widget* src) {
+	if ((Fl_Widget*)g_entry_ != src) g_entry_->update_fields();
+	if ((Fl_Widget*)g_qy_entry_ != src) g_qy_entry_->update_fields();
+	g_net_entry_->update_fields(src);
+	if ((Fl_Widget*)g_query_ != src) g_query_->update_fields();
+}
+
 // Update query
 void qso_data::update_query(logging_state_t query, qso_num_t match_num, qso_num_t query_num) {
 	switch (logging_state_) {

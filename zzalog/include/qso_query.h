@@ -61,6 +61,9 @@ public:
 	void clear_query();
 	//! Returns the messae to the user.
 	std::string query_message();
+	
+	//! Update the primary field
+	void update_fields();
 
 protected:
 	//! Callback from clicking the query table.

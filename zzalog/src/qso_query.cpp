@@ -215,3 +215,8 @@ void qso_query::action_handle_dclick(int col, std::string field) {
 	}
 	enable_widgets();
 }
+
+// Fields have changed
+void qso_query::update_fields() {
+	enable_widgets();
+}

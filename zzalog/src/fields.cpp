@@ -72,11 +72,14 @@ collection_t* fields::collection(std::string name, std::string source, bool* cop
 }
 
 // Get the collection named .. and if necessary pre-populate it
-collection_t* fields::collection(std::string name, field_list values) {
-    if (coll_map_.find(name) != coll_map_.end()) {
+collection_t* fields::collection(std::string name, field_list values, bool update) {
+    if (coll_map_.find(name) != coll_map_.end() && !update) {
         // Return the named collection
         return coll_map_.at(name);
     } else {
+        if (update) {
+            delete coll_map_.at(name);
+        }
         collection_t* coll = new collection_t;
         coll->clear();
         for (auto it = values.begin(); it != values.end(); it++) {

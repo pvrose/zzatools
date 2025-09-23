@@ -94,8 +94,11 @@ public:
 	collection_t* collection(field_app_t app);
 	//! Returns the collection named amd if necessary create it by copying from \p source.
 	collection_t* collection(std::string name, std::string source = "Default", bool* copied = nullptr);
+	
 	//! Returns the collection named and if necessary pre-populate it from the supplied \p values.
-	collection_t* collection(std::string name, field_list values);
+	
+	//! IF \p update then update the collection from the fields.
+	collection_t* collection(std::string name, field_list values, bool update = false);
 	//! Returns the std::list of field names in the collection in the collection \p name.
 	field_list field_names(std::string name);
 

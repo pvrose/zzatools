@@ -367,6 +367,9 @@ void qso_manager::update_qso(hint_t hint, qso_num_t match_num, qso_num_t query_n
 	case HT_IMPORT_QUERYSWL:
 		data_group_->update_query(qso_data::QUERY_SWL, match_num, query_num);
 		break;
+	case HT_FORMAT:
+		data_group_->update_fields(nullptr);
+		break;
 	default:
 		break;
 	}

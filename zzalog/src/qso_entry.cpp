@@ -27,10 +27,6 @@ extern void open_html(const char*);
 
 extern double prev_freq_;
 
-// Map showing what fields to display for what usage
-// Used for contest, but not currently used
-field_list* qso_entry::field_map_ = nullptr;
-
 int qso_entry::focus_ix_ = 0;
 
 // N rows of NUMBER_PER_ROW
@@ -44,6 +40,7 @@ qso_entry::qso_entry(int X, int Y, int W, int H, const char* L) :
 	, qso_number_(-1)
 	, original_qso_(nullptr)
 	, previous_serial_(0)
+	, field_map_(nullptr)
 {
 	// Get the enclosing qso_data instance
 	qso_data_ = ancestor_view<qso_data>(this);
@@ -662,6 +659,9 @@ void qso_entry::action_add_field(int ix, std::string field) {
 
 	// Save the altered field names
 	enable_widgets();
+	// Tell all the other qso_entry objects to update their fields
+	fields_->collection(fields_->coll_name(FO_QSOVIEW), *field_map_, true);
+	qso_data_->update_fields(this);
 }
 
 // Delete a field
@@ -686,6 +686,9 @@ void qso_entry::action_del_field(int ix) {
 	fields_in_use_.resize(fields_in_use_.size() - 1);
 
 	enable_widgets();
+	// Tell all the other qso_entry objects to update their fields
+	fields_->collection(fields_->coll_name(FO_QSOVIEW), *field_map_, true);
+	qso_data_->update_fields(this);
 }
 
 
@@ -980,5 +983,13 @@ void qso_entry::save_focus(Fl_Widget* w) {
 	if (ix < fields_in_use_.size()) {
 		focus_ix_ = ix;
 	}
+}
+
+// Update the displayed fields
+void qso_entry::update_fields() {
+	// Re-initialise the displayed fields
+	initialise_fields();
+	// Redraw current QSO
+	copy_qso_to_display(CF_ALL_FLAGS);
 }
 
