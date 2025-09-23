@@ -34,11 +34,11 @@ in chronological order.
 
 The next row of buttons selects the condition used:
 - <B>~</B> Regular expression matching - see https://cplusplus.com/ECMAScript for details.
-- <B>/=</B> Matches if the field selected does not equal the value specified.
+- <B>&ne;</B> Matches if the field selected does not equal the value specified.
 - <B>&lt;</B> Matches if the field selected is less than the value specified.
-- <B>&lt;=</B> Matches if the field selected is less than or equal to the value specified.
+- <B>&le;</B> Matches if the field selected is less than or equal to the value specified.
 - <B>=</B> Matches if the field selected is equal to the value specified.
-- <B>&gt;=</B> Matches if the field selected is greater than or equal to the value specified.
+- <B>&ge;</B> Matches if the field selected is greater than or equal to the value specified.
 - <B>&gt;</B> Matches if the field selected is greater than the value specified.
 
 Except when "CQ Zone" or "ITU Zone" are selected, comparisons are based on string comparisons - 

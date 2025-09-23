@@ -176,10 +176,7 @@ search_dialog::search_dialog() :
 		bn13->box(FL_THIN_UP_BOX);
 		bn13->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 		bn13->value(criteria_->comparator == i);
-		char* temp = new char[128];
-		sprintf(temp, "Use %s to compare records", comparator_labels_[i].c_str());
-		bn13->copy_tooltip(temp);
-		delete[] temp;
+		bn13->copy_tooltip(comparator_tooltips_[i].c_str());
 		comparator_params_[i].attribute = (int*)&criteria_->comparator;
 		bn13->callback(cb_radio, (void*)&comparator_params_[i]);
 		bn13->when(FL_WHEN_RELEASE);

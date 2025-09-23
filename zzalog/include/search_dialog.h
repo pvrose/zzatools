@@ -11,7 +11,17 @@
 
 	//! Labels for the comparison mode labels : order matches enumeration search_comp_t.
 	static const std::string comparator_labels_[7] = {
-		"~", "/=", "<", "<=", "=", ">=", ">"
+		"~ ", "\342\211\240 ", "< ", "\342\211\244 ", "= ", "\342\211\245 ", "> "
+	};
+	//! Tooltips for comparison buttonw
+	static const std::string comparator_tooltips_[7] = {
+		"Match for text value as regular expression",
+		"Match if records are not equal to test value",
+		"Match if record values are less than test value",
+		"Match if record values are less than or equal to test value",
+		"Match if record values are equal to test value",
+		"Match if record values are greater than or equal to test value",
+		"Match if record values are greater than test value"
 	};
 
 	//! This class provides a dialog to generate a search or extract condition
