@@ -264,7 +264,6 @@ bool book::load_data(std::string filename)
 						format_ = FT_ADX;
 					}
 
-					ok = false;
 				}
 				// neither .adi nor .adx 
 				else {

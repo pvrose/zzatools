@@ -134,7 +134,7 @@ bool adx_reader::start_element(std::string name, std::map<std::string, std::stri
 		}
 	}
 
-	return false;
+	return true;
 }
 
 // End XML element detected
@@ -274,7 +274,7 @@ bool adx_reader::end_element(std::string name) {
 			return true;
 		}
 	}
-	return false;
+	return ok;
 }
 
 // XML data characters received
