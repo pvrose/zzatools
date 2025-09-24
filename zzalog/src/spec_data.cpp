@@ -1194,8 +1194,12 @@ valn_error_t spec_data::check_datatype(const std::string&  data, const std::stri
 		if (enumeration_data == nullptr) {
 			return VE_FIELD_UNSUPPORTED;
 		}
+		std::string test_data;
+		// Special case - Bands are enumerated in lower case
+		if (enumeration_name == "Band") test_data = to_lower(data);
+		else test_data = data;
 		// Get the enumeration entry for the particular value
-		if (enumeration_data->data.find(data) != enumeration_data->data.end()) {
+		if (enumeration_data->data.find(test_data) != enumeration_data->data.end()) {
 			std::map<std::string, std::string>* enumeration_record = enumeration_data->data.at(data);
 			// Check it's not marked "Import Only" or deleted
 			if (enumeration_record->find("Import-only") == enumeration_record->end()) {
@@ -1208,10 +1212,10 @@ valn_error_t spec_data::check_datatype(const std::string&  data, const std::stri
 							return VE_VALUE_OUTDATED;
 						}
 					}
-					return check_enumeration(data, field, enumeration_name);
+					return check_enumeration(test_data, field, enumeration_name);
 				}
 				else {
-					return check_enumeration(data, field, enumeration_name);
+					return check_enumeration(test_data, field, enumeration_name);
 				}
 			}
 			else {
