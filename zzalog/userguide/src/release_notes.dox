@@ -7,6 +7,7 @@
 - Bug fixes:
   - Changing the displayed fields does not get saved.
   - Falsely claims data has been edited when closing ZZALOG.
+  - ADX parsing not returning correct response (OK/error)
 
 \section rev_367 Revision 3.6.7
 
