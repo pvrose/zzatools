@@ -7,7 +7,8 @@
 - Bug fixes:
   - Changing the displayed fields does not get saved.
   - Falsely claims data has been edited when closing ZZALOG.
-  - ADX parsing not returning correct response (OK/error)
+  - ADX parsing not returning correct response (OK/error).
+  - JSON ADIF Band enumeration is lower-case.
 
 \section rev_367 Revision 3.6.7
 

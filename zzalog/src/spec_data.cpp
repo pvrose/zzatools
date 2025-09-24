@@ -1200,7 +1200,7 @@ valn_error_t spec_data::check_datatype(const std::string&  data, const std::stri
 		else test_data = data;
 		// Get the enumeration entry for the particular value
 		if (enumeration_data->data.find(test_data) != enumeration_data->data.end()) {
-			std::map<std::string, std::string>* enumeration_record = enumeration_data->data.at(data);
+			std::map<std::string, std::string>* enumeration_record = enumeration_data->data.at(test_data);
 			// Check it's not marked "Import Only" or deleted
 			if (enumeration_record->find("Import-only") == enumeration_record->end()) {
 				// Not Import Only
