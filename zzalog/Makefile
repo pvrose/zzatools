@@ -11,7 +11,7 @@ EXEC_DIR = $(BUILD_DIR)/$(BUILD_TYPE)
 INSTALL_DIR := /usr/local/bin
 LIBRARY_DIR := /usr/local/lib
 APPDATA_DIR := ${HOME}/.config/GM3ZZA/ZZALOG
-DOCUMENTS_DIR := /etc/fltk/GM3ZZA/ZZALOG
+DOCUMENTS_DIR :=$(APPDATA_DIR)
 
 # Standard compilers and debuggers
 CC = gcc
@@ -164,7 +164,7 @@ $(DOCUMENTS_DIR)/docs/html/index.html : $(UG_DIR)/html/index.html ./Doxyfile
 # 	@sudo cp $(CDX_DIR)/images/* $(DOCUMENTS_DIR)/docs/images/
 
 # Copy PDF
-$(DOCUMENTS_DIR)/ZZALOG.pdf: $(UG_DIR)/latex/refman.pdf
+$(DOCUMENTS_DIR)/userguide/ZZALOG.pdf: $(UG_DIR)/latex/refman.pdf
 	@echo Copying PDF
 	@sudo cp $(UG_DIR)/latex/refman.pdf $(DOCUMENTS_DIR)/ZZALOG.pdf
 
@@ -188,7 +188,7 @@ $(UG_DIR)/latex/refman.pdf: $(UG_DIR)/latex/refman.tex
 	@make -C $(UG_DIR)/latex
 
 .PHONY: install_docs
-install_docs: $(DOCUMENTS_DIR)/userguide/html/index.html $(DOCUMENTS_DIR)/docs/html/index.html $(DOCUMENTS_DIR)/ZZALOG.pdf
+install_docs: $(DOCUMENTS_DIR)/userguide/html/index.html $(DOCUMENTS_DIR)/docs/html/index.html $(DOCUMENTS_DIR)/userguide/ZZALOG.pdf
 
 # # force recompile
 # .PHONY: touch_main
