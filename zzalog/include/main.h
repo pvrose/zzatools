@@ -344,6 +344,9 @@ void open_html(const char* file);
 //! Open the file \p full_filename  with default application
 void open_doc(std::string full_filename);
 
+//! Open the PDF version of the User Guide
+void open_pdf();
+
 //! Flag to prevent more than one closure process at the same time.
 bool closing_ = false;
 

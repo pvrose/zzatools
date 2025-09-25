@@ -197,6 +197,8 @@ struct search_criteria_t;
 		static void cb_mi_help_abt(Fl_Widget* w, void* v);
 		//! Help->USer Guide
 		static void cb_mi_help_ug(Fl_Widget* w, void* v);
+		//! Help->PDF
+		static void cb_mi_help_pdf(Fl_Widget* w, void* v);
 
 		//! Enable/disable menu
 		

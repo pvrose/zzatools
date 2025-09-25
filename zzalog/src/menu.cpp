@@ -81,8 +81,7 @@ extern std::string PROGRAM_ID;
 extern std::string VENDOR;
 extern time_t session_start_;
 extern void open_html(const char*);
-
-
+extern void open_pdf();
 
 
 	// The default menu - std::set of menu items
@@ -247,6 +246,7 @@ extern void open_html(const char*);
 	{ "&Help", 0, 0, 0, FL_SUBMENU },
 		{ "&About", 0, menu::cb_mi_help_abt },
 		{ "&User Guide", 0, menu::cb_mi_help_ug },
+		{ "User Guide (&PDF)", 0, menu::cb_mi_help_pdf },
 		{ 0 },
 	{ 0 }
 	};
@@ -1294,6 +1294,11 @@ void menu::cb_mi_help_abt(Fl_Widget* w, void* v) {
 // Help->User Guide
 void menu::cb_mi_help_ug(Fl_Widget* w, void* v) {
 	open_html("index.html");
+}
+
+// Help->User Guide (PDF)
+void menu::cb_mi_help_pdf(Fl_Widget* w, void* v) {
+	open_pdf();
 }
 
 // Enable/disable menu 

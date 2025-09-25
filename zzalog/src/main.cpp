@@ -1207,6 +1207,12 @@ void open_html(const char* file) {
 	open_doc(full_filename);
 }
 
+void open_pdf() {
+	std::string full_filename = default_html_directory_ +
+		"userguide/ZZALOG.pdf";
+	open_doc(full_filename);
+}
+
 void open_doc(std::string full_filename) {
 #ifdef _WIN32
 	HINSTANCE result = ShellExecute(NULL, "open", full_filename.c_str(), NULL, NULL, SW_SHOWNORMAL);
