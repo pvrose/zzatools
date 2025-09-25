@@ -164,9 +164,9 @@ $(DOCUMENTS_DIR)/docs/html/index.html : $(UG_DIR)/html/index.html ./Doxyfile
 # 	@sudo cp $(CDX_DIR)/images/* $(DOCUMENTS_DIR)/docs/images/
 
 # Copy PDF
-$(DOCUMENTS_DIR)/userguide/ZZALOG.pdf: $(UG_DIR)/latex/refman.pdf
+$(DOCUMENTS_DIR)/userguide/ZZALOG.pdf: $(UG_DIR)/ZZALOG.pdf
 	@echo Copying PDF
-	@sudo cp $(UG_DIR)/latex/refman.pdf $(DOCUMENTS_DIR)/ZZALOG.pdf
+	@sudo cp $(UG_DIR)/ZZALOG.pdf $(DOCUMENTS_DIR)/userguide/ZZALOG.pdf
 
 $(UG_DIR)/html/index.html: ./Doxyfile $(DOXS)
 	@echo Creating User Guide
@@ -180,7 +180,10 @@ $(CDX_DIR)/html/index.html: ./Doxyfile_code $(INCS)
 	@doxygen ./Doxyfile_code
 
 .PHONY: documents
-documents: $(UG_DIR)/html/index.html $(CDX_DIR)/html/index.html $(UG_DIR)/latex/refman.pdf
+documents: $(UG_DIR)/html/index.html $(CDX_DIR)/html/index.html $(UG_DIR)/ZZALOG.pdf
+
+$(UG_DIR)/ZZALOG.pdf: $(UG_DIR)/latex/refman.pdf
+	cp $(UG_DIR)/latex/refman.pdf $(UG_DIR)/ZZALOG.pdf
 
 $(UG_DIR)/latex/refman.pdf: $(UG_DIR)/latex/refman.tex
 	@echo Creating PDF

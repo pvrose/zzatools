@@ -3,6 +3,8 @@
 \section rev_368 Revision 3.6.7+
 
 - Testing proposal to ignore unpaired '<' in reading ADI format.
+- Removed special behaviour for club stations.
+- Added PDF version of userguide.
 - Cosmetic changes.
 - Bug fixes:
   - Changing the displayed fields does not get saved.
