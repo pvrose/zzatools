@@ -17,7 +17,6 @@
 extern wx_handler* wx_handler_;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
-extern Fl_Preferences::Root prefs_mode_;
 extern void open_html(const char*);
 
 // Weather group - constructor
@@ -73,7 +72,7 @@ int qso_wx::handle(int event) {
 // get settings
 void qso_wx::load_values() {
 	// Get last used display formats
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences user_settings(settings, "User Settings");
 	Fl_Preferences wx_settings(user_settings, "Weather");
 	wx_settings.get("Speed", (int&)display_speed_, MILE_PER_HOUR);
@@ -377,7 +376,7 @@ void qso_wx::enable_widgets() {
 
 // save value
 void qso_wx::save_values() {
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences user_settings(settings, "User Settings");
 	Fl_Preferences wx_settings(user_settings, "Weather");
 	wx_settings.set("Speed", (int&)display_speed_);

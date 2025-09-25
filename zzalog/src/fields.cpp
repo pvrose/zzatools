@@ -12,7 +12,6 @@ extern status* status_;
 extern std::string PROGRAM_ID;
 extern std::string VENDOR;
 extern std::string default_data_directory_;
-extern Fl_Preferences::Root prefs_mode_;
 
 //! Convert field_info_t to JSON object
 static void to_json(json& j, const field_info_t& s) {

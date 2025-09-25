@@ -31,7 +31,6 @@ extern qsl_dataset* qsl_dataset_;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
 extern std::string default_ref_directory_;
-extern Fl_Preferences::Root prefs_mode_;
 extern void open_html(const char*);
 
 // Constructor 

@@ -23,7 +23,6 @@ extern stn_default station_defaults_;
 extern std::string PROGRAM_ID;
 extern std::string VENDOR;
 extern void open_html(const char*);
-extern Fl_Preferences::Root prefs_mode_;
 
 qso_operation::qso_operation(int X, int Y, int W, int H, const char *L) : Fl_Group(X, Y, W, H, L),
 																		  current_qth_(""),
@@ -127,7 +126,7 @@ void qso_operation::enable_widgets()
 
 // Load data
 void qso_operation::load_data() {
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences station_settings(settings, "Station");
 	char* temp;
 	station_settings.get("Operator", temp, "");
@@ -152,7 +151,7 @@ void qso_operation::load_data() {
 
 // Store data
 void qso_operation::store_data() {
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences station_settings(settings, "Station");
 	station_settings.set("Operator", current_oper_.c_str());
 	station_settings.set("Callsign", current_call_.c_str());

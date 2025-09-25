@@ -12,7 +12,7 @@ main.cpp - application entry point
 // Get the backup filename
 std::string backup_filename(std::string source) {
 	// This needs to be int and not bool as the settings.get() would corrupt the stack.
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences backup_settings(settings, "Backup");
 	// Get back-up directory
 	char* temp;
@@ -60,7 +60,7 @@ void restore_backup() {
 	// Remove existing book
 	status_->misc_status(ST_WARNING, "LOG: Closing current book!");
 	menu::cb_mi_file_new(nullptr, nullptr);
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences backup_settings(settings, "Backup");
 	char* temp;
 	backup_settings.get("Last Backup", temp, "");
@@ -186,7 +186,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		}
 
 		// Save the window position
-		Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 		Fl_Preferences windows_settings(settings, "Windows");
 		Fl_Preferences window_settings(windows_settings, "Main");
 		window_settings.set("Left", main_window_->x_root());
@@ -420,7 +420,7 @@ std::string get_file(char * arg_filename) {
 	std::string result = "";
 	if (!arg_filename || !(*arg_filename)) {
 		// null argument or empty cstring - get the most recent file. (Recent Files->File1 in settings)
-		Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 		Fl_Preferences recent_settings(settings, "Recent Files");
 		char *filename;
 		if (recent_settings.get("File1", filename, "")) {
@@ -450,7 +450,7 @@ std::string get_file(char * arg_filename) {
 
 // Add some global properties
 void add_properties() {
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences user_settings(settings, "User Settings");
 	// Tooltip settings
 	Fl_Preferences tip_settings(user_settings, "Tooltip");
@@ -469,7 +469,7 @@ void add_properties() {
 // Get the recent files from settings
 void recent_files() {
 	recent_files_.clear();
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences recent_settings(settings, "Recent Files");
 	// Read the first four files
 	for (int i = 1; i <= 4; i++) {
@@ -551,7 +551,7 @@ void add_book(char* arg) {
 
 
 			if (!book_->load_data(log_file)) {
-				Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+				Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 				Fl_Preferences backup_settings(settings, "Backup");
 				char * temp;
 				backup_settings.get("Last Backup", temp, "");
@@ -677,7 +677,7 @@ void resize_window() {
 	int width;
 	int top;
 	int height;
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences windows_settings(settings, "Windows");
 	Fl_Preferences window_settings(windows_settings, "Main");
 	window_settings.get("Left", left, 0);
@@ -849,7 +849,7 @@ void customise_fltk() {
 
 // Some switches get saved between sessions - so-called sticky switches
 void read_saved_switches() {
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences switch_settings(settings, "Switches");
 	int temp;
 	char msg[128];
@@ -880,7 +880,7 @@ void read_saved_switches() {
 
 // Save "sticky" switches
 void save_switches() {
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences switch_settings(settings, "Switches");
 	switch_settings.set("Dark Mode", (int)DARK);
 	switch_settings.set("Auto Update QSOs", (int)AUTO_UPLOAD);
@@ -890,17 +890,9 @@ void save_switches() {
 // Open system settings to see if it's a club or individual installation
 void check_settings() {
 	// Open the system settings file 
-	Fl_Preferences sys_settings(Fl_Preferences::SYSTEM_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences sys_settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 
 	char stemp[128];
-	if (default_html_directory_.length() == 0) {
-		if (sys_settings.getUserdataPath(stemp, sizeof(stemp))) {
-			default_html_directory_ = std::string(stemp) + "userguide/html/";;
-		}
-	}
-	else {
-		default_html_directory_ += "userguide/html/";
-	}
 
 	int temp;
 	if (sys_settings.get("Installation Type", temp, stn_type::NOT_USED)) {
@@ -916,18 +908,6 @@ void check_settings() {
 		sys_settings.set("Installation Type", (int)station_defaults_.type);
 		sys_settings.flush();
 	}
-
-	switch (station_defaults_.type) {
-	case stn_type::NOT_USED: 
-		break;
-	case stn_type::CLUB:
-		prefs_mode_ = Fl_Preferences::SYSTEM_L;
-		break;
-	case stn_type::INDIVIDUAL:
-		prefs_mode_ = Fl_Preferences::USER_L;
-		break;
-	}
-
 }
 
 // Open preferences and save them - it is possible to corrupt the settings
@@ -936,13 +916,12 @@ bool open_settings() {
 	char stemp[128];
 
 	// SAve the staion defaults
-		// Get club details from settings
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 
 	// Now std::set the default app data directory
 	char buffer[128];
 	settings.filename(buffer, sizeof(buffer),
-		prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+		Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	if (settings.getUserdataPath(stemp, sizeof(stemp))) {
 		default_data_directory_ = stemp;
 		if (default_ref_directory_.length()) {
@@ -951,8 +930,12 @@ bool open_settings() {
 		else {
 			default_ref_directory_ = stemp;
 		}
+		if (!default_html_directory_.length()) {
+			default_html_directory_ = stemp;
+		}
 	}
 
+	// Rename all the saved preferences file 8->9, 7->8 down to ''->1
 	for (char c = '8'; c > '0'; c--) {
 		// Rename will fail if file does not exist, so no need to test file exists
 		std::string oldfile = std::string(buffer) + c;
@@ -993,7 +976,7 @@ bool open_settings() {
 }
 
 void save_station_settings() {
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences station_settings(settings, "Station");
 	char* temp;
 	station_settings.get("Callsign", temp, "");
@@ -1021,13 +1004,6 @@ void load_rig_data() {
 	if (!closing_) {
 		rig_data_ = new rig_data;
 	}
-}
-
-// If club-mode open settings screen for operator
-void club_operator() {
-	club_stn_dlg* dlg = new club_stn_dlg();
-	dlg->show();
-	while (dlg->visible()) Fl::check();
 }
 
 // The main app entry point
@@ -1119,8 +1095,6 @@ int main(int argc, char** argv)
 		config_ = new config(WCONFIG, HCONFIG, "Configuration");
 		config_->hide();
 	}
-	// Now ask for club operator
-	if (prefs_mode_ == Fl_Preferences::SYSTEM_L) club_operator();
 	// Add qsl_handlers - note add_rig_if() may have added URL handler
 	add_qsl_handlers();
 	int code = 0;
@@ -1192,7 +1166,7 @@ void backup_file() {
 		status_->misc_status(ST_ERROR, "BACKUP: failed");
 	} else {
 		status_->misc_status(ST_OK, "BACKUP: Done");
-		Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 		Fl_Preferences backup_settings(settings, "Backup");
 		backup_settings.set("Last Backup", backup.c_str());
 	}
@@ -1208,7 +1182,7 @@ void set_recent_file(std::string filename) {
 		recent_files_.push_front(filename);
 
 		// Update recent files in the settings
-		Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 		Fl_Preferences recent_settings(settings, "Recent Files");
 		// Clear the existing settings
 		recent_settings.clear();
@@ -1228,7 +1202,12 @@ void set_recent_file(std::string filename) {
 
 void open_html(const char* file) {
 	// OS dependent code to open a document
-	std::string full_filename = default_html_directory_ + std::string(file);
+	std::string full_filename = default_html_directory_ +
+		"userguide/html/" + std::string(file);
+	open_doc(full_filename);
+}
+
+void open_doc(std::string full_filename) {
 #ifdef _WIN32
 	HINSTANCE result = ShellExecute(NULL, "open", full_filename.c_str(), NULL, NULL, SW_SHOWNORMAL);
 	if ((intptr_t)result <= 32) {

@@ -30,7 +30,6 @@ extern tabbed_forms* tabbed_forms_;
 extern bool DARK;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
-extern Fl_Preferences::Root prefs_mode_;
 extern void open_html(const char*);
 
 // Constructor
@@ -51,7 +50,7 @@ report_tree::report_tree(int X, int Y, int W, int H, const char* label, field_ap
 	, custom_field_("")
 {
 	map_order_.clear();
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences user_settings(settings, "User Settings");
 	Fl_Preferences tree_settings(user_settings, "Tree Views");
 	tree_settings.get("Font Name", (int&)font_, 0);
@@ -855,7 +854,7 @@ void report_tree::update_status() {
 // Add filter - and redraw
 void report_tree::add_filter(report_filter_t filter) {
 	filter_ = filter;
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences report_settings(settings, "Report");
 	report_settings.set("Filter", filter_);
 	populate_tree(true);
@@ -929,7 +928,7 @@ void report_tree::add_category(int level, report_cat_t category, std::string cus
 		// Update menu
 		menu_->report_mode(map_order_, filter_);
 		// Update settings
-		Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 		Fl_Preferences report_settings(settings, "Report");
 		Fl_Preferences level_settings(report_settings, "Levels");
 		level_settings.clear();

@@ -23,7 +23,6 @@ extern std::map<std::string, contest_algorithm*>* algorithms_;
 extern contest_data* contest_data_;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
-extern Fl_Preferences::Root prefs_mode_;
 extern void open_html(const char*);
 
 contest_dialog::contest_dialog(int X, int Y, int W, int H, const char* L) :
@@ -75,7 +74,7 @@ int contest_dialog::handle(int event) {
 
 // Load values from settings
 void contest_dialog::load_values() {
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences contest_settings(settings, "Contest");
 	char* temp;
 	contest_settings.get("Current ID", temp, "");

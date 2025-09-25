@@ -22,7 +22,6 @@ extern std::string CONTACT;
 extern std::string COPYRIGHT;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
-extern Fl_Preferences::Root prefs_mode_;
 
 // Constructor
 config::config(int W, int H, const char* label) :
@@ -33,7 +32,7 @@ config::config(int W, int H, const char* label) :
 	updatable_views_.clear();
 
 	// Set position on screen
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences windows_settings(settings, "Windows");
 	Fl_Preferences window_settings(windows_settings, "Settings");
 	int left, top;
@@ -148,7 +147,7 @@ config::config(int W, int H, const char* label) :
 config::~config()
 {
 	// Rememeber window position
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences windows_settings(settings, "Windows");
 	Fl_Preferences window_settings(windows_settings, "Settings");
 	window_settings.set("Left", x_root());

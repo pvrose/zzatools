@@ -26,7 +26,6 @@ extern uint32_t seed_;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
 extern qsl_dataset* qsl_dataset_;
-extern Fl_Preferences::Root prefs_mode_;
 extern void open_html(const char*);
 
 // Constructor

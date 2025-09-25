@@ -24,7 +24,6 @@ extern wsjtx_handler* wsjtx_handler_;
 extern status* status_;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
-extern Fl_Preferences::Root prefs_mode_;
 extern void open_html(const char*);
 
 // Constructor for one std::set of modem controls
@@ -504,7 +503,7 @@ int qso_apps::handle(int event) {
 
 // Load settings
 void qso_apps::load_values() {
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
     Fl_Preferences apps_settings(settings, "Apps");
     for (int ix = 0; ix < apps_settings.groups(); ix++) {
         const char* app = apps_settings.group(ix);
@@ -651,7 +650,7 @@ void qso_apps::adjust_size() {
 
 // save settings
 void qso_apps::save_values() {
-    Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+    Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
     Fl_Preferences apps_settings(settings, "Apps");
     apps_settings.clear();
     for (auto it = apps_data_.begin(); it != apps_data_.end(); it++) {

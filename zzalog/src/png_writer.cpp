@@ -16,7 +16,6 @@
 extern status* status_;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
-extern Fl_Preferences::Root prefs_mode_;
 
 png_writer::png_writer() {
 	// TODO: Any initialisation of the libpng
@@ -40,7 +39,7 @@ std::string png_writer::png_filename(record* qso) {
 	std::string call = qso->item("CALL");
 	std::string date = qso->item("QSO_DATE");
 
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences dp_settings(settings, "Datapath");
 	char* temp;
 	dp_settings.get("QSLs", temp, "");

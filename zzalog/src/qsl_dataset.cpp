@@ -16,7 +16,6 @@
 extern status* status_;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
-extern Fl_Preferences::Root prefs_mode_;
 extern uint32_t seed_;
 
 using json = nlohmann::json;
@@ -386,7 +385,7 @@ qsl_call_data* qsl_dataset::get_qrz_api(std::string callsign) {
 // Read card designs
 void qsl_dataset::load_data() {
 	data_.clear();
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	if (!load_json(settings)) {
 		status_->misc_status(ST_ERROR, "QSL: No QSl data loaded");
 	}
@@ -466,7 +465,7 @@ bool qsl_dataset::load_json(Fl_Preferences& settings) {
 // Store card designs
 void qsl_dataset::save_data() {
 	if (!load_failed_) {
-		Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 		settings.delete_group("QSL Design");
 		save_json(settings);
 	}

@@ -9,7 +9,6 @@
 
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
-extern Fl_Preferences::Root prefs_mode_;
 extern void open_html(const char*);
 
 dxcc_view::dxcc_view(int X, int Y, int W, int H, const char* L, field_app_t fo) :
@@ -147,7 +146,7 @@ void dxcc_view::cb_confirm(Fl_Widget* w, void* v) {
 
 // Get previously saved values for display and confirmation types
 void dxcc_view::load_data() {
-    Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+    Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
     Fl_Preferences user_settings(settings, "User Settings");
     Fl_Preferences dxcc_settings(user_settings, "DXCC Table");
     int temp;
@@ -159,7 +158,7 @@ void dxcc_view::load_data() {
 
 // Remember values for display and confirmation types
 void dxcc_view::store_data() {
-    Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+    Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
     Fl_Preferences user_settings(settings, "User Settings");
     Fl_Preferences dxcc_settings(user_settings, "DXCC Table");
     dxcc_settings.set("Display Type", (int)display_type_);

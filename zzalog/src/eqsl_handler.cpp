@@ -41,7 +41,6 @@ extern fields* fields_;
 extern qsl_dataset* qsl_dataset_;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
-extern Fl_Preferences::Root prefs_mode_;
 extern stn_default station_defaults_;
 
 // Constructor
@@ -311,7 +310,7 @@ std::string eqsl_handler::card_filename_l(record* record, bool use_default) {
 		station_defaults_.callsign : record->item("STATION_CALLSIGN");
 	de_slash(station);
 	// Location of top-directory for QSL card images
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences datapath_settings(settings, "Datapath");
 	std::string qsl_directory;
 	char * temp;

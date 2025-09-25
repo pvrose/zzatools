@@ -12,7 +12,6 @@
 extern stn_default station_defaults_;
 extern std::string PROGRAM_ID;
 extern std::string VENDOR;
-extern Fl_Preferences::Root prefs_mode_;
 
 //! Constructor - sizes and labels itself
 init_dialog::init_dialog() : Fl_Double_Window(100, 100, "New installation")

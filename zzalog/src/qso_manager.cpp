@@ -65,7 +65,6 @@ extern std::string COPYRIGHT;
 extern std::string CONTACT;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
-extern Fl_Preferences::Root prefs_mode_;
 extern stn_default station_defaults_;
 
 
@@ -193,7 +192,7 @@ void qso_manager::create_form(int X, int Y) {
 // Load values
 void qso_manager::load_values() {
 	// Get position of window
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences windows_settings(settings, "Windows");
 	Fl_Preferences dash_settings(windows_settings, "Dashboard");
 	int left, top;
@@ -206,7 +205,7 @@ void qso_manager::load_values() {
 void qso_manager::save_values() {
 
 	// Save window position
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences windows_settings(settings, "Windows");
 	Fl_Preferences dash_settings(windows_settings, "Dashboard");
 	dash_settings.set("Left", x_root());

@@ -32,7 +32,6 @@ extern ticker* ticker_;
 extern banner* banner_;
 extern std::string default_data_directory_;
 extern bool keep_banner_;
-extern Fl_Preferences::Root prefs_mode_;
 
 // Constructor
 status::status() :
@@ -112,7 +111,7 @@ void status::misc_status(status_t status, const char* label) {
 				chooser->filter("Text files\t*.txt");
 				if (chooser->show() == 0) {
 					report_filename_ = chooser->filename();
-					Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+					Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 					Fl_Preferences status_settings(settings, "Status");
 					status_settings.set("Report File", report_filename_.c_str());
 				}

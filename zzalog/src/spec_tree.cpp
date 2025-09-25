@@ -24,7 +24,6 @@ extern status* status_;
 extern bool DARK;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
-extern Fl_Preferences::Root prefs_mode_;
 extern void open_html(const char*);
 
 
@@ -39,7 +38,7 @@ spec_tree::spec_tree(int X, int Y, int W, int H, const char* label, field_app_t 
 	, sub_item_(nullptr)
 {
 	// Tree parameters
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences user_settings(settings, "User Settings");
 	Fl_Preferences tree_settings(user_settings, "Tree Views");
 	tree_settings.get("Font Name", (int&)font_, 0);

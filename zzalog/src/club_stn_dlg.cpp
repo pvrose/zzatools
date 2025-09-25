@@ -23,7 +23,6 @@ extern bool new_installation_;
 extern stn_default station_defaults_;
 extern std::string PROGRAM_ID;
 extern std::string VENDOR;
-extern Fl_Preferences::Root prefs_mode_;
 
 club_stn_dlg::club_stn_dlg() :
 	win_dialog(640, 480, "Club log-in") {
@@ -99,7 +98,7 @@ void club_stn_dlg::create_form() {
 // Read data from settings
 void club_stn_dlg::load_data() {
 	// Get club details from settings
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences station_settings(settings, "Station");
 	char* temp;
 	station_settings.get("Club Name", temp, "");
@@ -188,7 +187,7 @@ void club_stn_dlg::add_callsign() {
 
 void club_stn_dlg::store_data() {
 	// Get club details from settings
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences station_settings(settings, "Station");
 	station_settings.set("Club Name", club_name_.c_str());
 	station_settings.set("Callsign", club_call_.c_str());

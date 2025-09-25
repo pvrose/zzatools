@@ -18,7 +18,6 @@ extern qso_manager* qso_manager_;
 extern tabbed_forms* tabbed_forms_;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
-extern Fl_Preferences::Root prefs_mode_;
 extern void open_html(const char*);
 
 // constructor
@@ -68,7 +67,7 @@ int user_dialog::handle(int event) {
 
 // Load values from settings
 void user_dialog::load_values() {
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences user_settings(settings, "User Settings");
 	// Log table
 	Fl_Preferences log_settings(user_settings, "Log Table");
@@ -211,7 +210,7 @@ void user_dialog::create_form(int X, int Y) {
 
 // Used to write settings back
 void user_dialog::save_values() {
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences user_settings(settings, "User Settings");
 	// Log settings
 	Fl_Preferences log_settings(user_settings, "Log Table");

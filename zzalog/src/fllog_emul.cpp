@@ -26,7 +26,6 @@ extern spec_data* spec_data_;
 extern qso_manager* qso_manager_;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
-extern Fl_Preferences::Root prefs_mode_;
 
 // Static - only one instance of this class supported
 fllog_emul* fllog_emul::that_ = nullptr;

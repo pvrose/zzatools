@@ -326,9 +326,6 @@ void check_settings();
 //! Initialise hamlib
 void load_rig_data();
 
-//! Open a dialog if a club installation to allow operator to login.
-void club_operator();
-
 //! Main program entry point.
 
 //! \param argc number of command-line arguments
@@ -343,6 +340,9 @@ void set_recent_file(std::string filename);
 
 //! Open the user-guide at the specified page &lt;\a file&gt;.html.
 void open_html(const char* file);
+
+//! Open the file \p full_filename  with default application
+void open_doc(std::string full_filename);
 
 //! Flag to prevent more than one closure process at the same time.
 bool closing_ = false;
@@ -382,9 +382,6 @@ std::string default_html_directory_ = "";
 
 //! Default location for reference data
 std::string default_ref_directory_ = "";
-
-//! Preferences root - system-wide or per-user.
-Fl_Preferences::Root prefs_mode_;
 
 //! Do not close banner. Kept \p false unless banner is not deleted at ZZALOG closure in error cases.
 bool keep_banner_ = false;

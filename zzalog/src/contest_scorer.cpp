@@ -29,7 +29,6 @@ extern stn_data* stn_data_;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
 extern std::map<std::string, contest_algorithm*>* algorithms_;
-extern Fl_Preferences::Root prefs_mode_;
 extern void open_html(const char*);
 
 contest_scorer::contest_scorer(int X, int Y, int W, int H, const char* L) :
@@ -80,7 +79,7 @@ int contest_scorer::handle(int event) {
 }
 
 void contest_scorer::load_data() {
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences contest_settings(settings, "Contest");
 	char * temp;
 	contest_settings.get("Contest", temp, "");
@@ -244,7 +243,7 @@ void contest_scorer::create_form() {
 }
 
 void contest_scorer::save_data() {
-	Fl_Preferences settings(prefs_mode_, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences contest_settings(settings, "Contest");
 	contest_settings.set("Contest", contest_id_.c_str());
 	contest_settings.set("Index", contest_index_.c_str());
