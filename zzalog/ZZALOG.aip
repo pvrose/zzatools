@@ -34,18 +34,16 @@
     <ROW Directory="DesktopFolder" Directory_Parent="TARGETDIR" DefaultDir="DESKTO~1|DesktopFolder" IsPseudoRoot="1"/>
     <ROW Directory="GM3ZZA_1_Dir" Directory_Parent="CommonAppDataFolder" DefaultDir="GM3ZZA"/>
     <ROW Directory="GM3ZZA_Dir" Directory_Parent="AppDataFolder" DefaultDir="GM3ZZA"/>
-    <ROW Directory="NewFolder_1_Dir" Directory_Parent="ZZALOG_Dir" DefaultDir="NEWFOL~1|New Folder"/>
-    <ROW Directory="NewFolder_Dir" Directory_Parent="ZZALOG_Dir" DefaultDir="DOCUME~1|documents"/>
     <ROW Directory="SHORTCUTDIR" Directory_Parent="TARGETDIR" DefaultDir="SHORTC~1|SHORTCUTDIR" IsPseudoRoot="1"/>
     <ROW Directory="TARGETDIR" DefaultDir="SourceDir"/>
     <ROW Directory="ZZALOG_1_Dir" Directory_Parent="GM3ZZA_1_Dir" DefaultDir="ZZALOG"/>
     <ROW Directory="ZZALOG_Dir" Directory_Parent="GM3ZZA_Dir" DefaultDir="ZZALOG"/>
-    <ROW Directory="docs_Dir" Directory_Parent="ZZALOG_1_Dir" DefaultDir="docs"/>
+    <ROW Directory="docs_Dir" Directory_Parent="ZZALOG_Dir" DefaultDir="docs"/>
     <ROW Directory="html_1_Dir" Directory_Parent="docs_Dir" DefaultDir="html"/>
     <ROW Directory="html_Dir" Directory_Parent="userguide_Dir" DefaultDir="html"/>
     <ROW Directory="search_1_Dir" Directory_Parent="html_1_Dir" DefaultDir="search"/>
     <ROW Directory="search_Dir" Directory_Parent="html_Dir" DefaultDir="search"/>
-    <ROW Directory="userguide_Dir" Directory_Parent="ZZALOG_1_Dir" DefaultDir="USERGU~1|userguide"/>
+    <ROW Directory="userguide_Dir" Directory_Parent="ZZALOG_Dir" DefaultDir="USERGU~1|userguide"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.SideBySideGuidComponent">
     <ROW Component="APPDIR" Value="{87C3BF7C-560D-402B-B03A-1E3D398ED6F0}"/>
@@ -53,23 +51,22 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
     <ROW Component="APPDIR" ComponentId="{87C3BF7C-560D-402B-B03A-1E3D398ED6F0}" Directory_="APPDIR" Attributes="0"/>
-    <ROW Component="NewFolder" ComponentId="{2253813D-1548-4C05-94FB-753321AEBDCA}" Directory_="NewFolder_1_Dir" Attributes="0"/>
     <ROW Component="ProductInformation" ComponentId="{E180E30E-16B6-4506-97ED-6FEB327E79BE}" Directory_="APPDIR" Attributes="260" KeyPath="Version"/>
     <ROW Component="SHORTCUTDIR" ComponentId="{04DB559B-3E2C-4C23-BE71-B8D21A9EC47B}" Directory_="SHORTCUTDIR" Attributes="0"/>
+    <ROW Component="ZZALOG" ComponentId="{B6806917-32BB-4F22-88FD-F336915BB485}" Directory_="ZZALOG_1_Dir" Attributes="0"/>
+    <ROW Component="ZZALOG.pdf" ComponentId="{AB90C026-9C54-4F72-B67B-1A9A47E8D69C}" Directory_="userguide_Dir" Attributes="0" KeyPath="refman.pdf" Type="0"/>
     <ROW Component="about__dialog_8h.html" ComponentId="{62C9209B-2263-4C2D-95C3-85EDDCD0A238}" Directory_="html_1_Dir" Attributes="0" KeyPath="about__dialog_8h.html" Type="0"/>
     <ROW Component="adding.html" ComponentId="{1D53FE55-ABE2-4C95-8506-D33663FE35AC}" Directory_="html_Dir" Attributes="0" KeyPath="adding.html" Type="0"/>
     <ROW Component="all.xml" ComponentId="{73F3094C-518F-4F63-A62E-F36CE2D1CE64}" Directory_="ZZALOG_Dir" Attributes="0" KeyPath="cty.csv" Type="0"/>
     <ROW Component="all_0.js" ComponentId="{84378801-D22C-4253-8E0A-7C33F9E390D0}" Directory_="search_Dir" Attributes="0" KeyPath="all_0.js" Type="0"/>
     <ROW Component="all_0.js_1" ComponentId="{69FD7002-6A7E-4D67-921C-0A2C163D31F8}" Directory_="search_1_Dir" Attributes="0" KeyPath="all_0.js_1" Type="0"/>
     <ROW Component="docs" ComponentId="{FDEEE471-BBD5-4DC1-813E-0A509EA2C271}" Directory_="docs_Dir" Attributes="0"/>
-    <ROW Component="documents" ComponentId="{BBE82F3B-88E2-4F2F-9105-CABD724D8EEF}" Directory_="NewFolder_Dir" Attributes="0"/>
     <ROW Component="libcurl.dll" ComponentId="{AF97FDAA-0EB1-4F49-9BCF-97AE0A24D0EC}" Directory_="APPDIR" Attributes="256" KeyPath="libcurl.dll"/>
     <ROW Component="libgcc_s_dw21.dll" ComponentId="{0B0EDD5D-972B-4CB8-93F3-5B77BF285763}" Directory_="APPDIR" Attributes="0" KeyPath="libgcc_s_dw21.dll"/>
     <ROW Component="libgcc_s_seh1.dll" ComponentId="{8703F152-C0F3-428D-8787-27C1CA594379}" Directory_="APPDIR" Attributes="256" KeyPath="libgcc_s_seh1.dll"/>
     <ROW Component="libhamlib4.dll" ComponentId="{D49D6F51-47A2-41B3-9500-EE71AF462B19}" Directory_="APPDIR" Attributes="256" KeyPath="libhamlib4.dll"/>
     <ROW Component="libusb1.0.dll" ComponentId="{5299D2AA-788C-42CF-90BC-AD1958D70590}" Directory_="APPDIR" Attributes="256" KeyPath="libusb1.0.dll"/>
     <ROW Component="libwinpthread1.dll" ComponentId="{0EB83431-B198-48DE-9813-B485A6181099}" Directory_="APPDIR" Attributes="256" KeyPath="libwinpthread1.dll"/>
-    <ROW Component="refman.pdf" ComponentId="{BE95F3BA-E8DF-4F94-8D68-37E9FBC71005}" Directory_="ZZALOG_1_Dir" Attributes="0" KeyPath="refman.pdf" Type="0"/>
     <ROW Component="zzalog.exe" ComponentId="{480F63B4-F3FE-4905-A069-FEE69889E54C}" Directory_="APPDIR" Attributes="256" KeyPath="zzalog.exe"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
@@ -1998,7 +1995,7 @@
     <ROW File="web_dialog_6.png" Component_="adding.html" FileName="WEB_DI~6.PNG|web_dialog_6.png" Attributes="0" SourcePath="userguide\images\web_dialog_6.png" SelfReg="false"/>
     <ROW File="web_dialog_7.png" Component_="adding.html" FileName="WEB_DI~7.PNG|web_dialog_7.png" Attributes="0" SourcePath="userguide\images\web_dialog_7.png" SelfReg="false"/>
     <ROW File="web_dialog_8.png" Component_="adding.html" FileName="WEB_DI~8.PNG|web_dialog_8.png" Attributes="0" SourcePath="userguide\images\web_dialog_8.png" SelfReg="false"/>
-    <ROW File="refman.pdf" Component_="refman.pdf" FileName="ZZALOG.pdf" Attributes="0" SourcePath="userguide\latex\refman.pdf" SelfReg="false"/>
+    <ROW File="refman.pdf" Component_="ZZALOG.pdf" FileName="ZZALOG.pdf" Attributes="0" SourcePath="userguide\latex\refman.pdf" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
     <ROW BuildKey="x64_Release" BuildName="x64_Release" BuildOrder="1" BuildType="0" PackageFileName="ZZALIB-3.6.7" Languages="en_GB" InstallationType="4" SummInfoMetadata="Page Count:450" UseLargeSchema="true" MsiPackageType="x64"/>
@@ -2054,9 +2051,8 @@
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCreateFolderComponent">
     <ROW Directory_="APPDIR" Component_="APPDIR" ManualDelete="true"/>
     <ROW Directory_="SHORTCUTDIR" Component_="SHORTCUTDIR" ManualDelete="false"/>
-    <ROW Directory_="NewFolder_Dir" Component_="documents" ManualDelete="false"/>
-    <ROW Directory_="NewFolder_1_Dir" Component_="NewFolder" ManualDelete="false"/>
     <ROW Directory_="docs_Dir" Component_="docs" ManualDelete="false"/>
+    <ROW Directory_="ZZALOG_1_Dir" Component_="ZZALOG" ManualDelete="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCustActComponent">
     <ROW Action="AI_DOWNGRADE" Type="19" Target="4010"/>
@@ -2082,19 +2078,18 @@
     <ROW Feature_="MainFeature" Component_="SHORTCUTDIR"/>
     <ROW Feature_="MainFeature" Component_="libcurl.dll"/>
     <ROW Feature_="MainFeature" Component_="libgcc_s_dw21.dll"/>
-    <ROW Feature_="MainFeature" Component_="documents"/>
     <ROW Feature_="MainFeature" Component_="libhamlib4.dll"/>
     <ROW Feature_="MainFeature" Component_="libusb1.0.dll"/>
     <ROW Feature_="MainFeature" Component_="libwinpthread1.dll"/>
     <ROW Feature_="MainFeature" Component_="all.xml"/>
-    <ROW Feature_="MainFeature" Component_="NewFolder"/>
     <ROW Feature_="MainFeature" Component_="libgcc_s_seh1.dll"/>
     <ROW Feature_="MainFeature" Component_="docs"/>
     <ROW Feature_="MainFeature" Component_="about__dialog_8h.html"/>
     <ROW Feature_="MainFeature" Component_="all_0.js_1"/>
     <ROW Feature_="MainFeature" Component_="adding.html"/>
     <ROW Feature_="MainFeature" Component_="all_0.js"/>
-    <ROW Feature_="MainFeature" Component_="refman.pdf"/>
+    <ROW Feature_="MainFeature" Component_="ZZALOG.pdf"/>
+    <ROW Feature_="MainFeature" Component_="ZZALOG"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
     <ROW Action="AI_DOWNGRADE" Condition="AI_NEWERPRODUCTFOUND AND (UILevel &lt;&gt; 5)" Sequence="210"/>
