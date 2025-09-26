@@ -152,16 +152,16 @@ bool qrz_handler::decode_response(std::istream& response) {
 	doc.load(response);
 
 	pugi::xml_node n_top = doc.document_element();
-	if (std::strcmp(n_top.name(), "QRZDatabase") != 0) {
+	if (strcmp(n_top.name(), "QRZDatabase") != 0) {
 		status_->misc_status(ST_ERROR, "QRZ: Invalid response from QRZ.com");
 		return false;
 	}
 
 	for (auto n_child : n_top.children()) {
-		if (std::strcmp(n_child.name(), "Session") == 0) {
+		if (strcmp(n_child.name(), "Session") == 0) {
 			decode_session(n_child);
 		}
-		else if (std::strcmp(n_child.name(), "Callsign") == 0) {
+		else if (strcmp(n_child.name(), "Callsign") == 0) {
 			decode_callsign(n_child);
 		}
 		else {
@@ -229,7 +229,7 @@ bool qrz_handler::user_details() {
 bool qrz_handler::decode_session(pugi::xml_node node) {
 	char msg[128];
 	for (auto datum : node.children()) {
-		if (std::strcmp(datum.name(), "Key") == 0) {
+		if (strcmp(datum.name(), "Key") == 0) {
 			std::string key = datum.text().as_string();
 			if (session_key_.length() && session_key_ != key) {
 				status_->misc_status(ST_ERROR, "QRZ: Incompatible session keys received - see log");
@@ -242,19 +242,19 @@ bool qrz_handler::decode_session(pugi::xml_node node) {
 			}
 		}
 		// Error detected - stop decoding
-		if (std::strcmp(datum.name(), "Error") == 0) {
+		if (strcmp(datum.name(), "Error") == 0) {
 			std::snprintf(msg, sizeof(msg), "QRZ: Error: %s", datum.text().as_string());
 			status_->misc_status(ST_ERROR, msg);
 			return false;
 		}
 		// Warning message received
-		else if (std::strcmp(datum.name(), "Message") ==0) {
+		else if (strcmp(datum.name(), "Message") ==0) {
 			std::snprintf(msg, sizeof(msg), "QRZ: Warning: %s", datum.text().as_string());
 			status_->misc_status(ST_WARNING, msg);
 		}
 		// Check subscription status
-		else if (std::strcmp(datum.name(), "SubExp") ==0) {
-			if (std::strcmp(datum.text().as_string(), "non-subscriber") == 0) {
+		else if (strcmp(datum.name(), "SubExp") ==0) {
+			if (strcmp(datum.text().as_string(), "non-subscriber") == 0) {
 				status_->misc_status(ST_WARNING, "QRZ: Not a QRZ.com subscriber");	
 				non_subscriber_ = true;
 			}
@@ -277,34 +277,34 @@ bool qrz_handler::decode_callsign(pugi::xml_node node) {
 	for (auto datum : node.children()) {
 		const char* name = datum.name();
 		std::string value = datum.text().as_string();
-		if (std::strcmp(name, "call") == 0) {
+		if (strcmp(name, "call") == 0) {
 			qrz_info_->item("CALL", value);
 		}
-		else if (std::strcmp(name, "dxcc") == 0) {
+		else if (strcmp(name, "dxcc") == 0) {
 			qrz_info_->item("DXCC", value);
 		}
-		else if (std::strcmp(name, "fname") == 0) {
+		else if (strcmp(name, "fname") == 0) {
 			qrz_info_->item("NAME", value);
 		}
-		else if (std::strcmp(name, "addr1") == 0) {
+		else if (strcmp(name, "addr1") == 0) {
 			qrz_info_->item("ADDRESS", value);
 		}
-		else if (std::strcmp(name, "addr2") == 0) {
+		else if (strcmp(name, "addr2") == 0) {
 			qrz_info_->item("QTH", value);
 		}
-		else if (std::strcmp(name, "state") == 0) {
+		else if (strcmp(name, "state") == 0) {
 			qrz_info_->item("STATE", value);
 		}
-		else if (std::strcmp(name, "lat") == 0) {
+		else if (strcmp(name, "lat") == 0) {
 			qrz_info_->item("LAT", value);
 		}
-		else if (std::strcmp(name, "lon") == 0) {
+		else if (strcmp(name, "lon") == 0) {
 			qrz_info_->item("LON", value);
 		}
-		else if (std::strcmp(name, "grid") == 0) {
+		else if (strcmp(name, "grid") == 0) {
 			qrz_info_->item("GRIDSQUARE", value);
 		}
-		else if (std::strcmp(name, "geoloc") == 0) {
+		else if (strcmp(name, "geoloc") == 0) {
 			if (value == "user" || value == "geocode") {
 				valid_coords = true;
 			}
@@ -312,25 +312,25 @@ bool qrz_handler::decode_callsign(pugi::xml_node node) {
 				valid_coords = false;
 			}
 		}
-		else if (std::strcmp(name, "fips") == 0) {
+		else if (strcmp(name, "fips") == 0) {
 			qrz_info_->item("CNTY", value);
 		}
-		else if (std::strcmp(name, "land") == 0) {
+		else if (strcmp(name, "land") == 0) {
 			qrz_info_->item("COUNTRY", value);
 		}
-		else if (std::strcmp(name, "email") == 0) {
+		else if (strcmp(name, "email") == 0) {
 			qrz_info_->item("EMAIL", value);
 		}
-		else if (std::strcmp(name, "url") == 0) {
+		else if (strcmp(name, "url") == 0) {
 			qrz_info_->item("WEB", value);
 		}
-		else if (std::strcmp(name, "iota") == 0) {
+		else if (strcmp(name, "iota") == 0) {
 			qrz_info_->item("IOTA", value);
 		}
-		else if (std::strcmp(name, "cqzone") == 0) {
+		else if (strcmp(name, "cqzone") == 0) {
 			qrz_info_->item("CQZ", value);
 		}
-		else if (std::strcmp(name, "ituzone") == 0) {
+		else if (strcmp(name, "ituzone") == 0) {
 			qrz_info_->item("ITUZ", value);
 		}
 	}

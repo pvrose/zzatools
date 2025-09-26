@@ -203,17 +203,17 @@ bool rpc_handler::decode_response(std::istream& response_xml, rpc_data_item* res
 
 	pugi::xml_node n_resp = doc.document_element();
 
-	if (std::strcmp(n_resp.name(), "methodResponse") != 0) {
+	if (strcmp(n_resp.name(), "methodResponse") != 0) {
 		status_->misc_status(ST_ERROR, "RPC: Not a valid response");
 		return false;
 	}
 	pugi::xml_node n_child = n_resp.first_child();
-	if (std::strcmp(n_child.name(), "params")) {
+	if (strcmp(n_child.name(), "params")) {
 		pugi::xml_node n_param = n_child.child("param");
 		read_item(n_param, *response);
 		rpc_fault = false;
 	}
-	else if (std::strcmp(n_child.name(), "fault")) {
+	else if (strcmp(n_child.name(), "fault")) {
 		read_item(n_child, *response);
 		rpc_fault = true;
 	}
@@ -231,7 +231,7 @@ bool rpc_handler::decode_request(std::istream& request_xml, std::string& method_
 	doc.load(request_xml);
 	// Check it's a request
 	pugi::xml_node n_req = doc.document_element();
-	if (std::strcmp(n_req.name(), "methodCall") != 0) {
+	if (strcmp(n_req.name(), "methodCall") != 0) {
 		status_->misc_status(ST_ERROR, "RPC: Not a valid request");
 		return false;
 	}
@@ -240,7 +240,7 @@ bool rpc_handler::decode_request(std::istream& request_xml, std::string& method_
 	// Get params
 	pugi::xml_node n_params = n_req.child("params");
 	for (auto n_param : n_params) {
-		if (std::strcmp(n_param.name(), "param") != 0) {
+		if (strcmp(n_param.name(), "param") != 0) {
 			status_->misc_status(ST_ERROR, "RPC: Not a valid request");
 			return false;
 		}
@@ -255,7 +255,7 @@ void rpc_handler::read_item(pugi::xml_node& node, rpc_data_item& item) {
 	pugi::xml_node n_value = node.child("value");
 	pugi::xml_node n_item = n_value.first_child();
 	const char* type = n_item.name();
-	if (std::strcmp(type, "array") == 0) {
+	if (strcmp(type, "array") == 0) {
 		rpc_data_item::rpc_array* array = new rpc_data_item::rpc_array;
 		pugi::xml_node n_data = n_item.child("data");
 		for (auto n_datum : n_data.children()) {
@@ -265,31 +265,31 @@ void rpc_handler::read_item(pugi::xml_node& node, rpc_data_item& item) {
 		}
 		item.set(array);
 	}
-	else if (std::strcmp(type, "base64") == 0) {
+	else if (strcmp(type, "base64") == 0) {
 		std::string s = decode_base_64(n_item.text().as_string());
 		item.set(s, XRT_STRING);
 	}
-	else if (std::strcmp(type, "boolean") == 0) {
+	else if (strcmp(type, "boolean") == 0) {
 		bool b = n_item.text().as_bool();
 		item.set(b);
 	}
-	else if (std::strcmp(type, "dateTime.iso8601") == 0) {
+	else if (strcmp(type, "dateTime.iso8601") == 0) {
 		std::string s = n_item.text().as_string();
 		item.set(s, XRT_DATETIME);
 	}
-	else if (std::strcmp(type, "double") == 0) {
+	else if (strcmp(type, "double") == 0) {
 		double d = n_item.text().as_double();
 		item.set(d);
 	}
-	else if (std::strcmp(type, "int") == 0 || std::strcmp(type, "i4") == 0) {
+	else if (strcmp(type, "int") == 0 || strcmp(type, "i4") == 0) {
 		uint32_t i = n_item.text().as_int();
 		item.set(i);
 	}
-	else if (std::strcmp(type, "string") == 0) {
+	else if (strcmp(type, "string") == 0) {
 		std::string s = n_item.text().as_string();
 		item.set(s, XRT_STRING);
 	}
-	else if (std::strcmp(type, "struct") == 0) {
+	else if (strcmp(type, "struct") == 0) {
 		rpc_data_item::rpc_struct* str = new rpc_data_item::rpc_struct;
 		for (auto member : n_item.children()) {
 			if (strcmp(member.name(), "member") == 0) {

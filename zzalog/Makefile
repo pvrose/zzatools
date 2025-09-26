@@ -25,10 +25,6 @@ DBG = gdb
 # Note the single quotes around the * expressions. Make will incorrectly expand these otherwise.
 SRCS := $(shell find $(SRC_DIRS) -name '*.cpp' -or -name '*.c' -or -name '*.s')
 SRCS += ../common/src/utils.cpp
-SRCS += ../common/src/xml_writer.cpp
-SRCS += ../common/src/xml_reader.cpp
-SRCS += ../common/src/xml_element.cpp
-
 # String substitution for every C/C++ file.
 # As an example, hello.cpp turns into ./build/hello.cpp.o
 OBJS := $(SRCS:%=$(EXEC_DIR)/%.o)
@@ -50,7 +46,6 @@ TREFS := $(REFS:%=$(APPDATA_DIR)/%)
 
 # Every folder in ./src will need to be passed to GCC so that it can find header files
 INC_DIRS := ./include ../widgets/include ../common/include
-
 # Include files for code documentation
 INCS := $(shell find $(INC_DIRS) -name '*.h' -or -name '*.hpp' -or -name '*.H')
 
