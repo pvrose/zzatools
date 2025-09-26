@@ -42,13 +42,15 @@ about_dialog::about_dialog() :
 	curl_version_info_data* data = curl_version_info(CURLVERSION_LAST);
 
 	// Draw the two text boxes - first program ID and versions
-	std::string program_id = 
+	std::string program_id =
 		"Compiled " + TIMESTAMP + "\n" +
 		(spec_data_ ? "using ADIF Version " + spec_data_->adif_version() + "\n" : "") +
 		" hamlib version " + rig_version() +
-		"\n FLTK version " + to_string(FL_MAJOR_VERSION) + "." + 
+		"\n FLTK version " + to_string(FL_MAJOR_VERSION) + "." +
 		to_string(FL_MINOR_VERSION) + "." + to_string(FL_PATCH_VERSION) +
-		"\n CURL version " + std::string(data->version);
+		"\n CURL version " + std::string(data->version) +
+		"\n JSON " +
+		"\n PUGIXML ";
 	std::string copyright = COPYRIGHT + "\ne-mail: " + CONTACT + "\n" + PARTY3RD_COPYRIGHT + "\n (Hamlib " + rig_copyright() + ")";
 	int w = W2;
 	int h = 0;
