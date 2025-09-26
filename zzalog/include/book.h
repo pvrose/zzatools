@@ -14,9 +14,8 @@
 
 	class view;
 	class adi_reader;
-	class adx_reader;
+	class adx_handler;
 	class adi_writer;
-	class adx_writer;
 	class record;
 	class band_set;
 	struct search_criteria_t;
@@ -552,9 +551,8 @@
 		int save_level_;
 		// Readers and writer
 		adi_reader* adi_reader_;  //!< Component used to read a .adi format file.
-		adx_reader* adx_reader_;  //!< Component used to read a .adx format file.
 		adi_writer* adi_writer_;  //!< Component used to write a .adi format file.
-		adx_writer* adx_writer_;  //!< Component used to write a .adx format file.
+		adx_handler* adx_handler_; //!< Component useed to read and write an ADX format file
 		//! Flag std::set when uploads to QSL sites is allowed.
 		bool upload_allowed_;
 		//! The std::set of QSO records that have been declared "dirty". Their contents

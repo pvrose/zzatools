@@ -142,7 +142,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\pvros\source\repos\pvrose\zzatools\zzalog\include;C:\Users\pvros\source\repos\fltk\build;C:\Program Files\hamlib-w64-4.6.4\include;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\pthread-win32;C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x64-release-dll-ipv6-sspi-schannel\include;C:\Users\pvros\source\repos\fltk\png;C:\Users\pvros\source\repos\fltk\zlib;C:\Users\pvros\source\repos\pvrose\zzatools\common\include;C:\Users\pvros\source\repos\pvrose\zzatools\widgets\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\pvros\source\repos\pvrose\zzatools\zzalog\include;C:\Users\pvros\source\repos\fltk\build;C:\Program Files\hamlib-w64-4.6.4\include;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\pthread-win32;C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x64-release-dll-ipv6-sspi-schannel\include;C:\Users\pvros\source\repos\fltk\png;C:\Users\pvros\source\repos\fltk\zlib;C:\Users\pvros\source\repos\pvrose\zzatools\common\include;C:\Users\pvros\source\repos\pvrose\zzatools\widgets\include;C:\Users\pvros\source\repos\pugixml-1.15\src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_HAS_STD_BYTE=0;CURL_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -159,6 +159,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\common\src\pugixml.cpp" />
     <ClCompile Include="..\common\src\utils.cpp" />
     <ClCompile Include="..\common\src\xml_element.cpp" />
     <ClCompile Include="..\common\src\xml_reader.cpp" />
@@ -166,6 +167,7 @@
     <ClCompile Include="src\about_dialog.cpp" />
     <ClCompile Include="src\adi_reader.cpp" />
     <ClCompile Include="src\adi_writer.cpp" />
+    <ClCompile Include="src\adx_handler.cpp" />
     <ClCompile Include="src\adx_reader.cpp" />
     <ClCompile Include="src\adx_writer.cpp" />
     <ClCompile Include="src\band_data.cpp" />
@@ -274,6 +276,7 @@
     <ClCompile Include="..\widgets\src\filename_input.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\include\pugixml.hpp" />
     <ClInclude Include="..\common\include\utils.h" />
     <ClInclude Include="..\common\include\xml_element.h" />
     <ClInclude Include="..\common\include\xml_reader.h" />
@@ -281,6 +284,7 @@
     <ClInclude Include="include\about_dialog.h" />
     <ClInclude Include="include\adi_reader.h" />
     <ClInclude Include="include\adi_writer.h" />
+    <ClInclude Include="include\adx_handler.h" />
     <ClInclude Include="include\adx_reader.h" />
     <ClInclude Include="include\adx_writer.h" />
     <ClInclude Include="include\band.h" />
