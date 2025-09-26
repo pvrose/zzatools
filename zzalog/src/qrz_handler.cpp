@@ -4,8 +4,6 @@
 #include "tabbed_forms.h"
 #include "book.h"
 #include "url_handler.h"
-#include "xml_reader.h"
-#include "xml_element.h"
 #include "menu.h"
 #include "record.h"
 #include "import_data.h"
@@ -13,6 +11,8 @@
 #include "adi_reader.h"
 #include "adi_writer.h"
 #include "qsl_dataset.h"
+
+#include "pugixml.hpp"
 
 #include <sstream>
 #include <iostream>
@@ -41,7 +41,6 @@ qrz_handler::qrz_handler() :
 	, password_("")
 	, session_key_("")
 	, qrz_info_(nullptr)
-	, qrz_version_("")
 	, merge_done_(false)
 {
 
@@ -56,7 +55,6 @@ qrz_handler::qrz_handler() :
 	if (!url_handler_) {
 		url_handler_ = new url_handler();
 	}
-	data_.clear();
 }
 
 // Destructor
@@ -67,7 +65,6 @@ qrz_handler::~qrz_handler() {
 	delete th_upload_;
 	// Delete dynamic data
 	delete qrz_info_;
-	data_.clear();
 }
 
 // Open the QRZ session
@@ -91,7 +88,7 @@ bool qrz_handler::open_session() {
 			return false;
 		}
 		session_key_ = "";
-		if (decode_session_response(response)) {
+		if (decode_response(response)) {
 			if (non_subscriber_) {
 				// User is not a subscriber - ask whether to continue
 				fl_beep(FL_BEEP_QUESTION);
@@ -139,7 +136,7 @@ bool qrz_handler::fetch_details(record* qso) {
 	// Create a new record
 	delete qrz_info_;
 	qrz_info_ = new record;
-	if (decode_details_response(response)) {
+	if (decode_response(response)) {
 		status_->misc_status(ST_OK, std::string("QRZ: query for " + qso->item("CALL") + " completed.").c_str());
 		return true;
 	}
@@ -149,24 +146,31 @@ bool qrz_handler::fetch_details(record* qso) {
 }
 
 // Decode session response
-bool qrz_handler::decode_session_response(std::istream& response) {
-	qrz_version_ = "";
-	xml_reader* reader = new xml_reader;
-	reader->parse(response);
-	xml_element* top_element = reader->element();
-	bool result = decode_xml(top_element);
-	delete top_element;
-	return result;
-}
+bool qrz_handler::decode_response(std::istream& response) {
+	char msg[128];
+	pugi::xml_document doc;
+	doc.load(response);
 
-// Decode details response
-bool qrz_handler::decode_details_response(std::istream& response) {
-	xml_reader* reader = new xml_reader;
-	reader->parse(response);
-	xml_element* top_element = reader->element();
-	bool result = decode_xml(top_element);
-	delete top_element;
-	return result;
+	pugi::xml_node n_top = doc.document_element();
+	if (std::strcmp(n_top.name(), "QRZDatabase") != 0) {
+		status_->misc_status(ST_ERROR, "QRZ: Invalid response from QRZ.com");
+		return false;
+	}
+
+	for (auto n_child : n_top.children()) {
+		if (std::strcmp(n_child.name(), "Session") == 0) {
+			decode_session(n_child);
+		}
+		else if (std::strcmp(n_child.name(), "Callsign") == 0) {
+			decode_callsign(n_child);
+		}
+		else {
+			std::snprintf(msg, sizeof(msg), "QRZ: Response item %s ignored",
+				n_child.name());
+			status_->misc_status(ST_NOTE, msg);
+		}
+	}
+	return true;
 }
 
 // Query user on merge
@@ -220,142 +224,120 @@ bool qrz_handler::user_details() {
 		return false;
 	}
 }
-// Decode an XML element
-bool qrz_handler::decode_xml(xml_element* element) {
-	if (element->parent() == nullptr) {
-		// Top element - must be named QRZDatabase
-		if (element->name() != "QRZDatabase") {
-			std::string message = "QRZ: unexpected XML " + element->name() + " received";
-			status_->misc_status(ST_ERROR, message.c_str());
-			return false;
-		}
-		else {
-			return decode_top(element);
-		}
-	}
-	else if (element->name() == "Session") {
-		return decode_session(element);
-	}
-	else if (element->name() == "Callsign") {
-		return decode_callsign(element);
-	}
-	else {
-		data_[element->name()] = element->content();
-		return true;
-	}
-}
-
-	// Decode QRZDatabase element
-bool qrz_handler::decode_top(xml_element* element) {
-	// Check the QRZ Database version matches that previously received
-	std::map <std::string, std::string>* attributes = element->attributes();
-	if (attributes->find("version") != attributes->end()) {
-		std::string version = attributes->at("version");
-		if (qrz_version_.length() && qrz_version_ != version) {
-			char format[] = "QRZ: database version mis-match: previously %s currently %s";
-			int length = strlen(format) + version.length() + qrz_version_.length();
-			char* message = new char[length];
-			snprintf(message, length, format, qrz_version_.c_str(), version.c_str());
-			status_->misc_status(ST_WARNING, message);
-		}
-	}
-	// now decode all the children
-	bool result = true;
-	for (int i = 0; i < element->count() && result; i++) {
-		result &= decode_xml(element->child(i));
-	}
-	return result;
-}
 
 // Decode Session element
-bool qrz_handler::decode_session(xml_element* element) {
-	data_.clear();
-	// Get all the children - loaded ito data_
-	bool result = true;
-	for (int i = 0; i < element->count() && result; i++) {
-		result &= decode_xml(element->child(i));
-	}
-	if (!result) return false;
-	// Check the key is as received previously
-	if (data_.find("Key") != data_.end()) {
-		std::string key = data_.at("Key");
-		if (session_key_.length() && session_key_ != key) {
-			status_->misc_status(ST_ERROR, "QRZ: Incompatible session keys received - see log");
-			status_->misc_status(ST_LOG, std::string("QRZ: Previously " + session_key_).c_str());
-			status_->misc_status(ST_LOG, std::string("QRZ: Currently  " + key).c_str());
+bool qrz_handler::decode_session(pugi::xml_node node) {
+	char msg[128];
+	for (auto datum : node.children()) {
+		if (std::strcmp(datum.name(), "Key") == 0) {
+			std::string key = datum.text().as_string();
+			if (session_key_.length() && session_key_ != key) {
+				status_->misc_status(ST_ERROR, "QRZ: Incompatible session keys received - see log");
+				status_->misc_status(ST_LOG, std::string("QRZ: Previously " + session_key_).c_str());
+				status_->misc_status(ST_LOG, std::string("QRZ: Currently  " + key).c_str());
+				return false;
+			}
+			else {
+				session_key_ = key;
+			}
+		}
+		// Error detected - stop decoding
+		if (std::strcmp(datum.name(), "Error") == 0) {
+			std::snprintf(msg, sizeof(msg), "QRZ: Error: %s", datum.text().as_string());
+			status_->misc_status(ST_ERROR, msg);
 			return false;
 		}
-		else {
-			session_key_ = key;
+		// Warning message received
+		else if (std::strcmp(datum.name(), "Message") ==0) {
+			std::snprintf(msg, sizeof(msg), "QRZ: Warning: %s", datum.text().as_string());
+			status_->misc_status(ST_WARNING, msg);
 		}
-	}
-	// Error detected - stop decoding
-	if (data_.find("Error") != data_.end()) {
-		status_->misc_status(ST_ERROR, std::string("QRZ: error: " + data_.at("Error")).c_str());
-		return false;
-	}
-	// Warning message received
-	if (data_.find("Message") != data_.end()) {
-		status_->misc_status(ST_WARNING, std::string("QRZ: warning: " + data_.at("Message")).c_str());
-	}
-	// Check subscription status
-	if (data_.find("SubExp") != data_.end() && data_["SubExp"] == "non-subscriber") {
-		non_subscriber_ = true;
-	}
-	else {
-		non_subscriber_ = false;
+		// Check subscription status
+		else if (std::strcmp(datum.name(), "SubExp") ==0) {
+			if (std::strcmp(datum.text().as_string(), "non-subscriber") == 0) {
+				status_->misc_status(ST_WARNING, "QRZ: Not a QRZ.com subscriber");	
+				non_subscriber_ = true;
+			}
+			else {
+				std::snprintf(msg, sizeof(msg), "QRZ: QRZ Subscription expires %s",
+					datum.text().as_string());
+				status_->misc_status(ST_NOTE, msg);
+				non_subscriber_ = false;
+			}
+		}
 	}
 	return true;
 }
 
 // Decode Callsign element
-bool qrz_handler::decode_callsign(xml_element* element) {
-	data_.clear();
-	// Get all the children - loaded ito data_
-	bool result = true;
-	for (int i = 0; i < element->count() && result; i++) {
-		result &= decode_xml(element->child(i));
+bool qrz_handler::decode_callsign(pugi::xml_node node) {
+	// Get all the children
+	char msg[128];
+	bool valid_coords = false;
+	for (auto datum : node.children()) {
+		const char* name = datum.name();
+		std::string value = datum.text().as_string();
+		if (std::strcmp(name, "call") == 0) {
+			qrz_info_->item("CALL", value);
+		}
+		else if (std::strcmp(name, "dxcc") == 0) {
+			qrz_info_->item("DXCC", value);
+		}
+		else if (std::strcmp(name, "fname") == 0) {
+			qrz_info_->item("NAME", value);
+		}
+		else if (std::strcmp(name, "addr1") == 0) {
+			qrz_info_->item("ADDRESS", value);
+		}
+		else if (std::strcmp(name, "addr2") == 0) {
+			qrz_info_->item("QTH", value);
+		}
+		else if (std::strcmp(name, "state") == 0) {
+			qrz_info_->item("STATE", value);
+		}
+		else if (std::strcmp(name, "lat") == 0) {
+			qrz_info_->item("LAT", value);
+		}
+		else if (std::strcmp(name, "lon") == 0) {
+			qrz_info_->item("LON", value);
+		}
+		else if (std::strcmp(name, "grid") == 0) {
+			qrz_info_->item("GRIDSQUARE", value);
+		}
+		else if (std::strcmp(name, "geoloc") == 0) {
+			if (value == "user" || value == "geocode") {
+				valid_coords = true;
+			}
+			else {
+				valid_coords = false;
+			}
+		}
+		else if (std::strcmp(name, "fips") == 0) {
+			qrz_info_->item("CNTY", value);
+		}
+		else if (std::strcmp(name, "land") == 0) {
+			qrz_info_->item("COUNTRY", value);
+		}
+		else if (std::strcmp(name, "email") == 0) {
+			qrz_info_->item("EMAIL", value);
+		}
+		else if (std::strcmp(name, "url") == 0) {
+			qrz_info_->item("WEB", value);
+		}
+		else if (std::strcmp(name, "iota") == 0) {
+			qrz_info_->item("IOTA", value);
+		}
+		else if (std::strcmp(name, "cqzone") == 0) {
+			qrz_info_->item("CQZ", value);
+		}
+		else if (std::strcmp(name, "ituzone") == 0) {
+			qrz_info_->item("ITUZ", value);
+		}
 	}
-	if (!result) return false;
-	// now for each received element in turn
-	// call->CALL
-	qrz_info_->item("CALL", data_["call"]);
-	// dxcc->DXCC
-	qrz_info_->item("DXCC", data_["dxcc"]);
-	// fname ->NAME
-	qrz_info_->item("NAME", data_["fname"]);
-	// addr1->ADDRESS
-	qrz_info_->item("ADDRESS", data_["addr1"]);
-	// addr2->QTH
-	qrz_info_->item("QTH", data_["addr2"]);
-	// state->STATE
-	qrz_info_->item("STATE", data_["state"]);
-	// lon, lat and gridsquare
-	if (data_["geoloc"] == "user" || data_["geoloc"] == "geocode") {
-		// Convert lat/lon to ADIF format
-		qrz_info_->item("LAT", data_["LAT"], true);
-		qrz_info_->item("LON", data_["LON"], true);
-		qrz_info_->item("GRIDSQUARE", data_["grid"]);
+	if (!valid_coords) {
+		qrz_info_->item("LAT", (string)"");
+		qrz_info_->item("LON", (string)"");
 	}
-	else if (data_["geoloc"] == "grid") {
-		qrz_info_->item("GRIDSQUARE", data_["grid"]);
-	}
-	// county
-	qrz_info_->item("CNTY", data_["state"] + ',' + data_["county"]);
-	// land->COUNTRY
-	qrz_info_->item("COUNTRY", data_["land"]);
-	// qslmgr->QSL_VIA
-	qrz_info_->item("QSL_VIA", data_["qslmgr"]);
-	// email->EMAIL
-	qrz_info_->item("EMAIL", data_["email"]);
-	// url->WEB
-	qrz_info_->item("WEB", data_["url"]);
-	// iota->IOTA
-	qrz_info_->item("IOTA", data_["iota"]);
-	// cqzone
-	qrz_info_->item("CQZ", data_["cqzone"]);
-	// ituzone
-	qrz_info_->item("ITUZ", data_["ituzone"]);
 	return true;
 }
 

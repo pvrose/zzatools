@@ -1,6 +1,8 @@
 #ifndef __QRZ_HANDLER__
 #define __QRZ_HANDLER__
 
+#include "pugixml.hpp"
+
 #include <string>
 #include<istream>
 #include <map>
@@ -13,7 +15,6 @@
 
 class book;
 class record;
-class xml_element;
 typedef size_t qso_num_t;
 
 struct qsl_call_data;
@@ -73,10 +74,8 @@ protected:
 		record* qso = nullptr;             //!< QSO record for which this response is.
 		unsigned long long logid = 0ull;   //!< QSO log id as known to QRZ.com (universally unique).
 	};
-	//! Decode session \p response. 
-	bool decode_session_response(std::istream& response);
-	//! Decode details \p response.
-	bool decode_details_response(std::istream& response);
+	//! Decode \p response. 
+	bool decode_response(std::istream& response);
 	//! Query user on merge.
 	bool query_merge();
 	//! Generate URI for session request.
@@ -85,14 +84,10 @@ protected:
 	std::string generate_details_uri(std::string callsign);
 	//! Fetch user details.
 	bool user_details();
-	//! Decode re.ceived XML \p element - into a data std::map.
-	bool decode_xml(xml_element* element);
-	//! Decode QRZ Database \p element.
-	bool decode_top(xml_element* element);
 	//! Decode Session \p element.
-	bool decode_session(xml_element* element);
+	bool decode_session(pugi::xml_node node);
 	//! Decode Callsign \p element.
-	bool decode_callsign(xml_element* element);
+	bool decode_callsign(pugi::xml_node node);
 	//! Generate fetch request for logbook described in \p api into stream \p request.
 	bool fetch_request(qsl_call_data* api, std::ostream& request);
 	//! Decode fetch response for logbook described in \p api from stream \p response.
@@ -124,12 +119,8 @@ protected:
 	std::string username_;
 	//! User's QRZ.com password
 	std::string password_;
-	//! Current response data as name=value pairs
-	std::map< std::string, std::string> data_;
 	//! Current response data as fields of q QSO record.
 	record* qrz_info_;
-	//! QRZ database version.
-	std::string qrz_version_;
 	//! Merge complete.
 	bool merge_done_;
 	//! Use XML Database.
