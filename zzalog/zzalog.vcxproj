@@ -163,7 +163,6 @@
     <ClCompile Include="..\common\src\utils.cpp" />
     <ClCompile Include="..\common\src\xml_element.cpp" />
     <ClCompile Include="..\common\src\xml_reader.cpp" />
-    <ClCompile Include="..\common\src\xml_writer.cpp" />
     <ClCompile Include="src\about_dialog.cpp" />
     <ClCompile Include="src\adi_reader.cpp" />
     <ClCompile Include="src\adi_writer.cpp" />
@@ -278,7 +277,6 @@
     <ClInclude Include="..\common\include\utils.h" />
     <ClInclude Include="..\common\include\xml_element.h" />
     <ClInclude Include="..\common\include\xml_reader.h" />
-    <ClInclude Include="..\common\include\xml_writer.h" />
     <ClInclude Include="include\about_dialog.h" />
     <ClInclude Include="include\adi_reader.h" />
     <ClInclude Include="include\adi_writer.h" />

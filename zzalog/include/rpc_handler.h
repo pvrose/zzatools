@@ -3,16 +3,14 @@
 
 #include "rpc_data_item.h"
 
+#include "pugixml.hpp"
+
 #include <string>
 #include<istream>
 #include<ostream>
 #include <regex>
 #include <map>
 
-
-
-class xml_element;
-class xml_writer;
 class socket_server;
 
 	//! This class acts as both a server or a client for the XML-RPC interfcae.
@@ -97,24 +95,10 @@ class socket_server;
 		//! \param fault Receives true if the response contains an error.
 		//! \return true if successful.
 		bool decode_response(std::istream& response_xml, rpc_data_item* response, bool& fault);
-		//! Write XML for an individual data \p item using \p pWriter.
-		bool write_item(xml_writer* pWriter, rpc_data_item* item);
-		//! Decode the individual XML element for a request
-		
-		//! \param Type The element type.
-		//! \param pElement The element or elements to decode.
-		//! \param method_name Receives the name of the method
-		//! \param items Receives the method parameters or response.
-		//! \return true if successful
-		bool decode_xml_element(rpc_element_t Type, xml_element* pElement, std::string& method_name, rpc_data_item::rpc_list* items);
-		//! Decode the individual XML element for a response
-
-		//! \param Type The element type.
-		//! \param pElement The element or elements to decode.
-		//! \param item Response data item
-		//! \param fault Response was an error,
-		//! \return true if successful
-		bool decode_xml_element(rpc_element_t Type, xml_element* pElement, rpc_data_item* item, bool& fault);
+		//! Write XML for an individual data \p item to XML \p node
+		void write_item(rpc_data_item& item, pugi::xml_node& node);
+		//! Gate RPC data item from \p item from XML \p node
+		void read_item(pugi::xml_node& node, rpc_data_item& item);
 		//! Decode the request on the input stream \p ss, perform the action and send response.
 		int handle_request(std::stringstream& ss);
 		//! Reserved method: List the available methods.

@@ -1,11 +1,11 @@
 #include "rpc_handler.h"
 #include "url_handler.h"
-#include "xml_writer.h"
-#include "xml_reader.h"
 #include "socket_server.h"
 #include "utils.h"
 #include "status.h"
 #include "regices.h"
+
+#include "pugixml.hpp"
 
 #include <sstream>
 #include <iostream>
@@ -91,44 +91,29 @@ bool rpc_handler::generate_request(
 	rpc_data_item::rpc_list* params,
 	std::ostream& request_xml
 ) {
-	// The XML writer to generate XML
-	xml_writer* writer = new xml_writer;
-	writer->indent(xml_writer::INDENT, 1);
+	// Generate the document
+	pugi::xml_document doc;
+	// Add the declaraion
+	auto n_decl = doc.append_child(pugi::node_declaration);
+	n_decl.append_attribute("version") = "1.0";
 
-	// Start writing XML - 
-	bool xml_ok = writer->process_instr("xml", "version = \"1.0\"");
-	// <methodCall>
-	xml_ok &= writer->start_element("methodCall", nullptr);
+	// Top level node
+	pugi::xml_node n_call = doc.append_child("methodCall");
 
-	// Method name - <methodName>NAME</methodName>
-	xml_ok &= writer->start_element("methodName", nullptr);
-	xml_ok &= writer->characters(method_name);
-	xml_ok &= writer->end_element("methodName");
+	// Method name
+	n_call.append_child("methodName").text().set(method_name);
 
-	// Parameters - <params>
-	xml_ok &= writer->start_element("params", nullptr);
-
-	// Individual parameters
-	if (params != nullptr) {
-		// For each parameter
-		for (auto it = params->begin(); it != params->end() && xml_ok; it++) {
-			// <param>ITEM</param>
-			xml_ok &= writer->start_element("param", nullptr);
-			xml_ok &= write_item(writer, *it);
-			xml_ok &= writer->end_element("param");
-		}
+	// Parameters
+	pugi::xml_node n_params = n_call.append_child("params");
+	for (auto param : *params) {
+		pugi::xml_node n_param = n_params.append_child("param");
+		write_item(*param, n_param);
 	}
 
-	// End enclosing elements </params></methodCall>
-	xml_ok &= writer->end_element("params");
-	xml_ok &= writer->end_element("methodCall");
+	// WRite XML to output stream
+	doc.save(request_xml, " ");
 
-	// now write the destination to the output stream.
-	xml_ok &= writer->data(request_xml);
-
-	delete writer;
-
-	return xml_ok;
+	return true;
 }
 
 // Generate an RPC Respose
@@ -136,587 +121,186 @@ bool rpc_handler::generate_response(
 	bool rpc_fault,
 	rpc_data_item* response,
 	std::ostream& response_xml) {
+	// Generate the document
+	pugi::xml_document doc;
+	// Add the declaraion
+	auto n_decl = doc.append_child(pugi::node_declaration);
+	n_decl.append_attribute("version") = "1.0";
 
-	xml_writer* writer = new xml_writer;
+	// Add the response
+	pugi::xml_node n_resp = doc.append_child("methodResponse");
 
-	// Start writing XML
-	bool xml_ok = writer->process_instr("xml", "version = \"1.0\"");
-	// <methodResponse>
-	xml_ok &= writer->start_element("methodResponse", nullptr);
 	// <params> or <fault>
 	if (rpc_fault) {
-		// <fault>ITEM</fault>
-		xml_ok &= writer->start_element("fault", nullptr);
-		xml_ok &= write_item(writer, response);
-		xml_ok &= writer->end_element("fault");
+		pugi::xml_node n_fault = n_resp.append_child("fault");
+		write_item(*response, n_fault);
 	}
 	else {
-		// <params>
-		xml_ok &= writer->start_element("params", nullptr);
-		// <param>ITEM</param>
-		xml_ok &= writer->start_element("param", nullptr);
-		xml_ok &= write_item(writer, response);
-		xml_ok &= writer->end_element("param");
-		// </params>
-		xml_ok &= writer->end_element("params");
+		// Parameters
+		pugi::xml_node n_params = n_resp.append_child("params");
+		pugi::xml_node n_param = n_params.append_child("param");
+		write_item(*response, n_param);
 	}
 	// Write the response to the output stream
-	xml_ok &= writer->data(response_xml);
+	doc.save(response_xml, " ");
 
-	delete writer;
-
-	return xml_ok;
+	return true;
 }
 
 // Create XML for an individual item
-bool rpc_handler::write_item(xml_writer* writer, rpc_data_item* item) {
-	rpc_data_t element_type = item->type();
+void rpc_handler::write_item(rpc_data_item& item, pugi::xml_node& node) {
+	rpc_data_t element_type = item.type();
 	std::string text;
-
-	// <value>
-	bool xml_ok = writer->start_element("value", nullptr);
+	pugi::xml_node n_value = node.append_child("value");
 
 	switch (element_type) {
 	case XRT_BOOLEAN:
-		text = item->get_int() == 0 ? "1" : "0";
-		// <Boolean>0/1</Boolean
-		xml_ok &= writer->start_element("Boolean", nullptr);
-		xml_ok &= writer->characters(text);
-		xml_ok &= writer->end_element("Boolean");
+		n_value.append_child("boolean").text().set(item.get_int() == 1);
 		break;
 	case XRT_INT:
-		text = to_string(item->get_int());
-		// <int>n</int>
-		xml_ok &= writer->start_element("int", nullptr);
-		xml_ok &= writer->characters(text);
-		xml_ok &= writer->end_element("int");
+		n_value.append_child("int").text().set(item.get_int());
 		break;
 	case XRT_DOUBLE:
-		text = to_string(item->get_double());
-		// <double>n.nn</double>
-		xml_ok &= writer->start_element("double", nullptr);
-		xml_ok &= writer->characters(text);
-		xml_ok &= writer->end_element("double");
+		n_value.append_child("double").text().set(item.get_double());
 		break;
 	case XRT_STRING:
-		text = item->get_string();
-		// <std::string>text</std::string>
-		xml_ok &= writer->start_element("std::string", nullptr);
-		xml_ok &= writer->characters(text);
-		xml_ok &= writer->end_element("std::string");
+		n_value.append_child("string").text().set(item.get_string());
 		break;
 	case XRT_DATETIME:
-		text = item->get_string();
-		// <dateTime.iso8601>text</dateTime.iso8601>
-		xml_ok &= writer->start_element("dateTime.iso8601", nullptr);
-		xml_ok &= writer->characters(text);
-		xml_ok &= writer->end_element("dateTime.iso8601");
+		n_value.append_child("dateTime.iso8601").text().set(item.get_string());
 		break;
 	case XRT_BYTES:
-		text = encode_base_64(item->get_string());
-		// <base64>n.</base64>
-		xml_ok &= writer->start_element("base64", nullptr);
-		xml_ok &= writer->characters(text);
-		xml_ok &= writer->end_element("base64");
+		n_value.append_child("base64").text().set(encode_base_64(item.get_string()));
 		break;
-	case XRT_ARRAY:
-		// <array><data>items</data></array
-		xml_ok &= writer->start_element("array", nullptr);
-		xml_ok &= writer->start_element("data", nullptr);
-		for (size_t i = 0; i < item->get_array()->size() && xml_ok; i++) {
-			xml_ok &= write_item(writer, item->get_array()->at(i));
+	case XRT_ARRAY: {
+		pugi::xml_node n_array = n_value.append_child("array");
+		pugi::xml_node n_data = n_array.append_child("data");
+		for (auto datum : *item.get_array()) {
+			write_item(*datum, n_data);
 		}
-		xml_ok &= writer->end_element("data");
-		xml_ok &= writer->end_element("array");
 		break;
+	}
 	case XRT_STRUCT: {
-		// <struct><member>[<name>...</name>item]</member></struct>
-		xml_ok &= writer->start_element("struct", nullptr);
-		rpc_data_item::rpc_struct* struct_item = item->get_struct();
-		for (auto it = struct_item->begin(); it != struct_item->end() && xml_ok; it++) {
-			xml_ok &= writer->start_element("member", nullptr);
-			xml_ok &= writer->start_element("name", nullptr);
-			xml_ok &= writer->characters(it->first);
-			xml_ok &= writer->end_element("name");
-			xml_ok &= write_item(writer, it->second);
-			xml_ok &= writer->end_element("member");
+		pugi::xml_node n_struct = n_value.append_child("struct");
+		for (auto member : *item.get_struct()) {
+			pugi::xml_node n_member = n_struct.append_child("member");
+			n_member.append_child("name").text().set(member.first);
+			write_item(*member.second, n_member);
 		}
-		xml_ok &= writer->end_element("struct");
 		break;
 	}
 	default:
 		break;
 	}
-
-	xml_ok &= writer->end_element("value");
-	return xml_ok;
+	return;
 }
 
 // Decode the response on the input stream
 bool rpc_handler::decode_response(std::istream& response_xml, rpc_data_item* response, bool& rpc_fault) {
-	xml_reader* reader = new xml_reader;
-	// Send the input stream to the XML parser
-	reader->parse(response_xml);
-	// Get the outer XML: element - it should be <methodResponse>
-	xml_element* top_element = reader->element();
-	if (top_element == nullptr) {
-		// Currently this happens when closing
-		status_->misc_status(ST_ERROR, "RPC: null XML received!");
-		delete reader;
+
+	pugi::xml_document doc;
+	doc.load(response_xml);
+
+	pugi::xml_node n_resp = doc.document_element();
+
+	if (std::strcmp(n_resp.name(), "methodResponse") != 0) {
+		status_->misc_status(ST_ERROR, "RPC: Not a valid response");
 		return false;
-	} 
-	else if (top_element->name() != "methodResponse") {
-		// Bad or incorrect XML received
-		fl_alert("XML_RPC: XML reader has not decoded XML or top-level != methodResponse");
-		delete reader;
-		return false;
+	}
+	pugi::xml_node n_child = n_resp.first_child();
+	if (std::strcmp(n_child.name(), "params")) {
+		pugi::xml_node n_param = n_child.child("param");
+		read_item(n_param, *response);
+		rpc_fault = false;
+	}
+	else if (std::strcmp(n_child.name(), "fault")) {
+		read_item(n_child, *response);
+		rpc_fault = true;
 	}
 	else {
-		// Decode XML starting at outer XML element and iterate down
-		bool xml_ok = decode_xml_element(XRP_METHODRESPONSE, top_element, response, rpc_fault);
-		delete reader;
-		return xml_ok;
+		status_->misc_status(ST_ERROR, "RPC: Not a valid response");
+		return false;
 	}
+	return true;
 }
 
 // Decode the RPC Request XML on the input stream
 bool rpc_handler::decode_request(std::istream& request_xml, std::string& method_name, rpc_data_item::rpc_list* params) {
-	xml_reader* reader = new xml_reader;
-	// Send the input stream to the XML parser
-	reader->parse(request_xml);
-	// Get the outer XML element - it should be <methodCall>
-	xml_element* top_element = reader->element();
-	if (top_element == nullptr || top_element->name() != "methodCall") {
-		// bad or incorrect XML received
-		fl_alert("XML_RPC: XML reader has not decoded XML or top-level != methodCall");
-		delete reader;
+	// parse the request
+	pugi::xml_document doc;
+	doc.load(request_xml);
+	// Check it's a request
+	pugi::xml_node n_req = doc.document_element();
+	if (std::strcmp(n_req.name(), "methodCall") != 0) {
+		status_->misc_status(ST_ERROR, "RPC: Not a valid request");
 		return false;
 	}
-	else {
-		// Decode XML starting at outer XML element and iterate down
-		bool result = decode_xml_element(XRP_METHODCALL, top_element, method_name, params);
-		delete reader;
-		return result;
+	// Get method call
+	method_name = n_req.child("methodCall").text().as_string();
+	// Get params
+	pugi::xml_node n_params = n_req.child("params");
+	for (auto n_param : n_params) {
+		if (std::strcmp(n_param.name(), "param") != 0) {
+			status_->misc_status(ST_ERROR, "RPC: Not a valid request");
+			return false;
+		}
+		rpc_data_item* item = new rpc_data_item;
+		read_item(n_param, *item);
+		params->push_back(item);
 	}
+	return true;
 }
 
-// Decode the individual XML element for more than element expected
-bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* element, std::string& method_name, rpc_data_item::rpc_list* items) {
-	xml_element* child_element;
-	std::string child_name;
-	bool xml_ok = true;
-	std::string error_message = "";
-	bool dummy = false;
-	switch (element_type) {
-	case XRP_METHODCALL:
-		// Expect two elements <methodName> and <params>
-		if (element->count() > 0) {
-			// For each element
-			for (int i = 0; i < element->count() && xml_ok; i++) {
-				// Get the element
-				child_element = element->child(i);
-				child_name = child_element->name();
-				// Element is <methodName>
-				if (child_name == "methodName") {
-					method_name = child_element->content();
-				}
-				else if (child_name == "params") {
-					// Get the element
-					std::string dummy_string;
-					xml_ok = decode_xml_element(XRP_PARAMS, child_element, dummy_string, items);
-				}
-				else {
-					xml_ok = false;
-					error_message = "Expected <methodName> and <params> - got " + child_name;
-				}
-			}
+void rpc_handler::read_item(pugi::xml_node& node, rpc_data_item& item) {
+	pugi::xml_node n_value = node.child("value");
+	pugi::xml_node n_item = n_value.first_child();
+	const char* type = n_item.name();
+	if (std::strcmp(type, "array") == 0) {
+		rpc_data_item::rpc_array* array = new rpc_data_item::rpc_array;
+		pugi::xml_node n_data = n_item.child("data");
+		for (auto n_datum : n_data.children()) {
+			rpc_data_item* datum = new rpc_data_item;
+			read_item(n_datum, *datum);
+			array->push_back(datum);
 		}
-		else {
-			xml_ok = false;
-			error_message = "Expected one or two elements - got " + to_string(element->count());
-		}
-		break;
-	case XRP_PARAMS:
-		// For a response should only get one item, but for request any number - for each element
-		for (int i = 0; i < element->count() && xml_ok; i++) {
-			// Get element
-			child_element = element->child(i);
-			child_name = child_element->name();
-			rpc_data_item* item = new rpc_data_item;
-			if (child_name == "param") {
-				// Decode <param> element
-				xml_ok = decode_xml_element(XRP_PARAM, child_element, item, dummy);
-				if (xml_ok) {
-					items->push_back(item);
-				}
-			}
-			else {
-				xml_ok = false;
-				error_message = "Expected <param> - got <" + child_name + ">";
-			}
-		}
-		method_name = "";
-		break;
-	default:
-		// Cannot use this methods containing only a single item
-		xml_ok = false;
-		error_message = "Serious programming error decoding element" + element->child(0)->name();
+		item.set(array);
 	}
-	if (!xml_ok && error_message.length() > 0) {
-		fl_alert(("XML_RPC" + error_message).c_str());
+	else if (std::strcmp(type, "base64") == 0) {
+		std::string s = decode_base_64(n_item.text().as_string());
+		item.set(s, XRT_STRING);
 	}
-	return xml_ok;
-}
-
-// Decode the individual XML element - contains a single element 
-bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* element, rpc_data_item* item, bool& rpc_fault) {
-	xml_element* child_element;
-	std::string child_name;
-	bool xml_ok = true;
-	std::string error_message = "";
-	bool dummy;
-	switch (element_type) {
-	case XRP_METHODRESPONSE:
-		// Expect to get either a single <params> or <fault>
-		if (element->count() == 1) {
-			child_element = element->child(0);
-			child_name = child_element->name();
-			if (child_name == "params") {
-				xml_ok = decode_xml_element(XRP_PARAMS, child_element, item, dummy);
-				rpc_fault = false;
-			}
-			else if (child_name == "fault") {
-				xml_ok = decode_xml_element(XRP_FAULT, child_element, item, dummy);
-				rpc_fault = true;
-			}
-			else {
-				xml_ok = false;
-				error_message = "Expected <params> or <fault> - got <" + child_name + ">";
-				rpc_fault = false;
-			}
-		}
-		else {
-			xml_ok = false;
-			error_message = "Expected a single child - got" + to_string(element->count()) + " children";
-		}
-		break;
-	case XRP_PARAMS:
-		// For a response should only get one item, but for request any number - see above for request
-		if (element->count() == 1) {
-			child_element = element->child(0);
-			child_name = child_element->name();
-			if (child_name == "param") {
-				// Get the single <param> element
-				xml_ok = decode_xml_element(XRP_PARAM, child_element, item, dummy);
-			}
-			else {
-				xml_ok = false;
-				error_message = "Expected <param> - got <" + child_name + ">";
-			}
-		}
-		else {
-			xml_ok = false;
-			error_message = "Expected a single child - got" + to_string(element->count()) + " children";
-		}
-		break;
-	case XRP_FAULT:
-		// Only 1 item expected - a struct containg an int faultCode and a std::string faultString
-		if (element->count() == 1) {
-			child_element = element->child(0);
-			child_name = child_element->name();
-			rpc_data_item* item = new rpc_data_item;
-			if (child_name == "value") {
-				// get the single <value> element
-				xml_ok = decode_xml_element(XRP_VALUE, child_element, item, dummy);
-				// Display reeceived response
-				rpc_data_item::rpc_struct* fault = item->get_struct();
-				int fault_code = fault->at("faultCode")->get_int();
-				std::string fault_string = fault->at("faultString")->get_string();
-				fl_alert("RPC FAULT: %d: %s", fault_code, fault_string.c_str());
-			}
-			else {
-				xml_ok = false;
-				error_message = "Expected <value> - got " + child_name;
-			}
-		}
-		else {
-			xml_ok = false;
-			error_message = "Expected only 1 element - got" + to_string(element->count());
-		}
-		break;
-	case XRP_PARAM:
-		// Expect to get either a single <value> 
-		if (element->count() == 1) {
-			child_element = element->child(0);
-			child_name = child_element->name();
-			if (child_name == "value") {
-				// get the single <value> element
-				xml_ok = decode_xml_element(XRP_VALUE, child_element, item, dummy);
-			}
-			else {
-				xml_ok = false;
-				error_message = "Expected <value> - got " + child_name;
-			}
-		}
-		else {
-			xml_ok = false;
-			error_message = "Expected a single child - got " + to_string(element->count()) + " children";
-		}
-		break;
-	case XRP_VALUE:
-		// Expect one of a single data-type element: no element means it's a STRING
-		if (element->count() == 0) {
-			// Use special DEFAULT data type to cope with lazy servers that use it 
-			// for numerical data-types as well.
-			std::string content = element->content();
-			item->set(content, XRT_DEFAULT);
-		}
-		else if (element->count() == 1) {
-			child_element = element->child(0);
-			child_name = child_element->name();
-			if (child_name == "boolean") {
-				xml_ok = decode_xml_element(XRP_BOOLEAN, child_element, item, dummy);
-			}
-			else if (child_name == "int" || child_name == "i4") {
-				xml_ok = decode_xml_element(XRP_INT, child_element, item, dummy);
-			}
-			else if (child_name == "double") {
-				xml_ok = decode_xml_element(XRP_DOUBLE, child_element, item, dummy);
-			}
-			else if (child_name == "std::string") {
-				xml_ok = decode_xml_element(XRP_STRING, child_element, item, dummy);
-			}
-			else if (child_name == "dateTime.iso8601") {
-				xml_ok = decode_xml_element(XRP_DATETIME, child_element, item, dummy);
-			}
-			else if (child_name == "base64") {
-				xml_ok = decode_xml_element(XRP_BASE64, child_element, item, dummy);
-			}
-			else if (child_name == "array") {
-				xml_ok = decode_xml_element(XRP_ARRAY, child_element, item, dummy);
-			}
-			else if (child_name == "struct") {
-				xml_ok = decode_xml_element(XRP_STRUCT, child_element, item, dummy);
-			}
-			else {
-				xml_ok = false;
-				error_message = "Expected a data-type element - got " + child_name;
-			}
-		}
-		else {
-			xml_ok = false;
-			error_message = "Expected a 0 or 1 child - got " + to_string(element->count()) + " children";
-		}
-		break;
-	case XRP_BOOLEAN:
-		// expect only character data "0" or "1"
-		if (element->count() == 0) {
-			std::string content = element->content();
-			bool value;
-			if (content == "0") {
-				value = false;
-			}
-			else if (content == "1") {
-				value = true;
-			}
-			else {
-				xml_ok = false;
-				error_message = "Boolean value expected (0/1) - got " + content;
-			}
-			if (xml_ok) {
-				item->set(value, XRT_BOOLEAN);
-			}
-		}
-		else {
-			xml_ok = false;
-			error_message = "Children found when a value expected";
-		}
-		break;
-	case XRP_INT:
-		// expect only character data
-		if (element->count() == 0) {
-			std::string content = element->content();
-			int value = 0;
-			try {
-				value = std::stoi(content);
-			}
-			catch (invalid_argument&) {
-				xml_ok = false;
-				error_message = "Integer value expected - got " + content;
-			}
-			if (xml_ok) {
-				item->set(value, XRT_INT);
-			}
-		}
-		else {
-			xml_ok = false;
-			error_message = "Children found when a value expected";
-		}
-		break;
-	case XRP_DOUBLE:
-		// expect only character data
-		if (element->count() == 0) {
-			std::string content = element->content();
-			double double_value;
-			try {
-				double_value = std::stod(content);
-			}
-			catch( exception&) {
-				xml_ok = false;
-				error_message = "Real value expected - got " + content;
-			}
-			if (xml_ok) {
-				item->set(double_value);
-			}
-		}
-		else {
-			xml_ok = false;
-			error_message = "Children found when a value expected";
-		}
-		break;
-	case XRP_STRING:
-		// Expect only character data
-		if (element->count() == 0) {
-			std::string content = element->content();
-			item->set(content, XRT_STRING);
-		}
-		else {
-			xml_ok = false;
-			error_message = "Children found when a value expected";
-		}
-		break;
-	case XRP_DATETIME:
-		// Expect only character data
-		if (element->count() == 0) {
-			std::string content = element->content();
-			// Check it a valid ISO date/time yyyymmddThh:mm:ss
-			if (regex_match<char>(content.c_str(), REGEX_ISO_DATETIME)) {
-				item->set(content, XRT_DATETIME);
-			}
-			else {
-				xml_ok = false;
-				error_message = "Expected data in ISO date format yyyymmddThh:mm:ss - got " + content;
-			}
-		}
-		else {
-			xml_ok = false;
-			error_message = "Children found when a value expected";
-		}
-		break;
-	case XRP_BASE64:
-		// Expect only character data
-		if (element->count() == 0) {
-			// Convert it to UTF-8
-			std::string content = decode_base_64(element->content());
-			item->set(content, XRT_BYTES);
-		}
-		else {
-			xml_ok = false;
-			error_message = "Children found when a value expected";
-		}
-	case XRP_ARRAY:
-		// Expect only 1 element
-		if (element->count() == 1) {
-			child_element = element->child(0);
-			child_name = child_element->name();
-			if (child_name == "data") {
-				xml_ok = decode_xml_element(XRP_DATA, child_element, item, dummy);
-			}
-			else {
-				xml_ok = false;
-				error_message = "Expected <data> - got " + child_name;
-			}
-		}
-		else {
-			xml_ok = false;
-			error_message = "Expected a single child - got " + to_string(element->count()) + "children";
-		}
-		break;
-	case XRP_DATA:
-		// Expect several elements - for each
-		for (int i = 0; i < element->count() && xml_ok; i++) {
-			// Get the element
-			child_element = element->child(i);
-			child_name = child_element->name();
-			if (child_name == "value") {
-				// Decode it
-				rpc_data_item* sub_item = new rpc_data_item;
-				xml_ok = decode_xml_element(XRP_VALUE, child_element, sub_item, dummy);
-				if (xml_ok) {
-					// Append the item to the array
-					item->get_array()->push_back(sub_item);
-				}
-			}
-			else {
-				xml_ok = false;
-				error_message = "Expected <value> got " + child_name;
-			}
-		}
-		break;
-	case XRP_STRUCT:
-		// Expect several Elements - create a new structure to receive them
-		item->set(new rpc_data_item::rpc_struct);
-		for (int i = 0; i < element->count() && xml_ok; i++) {
-			child_element = element->child(i);
-			child_name = child_element->name();
-			if (child_name == "member") {
-				xml_ok = decode_xml_element(XRP_MEMBER, child_element, item, dummy);
-			}
-			else {
-				xml_ok = false;
-				error_message = "Expected <member> got " + child_name;
-			}
-		}
-		break;
-	case XRP_MEMBER:
-		// Expect two elements <name> and <value>
-		if (element->count() == 2) {
-			rpc_data_item* sub_item = new rpc_data_item;
-			rpc_data_item* name_item = new rpc_data_item;
-			for (int i = 0; i < 2 && xml_ok; i++) {
-				child_element = element->child(i);
-				child_name = child_element->name();
-				if (child_name == "name") {
-					xml_ok = decode_xml_element(XRP_NAME, child_element, name_item, dummy);
-				}
-				else if (child_name == "value") {
-					xml_ok = decode_xml_element(XRP_VALUE, child_element, sub_item, dummy);
-				}
-			}
-			if (xml_ok) {
-				(*item->get_struct())[name_item->get_string()] = sub_item;
-				delete name_item;
-			}
-		}
-		else {
-			xml_ok = false;
-			error_message = "Expected 2 elemnts - got " + to_string(element->count());
-		}
-		break;
-	case XRP_NAME:
-		// Expect no elements
-		if (element->count() == 0) {
-			// Use special DEFAULT data type to cope with lazy servers that use it 
-			// for numerical data-types as well.
-			std::string content = element->content();
-			item->set(content, XRT_STRING);
-		}
-		else {
-			xml_ok = false;
-			error_message = to_string(element->count()) + " children found when a value expected";
-		}
-		break;
-	default:
-		// Cannot use this methods containing only a single item
-		xml_ok = false;
-		error_message = "Serious programming error decoding element - " + element->child(0)->name();
-		break;
-
+	else if (std::strcmp(type, "boolean") == 0) {
+		bool b = n_item.text().as_bool();
+		item.set(b);
 	}
-	if (!xml_ok && error_message.length() > 0) {
-		fl_alert(("XML_RPC: " + error_message).c_str());
+	else if (std::strcmp(type, "dateTime.iso8601") == 0) {
+		std::string s = n_item.text().as_string();
+		item.set(s, XRT_DATETIME);
 	}
-	return xml_ok;
+	else if (std::strcmp(type, "double") == 0) {
+		double d = n_item.text().as_double();
+		item.set(d);
+	}
+	else if (std::strcmp(type, "int") == 0 || std::strcmp(type, "i4") == 0) {
+		uint32_t i = n_item.text().as_int();
+		item.set(i);
+	}
+	else if (std::strcmp(type, "string") == 0) {
+		std::string s = n_item.text().as_string();
+		item.set(s, XRT_STRING);
+	}
+	else if (std::strcmp(type, "struct") == 0) {
+		rpc_data_item::rpc_struct* str = new rpc_data_item::rpc_struct;
+		for (auto member : n_item.children()) {
+			if (strcmp(member.name(), "member") == 0) {
+				string name = member.text().as_string();
+				rpc_data_item* datum = new rpc_data_item;
+				read_item(member, *datum);
+				(*str)[name] = datum;
+			}
+		}
+		item.set(str);
+	}
 }
 
 // Run the HTTP server

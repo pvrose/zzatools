@@ -324,9 +324,6 @@
     <ClCompile Include="..\common\src\xml_reader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\src\xml_writer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\widgets\src\filename_input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -690,9 +687,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\common\include\xml_reader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\include\xml_writer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\widgets\include\button_input.h">

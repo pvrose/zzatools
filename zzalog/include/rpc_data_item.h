@@ -7,32 +7,6 @@
 #include <list>
 
 
-
-
-
-	//! XML-RPC Request/Response - XML element types
-	enum rpc_element_t {
-		XRP_NONE,               //!< Not in an element - at top-level
-		XRP_METHODCALL,         //!<  methodCall  - requesting paticular method
-		XRP_METHODNAME,         //!<  methodName  - name of method
-		XRP_METHODRESPONSE,     //!<  methodResponse  - response element
-		XRP_FAULT,              //!<  fault  - error message
-		XRP_PARAMS,             //!<  params  - start of parameter section    
-		XRP_PARAM,              //!<  param  - individual parameter
-		XRP_VALUE,              //!<  value  - individual data item
-		XRP_ARRAY,              //!<  array  - array of items
-		XRP_DATA,               //!<  data  - start of array items
-		XRP_STRUCT,             //!<  struct  - hashed array of items
-		XRP_MEMBER,             //!<  member  - individual entry in hash array
-		XRP_NAME,               //!<  name  - key to item in hash array
-		XRP_INT,                //!<  int  or  i4  - 32-bit integer item
-		XRP_BOOLEAN,            //!<  Boolean  - 1 or 0
-		XRP_DOUBLE,             //!<  double  - 64-bit floating point
-		XRP_STRING,             //!<  std::string>
-		XRP_DATETIME,           //!<  dateTime.iso8601  - Dates in ISO8601 format: YYYYMMDDTHH:MM:SS
-		XRP_BASE64,             //!<  base64  - Binary information encoded as Base 64, as defined in RFC 2045
-	};
-
 	//! XML-RPC data types
 	enum rpc_data_t {
 		XRT_EMPTY,              //!< Empty data std::set
