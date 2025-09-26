@@ -2,6 +2,8 @@
 #include "status.h"
 #include "cty_data.h"
 
+#include "pugixml.hpp"
+
 #include <list>
 
 
@@ -11,233 +13,129 @@ extern bool closing_;
 
 // Constructor
 cty1_reader::cty1_reader() {
-	ignore_processing_ = false;
-	current_entity_ = nullptr;
-	current_prefix_ = nullptr;
+	//ignore_processing_ = false;
+	//current_entity_ = nullptr;
+	//current_prefix_ = nullptr;
 	//current_exception_ = nullptr;
 	//current_invalid_ = nullptr;
 	//current_zone_exc_ = nullptr;
 	//current_entity_ = nullptr;
 	//current_prefix_ = nullptr;
 	data_ = nullptr;
-	file_ = nullptr;
+	//file_ = nullptr;
 }
 
 // Destructor
 cty1_reader::~cty1_reader() {
 }
 
-// Overloadable XML handlers
-// Start element
-bool cty1_reader::start_element(std::string name, std::map<std::string, std::string>* attributes) {
-	if (!ignore_processing_) {
-		if (elements_.size()) {
-			std::string enclosure = elements_.back();
-			elements_.push_back(name);
-			if (enclosure == "entities" && name == "entity") {
-				current_entity_ = new cty_entity;
-			}
-			else if (enclosure == "prefixes" && name == "prefix") {
-				current_prefix_ = new cty_prefix;
-			}
-			else if (enclosure == "exceptions" && name == "exception") {
-				current_exception_ = new cty_exception;
-				current_exception_->exc_type_ = cty_exception::EXC_OVERRIDE;
-			}
-			else if (enclosure == "invalid_operations" && name == "invalid") {
-				current_exception_ = new cty_exception;
-				current_exception_->exc_type_ = cty_exception::EXC_INVALID;
-				current_exception_->dxcc_id_ = -1;
-			}
-			else if (enclosure == "zone_exceptions" && name == "zone_exception") {
-				current_exception_ = new cty_exception;
-				current_exception_->exc_type_ = cty_exception::EXC_OVERRIDE;
-			}
-		}
-		else {
-			elements_.push_back(name);
-			if (name == "clublog") {
-				if (attributes && attributes->find("date") != attributes->end()) {
-					timestamp_ = xmldt2date(attributes->at("date"));
-				}
-			}
-		}
-	}
-	return true;
-}
-
-// End element
-bool cty1_reader::end_element(std::string name) {
-	if (ignore_processing_) {
-		// We stop ignoring
-		if (name == elements_.back()) {
-			ignore_processing_ = false;
-			elements_.pop_back();
-		}
-	}
-	else {
-		// Capture the exception or invalid record. Move the record to the database
-		std::string element = elements_.back();
-		elements_.pop_back();
-		std::string enclosure = elements_.size() ? elements_.back() : "";
-		if ((enclosure == "exceptions" && element == "exception") ||
-			(enclosure == "zone_exceptions" && element == "zone_exception") ) {
-			// Add it to the std::list, which if necessay create
-			data_->add_exception(current_match_, current_exception_);
-			current_exception_ = nullptr;
-			current_match_ = "";
-		}
-		else if ((enclosure == "invalid_operations" && element == "invalid")) {
-			// Add it to the std::list, which if necessay create
-			data_->add_exception(current_match_, current_exception_);
-			current_exception_ = nullptr;
-			current_match_ = "";
-		}
-		else if ((enclosure == "prefixes" && element == "prefix")) {
-			// Add it to the std::list, which if necessay create
-			data_->add_prefix(current_match_, current_prefix_);
-			current_prefix_ = nullptr;
-			current_match_ = "";
-		}
-		else if (enclosure == "entities" && element == "entity") {
-			data_->add_entity(current_entity_);
-			current_entity_ = nullptr;
-		}
-		else if (elements_.size() && elements_.back() == "entity") {
-			// Build up the exception record from the various child elements
-			if (element == "adif") current_entity_->dxcc_id_ = std::stoi(value_);
-			else if (element == "name") current_entity_->name_ = value_;
-			else if (element == "prefix") current_entity_->nickname_ = value_;
-			else if (element == "cqz") current_entity_->cq_zone_ = std::stoi(value_);
-			else if (element == "cont") current_entity_->continent_ = value_;
-			else if (element == "long") current_entity_->coordinates_.longitude = std::stod(value_);
-			else if (element == "lat") current_entity_->coordinates_.latitude = std::stod(value_);
-			else if (element == "deleted" && value_ == "true") current_entity_->deleted_ = true;
-			else if (element == "start") {
-				current_entity_->time_validity_.start = xmldt2date(value_);
-			}
-			else if (element == "end") {
-				current_entity_->time_validity_.finish = xmldt2date(value_);
-			}
-		}
-		else if (elements_.size() && elements_.back() == "prefix") {
-			// Build up the exception record from the various child elements
-			if (element == "call") current_match_ = value_;
-			else if (element == "adif") current_prefix_->dxcc_id_ = std::stoi(value_);
-			else if (element == "entity") current_prefix_->name_ = value_;
-			else if (element == "cqz") current_prefix_->cq_zone_ = std::stoi(value_);
-			else if (element == "cont") current_prefix_->continent_ = value_;
-			else if (element == "long") current_prefix_->coordinates_.longitude = std::stod(value_);
-			else if (element == "lat") current_prefix_->coordinates_.latitude = std::stod(value_);
-			else if (element == "start") {
-				current_prefix_->time_validity_.start = xmldt2date(value_);
-			}
-			else if (element == "end") {
-				current_prefix_->time_validity_.finish = xmldt2date(value_);
-			}
-		}
-		else if (elements_.size() && elements_.back() == "exception") {
-			// Build up the exception record from the various child elements
-			if (element == "call") current_match_ = value_;
-			else if (element == "adif") current_exception_->dxcc_id_ = std::stoi(value_);
-			else if (element == "entity") current_exception_->name_ = value_;
-			else if (element == "cqz") current_exception_->cq_zone_ = std::stoi(value_);
-			else if (element == "cont") current_exception_->continent_ = value_;
-			else if (element == "long") current_exception_->coordinates_.longitude = std::stod(value_);
-			else if (element == "lat") current_exception_->coordinates_.latitude = std::stod(value_);
-			else if (element == "start") {
-				current_exception_->time_validity_.start = xmldt2date(value_);
-			}
-			else if (element == "end") {
-				current_exception_->time_validity_.finish = xmldt2date(value_);
-			}
-		}
-		else if (elements_.size() && elements_.back() == "invalid") {
-			// Build up the invalid record from the various child elements
-			if (element == "call") current_match_ = value_;
-			else if (element == "start") {
-				current_exception_->time_validity_.start = xmldt2date(value_);
-			}
-			else if (element == "end") {
-				current_exception_->time_validity_.finish = xmldt2date(value_);
-			}
-		}
-		else if (elements_.size() && elements_.back() == "zone_exception") {
-			// Build up the exception record from the various child elements
-			if (element == "call") current_match_ = value_;
-			else if (element == "cqz") current_exception_->cq_zone_ = std::stoi(value_);
-			else if (element == "start") {
-				current_exception_->time_validity_.start = xmldt2date(value_);
-			}
-			else if (element == "end") {
-				current_exception_->time_validity_.finish = xmldt2date(value_);
-			}
-		}
-	}
-	number_read_++;
-	if (number_read_ % 1000 == 0 || elements_.size() <= 1) {
-		// Report progress every 1000 elements
-		int bytes = (int)file_->tellg();
-		status_->progress(bytes, OT_PREFIX);
-	}
-	return true;
-}
-
-// Special element - not expected
-bool cty1_reader::declaration(xml_element::element_t element_type, std::string name, std::string content) {
-	return false;
-}
-
-// Processing instruction - ignored
-bool cty1_reader::process_instr(std::string name, std::string content) {
-	return false;
-}
-
-// characters - std::set the element value
-bool cty1_reader::characters(std::string content) {
-	value_ = content;
-	return true;
-}
-
 // Load data from specified file into and add each record to the std::map
 bool cty1_reader::load_data(cty_data* data, std::istream& in, std::string& version) {
 	fl_cursor(FL_CURSOR_WAIT);
-	data_ = data;
-	file_ = &in;
-	// calculate the file size and initialise the progress bar
-	std::streampos startpos = in.tellg();
-	in.seekg(0, std::ios::end);
-	std::streampos endpos = in.tellg();
-	long file_size = (long)(endpos - startpos);
-	// reposition back to beginning
-	in.seekg(0, std::ios::beg);
-	// Initialsie the progress
-	status_->progress(file_size, OT_PREFIX, "Loading country data from clublog.org", "bytes");
-	// Call the XML parser - calls back to the overides herein
-	if (parse(in)) {
-		// Read successful - complete progress
-		version = timestamp_;
-		fl_cursor(FL_CURSOR_DEFAULT);
-		return true;
-	}
-	else if (closing_) {
-		status_->misc_status(ST_WARNING, "CTY DATA: Cancelled as close-down requested");
-		status_->progress("Load cancelled", OT_PREFIX);
-		fl_cursor(FL_CURSOR_DEFAULT);
-		return false;
-	}
-	else {
-		// Read failed - report failure
-		status_->misc_status(ST_ERROR, "CTY DATA: Load failed");
-		status_->progress("Load failed", OT_PREFIX);
-		fl_cursor(FL_CURSOR_DEFAULT);
-		return false;
-	}
 
+	status_->progress(6, OT_PREFIX, "Loading Clublog.org", "steps");
+
+	pugi::xml_document doc;
+	doc.load(in);
+
+	pugi::xml_node top = doc.document_element();
+	status_->progress(1, OT_PREFIX);
+
+	// Call the XML parser - calls back to the overides herein
+
+	// Copy entities
+	pugi::xml_node n_ents = top.child("entities");
+	for (auto n_ent : n_ents.children()) {
+		cty_entity* entity = new cty_entity;
+		entity->dxcc_id_ = n_ent.child("adif").text().as_int();
+		entity->name_ = n_ent.child("name").text().as_string();
+		entity->nickname_ = n_ent.child("prefix").text().as_string();
+		entity->deleted_ = n_ent.child("deleted").text().as_bool();
+		entity->cq_zone_ = n_ent.child("cqz").text().as_int();
+		entity->continent_ = n_ent.child("cont").text().as_string();
+		entity->coordinates_.longitude = n_ent.child("long").text().as_double();
+		entity->coordinates_.latitude = n_ent.child("lat").text().as_double();
+		entity->time_validity_.start =
+			xmldt2date(n_ent.child("start").text().as_string());
+		entity->time_validity_.finish =
+			xmldt2date(n_ent.child("end").text().as_string());
+		data->add_entity(entity);
+	}
+	status_->progress(2, OT_PREFIX);
+
+	// Copy exceptions
+	pugi::xml_node n_excs = top.child("exceptions");
+	for (auto n_exc : n_excs.children()) {
+		string call = n_exc.child("call").text().as_string();
+		cty_exception* exc = new cty_exception;
+		exc->exc_type_ = cty_exception::EXC_OVERRIDE;
+		exc->name_ = n_exc.child("entity").text().as_string();
+		exc->dxcc_id_ = n_exc.child("adif").text().as_int();
+		exc->cq_zone_ = n_exc.child("cqz").text().as_int();
+		exc->continent_ = n_exc.child("cont").text().as_string();
+		exc->coordinates_.longitude = n_exc.child("long").text().as_double();
+		exc->coordinates_.latitude = n_exc.child("lat").text().as_double();
+		exc->time_validity_.start =
+			xmldt2date(n_exc.child("start").text().as_string());
+		exc->time_validity_.finish =
+			xmldt2date(n_exc.child("end").text().as_string());
+		data->add_exception(call, exc);
+	}
+	status_->progress(3, OT_PREFIX);
+
+	// Copy prefixes
+	pugi::xml_node n_pfxs = top.child("prefixes");
+	for (auto n_pfx : n_pfxs.children()) {
+		string call = n_pfx.child("call").text().as_string();
+		cty_prefix* pfx = new cty_prefix;
+		pfx->name_ = n_pfx.child("entity").text().as_string();
+		pfx->dxcc_id_ = n_pfx.child("adif").text().as_int();
+		pfx->cq_zone_ = n_pfx.child("cqz").text().as_int();
+		pfx->continent_ = n_pfx.child("cont").text().as_string();
+		pfx->coordinates_.longitude = n_pfx.child("long").text().as_double();
+		pfx->coordinates_.latitude = n_pfx.child("lat").text().as_double();
+		pfx->time_validity_.start =
+			xmldt2date(n_pfx.child("start").text().as_string());
+		pfx->time_validity_.finish =
+			xmldt2date(n_pfx.child("end").text().as_string());
+		data->add_prefix(call, pfx);
+	}
+	status_->progress(4, OT_PREFIX);
+
+	// Copy invalid operations
+	pugi::xml_node n_invs = top.child("invalid_operations");
+	for (auto n_inv : n_invs.children()) {
+		string call = n_inv.child("call").text().as_string();
+		cty_exception* inv = new cty_exception;
+		inv->exc_type_ = cty_exception::EXC_INVALID;
+		inv->time_validity_.start =
+			xmldt2date(n_inv.child("start").text().as_string());
+		inv->time_validity_.finish =
+			xmldt2date(n_inv.child("end").text().as_string());
+		data->add_exception(call, inv);
+	}
+	status_->progress(5, OT_PREFIX);
+
+	// Copy zone exceptions
+	pugi::xml_node n_zexs = top.child("zone_exceptions");
+	for (auto n_zex : n_zexs.children()) {
+		string call = n_zex.child("call").text().as_string();
+		cty_exception* zex = new cty_exception;
+		zex->exc_type_ = cty_exception::EXC_INVALID;
+		zex->cq_zone_ = n_zex.child("zone").text().as_int();
+		zex->time_validity_.start =
+			xmldt2date(n_zex.child("start").text().as_string());
+		zex->time_validity_.finish =
+			xmldt2date(n_zex.child("end").text().as_string());
+		data->add_exception(call, zex);
+	}
+	status_->progress(6, OT_PREFIX);
+	return true;
 }
 
 // Get date in format %Y%m%d from XML date time value.
 std::string cty1_reader::xmldt2date(std::string xml_date) {
+	if (xml_date.length() == 0) return "*";
 	std::string result = xml_date.substr(0, 4) + xml_date.substr(5, 2) + xml_date.substr(8, 2) +
 		xml_date.substr(11, 2) + xml_date.substr(14, 2);
 	return result;
