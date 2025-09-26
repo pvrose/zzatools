@@ -30,12 +30,6 @@
     <ClCompile Include="src\adi_writer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\adx_reader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\adx_writer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\band_data.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -381,12 +375,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\adi_writer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\adx_reader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\adx_writer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\band.h">

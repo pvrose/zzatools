@@ -168,8 +168,6 @@
     <ClCompile Include="src\adi_reader.cpp" />
     <ClCompile Include="src\adi_writer.cpp" />
     <ClCompile Include="src\adx_handler.cpp" />
-    <ClCompile Include="src\adx_reader.cpp" />
-    <ClCompile Include="src\adx_writer.cpp" />
     <ClCompile Include="src\band_data.cpp" />
     <ClCompile Include="src\band_widget.cpp" />
     <ClCompile Include="src\band_window.cpp" />
@@ -285,8 +283,6 @@
     <ClInclude Include="include\adi_reader.h" />
     <ClInclude Include="include\adi_writer.h" />
     <ClInclude Include="include\adx_handler.h" />
-    <ClInclude Include="include\adx_reader.h" />
-    <ClInclude Include="include\adx_writer.h" />
     <ClInclude Include="include\band.h" />
     <ClInclude Include="include\band_data.h" />
     <ClInclude Include="include\band_widget.h" />

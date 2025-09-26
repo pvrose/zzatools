@@ -44,6 +44,7 @@ ZZALOG uses the following third-party libraries:
 - Hamlib (https://github.com/Hamlib/Hamlib/wiki/Hamlib) CAT Interface library.
 - Libcurl (https://curl.se/libcurl/c/libcurl.html) HTTP support library.
 - JSON (https://json.nlohmann.me/nlohmann/json) JSON support library.
+- pugixml (https://pugixml.org) XML support library.
 
 ZZALOG uses reference data from the following third-parties
 - Clublog.org (https://clublog.org) Country data.
