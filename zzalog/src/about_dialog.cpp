@@ -50,8 +50,9 @@ about_dialog::about_dialog() :
 		to_string(FL_MINOR_VERSION) + "." + to_string(FL_PATCH_VERSION) +
 		"\n CURL version " + std::string(data->version) +
 		"\n JSON " +
-		"\n PUGIXML ";
-	std::string copyright = COPYRIGHT + "\ne-mail: " + CONTACT + "\n" + PARTY3RD_COPYRIGHT + "\n (Hamlib " + rig_copyright() + ")";
+		"\n PUGIXML " +
+		"\n";
+	std::string copyright = COPYRIGHT + "\ne-mail: " + CONTACT + "\n";
 	int w = W2;
 	int h = 0;
 	// Get the width and height required to display the message (add a bit of height) 
