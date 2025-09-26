@@ -282,7 +282,7 @@ std::string spec_data::band_for_freq(double frequency_MHz) {
 			found = true;
 		}
 	}
-	return result;
+	return to_upper(result);
 }
 
 // Get the Lower frequency for a band
