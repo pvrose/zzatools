@@ -57,7 +57,7 @@ about_dialog::about_dialog() :
 	// Get the width and height required to display the message (add a bit of height) 
 	fl_font(0, FL_NORMAL_SIZE);
 	fl_measure(program_id.c_str(), w, h);
-	h += 5;
+	h += FL_NORMAL_SIZE;
 	Fl_Box* op1 = new Fl_Box(C2, R1, W2, h);
 	op1->copy_label(program_id.c_str());
 	op1->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
@@ -66,7 +66,7 @@ about_dialog::about_dialog() :
 	// Secondly - copyright statement
 	h = 0;
 	fl_measure(copyright.c_str(), w, h);
-	h += 5;
+	h += FL_NORMAL_SIZE;
 	Fl_Box* op2 = new Fl_Box(C2, R2, W2, h);
 	op2->copy_label(copyright.c_str());
 	op2->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
