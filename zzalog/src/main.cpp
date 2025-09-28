@@ -843,6 +843,17 @@ void customise_fltk() {
 	fl_message_size_ = FL_NORMAL_SIZE;
 	fl_message_font_ = 0;
 	fl_message_title_default(PROGRAM_ID.c_str());
+	// Set foreground and background colours
+	if (DARK) {
+		Fl::foreground(240, 240, 240);             // 15/16 White
+		Fl::background2(16, 16, 16);               // 1/16 white
+		Fl::background(32, 32, 32);                // 1/8 white
+	}
+	else {
+		Fl::foreground(16, 16, 16);                // 1/16 white
+		Fl::background2(240, 240, 240);            // 15/16 white
+		Fl::background(192, 192, 192);             // 3/4 white
+	}
 	// Default scrollbar
 	Fl::scrollbar_size(10);
 }
