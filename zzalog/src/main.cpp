@@ -1027,6 +1027,8 @@ int main(int argc, char** argv)
 	// Parse command-line arguments - accept FLTK standard arguments and custom ones (in cb_args)
 	int i = 1;
 	Fl::args(argc, argv, i, cb_args);
+	// Read any switches that stick between calls
+	read_saved_switches();
 	customise_fltk();
 	// Create the settings before anything else 
 	check_settings();
@@ -1038,8 +1040,6 @@ int main(int argc, char** argv)
 	// Create the ticker first of all
 	ticker_ = new ticker();
 
-	// Read any switches that stick between calls
-	read_saved_switches();
 	if (DISPLAY_VERSION) {
 #ifndef WIN32
 		// Display version
