@@ -4,6 +4,8 @@
 
 class qso_clock;
 class qso_wx;
+class condx_view;
+class Fl_Tabs;
 
 //! This class contains the clock and weather displays.
 class qso_clocks :
@@ -33,13 +35,20 @@ public:
     void save_values();
     //! Configure widgets after data changes.
     void enable_widgets();
-    // Returns whether clock is displaying system locale's timezone.
+    //! Returns whether clock is displaying system locale's timezone.
     bool is_local();
+    //! Returns Weather control
+    qso_wx* wx();
+
+    //! Callback on tabs
+    static void cb_tabs(Fl_Widget* w, void* v);
 
 protected:
     // The two instances
     qso_clock* clock_;         //!< Clock display.
+    Fl_Tabs* tabs_;
     qso_wx* qso_weather_;      //!< Weather display.
+    condx_view* condx_;        //!< Solar conditions.
 
     //! Clock is displaying timezone from system locale.
     bool local_;

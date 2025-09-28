@@ -34,6 +34,12 @@ public:
 	//! Configure components widgets after data changes.
     void enable_widgets();
 
+	//! Returns in daytime - defaults true if no data
+	bool is_day(time_t when);
+
+	//! Returns in nighttime - defaults true if no data
+	bool is_night(time_t when);
+
 protected:
 	//! Callback on the WX icon clicked - fetches report again
 	static void cb_bn_icon(Fl_Widget* w, void *v);

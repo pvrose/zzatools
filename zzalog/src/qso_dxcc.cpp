@@ -354,7 +354,8 @@ void qso_dxcc::wb4_table::draw_cell(TableContext context, int R, int C, int X, i
 		fl_rectf(X, Y, W, H);
 		fl_color(FL_FOREGROUND_COLOR);
 		fl_yxline(X, Y, Y + H - 1, X + W);
-		if (wkd_matrix_.at(cat).text.length()) {
+		if (wkd_matrix_.find(cat) != wkd_matrix_.end() &&
+			wkd_matrix_.at(cat).text.length()) {
 			fl_draw(wkd_matrix_.at(cat).text.c_str(), X, Y, W, H, FL_ALIGN_CENTER);
 		}
 		else {
@@ -403,32 +404,37 @@ void qso_dxcc::wb4_table::draw_cell(TableContext context, int R, int C, int X, i
 		}
 		break;
 	case CONTEXT_CELL: {
-		bool new_entity;
-		wkd_line& w = wkd_matrix_.at(cat);
 		fl_color(FL_BACKGROUND_COLOR);
 		fl_rectf(X, Y, W, H);
 		fl_color(FL_FOREGROUND_COLOR);
 		fl_yxline(X, Y, Y + H - 1, X + W);
-		switch (C) {
-		case 0:
-			new_entity = w.any;
-			break;
-		case 1:
-			new_entity = w.band;
-			break;
-		case 2:
-			new_entity = w.mode;
-			fl_line(X + W - 1, Y, X + W - 1, Y + H - 1);
-			break;
-		}
-		if (w.text.length()) {
-			if (new_entity) {
-				fl_font(FL_BOLD, FL_NORMAL_SIZE);
-				fl_draw("NEW", X, Y, W, H, FL_ALIGN_CENTER);
-				fl_font(0, FL_NORMAL_SIZE);
+		if (wkd_matrix_.find(cat) != wkd_matrix_.end()) {
+			bool new_entity;
+			wkd_line& w = wkd_matrix_.at(cat);
+			switch (C) {
+			case 0:
+				new_entity = w.any;
+				break;
+			case 1:
+				new_entity = w.band;
+				break;
+			case 2:
+				new_entity = w.mode;
+				fl_line(X + W - 1, Y, X + W - 1, Y + H - 1);
+				break;
+			}
+			if (w.text.length()) {
+				if (new_entity) {
+					fl_font(FL_BOLD, FL_NORMAL_SIZE);
+					fl_draw("NEW", X, Y, W, H, FL_ALIGN_CENTER);
+					fl_font(0, FL_NORMAL_SIZE);
+				}
+				else {
+					fl_draw("\342\234\224", X, Y, W, H, FL_ALIGN_CENTER);
+				}
 			}
 			else {
-				fl_draw("\342\234\224", X, Y, W, H, FL_ALIGN_CENTER);
+				fl_draw("?", X, Y, W, H, FL_ALIGN_CENTER);
 			}
 		}
 		else {

@@ -675,3 +675,45 @@ void qso_wx::draw_cloud_okta(Fl_Widget* w, unsigned int okta) {
 	w->image(image);
 
 }
+
+bool qso_wx::is_day(time_t when) {
+	if (wx_handler_) {
+		time_t sunrise = wx_handler_->sun_rise();
+		time_t sunset = wx_handler_->sun_set();
+		if (sunrise == 0 || sunset == 0) {
+			return true;
+		}
+		else {
+			if (when >= sunrise && when <= sunset) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+	}
+	else {
+		return true;
+	}
+}
+
+bool qso_wx::is_night(time_t when) {
+	if (wx_handler_) {
+		time_t sunrise = wx_handler_->sun_rise();
+		time_t sunset = wx_handler_->sun_set();
+		if (sunrise == 0 || sunset == 0) {
+			return true;
+		}
+		else {
+			if (when < sunrise || when > sunset) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+	}
+	else {
+		return true;
+	}
+}

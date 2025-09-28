@@ -67,7 +67,7 @@ public:
     static void cb_fetch_done(void* v);
     //! Callback from fetch std::thread on error.
     static void cb_fetch_error(void* v);
-    
+
     // Get the various weather items - 
     //! Returns icon
     Fl_Image* icon();

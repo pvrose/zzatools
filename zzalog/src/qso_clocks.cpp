@@ -1,5 +1,6 @@
 #include "qso_clocks.h"
 
+#include "condx_view.h"
 #include "qso_clock.h"
 #include "qso_manager.h"
 #include "qso_wx.h"
@@ -12,8 +13,7 @@
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Radio_Round_Button.H>
-
-
+#include <FL/Fl_Tabs.H>
 
 // basic tick is 200 ms 
 extern status* status_;
@@ -90,15 +90,40 @@ void qso_clocks::create_form() {
 	int max_w = clock_->x() + clock_->w() - x();
 	int max_h = clock_->y() + clock_->h() - y();
 
-	cy += clock_->h() + HTEXT;
+	cy += clock_->h() + GAP;
 	cx = x() + GAP;
 	int cw = max_w - GAP;
 
-	qso_weather_ = new qso_wx(cx, cy, cw, 50, "Weather");
-	qso_weather_->align(FL_ALIGN_TOP | FL_ALIGN_LEFT);
+	tabs_ = new Fl_Tabs(cx, cy, cw, 50);
+	tabs_->callback(cb_tabs);
+	tabs_->box(FL_BORDER_BOX);
+	int rx = 0;
+	int ry = 0;
+	int rw = 0;
+	int rh = 0;
+	tabs_->client_area(rx, ry, rw, rh, 0);
+	int saved_rw = rw;
+	int saved_rh = rh;
 
-	max_w = max(max_w, qso_weather_->x() + qso_weather_->w() - x());
-	max_h = max(max_h, qso_weather_->y() + qso_weather_->h() - y());
+	qso_weather_ = new qso_wx(rx, ry, rw, rh, "Weather");
+	qso_weather_->align(FL_ALIGN_TOP | FL_ALIGN_LEFT);
+	rw = max(rw, qso_weather_->w());
+	rh = max(rh, qso_weather_->h());
+
+	condx_ = new condx_view(rx, ry, rw, rh, "Conditions");
+	condx_->align(FL_ALIGN_TOP | FL_ALIGN_LEFT);
+	rw = max(rw, condx_->w());
+	rh = max(rh, condx_->h());
+
+	tabs_->resizable(nullptr);
+	tabs_->size(tabs_->w() + rw - saved_rw, tabs_->h() + rh - saved_rh);
+	tabs_->end();
+
+	for (int ix = 0; ix < tabs_->children(); ix++) {
+		tabs_->child(ix)->size(rw, rh);
+	}
+
+	max_h = tabs_->y() + tabs_->h() - y();
 
 	enable_widgets();
 	resizable(nullptr);
@@ -115,6 +140,18 @@ void qso_clocks::save_values() {
 
 // Enable the widgets
 void qso_clocks::enable_widgets() {
+	// Set standard tab label formats
+	for (int ix = 0; ix < tabs_->children(); ix++) {
+		Fl_Widget* wx = tabs_->child(ix);
+		if (wx == tabs_->value()) {
+			wx->labelfont((wx->labelfont() | FL_BOLD) & (~FL_ITALIC));
+			wx->labelcolor(FL_FOREGROUND_COLOR);
+		}
+		else {
+			wx->labelfont((wx->labelfont() & (~FL_BOLD)) | FL_ITALIC);
+			wx->labelcolor(FL_FOREGROUND_COLOR);
+		}
+	}
 	local_ = clock_->local();
 	// Enable the two qso_clock widgets
 	clock_->enable_widgets();
@@ -122,5 +159,15 @@ void qso_clocks::enable_widgets() {
 	redraw();
 }
 
-
 bool qso_clocks::is_local() { return local_; }
+
+qso_wx* qso_clocks::wx() {
+	return qso_weather_;
+}
+
+void qso_clocks::cb_tabs(Fl_Widget* w, void* v) {
+	Fl_Tabs* that = (Fl_Tabs*)w;
+	that->label(that->value()->label());
+	((qso_clocks*)that->parent())->enable_widgets();
+
+}

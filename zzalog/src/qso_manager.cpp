@@ -516,3 +516,8 @@ void qso_manager::merge_qrz_com() {
 	data_group_->action_qrz_com();
 }
 
+// Return weather
+qso_wx* qso_manager::wx() {
+	return clock_group_->wx();
+}
+

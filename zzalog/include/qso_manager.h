@@ -21,6 +21,7 @@ class qso_log_info;
 class qso_log;
 class qso_rig;
 class qso_qsl;
+class qso_wx;
 class rig_if;
 class import_data;
 class record;
@@ -128,6 +129,8 @@ enum hint_t : uchar;
 		qso_log_info* log_info();
 		//! Returns the associated app control widget qso_apps.
 		qso_apps* apps();
+		//! Returns the weather control
+		qso_wx* wx();
 
 		//! Deactivate all controls.
 		void deactivate_all();

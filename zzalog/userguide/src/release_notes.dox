@@ -5,7 +5,8 @@
 - Testing proposal to ignore unpaired '<' in reading ADI format.
 - Removed special behaviour for club stations.
 - Added PDF version of userguide.
-- Use pugixml as XML engine.
+- Used pugixml as XML engine.
+- Addd panel with solar data.
 - Cosmetic changes.
 - Bug fixes:
   - Changing the displayed fields does not get saved.

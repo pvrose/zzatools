@@ -93,6 +93,8 @@
 //! - Country-files.com (https://www.country-files.com) Country data.
 //! - DxAtlas (http://dxatlas.com) Prefix data.
 //! - ADIF (http://adif.org) ADIF Specification (JSON).
+//! - OpenWeatherMap(https://openweathermap.org) Weather data.
+//! - HAMQSL(https ://www.hamqsl.com) Solar and Terrestrial data.
 //! 
 //! \copyright Philip Rose GM3ZZA 2018-2025. All rights reserved.
 //!

@@ -51,7 +51,7 @@ about_dialog::about_dialog() :
 		"\n CURL version " + std::string(data->version) +
 		"\n JSON " +
 		"\n PUGIXML " +
-		"\n";
+		"\nSee Userguide for refernce data acknowledgements\n";
 	std::string copyright = COPYRIGHT + "\ne-mail: " + CONTACT + "\n";
 	int w = W2;
 	int h = 0;
