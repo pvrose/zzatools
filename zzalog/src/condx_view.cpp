@@ -21,10 +21,18 @@
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Tabs.H>
 
+extern bool DARK;
 extern qso_manager* qso_manager_;
 extern status* status_;
 extern ticker* ticker_;
 extern url_handler* url_handler_;
+
+const Fl_Color COLOUR_BAD = FL_RED;         //!< Use for bad stuff
+const Fl_Color COLOUR_FAIR = FL_FOREGROUND_COLOR;
+//!< Use for fair stuff
+const Fl_Color COLOUR_GOOD = DARK ? FL_GREEN : FL_DARK_GREEN;      //!< Use for good stuff
+const Fl_Color COLOYR_NOTE = FL_BLUE;       //!< Use for extra annotation
+
 
 //! Constructor
 
@@ -212,14 +220,23 @@ void condx_view::enable_widgets() {
 	// SFI
 	snprintf(text, sizeof(text), "%d", data_->solar_flux_index);
 	w_sfi_->value(text);
+	if (data_->solar_flux_index > 150) w_sfi_->textcolor(COLOUR_GOOD);
+	else if (data_->solar_flux_index > 90) w_sfi_->textcolor(COLOUR_FAIR);
+	else w_sfi_->textcolor(COLOUR_BAD);
 	// A-index
 	snprintf(text, sizeof(text), "%d", data_->A_index);
 	w_aix_->value(text);
 	// K-index
 	snprintf(text, sizeof(text), "%d", data_->K_index);
 	w_kix_->value(text);
+	if (data_->K_index > 7) w_kix_->textcolor(COLOUR_BAD);
+	else if (data_->K_index > 3) w_kix_->textcolor(COLOUR_FAIR);
+	else w_kix_->textcolor(COLOUR_GOOD);
 	// X-ray
 	w_xray_->value(data_->x_ray.c_str());
+	if (data_->x_ray[0] == 'X') w_xray_->textcolor(COLOUR_BAD);
+	else if (data_->x_ray[0] == 'M') w_xray_->textcolor(COLOUR_FAIR);
+	else w_xray_->textcolor(COLOUR_GOOD);
 	//Sunspots
 	snprintf(text, sizeof(text), "%d", data_->num_sunpsots);
 	w_sunspots_->value(text);
@@ -229,13 +246,28 @@ void condx_view::enable_widgets() {
 	// Proton flux
 	snprintf(text, sizeof(text), "%d", data_->proton_flux);
 	w_proton_->value(text);
+	if (data_->proton_flux > 100000) w_proton_->textcolor(COLOUR_BAD);
+	else if (data_->proton_flux > 100) w_proton_->textcolor(COLOUR_FAIR);
+	else w_proton_->textcolor(COLOUR_GOOD);
 	// Electron flux
 	snprintf(text, sizeof(text), "%d", data_->electron_flux);
 	w_electron_->value(text);
+	if (data_->electron_flux > 1000) w_electron_->textcolor(COLOUR_BAD);
+	else if (data_->electron_flux > 100) w_electron_->textcolor(COLOUR_FAIR);
+	else w_electron_->textcolor(COLOUR_GOOD);
+	// Solar wind
+	snprintf(text, sizeof(text), "%g km s\342\201\273\302\271", data_->solar_wind_vel);
+	w_wind_->value(text);
+	if (data_->solar_wind_vel > 700) w_wind_->textcolor(COLOUR_BAD);
+	else if (data_->solar_wind_vel > 400) w_wind_->textcolor(COLOUR_FAIR);
+	else w_wind_->textcolor(COLOUR_GOOD);
 
 	// "Geomag:" tab
 	// Aurora
 	w_aurora_->value(data_->aurora.c_str());
+	if (data_->aurora >= "10") w_aurora_->textcolor(COLOUR_BAD);
+	else if (data_->aurora >= "8") w_aurora_->textcolor(COLOUR_FAIR);
+	else w_aurora_->textcolor(COLOUR_GOOD);
 	// Aurora latitude
 	snprintf(text, sizeof(text), "%0.1f\302\260 %c",
 		data_->aurora_latitude,
@@ -244,6 +276,9 @@ void condx_view::enable_widgets() {
 	// Bz
 	snprintf(text, sizeof(text), "%g", data_->mag_delta);
 	w_bz_->value(text);
+	if (data_->mag_delta < -20.) w_bz_->textcolor(COLOUR_BAD);
+	else if (data_->mag_delta < 0) w_bz_->textcolor(COLOUR_FAIR);
+	else w_bz_->textcolor(COLOUR_GOOD);
 	// Geomag
 	w_geomag_->value(data_->mag_field.c_str());
 	// Solar noise
@@ -255,8 +290,14 @@ void condx_view::enable_widgets() {
 	if (qso_manager_ && qso_manager_->wx()->is_day(now)) {
 		g_day_->activate();
 		for (auto b : data_->hf_forecasts) {
-			if (b.second.find("day") != b.second.end())
+			if (b.second.find("day") != b.second.end()) {
 				w_day_condx_.at(b.first)->value(b.second.at("day").c_str());
+				if (b.second.at("day") == "Good")
+					w_day_condx_.at(b.first)->textcolor(COLOUR_GOOD);
+				else if (b.second.at("day") == "Poor")
+					w_day_condx_.at(b.first)->textcolor(COLOUR_BAD);
+				else w_day_condx_.at(b.first)->textcolor(COLOUR_FAIR);
+			}			
 		}
 	}
 	else {
@@ -266,8 +307,14 @@ void condx_view::enable_widgets() {
 	if (qso_manager_ && qso_manager_->wx()->is_night(now)) {
 		g_night_->activate();
 		for (auto b : data_->hf_forecasts) {
-			if (b.second.find("night") != b.second.end())
+			if (b.second.find("night") != b.second.end()) {
 				w_night_condx_.at(b.first)->value(b.second.at("night").c_str());
+				if (b.second.at("night") == "Good")
+					w_night_condx_.at(b.first)->textcolor(COLOUR_GOOD);
+				else if (b.second.at("night") == "Poor")
+					w_night_condx_.at(b.first)->textcolor(COLOUR_BAD);
+				else w_night_condx_.at(b.first)->textcolor(COLOUR_FAIR);
+			}
 		}
 	}
 	else {
@@ -278,6 +325,10 @@ void condx_view::enable_widgets() {
 	// vHF phenomena
 	for (auto b : data_->vhf_forecasts) {
 		w_vhf_phenomena_.at(b.first)->value(b.second.c_str());
+		if (b.second == "Band Closed") w_vhf_phenomena_.at(b.first)->textcolor(COLOUR_BAD);
+		else if (b.second.substr(0,4) == "High")
+			w_vhf_phenomena_.at(b.first)->textcolor(COLOUR_FAIR);
+		else  w_vhf_phenomena_.at(b.first)->textcolor(COLOUR_GOOD);
 	}
 
 	//// "Image" tab
@@ -379,7 +430,13 @@ void condx_view::create_solar(int x, int y, int w, int h) {
 	w_electron_->align(FL_ALIGN_LEFT);
 	w_electron_->tooltip("Electron Flux:\n Density of electrons in solar wind\n Impacts E-layer");
 
-	cy += GAP;
+	cy += ROW_HEIGHT;
+	w_wind_ = new Fl_Output(cx, cy, WBUTTON, ROW_HEIGHT, "Solar wind");
+	w_wind_->box(FL_FLAT_BOX);
+	w_wind_->align(FL_ALIGN_LEFT);
+	w_wind_->tooltip("Solar wind speed:\n Velocity of solar patrticles in km/s\n Affects HF propagation");
+
+	cy += ROW_HEIGHT + GAP;
 	g_solar_->resizable(nullptr);
 	g_solar_->size(GAP + GAP + WLABEL + WBUTTON, cy - g_solar_->y());
 	g_solar_->end();

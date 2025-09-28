@@ -51,7 +51,6 @@ const Fl_Color COLOUR_CLARET = 80;       /*!< R=3/4, B=0/4, G=0/4 */
 const Fl_Color COLOUR_GREY = fl_color_average(FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR, 0.33F);
 	//!< One third between fotreground and background colours.
 
-
 //! the various views and data objects
 enum object_t : char {
 	OT_NONE,             //!< No object (for default use)

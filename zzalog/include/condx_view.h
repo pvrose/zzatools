@@ -100,7 +100,8 @@ protected:
     Fl_Output* w_sunspots_;   //!< Sunspot count.
     Fl_Output* w_helium_;     //!< Helium (30.4 nm) intensity.
     Fl_Output* w_proton_;     //!< Proton flux.
-    Fl_Output* w_electron_;   //!< Electron fulx.
+    Fl_Output* w_electron_;   //!< Electron flux.
+    Fl_Output* w_wind_;       //!< Solar wind.
     // Geomagnetic data
     Fl_Group* g_geo_;         //!< Geomagnetic data tab
     Fl_Output* w_aurora_;     //!< Auroral intensity.
