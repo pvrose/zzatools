@@ -97,6 +97,7 @@ void qso_clocks::create_form() {
 	tabs_ = new Fl_Tabs(cx, cy, cw, 50);
 	tabs_->callback(cb_tabs);
 	tabs_->box(FL_BORDER_BOX);
+	tabs_->labeltype(FL_NO_LABEL);
 	int rx = 0;
 	int ry = 0;
 	int rw = 0;
