@@ -452,6 +452,7 @@
     <None Include="userguide\report_tree.dox" />
     <None Include="userguide\searching.dox" />
     <None Include="userguide\search_dialog.dox" />
+    <None Include="userguide\src\condx_view.dox" />
     <None Include="userguide\stn_dialog.dox" />
     <None Include="userguide\toolbar.dox" />
     <None Include="userguide\user_dialog.dox" />

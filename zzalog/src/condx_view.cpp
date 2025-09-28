@@ -312,38 +312,41 @@ void condx_view::enable_widgets() {
 	// "HF" tab
 	// Band daytime condiitons
 	time_t now = time(nullptr);
-	if (qso_manager_ && qso_manager_->wx()->is_day(now)) {
-		g_day_->activate();
-		for (auto b : data_->hf_forecasts) {
-			if (b.second.find("day") != b.second.end()) {
-				w_day_condx_.at(b.first)->value(b.second.at("day").c_str());
-				if (b.second.at("day") == "Good")
-					w_day_condx_.at(b.first)->textcolor(COLOUR_GOOD);
-				else if (b.second.at("day") == "Poor")
-					w_day_condx_.at(b.first)->textcolor(COLOUR_BAD);
-				else w_day_condx_.at(b.first)->textcolor(COLOUR_FAIR);
-			}			
-		}
+	if (!qso_manager_ || qso_manager_->wx()->is_day(now)) {
+		g_day_->labelfont(FL_BOLD);
 	}
 	else {
-		g_day_->deactivate();
+		g_day_->labelfont(FL_ITALIC);
 	}
-	// Band nighttime condiiton
-	if (qso_manager_ && qso_manager_->wx()->is_night(now)) {
-		g_night_->activate();
-		for (auto b : data_->hf_forecasts) {
-			if (b.second.find("night") != b.second.end()) {
-				w_night_condx_.at(b.first)->value(b.second.at("night").c_str());
-				if (b.second.at("night") == "Good")
-					w_night_condx_.at(b.first)->textcolor(COLOUR_GOOD);
-				else if (b.second.at("night") == "Poor")
-					w_night_condx_.at(b.first)->textcolor(COLOUR_BAD);
-				else w_night_condx_.at(b.first)->textcolor(COLOUR_FAIR);
-			}
-		}
+	for (auto b : data_->hf_forecasts) {
+		if (b.second.find("day") != b.second.end()) {
+			w_day_condx_.at(b.first)->value(b.second.at("day").c_str());
+			w_day_condx_.at(b.first)->textfont(g_day_->labelfont() & FL_ITALIC);
+			if (b.second.at("day") == "Good")
+				w_day_condx_.at(b.first)->textcolor(COLOUR_GOOD);
+			else if (b.second.at("day") == "Poor")
+				w_day_condx_.at(b.first)->textcolor(COLOUR_BAD);
+			else w_day_condx_.at(b.first)->textcolor(COLOUR_FAIR);
+		}			
+	}
+	// Band night-time condiiton
+	if (!qso_manager_ || qso_manager_->wx()->is_night(now)) {
+		g_night_->labelfont(FL_BOLD);
 	}
 	else {
-		g_night_->deactivate();
+		g_night_->labelfont(FL_ITALIC);
+	}
+	g_night_->activate();
+	for (auto b : data_->hf_forecasts) {
+		if (b.second.find("night") != b.second.end()) {
+			w_night_condx_.at(b.first)->value(b.second.at("night").c_str());
+			w_night_condx_.at(b.first)->textfont(g_night_->labelfont() & FL_ITALIC);
+			if (b.second.at("night") == "Good")
+				w_night_condx_.at(b.first)->textcolor(COLOUR_GOOD);
+			else if (b.second.at("night") == "Poor")
+				w_night_condx_.at(b.first)->textcolor(COLOUR_BAD);
+			else w_night_condx_.at(b.first)->textcolor(COLOUR_FAIR);
+		}
 	}
 
 	// "VHF" tab
@@ -362,6 +365,8 @@ void condx_view::enable_widgets() {
 	// Updated
 	snprintf(text, sizeof(text), "Updated: %s", data_->update.c_str());
 	w_updated_->copy_label(text);
+
+	redraw();
 }
 
 //! Fetch new data (greater than 1 hour old)

@@ -31,15 +31,16 @@ class ticker {
     //! Destructor
     ~ticker();
     //! Set ticker
-    //! 
+    
     //! \param object Pointer to the object requesting a tick.
     //! \param cb Method to use as callback.
     //! \param interval Tick period in units of 100 milliseconds.
+    //! \param immediate If true, immediately issues a callback to the requesting unit.
     void add_ticker(void* object, callback* cb, unsigned int interval, bool immediate = true);
     //! Remove ticker for \p object.
     void remove_ticker(void* object);
     //! Suspend/restart ticker.
-    //! 
+    
     //! \param object Pointer to the requesting object.
     //! \param active If true restart the ticker otherwise suspend it.
     void activate_ticker(void* object, bool active);

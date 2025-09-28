@@ -779,6 +779,7 @@
     <None Include="userguide\release_notes.dox" />
     <None Include="packages.config" />
     <None Include="ZZALOG.pdf" />
+    <None Include="userguide\src\condx_view.dox" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="zzalog.ico">

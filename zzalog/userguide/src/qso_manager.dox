@@ -23,6 +23,7 @@ and managing the data within the log-book.
   - Time & Weather
     - \subpage qso_clocks
     - \subpage qso_wx
+    - \subpage condx_view
   - Miscellaneous
     - \subpage qso_log_info
     - \subpage qso_qsl
