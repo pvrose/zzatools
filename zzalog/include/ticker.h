@@ -35,7 +35,7 @@ class ticker {
     //! \param object Pointer to the object requesting a tick.
     //! \param cb Method to use as callback.
     //! \param interval Tick period in units of 100 milliseconds.
-    void add_ticker(void* object, callback* cb, unsigned int interval);
+    void add_ticker(void* object, callback* cb, unsigned int interval, bool immediate = true);
     //! Remove ticker for \p object.
     void remove_ticker(void* object);
     //! Suspend/restart ticker.

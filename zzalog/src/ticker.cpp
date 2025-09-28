@@ -26,13 +26,13 @@ ticker::~ticker() {
 }
 
 // Add ticker
-void ticker::add_ticker(void* object, callback* cb, unsigned int interval) {
+void ticker::add_ticker(void* object, callback* cb, unsigned int interval, bool immediate) {
     ticker_entry* entry = new ticker_entry;
     entry->object = object;
     entry->tick = cb;
     entry->period_ds = DEBUG_QUICK ? std::min(interval, 3000U) : interval;
     entry->active = true;
-    entry->not_ticked = true;
+    entry->not_ticked = immediate;
     tickers_.push_back(entry);
 }
 

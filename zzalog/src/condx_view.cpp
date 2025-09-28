@@ -19,11 +19,15 @@
 #include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_Image.H>
 #include <FL/Fl_Output.H>
+#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Tabs.H>
 
 extern bool DARK;
 extern qso_manager* qso_manager_;
 extern status* status_;
+extern std::string default_data_directory_;
+extern std::string VENDOR;
+extern std::string PROGRAM_ID;
 extern ticker* ticker_;
 extern url_handler* url_handler_;
 
@@ -52,7 +56,7 @@ condx_view::condx_view(int X, int Y, int W, int H, const char* L) :
 		enable_widgets();
 	}
 	// Set a time to update every hour
-	ticker_->add_ticker(this, cb_ticker, 360000);
+	ticker_->add_ticker(this, cb_ticker, 360000, false);
 }
 
 //! Destructor
@@ -63,14 +67,35 @@ condx_view::~condx_view() {
 //! Load data
 bool condx_view::load_data() {
 	char msg[128];
-	status_->misc_status(ST_NOTE, "SOLAR: Downloading solar data");
-	// Copy file to data
 	pugi::xml_document doc;
-	std::stringstream ss;
-	if (!fetch_data(ss)) {
-		return false;
+	std::string filename = default_data_directory_ + "solar.xml";
+
+	// Check if saved file is > 1 hour old
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	int temp;
+	settings.get("Solar Timestamp", temp, 0);
+	time_t when = temp;
+	time_t now = time(nullptr);
+	if (difftime(now, when) > 3600) {
+		// Download fresh data
+		status_->misc_status(ST_NOTE, "SOLAR: Downloading solar data");
+		// Copy file to data
+		std::stringstream ss;
+		if (!fetch_data(ss)) {
+			status_->misc_status(ST_ERROR, "SOLAR: Download failed");
+			return false;
+		}
+		doc.load(ss);
+		// Save file
+		doc.save_file(filename.c_str());
+		settings.set("Solar Timestamp", (int)now);
 	}
-	doc.load(ss);
+	else {
+		// Load from old data
+		status_->misc_status(ST_NOTE, "SOLAR: Loading previous data");
+		doc.load_file(filename.c_str());
+	}
+	// 
 
 	pugi::xml_node top = doc.document_element();
 	if (strcmp(top.name(), "solar") != 0) {
@@ -137,7 +162,7 @@ bool condx_view::load_data() {
 			status_->misc_status(ST_WARNING, msg);
 		}
 	}
-	status_->misc_status(ST_OK, "SOLAR: Solar data downloaded OK");
+	status_->misc_status(ST_OK, "SOLAR: Solar data loaded OK");
 	return true;
 }
 
