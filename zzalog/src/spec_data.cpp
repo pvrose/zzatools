@@ -146,18 +146,28 @@ bool spec_data::load_json() {
 			json j = jall.at("Adif");
 			j.at("Version").get_to(adif_version_);
 			// Ignore Status, Date, Created
-			spec_dataset* ds = new spec_dataset;
-			j.at("DataTypes").get_to(*ds);
-			(*this)["Data Types"] = ds;
+			spec_dataset* ds;
 			auto enums = j.at("Enumerations").get<std::map<std::string, json>>();
+			int total_items = enums.size() + 2;
+			int num_items = 0;
+			status_->progress(total_items, OT_ADIF, "Loading ADIF Specification", "items");
 			for (auto& it : enums) {
 				ds = new spec_dataset;
 				it.second.get_to(*ds);
 				(*this)[it.first] = ds;
+				num_items++;
+				status_->progress(num_items, OT_ADIF);
 			}
+			ds = new spec_dataset;
+			j.at("DataTypes").get_to(*ds);
+			(*this)["Data Types"] = ds;
+			num_items++;
+			status_->progress(num_items, OT_ADIF);
 			ds = new spec_dataset;
 			j.at("Fields").get_to(*ds);
 			(*this)["Fields"] = ds;
+			num_items++;
+			status_->progress(num_items, OT_ADIF);
 			process_subdivision("Primary_Administrative_Subdivision");
 			process_subdivision("Secondary_Administrative_Subdivision");
 			process_subdivision("Secondary_Administrative_Subdivision_Alt");
