@@ -54,6 +54,9 @@ public:
     //! Destructor
     ~condx_view();
 
+    //! Override of handle to get F1
+    virtual int handle(int e);
+
     //! Load data
     bool load_data();
 

@@ -30,6 +30,7 @@ extern std::string VENDOR;
 extern std::string PROGRAM_ID;
 extern ticker* ticker_;
 extern url_handler* url_handler_;
+extern void open_html(const char*);
 
 const Fl_Color COLOUR_BAD = FL_RED;         //!< Use for bad stuff
 const Fl_Color COLOUR_FAIR = FL_FOREGROUND_COLOR;
@@ -63,6 +64,30 @@ condx_view::condx_view(int X, int Y, int W, int H, const char* L) :
 condx_view::~condx_view() {
 
 }
+
+int condx_view::handle(int event) {
+	int result = Fl_Group::handle(event);
+	// Now handle F1 regardless
+	switch (event) {
+	case FL_FOCUS:
+		return true;
+	case FL_UNFOCUS:
+		// Acknowledge focus events to get the keyboard event
+		return true;
+	case FL_PUSH:
+		if (!result) take_focus();
+		return true;
+	case FL_KEYBOARD:
+		switch (Fl::event_key()) {
+		case FL_F + 1:
+			open_html("condx_view.html");
+			return true;
+		}
+		break;
+	}
+	return result;
+}
+
 
 //! Load data
 bool condx_view::load_data() {
