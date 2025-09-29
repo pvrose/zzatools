@@ -143,7 +143,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		}
 
 		// Check the book needs saving
-		if (book_ && book_->is_dirty()) {
+		if (book_ && (book_->is_dirty() || new_installation_)) {
 			fl_beep(FL_BEEP_QUESTION);
 			switch (fl_choice("Book has been modified. Do you want to save and exit, exit or cancel exit?", "Exit", "Save && Exit", "Cancel Exit")) {
 			case 0:
@@ -903,11 +903,28 @@ void check_settings() {
 	// Open the system settings file 
 	Fl_Preferences sys_settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 
-	char stemp[128];
+	char* stemp;
 
 	int temp;
 	if (sys_settings.get("Installation Type", temp, stn_type::NOT_USED)) {
 		station_defaults_.type = (stn_type)temp;
+		Fl_Preferences station_settings(sys_settings, "Station");
+		switch (station_defaults_.type) {
+		case stn_type::CLUB:
+			station_settings.get("Club Name", stemp, "");
+			station_defaults_.name = stemp;
+			break;
+		case stn_type::INDIVIDUAL:
+			station_settings.get("Operator", stemp, "");
+			station_defaults_.name = stemp;
+			break;
+		default:
+			break;
+		} 
+		station_settings.get("Callsign", stemp, "");
+		station_defaults_.callsign = stemp;
+		station_settings.get("Location", stemp, "");
+		station_defaults_.location = stemp;
 		new_installation_ = false;
 	}
 	else {
@@ -992,10 +1009,6 @@ void save_station_settings() {
 	char* temp;
 	station_settings.get("Callsign", temp, "");
 	if (strlen(temp) == 0) {
-		// First use - open dialog to get station defaults.
-		init_dialog* dlg = new init_dialog();
-		while (dlg->visible()) Fl::check();
-		station_defaults_ = dlg->get_default();
 		if (station_defaults_.type == CLUB) {
 			station_settings.set("Club Name", station_defaults_.name.c_str());
 		}

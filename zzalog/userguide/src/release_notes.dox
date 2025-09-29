@@ -6,13 +6,14 @@
 - Removed special behaviour for club stations.
 - Added PDF version of userguide.
 - Used pugixml as XML engine.
-- Addd panel with solar data.
+- Added panel with solar data.
 - Cosmetic changes.
 - Bug fixes:
   - Changing the displayed fields does not get saved.
   - Falsely claims data has been edited when closing ZZALOG.
   - ADX parsing not returning correct response (OK/error).
   - JSON ADIF Band enumeration is lower-case.
+  - Errors with cold-start.
 
 \section rev_367 Revision 3.6.7
 

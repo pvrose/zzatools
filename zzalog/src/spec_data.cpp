@@ -139,36 +139,43 @@ bool spec_data::load_json() {
 	status_->misc_status(ST_NOTE, "ADIF SPEC: Loading ADIF Specification");
 	ifstream is;
 	is.open(filename, std::ios_base::in);
-	try {
-		json jall;
-		is >> jall;
-		json j = jall.at("Adif");
-		j.at("Version").get_to(adif_version_);
-		// Ignore Status, Date, Created
-		spec_dataset* ds = new spec_dataset;
-		j.at("DataTypes").get_to(*ds);
-		(*this)["Data Types"] = ds;
-		auto enums = j.at("Enumerations").get<std::map<std::string, json>>();
-		for (auto& it : enums) {
+	if (is.good()) {
+		try {
+			json jall;
+			is >> jall;
+			json j = jall.at("Adif");
+			j.at("Version").get_to(adif_version_);
+			// Ignore Status, Date, Created
+			spec_dataset* ds = new spec_dataset;
+			j.at("DataTypes").get_to(*ds);
+			(*this)["Data Types"] = ds;
+			auto enums = j.at("Enumerations").get<std::map<std::string, json>>();
+			for (auto& it : enums) {
+				ds = new spec_dataset;
+				it.second.get_to(*ds);
+				(*this)[it.first] = ds;
+			}
 			ds = new spec_dataset;
-			it.second.get_to(*ds);
-			(*this)[it.first] = ds;
+			j.at("Fields").get_to(*ds);
+			(*this)["Fields"] = ds;
+			process_subdivision("Primary_Administrative_Subdivision");
+			process_subdivision("Secondary_Administrative_Subdivision");
+			process_subdivision("Secondary_Administrative_Subdivision_Alt");
+			std::snprintf(msg, sizeof(msg), "ADIF SPEC: File %s loaded OK", filename.c_str());
+			status_->misc_status(ST_OK, msg);
+			return true;
 		}
-		ds = new spec_dataset;
-		j.at("Fields").get_to(*ds);
-		(*this)["Fields"] = ds;
-		process_subdivision("Primary_Administrative_Subdivision");
-		process_subdivision("Secondary_Administrative_Subdivision");
-		process_subdivision("Secondary_Administrative_Subdivision_Alt");
-		std::snprintf(msg, sizeof(msg), "ADIF SPEC: File %s loaded OK", filename.c_str());
-		status_->misc_status(ST_OK, msg);
-		return true;
+		catch (const json::exception& e) {
+			std::snprintf(msg, sizeof(msg), "ADIF SPEC: Reading JSON failed %d (%s)\n",
+				e.id, e.what());
+			status_->misc_status(ST_ERROR, msg);
+			is.close();
+			return false;
+		}
 	}
-	catch (const json::exception& e) {
-		std::snprintf(msg, sizeof(msg), "ADIF SPEC: Reading JSON failed %d (%s)\n",
-			e.id, e.what());
-		status_->misc_status(ST_ERROR, msg);
-		is.close();
+	else {
+		std::snprintf(msg, sizeof(msg), "ADIF SPEC: Failed to open %s", filename.c_str());
+		status_->misc_status(ST_FATAL, msg);
 		return false;
 	}
 }
