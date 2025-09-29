@@ -32,11 +32,11 @@ extern ticker* ticker_;
 extern url_handler* url_handler_;
 extern void open_html(const char*);
 
-const Fl_Color COLOUR_BAD = FL_RED;         //!< Use for bad stuff
-const Fl_Color COLOUR_FAIR = FL_FOREGROUND_COLOR;
+Fl_Color COLOUR_BAD = FL_RED;         //!< Use for bad stuff
+Fl_Color COLOUR_FAIR = FL_FOREGROUND_COLOR;
 //!< Use for fair stuff
-const Fl_Color COLOUR_GOOD = DARK ? FL_GREEN : FL_DARK_GREEN;      //!< Use for good stuff
-const Fl_Color COLOYR_NOTE = FL_BLUE;       //!< Use for extra annotation
+Fl_Color COLOUR_GOOD = FL_DARK_GREEN;      //!< Use for good stuff
+Fl_Color COLOYR_NOTE = FL_BLUE;       //!< Use for extra annotation
 
 
 //! Constructor
@@ -51,6 +51,7 @@ condx_view::condx_view(int X, int Y, int W, int H, const char* L) :
 	, data_(nullptr)
 	, solar_image_(nullptr)
 {
+	if (DARK) COLOUR_GOOD = FL_GREEN;
 	if (load_data()) {
 //		load_image();
 		create_form();
