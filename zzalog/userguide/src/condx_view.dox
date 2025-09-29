@@ -65,8 +65,10 @@ individual sunspots, g is the number of sunspot groups and k is a fiddle-factor 
 compensate for measurement technique.
 - <B>304&Aring; (He)</B> Received solar power flux at wavelength 30.4 nm (304 &Aring;). 
 This relates to a principal spectrum line for Helium.
-- <B>Proton Flux</B> Density of charged protons in the solar wind. 
-- <B>Electron Flux</B> Density of charged electrons in the solar wind. 
+- <B>Proton Flux</B> Density (cm<sup>-3</sup> s<sup>-1</sup> sr<sup>-1</sup>) 
+of charged protons in the solar wind. 
+- <B>Electron Flux</B> Density  (cm<sup>-3</sup> s<sup>-1</sup> sr<sup>-1</sup>) 
+of charged electrons in the solar wind. 
 - <B>Solar Wind</B> Speed, in km s<sup>-1</sup>, of the charged particles as they pass earth.
 
 \subsection condx_geo Geomagnetic data
