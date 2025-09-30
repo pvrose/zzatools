@@ -94,7 +94,7 @@
 //! - DxAtlas (http://dxatlas.com) Prefix data.
 //! - ADIF (http://adif.org) ADIF Specification (JSON).
 //! - OpenWeatherMap(https://openweathermap.org) Weather data.
-//! - HAMQSL(https ://www.hamqsl.com) Solar and Terrestrial data.
+//! - HAMQSL(https://www.hamqsl.com) Solar and Terrestrial data.
 //! 
 //! \copyright Philip Rose GM3ZZA 2018-2025. All rights reserved.
 //!
@@ -117,53 +117,53 @@ std::string PROGRAM_ID = "ZZALOG";
 //! Short-form program identifier.
 std::string PROG_ID = "ZLG";
 //! Program version. 
-std::string PROGRAM_VERSION = "3.6.7+";
+std::string PROGRAM_VERSION = "3.6.8-beta";
 //! Program vendor: used for Fl_Preferences.
 std::string VENDOR = "GM3ZZA";
 
 // Debug switches
-//! Print errors - std::set by "-d e"
+//! Print errors -  by "-d e"
 bool DEBUG_ERRORS = true;
-//! Print std::thread debugging messages - std::set by "-d t"
+//! Print std::thread debugging messages -  by "-d t"
 bool DEBUG_THREADS = false;
-//! Print libcurl debugging messages - std::set by "-d c"
+//! Print libcurl debugging messages -  by "-d c"
 bool DEBUG_CURL = false;
-//! Reduce long duration tiemouts and waits - std::set by "-d q"
+//! Reduce long duration tiemouts and waits -  by "-d q"
 bool DEBUG_QUICK = false;
-//! Print rig access debugging messages - std::set by "-d r"
+//! Print rig access debugging messages -  by "-d r"
 bool DEBUG_RIGS = false;
-//! Print callsign parsing messages - std::set by "-d d"
+//! Print callsign parsing messages -  by "-d d"
 bool DEBUG_PARSE = false;
-//! Set hamlib debugging verbosity level - std::set by "-d h=<level>"
+//! Set hamlib debugging verbosity level -  by "-d h=<level>"
 rig_debug_level_e HAMLIB_DEBUG_LEVEL = RIG_DEBUG_ERR;
 
 // Operation switches - _S versions used to override sticky switch
-//! Automatically upload QSOs to QSL sites - std::set by "-n"
+//! Automatically upload QSOs to QSL sites -  by "-n"
 bool AUTO_UPLOAD = true;
 //! Version of \p AUTO_UPLOAD read from settings
 bool AUTO_UPLOAD_S = false;
-//! Automatically save QSO record after each change - std::set by "-a"
+//! Automatically save QSO record after each change -  by "-a"
 bool AUTO_SAVE = true;
 //! Version of \p AUTO_SAVE read from settings.
 bool AUTO_SAVE_S = false;
-//! Dark mode: Dark background, light forreground - std::set by "-k"
+//! Dark mode: Dark background, light forreground -  by "-k"
 bool DARK = false;
 //! Version of \p DARK read from settings.
 bool DARK_S = false;
-//! Print version details instead of running ZZALOG - std::set by "-v"
+//! Print version details instead of running ZZALOG -  by "-v"
 bool DISPLAY_VERSION = false;
-//! Print command-line interface instead of running ZZALOG - std::set by "-h"
+//! Print command-line interface instead of running ZZALOG -  by "-h"
 bool HELP = false;
-//! Start with an empty logbook - std::set by "-e"
+//! Start with an empty logbook -  by "-e"
 bool NEW_BOOK = false;
-//! Do not add file to recent file std::list - std::set by "-p"
+//! Do not add file to recent file std::list -  by "-p"
 bool PRIVATE = false;
-//! Open file in read-only mode - std::set by "-r"
+//! Open file in read-only mode -  by "-r"
 bool READ_ONLY = false;
-//! Resum logging including previous session - std::set by "-m"
+//! Resum logging including previous session -  by "-m"
 bool RESUME_SESSION = false;
 
-//! Access to FLTK global attribute to std::set default text size throughout ZZALOG.
+//! Access to FLTK global attribute to  default text size throughout ZZALOG.
 extern int FL_NORMAL_SIZE;
 
 //! \cond
@@ -244,7 +244,7 @@ void recent_files();
 
 //! - ADIF specification.
 //! - Callsign parsing database.
-//! - International character std::set.
+//! - International character .
 //! - Bandplan data.
 //! - QSL Designs.
 //! - Configured rig data.

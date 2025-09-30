@@ -1,6 +1,6 @@
 /** \page release_notes Revision History
 
-\section rev_368 Revision 3.6.7+
+\section rev_368 Revision 3.6.8
 
 - Testing proposal to ignore unpaired '<' in reading ADI format.
 - Removed special behaviour for club stations.
@@ -14,6 +14,7 @@
   - ADX parsing not returning correct response (OK/error).
   - JSON ADIF Band enumeration is lower-case.
   - Errors with cold-start.
+  - Focus management in QSO entry broken when added userguide.
 
 \section rev_367 Revision 3.6.7
 
