@@ -66,7 +66,7 @@ qso_entry::~qso_entry() {
 	ticker_->remove_ticker(this);
 }
 
-// When shown std::set the focus to the most likely input widgsets
+// When shown set the focus to the most likely input widgsets
 int qso_entry::handle(int event) {
 	int result = Fl_Group::handle(event);
 	switch (event) {
@@ -79,7 +79,10 @@ int qso_entry::handle(int event) {
 		// Acknowledge focus events to get the keyboard event
 		return true;
 	case FL_PUSH:
-		if (!result) take_focus();
+		if (!result) {
+			save_focus(this);
+			take_focus();
+		}
 		return true;
 	case FL_KEYBOARD:
 		switch (Fl::event_key()) {
@@ -92,6 +95,7 @@ int qso_entry::handle(int event) {
 			}
 			return true;
 		}
+		set_focus_saved();
 		break;
 	}
 	return result;
