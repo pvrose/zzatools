@@ -25,6 +25,7 @@ DBG = gdb
 # Note the single quotes around the * expressions. Make will incorrectly expand these otherwise.
 SRCS := $(shell find $(SRC_DIRS) -name '*.cpp' -or -name '*.c' -or -name '*.s')
 SRCS += ../common/src/utils.cpp
+SRCS += ../common/src/pugixml.cpp
 # String substitution for every C/C++ file.
 # As an example, hello.cpp turns into ./build/hello.cpp.o
 OBJS := $(SRCS:%=$(EXEC_DIR)/%.o)

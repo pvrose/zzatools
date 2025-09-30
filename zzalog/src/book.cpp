@@ -162,7 +162,6 @@ bool book::load_data(std::string filename)
 						Fl_Preferences datapath_settings(settings, "Datapath");
 						datapath_settings.set("Log Directory", file_directory.c_str());
 					}
-					size_t start = last_slash == std::string::npos ? 0 : last_slash + 1;
 					// Check for .adi or .adif format
 					if (filetype == ".adi" || filetype == ".adif") {
 						// Use ADI reader to read from an input stream connected to thefile

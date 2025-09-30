@@ -272,7 +272,6 @@ bool qrz_handler::decode_session(pugi::xml_node node) {
 // Decode Callsign element
 bool qrz_handler::decode_callsign(pugi::xml_node node) {
 	// Get all the children
-	char msg[128];
 	bool valid_coords = false;
 	for (auto datum : node.children()) {
 		const char* name = datum.name();
