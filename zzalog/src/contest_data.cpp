@@ -167,6 +167,7 @@ bool contest_data::load_json(std::ifstream& is) {
 // SAve JSON
 bool contest_data::save_json(std::ofstream& os) {
 	json jall;
+	jall["Contests"].clear();
 	for (auto itc : contests_) {
 		json jc;
 		jc["Name"] = itc.first;
