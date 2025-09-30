@@ -2,7 +2,7 @@
 
 \section win_install Windows Installation
 
-A file zzalog-3.6.7.msi is available from https://sourceforge.net/projects/zzalog/. Please follow
+A file zzalog-3.6.8.msi is available from https://sourceforge.net/projects/zzalog/. Please follow
 instructions to install this. ZZALOG will be installed in
 "C:\Program Files\GM3ZZA\ZZALOG\". 
 Data used by ZZALOG will be installed in 
@@ -19,7 +19,8 @@ the flow has not yet been tested on a clean machine.
 
 ZZALOG is available in source form. It may be cloned from 
 https://github.com/pvrose/zzatools. It has dependencies on the 
-external libraries: fltk, hamlib, libcurl and nlohmann/json.
+external libraries: fltk, hamlib, libcurl and nlohmann/json. The 
+library pugixml is included in the source data.
 
 To compile:
 

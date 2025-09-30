@@ -136,9 +136,12 @@
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
       <DelayLoadDLLs>%(DelayLoadDLLs)</DelayLoadDLLs>
-      <ShowProgress>LinkVerbose</ShowProgress>
+      <ShowProgress>LinkVerboseLib</ShowProgress>
       <AdditionalLibraryDirectories>C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x64-release-dll-ipv6-sspi-schannel\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <ResourceCompile>
+      <Culture>0x0809</Culture>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>

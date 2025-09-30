@@ -2109,8 +2109,11 @@
     <ROW File="condx_view_4.png" Component_="adding.html" FileName="CONDX_~4.PNG|condx_view_4.png" Attributes="0" SourcePath="userguide\images\condx_view_4.png" SelfReg="false"/>
     <ROW File="condx_view_5.png" Component_="adding.html" FileName="CONDX_~5.PNG|condx_view_5.png" Attributes="0" SourcePath="userguide\images\condx_view_5.png" SelfReg="false"/>
   </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.custcomp.MsiShortcutPropertyComponent">
+    <ROW MsiShortcutProperty="ZZALOG.pdf0" Shortcut_="ZZALOG.pdf" PropertyKey="System.AppUserModel.PreventPinning" PropVariantValue="1"/>
+  </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
-    <ROW BuildKey="x64_Release" BuildName="x64_Release" BuildOrder="1" BuildType="0" PackageFileName="ZZALOG-3.6.8-beta" Languages="en_GB" InstallationType="4" SummInfoMetadata="Page Count:450" UseLargeSchema="true" MsiPackageType="x64"/>
+    <ROW BuildKey="x64_Release" BuildName="x64_Release" BuildOrder="1" BuildType="0" PackageFileName="ZZALOG-3.6.8" Languages="en_GB" InstallationType="4" SummInfoMetadata="Page Count:450" UseLargeSchema="true" MsiPackageType="x64"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
     <ROW Path="&lt;AI_DICTS&gt;ui.ail"/>
@@ -2231,6 +2234,7 @@
     <ROW Registry="Version" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="Version" Value="[ProductVersion]" Component_="ProductInformation"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiShortsComponent">
+    <ROW Shortcut="ZZALOG.pdf" Directory_="DesktopFolder" Name="ZZALOG.pdf" Component_="ZZALOG.pdf" Target="[#refman.pdf]" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="userguide_Dir"/>
     <ROW Shortcut="zzalog.exe" Directory_="SHORTCUTDIR" Name="zzalog.exe" Component_="zzalog.exe" Target="[#zzalog.exe]" Description="zzalog.exe" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
     <ROW Shortcut="zzalog.exe_1" Directory_="DesktopFolder" Name="ZZALOG" Component_="zzalog.exe" Target="[#zzalog.exe]" Description="ZZALOG" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
   </COMPONENT>
