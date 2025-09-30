@@ -160,9 +160,11 @@ void stn_data::load_data() {
 	if (!loaded) {
 		// Create a set of initial values from input defaults.
 		qth_info_t* qth_info = new qth_info_t;
+		qth_info->data.clear();
 		(qth_info->data)[LOCATOR] = station_defaults_.grid;
 		add_qth(station_defaults_.location, qth_info);
 		oper_info_t* oper_info = new oper_info_t;
+		oper_info->data.clear();
 		add_oper(station_defaults_.name, oper_info);
 		add_call(station_defaults_.callsign);
 	}
@@ -188,15 +190,25 @@ bool stn_data::load_json() {
 		auto temp = j.at("Locations").get<std::vector<std::map<std::string, json>>>();
 		for (auto& it : temp) {
 			for (auto& ita : it) {
-				qth_info_t* qi = new qth_info_t(ita.second.template get<qth_info_t>());
-				qths_[ita.first] = qi;
+				if (ita.second.is_null()) {
+					qths_[ita.first] = new qth_info_t;;
+				}
+				else {
+					qth_info_t* qi = new qth_info_t(ita.second.template get<qth_info_t>());
+					qths_[ita.first] = qi;
+				}
 			}
 		}
 		temp = j.at("Operators").get<std::vector<std::map<std::string, json>>>();
 		for (auto& it : temp) {
 			for (auto& ita : it) {
-				oper_info_t* oi = new oper_info_t(ita.second.template get<oper_info_t>());
-				opers_[ita.first] = oi;
+				if (ita.second.is_null()) {
+					opers_[ita.first] = new oper_info_t;
+				}
+				else {
+					oper_info_t* oi = new oper_info_t(ita.second.template get<oper_info_t>());
+					opers_[ita.first] = oi;
+				}
 			}
 		}
 		auto temp2 = j.at("Station callsigns").get<std::map<std::string, string>>();
@@ -229,14 +241,16 @@ bool stn_data::store_json() {
 		for (auto& it : qths_) {
 			if (it.first.length()) {
 				json jq;
-				jq[it.first] = *it.second;
+				if (it.second) jq[it.first] = *it.second;
+				else jq[it.first];
 				jall["Locations"].push_back(jq);
 			}
 		}
 		for (auto& it : opers_) {
 			if (it.first.length()) {
 				json jo;
-				jo[it.first] = *it.second;
+				if (it.second) jo[it.first] = *it.second;
+				else jo[it.first];
 				jall["Operators"].push_back(jo);
 			}
 		}

@@ -256,27 +256,31 @@ void qso_operation::populate_choices()
 	ch_qth_->add("");
 	for (auto it : *stn_data_->get_qths())
 	{
-		std::map<qth_value_t, std::string> &data = it.second->data;
-		snprintf(l, sizeof(l), "%s:--->%s,%s,%s",
-					escape_menu(it.first).c_str(),
-					data.find(STREET) == data.end() ? "" : data.at(STREET).c_str(),
-					data.find(CITY) == data.end() ? "" : data.at(CITY).c_str(),
-					data.find(LOCATOR) == data.end() ? "" : data.at(LOCATOR).c_str());
-		ch_qth_->add(l);
-		ch_qth_->menubutton()->user_data((void *)&it.first);
+		if (it.second) {
+			std::map<qth_value_t, std::string>& data = it.second->data;
+			snprintf(l, sizeof(l), "%s:--->%s,%s,%s",
+				escape_menu(it.first).c_str(),
+				data.find(STREET) == data.end() ? "" : data.at(STREET).c_str(),
+				data.find(CITY) == data.end() ? "" : data.at(CITY).c_str(),
+				data.find(LOCATOR) == data.end() ? "" : data.at(LOCATOR).c_str());
+			ch_qth_->add(l);
+			ch_qth_->menubutton()->user_data((void*)&it.first);
+		}
 	}
 	// Populate Operator choice
 	ch_oper_->clear();
 	ch_oper_->add("");
 	for (auto it : *stn_data_->get_opers())
 	{
-		std::map<oper_value_t, std::string> &data = it.second->data;
-		snprintf(l, sizeof(l), "%s:--->%s,%s",
-			escape_menu(it.first).c_str(),
-			data.find(NAME) == data.end() ? "" : data.at(NAME).c_str(),
-			data.find(CALLSIGN) == data.end() ? "" : data.at(CALLSIGN).c_str());
-		ch_oper_->add(l);
-		ch_oper_->menubutton()->user_data((void *)&it.first);
+		if (it.second) {
+			std::map<oper_value_t, std::string>& data = it.second->data;
+			snprintf(l, sizeof(l), "%s:--->%s,%s",
+				escape_menu(it.first).c_str(),
+				data.find(NAME) == data.end() ? "" : data.at(NAME).c_str(),
+				data.find(CALLSIGN) == data.end() ? "" : data.at(CALLSIGN).c_str());
+			ch_oper_->add(l);
+			ch_oper_->menubutton()->user_data((void*)&it.first);
+		}
 	}
 	// Populate callsign choice
 	ch_call_->clear();

@@ -135,7 +135,7 @@ void wx_handler::update() {
     lat_long_t location = { nan(""), nan("") };
     if (qth_id.length()) {
         const qth_info_t* info = stn_data_->get_qth(qth_id);
-        if (info != nullptr) {
+        if (info != nullptr && info->data.find(LOCATOR) != info->data.end()) {
             dummy->item("MY_GRIDSQUARE", info->data.at(LOCATOR));
             location = dummy->location(true);
         }
