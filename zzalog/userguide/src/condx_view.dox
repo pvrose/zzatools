@@ -57,7 +57,7 @@ is normalised for variation in geomagnetic inclination and averaged across sever
 planet-wide meters. Each increase in K roughly corresponds to a doubling in intensity.
 - <B>A Index</B> Daily average of K index readings converted back to absolute values.
 K=1 corresponds to A=4: K=6 to A=80.
-- <B>X-ray</B> Intensity of X-rays in the wavelength range 0.1~0.8 &mu;m (1~8 &Aring;). 
+- <B>X-ray</B> Intensity of X-rays in the wavelength range 0.1~0.8 nm (1~8 &Aring;). 
 Given as A, B, C, M or X followed by a number in the range 1 to 10 in a logarithmic scale.
 X1 represents an intensity 10000 times A1.
 - <B>Sunspots</B> Relative sunspot number: R. R=k(10g + s) where s is the number of 
