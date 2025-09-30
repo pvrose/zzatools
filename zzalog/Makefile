@@ -146,23 +146,23 @@ $(APPDATA_DIR)/%: $(REF_DIR)/%
 # Copy User guide
 $(DOCUMENTS_DIR)/userguide/html/index.html : $(UG_DIR)/html/index.html ./Doxyfile
 	@echo Copying Userguide HTML files
-	@sudo mkdir -p $(DOCUMENTS_DIR)/userguide/html
-	@sudo cp -r $(UG_DIR)/html/* $(DOCUMENTS_DIR)/userguide/html/
-	@sudo mkdir -p $(DOCUMENTS_DIR)/userguide/images
-	@sudo cp $(UG_DIR)/images/* $(DOCUMENTS_DIR)/userguide/images/
+	@mkdir -p $(DOCUMENTS_DIR)/userguide/html
+	@cp -r $(UG_DIR)/html/* $(DOCUMENTS_DIR)/userguide/html/
+	@mkdir -p $(DOCUMENTS_DIR)/userguide/images
+	@cp $(UG_DIR)/images/* $(DOCUMENTS_DIR)/userguide/images/
 
 # Copy Code documenation
 $(DOCUMENTS_DIR)/docs/html/index.html : $(UG_DIR)/html/index.html ./Doxyfile
 	@echo Copying Code Documentation HTML files
-	@sudo mkdir -p $(DOCUMENTS_DIR)/docs/html
-	@sudo cp -r $(CDX_DIR)/html/* $(DOCUMENTS_DIR)/docs/html/
+	@mkdir -p $(DOCUMENTS_DIR)/docs/html
+	@cp -r $(CDX_DIR)/html/* $(DOCUMENTS_DIR)/docs/html/
 # 	@sudo mkdir -p $(DOCUMENTS_DIR)/docs/images
 # 	@sudo cp $(CDX_DIR)/images/* $(DOCUMENTS_DIR)/docs/images/
 
 # Copy PDF
 $(DOCUMENTS_DIR)/userguide/ZZALOG.pdf: $(UG_DIR)/ZZALOG.pdf
 	@echo Copying PDF
-	@sudo cp $(UG_DIR)/ZZALOG.pdf $(DOCUMENTS_DIR)/userguide/ZZALOG.pdf
+	@cp $(UG_DIR)/ZZALOG.pdf $(DOCUMENTS_DIR)/userguide/ZZALOG.pdf
 
 $(UG_DIR)/html/index.html: ./Doxyfile $(DOXS)
 	@echo Creating User Guide
