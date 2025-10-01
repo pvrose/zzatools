@@ -460,6 +460,7 @@
     <None Include="userguide\toolbar.dox" />
     <None Include="userguide\user_dialog.dox" />
     <None Include="userguide\web_dialog.dox" />
+    <None Include="userguide\ZZALOG.pdf" />
     <None Include="ZZALOG.pdf" />
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,9 @@
 /** \page release_notes Revision History
 
+\section rev_368A Revision 3.6.8A
+
+- Further issues with "luke-warm" start.
+
 \section rev_368 Revision 3.6.8
 
 - Testing proposal to ignore unpaired '<' in reading ADI format.

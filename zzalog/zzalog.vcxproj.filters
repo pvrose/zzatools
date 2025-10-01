@@ -780,6 +780,7 @@
     <None Include="packages.config" />
     <None Include="ZZALOG.pdf" />
     <None Include="userguide\src\condx_view.dox" />
+    <None Include="userguide\ZZALOG.pdf" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="zzalog.ico">
