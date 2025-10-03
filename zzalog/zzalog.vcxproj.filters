@@ -351,6 +351,12 @@
     <ClCompile Include="src\stn_qth_dlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\stn_oper_dlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stn_call_dlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="packages\pthreads.2.9.1.4\build\native\include\pthread.h">
@@ -720,6 +726,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\stn_qth_dlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\stn_oper_dlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\stn_call_dlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

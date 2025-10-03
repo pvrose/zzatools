@@ -259,8 +259,10 @@
     <ClCompile Include="src\spec_data.cpp" />
     <ClCompile Include="src\spec_tree.cpp" />
     <ClCompile Include="src\status.cpp" />
+    <ClCompile Include="src\stn_call_dlg.cpp" />
     <ClCompile Include="src\stn_data.cpp" />
     <ClCompile Include="src\stn_dialog.cpp" />
+    <ClCompile Include="src\stn_oper_dlg.cpp" />
     <ClCompile Include="src\stn_qth_dlg.cpp" />
     <ClCompile Include="src\symbols.cpp" />
     <ClCompile Include="src\tabbed_forms.cpp" />
@@ -380,8 +382,10 @@
     <ClInclude Include="include\spec_data.h" />
     <ClInclude Include="include\spec_tree.h" />
     <ClInclude Include="include\status.h" />
+    <ClInclude Include="include\stn_call_dlg.h" />
     <ClInclude Include="include\stn_data.h" />
     <ClInclude Include="include\stn_dialog.h" />
+    <ClInclude Include="include\stn_oper_dlg.h" />
     <ClInclude Include="include\stn_qth_dlg.h" />
     <ClInclude Include="include\symbols.h" />
     <ClInclude Include="include\tabbed_forms.h" />

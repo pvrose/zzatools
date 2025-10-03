@@ -98,7 +98,8 @@ static std::map<std::string, qth_value_t> STRING_2_QTH_INFO_T = {
 //! Identifiers for field indicating station operator
 enum oper_value_t : char {
 	NAME,           //!< Operator's name
-	CALLSIGN        //!< Operator's callsign
+	CALLSIGN,       //!< Operator's callsign
+	MAX_OPER        //!< Not used
 };
 
 //! Station operator database.
@@ -141,6 +142,8 @@ public:
 	bool add_oper_item(std::string id, oper_value_t item, std::string value);
 	//! Add a new operator \p with data \p oper.
 	bool add_oper(std::string id, oper_info_t* oper);
+	//! Delete details for opertaor
+	bool delete_oper(std::string id);
 	//! Add a new station callsign
 	bool add_call(std::string call);
 	//! Returns the location data for \p id.
@@ -161,6 +164,10 @@ public:
 	const std::map<std::string, std::string>* get_calls();
 	//! Returns the description for callsign \p id.
 	std::string get_call_descr(std::string id);
+	//! Add \p description to call \p id
+	bool set_call_descr(std::string id, std::string description);
+	//! Delete \p call
+	bool delete_call(std::string id);
 
 protected:
 	//! Station location data

@@ -289,6 +289,7 @@ bool stn_data::replace_qth(std::string id, const qth_info_t& qth) {
 		delete qths_.at(id);
 		qth_info_t* new_data = new qth_info_t(qth);
 		qths_[id] = new_data;
+		return true;
 	}
 	else {
 		char msg[128];
@@ -347,6 +348,19 @@ bool stn_data::add_oper(std::string id, oper_info_t* oper) {
 	}
 }
 
+// Delete QTH
+bool stn_data::delete_oper(std::string id) {
+	if (opers_.find(id) == opers_.end()) {
+		return false;
+	}
+	else {
+		delete opers_.at(id);
+		opers_.erase(id);
+		return true;
+	}
+}
+
+
 // Fetch the QTH info
 const qth_info_t* stn_data::get_qth(std::string id) {
 	if (qths_.find(id) == qths_.end()) {
@@ -393,6 +407,17 @@ bool stn_data::add_call(std::string call) {
 	}
 }
 
+// Delete  a callsign
+bool stn_data::delete_call(std::string call) {
+	if (calls_.find(call) == calls_.end()) {
+		return false;
+	}
+	else {
+		calls_.erase(call);
+		return true;
+	}
+}
+
 // get existing calls
 const std::map<std::string, std::string>* stn_data::get_calls() {
 	return &calls_;
@@ -424,5 +449,17 @@ std::string stn_data::get_call_descr(std::string id) {
 	else {
 		return calls_.at(id);
 	}
+}
+
+// Set decsription for a specific call
+bool stn_data::set_call_descr(std::string id, std::string d) {
+	if (calls_.find(id) == calls_.end()) {
+		return false;
+	}
+	else {
+		calls_[id] = d;
+		return true;
+	}
+
 }
 
