@@ -11,23 +11,6 @@ extern stn_default station_defaults_;
 
 using json = nlohmann::json;
 
-// Conversion from enum qth_value_t to string
-static std::map<qth_value_t, std::string> QTH_VALUE_T_2_STRING = {
-	{ STREET, "Street" },
-	{ CITY, "City" },
-	{ POSTCODE, "Postcode" },
-	{ LOCATOR, "Locator" },
-	{ DXCC_NAME, "Country" },
-	{ DXCC_ID, "DXCC" },
-	{ PRIMARY_SUB, "Primary Subdivision" },
-	{ SECONDARY_SUB, "Secondary Subdivision" },
-	{ CQ_ZONE, "CQ Zone" },
-	{ ITU_ZONE, "ITU Zone" },
-	{ CONTINENT, "Continent" },
-	{ IOTA, "IOTA" },
-	{ WAB, "WAB" }
-};
-
 //! Convert qth_info_t to JSON object
 static void to_json(json& j, const qth_info_t& s) {
 	for (auto it : s.data) {
@@ -36,22 +19,6 @@ static void to_json(json& j, const qth_info_t& s) {
 		}
 	}
 }
-
-static std::map<std::string, qth_value_t> STRING_2_QTH_INFO_T = {
-	{ "Street", STREET },
-	{ "City", CITY },
-	{ "Postcode", POSTCODE },
-	{ "Locator", LOCATOR },
-	{ "Country", DXCC_NAME },
-	{ "DXCC", DXCC_ID },
-	{ "Primary Subdivision", PRIMARY_SUB },
-	{ "Secondary Subdivision", SECONDARY_SUB },
-	{ "CQ Zone", CQ_ZONE },
-	{ "ITU Zone", ITU_ZONE },
-	{ "Continent", CONTINENT },
-	{ "IOTA", IOTA },
-	{ "WAB", WAB }
-};
 
 //! Convert JSON object to qth_info_t
 static void from_json(const json& j, qth_info_t& s) {
@@ -198,6 +165,7 @@ bool stn_data::load_json() {
 					qths_[ita.first] = qi;
 				}
 			}
+
 		}
 		temp = j.at("Operators").get<std::vector<std::map<std::string, json>>>();
 		for (auto& it : temp) {
@@ -312,6 +280,33 @@ bool stn_data::add_qth(std::string id, qth_info_t* qth) {
 		snprintf(msg, sizeof(msg), "STN DATA: Already have data for QTH %s", id.c_str());
 		status_->misc_status(ST_ERROR, msg);
 		return false;
+	}
+}
+
+// // Replace a new QTH
+bool stn_data::replace_qth(std::string id, const qth_info_t& qth) {
+	if (qths_.find(id) != qths_.end()) {
+		delete qths_.at(id);
+		qth_info_t* new_data = new qth_info_t(qth);
+		qths_[id] = new_data;
+	}
+	else {
+		char msg[128];
+		snprintf(msg, sizeof(msg), "STN DATA: Do not have data for QTH %s", id.c_str());
+		status_->misc_status(ST_ERROR, msg);
+		return false;
+	}
+}
+
+// Delete QTH
+bool stn_data::delete_qth(std::string id) {
+	if (qths_.find(id) == qths_.end()) {
+		return false;
+	}
+	else {
+		delete qths_.at(id);
+		qths_.erase(id);
+		return true;
 	}
 }
 

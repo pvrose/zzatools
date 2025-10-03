@@ -6,6 +6,7 @@
 #include "record.h"
 #include "spec_data.h"
 #include "stn_data.h"
+#include "stn_qth_dlg.h"
 
 #include "callback.h"
 #include "drawing.h"
@@ -86,7 +87,8 @@ void stn_dialog::create_form(int X, int Y) {
 	// Get individual area
 	tabs_->client_area(rx, ry, rw, rh);
 
-	g_qth_ = new single_tab(rx, ry, rw, rh, QTH, "QTHs");
+	g_qth_ = new stn_qth_dlg(rx, ry, rw, rh, "QTHs");
+	g_qth_->tooltip("Allows the editing of location (QTH) data");
 
 	g_oper_ = new single_tab(rx, ry, rw, rh, OPERATOR, "Operators");
 
@@ -100,7 +102,7 @@ void stn_dialog::create_form(int X, int Y) {
 
 // Used to write settings back
 void stn_dialog::save_values() {
-	g_qth_->save_data();
+//	g_qth_->save_data();
 	g_oper_->save_data();
 	g_call_->save_data();
 	// Make the changes availble in qso_data
@@ -139,13 +141,19 @@ void stn_dialog::cb_tab(Fl_Widget* w, void* v) {
 
 // Set tab
 void stn_dialog::set_tab(tab_type t, std::string id) {
-	for (int ix = 0; ix < tabs_->children(); ix++) {
-		single_tab* w = (single_tab*)tabs_->child(ix);
-		if (w->type() == t) {
-			tabs_->value(w);
-			w->activate();
-			w->id(id);
-		}
+	switch (t) {
+	case QTH:
+		g_qth_->activate();
+		g_qth_->set_location(id);
+		break;
+	case OPERATOR:
+		g_oper_->activate();
+		g_oper_->id(id);
+		break;
+	case CALLSIGN:
+		g_call_->activate();
+		g_call_->id(id);
+		break;
 	}
 	enable_widgets();
 }

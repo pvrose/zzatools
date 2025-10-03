@@ -15,6 +15,7 @@ class Fl_Tabs;
 class Fl_Widget;
 
 class record;
+class stn_qth_dlg;
 struct qth_info_t;
 struct oper_info_t;
 
@@ -146,7 +147,7 @@ protected:
 	record* qso_;
 
 	Fl_Tabs* tabs_;           //!< Tabs: 
-	single_tab* g_qth_;       //!< Tab: Location editing
+	stn_qth_dlg* g_qth_;       //!< Tab: Location editing
 	single_tab* g_oper_;      //!< Tab: Operator editing.
 	single_tab* g_call_;      //!< Tab: Callsign editing.
 };

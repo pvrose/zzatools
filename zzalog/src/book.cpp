@@ -1201,8 +1201,10 @@ void book::deprecate_macros(record* use_record) {
 		}
 		else {
 			for (auto it : stn_items->data) {
-				std::string item = QTH_ADIF_MAP.at(it.first);
-				use_record->item(item, it.second);
+				if (it.first != DESCRIPTION) {
+					std::string item = QTH_ADIF_MAP.at(it.first);
+					use_record->item(item, it.second);
+				}
 
 			}
 		}

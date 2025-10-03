@@ -261,6 +261,7 @@
     <ClCompile Include="src\status.cpp" />
     <ClCompile Include="src\stn_data.cpp" />
     <ClCompile Include="src\stn_dialog.cpp" />
+    <ClCompile Include="src\stn_qth_dlg.cpp" />
     <ClCompile Include="src\symbols.cpp" />
     <ClCompile Include="src\tabbed_forms.cpp" />
     <ClCompile Include="src\ticker.cpp" />
@@ -381,6 +382,7 @@
     <ClInclude Include="include\status.h" />
     <ClInclude Include="include\stn_data.h" />
     <ClInclude Include="include\stn_dialog.h" />
+    <ClInclude Include="include\stn_qth_dlg.h" />
     <ClInclude Include="include\symbols.h" />
     <ClInclude Include="include\tabbed_forms.h" />
     <ClInclude Include="include\ticker.h" />

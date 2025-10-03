@@ -34,7 +34,8 @@ enum qth_value_t : char {
 	ITU_ZONE,              //!< MY_ITU_ZONE
 	CONTINENT,             //!< APP_ZZA_MY_CONT
 	IOTA,                  //!< MY_IOTA
-	WAB                    //!< APP_ZZA_MY_WAB
+	WAB,                   //!< APP_ZZA_MY_WAB
+	DESCRIPTION            //!< No ADIF equivalent
 };
 
 //! Station location data
@@ -57,6 +58,41 @@ const std::map<qth_value_t, std::string> QTH_ADIF_MAP = {
 	{ CONTINENT, "APP_ZZA_MY_CONT" },
 	{ IOTA, "MY_IOTA" },
 	{ WAB, "APP_ZZA_MY_WAB" }
+};
+
+// Conversion from enum qth_value_t to string
+static std::map<qth_value_t, std::string> QTH_VALUE_T_2_STRING = {
+	{ STREET, "Street" },
+	{ CITY, "City" },
+	{ POSTCODE, "Postcode" },
+	{ LOCATOR, "Locator" },
+	{ DXCC_NAME, "Country" },
+	{ DXCC_ID, "DXCC" },
+	{ PRIMARY_SUB, "Primary Subdivision" },
+	{ SECONDARY_SUB, "Secondary Subdivision" },
+	{ CQ_ZONE, "CQ Zone" },
+	{ ITU_ZONE, "ITU Zone" },
+	{ CONTINENT, "Continent" },
+	{ IOTA, "IOTA" },
+	{ WAB, "WAB" },
+	{ DESCRIPTION, "Description"}
+};
+
+static std::map<std::string, qth_value_t> STRING_2_QTH_INFO_T = {
+	{ "Street", STREET },
+	{ "City", CITY },
+	{ "Postcode", POSTCODE },
+	{ "Locator", LOCATOR },
+	{ "Country", DXCC_NAME },
+	{ "DXCC", DXCC_ID },
+	{ "Primary Subdivision", PRIMARY_SUB },
+	{ "Secondary Subdivision", SECONDARY_SUB },
+	{ "CQ Zone", CQ_ZONE },
+	{ "ITU Zone", ITU_ZONE },
+	{ "Continent", CONTINENT },
+	{ "IOTA", IOTA },
+	{ "WAB", WAB },
+	{ "Description", DESCRIPTION }
 };
 
 //! Identifiers for field indicating station operator
@@ -95,8 +131,12 @@ public:
 	bool add_qth_item(std::string id, qth_value_t item, std::string value);
 	//! Remove \p item from location \p id. 
 	void remove_qth_item(std::string id, qth_value_t item);
+	//! Remove \p id: Retunrs true if successful
+	bool delete_qth(std::string id);
 	//! Add a new QTH \p id with data \p qth.
 	bool add_qth(std::string id, qth_info_t* qth);
+	//! Replace data for QTH \p id with data \p qth
+	bool replace_qth(std::string id, const qth_info_t& qth);
 	//! Add a specific item for operator \p id, \p value - return true if added.
 	bool add_oper_item(std::string id, oper_value_t item, std::string value);
 	//! Add a new operator \p with data \p oper.
