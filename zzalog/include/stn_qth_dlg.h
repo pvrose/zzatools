@@ -135,6 +135,9 @@ public:
     //! Callback from "Check log" button
     static void cb_check(Fl_Widget* w, void* v);
 
+    //! CAllback from "Set Default" button
+    static void cb_default(Fl_Widget* w, void* v);
+
 protected:
     //! Load data
     void load_data();
@@ -160,6 +163,7 @@ protected:
     Fl_Button* bn_delete_;           //!< Selete selected entry
     Fl_Button* bn_rename_;           //!< Rename selected entry as new entry
     Fl_Button* bn_check_;            //!< Check log
+    Fl_Button* bn_default_;          //!< Set as default
     stn_qth_cntnr* table_;           //!< Table displaying QTH details
 
     bool selected_new_;              //!< A new location has been enetered (for Add or REname)

@@ -29,7 +29,6 @@ const int HCONFIG = 500;
 		enum cfg_dialog_t {
 			DLG_WEB,        //!< Web location dialog.
 			DLG_COLUMN,     //!< Columns (aka fields) format dialog.
-			DLG_STATION,    //!< Station configuration dialog.
 			DLG_USER,       //!< User formatting configuration dialog.
 			DLG_QSLE,       //!< QSL Editor.
 			DLG_CONTEST,    //!< Contest setup dialog.

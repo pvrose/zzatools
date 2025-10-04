@@ -60,9 +60,6 @@
     <ClCompile Include="src\club_handler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\club_stn_dlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\config.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -411,9 +408,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\club_handler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\club_stn_dlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\config.h">

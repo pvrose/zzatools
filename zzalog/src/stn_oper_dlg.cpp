@@ -138,7 +138,7 @@ void stn_oper_cntnr::redraw_widgets() {
 	// Begin adding new widgets
 	// Get the data
 	const std::map<std::string, oper_info_t*>* data = stn_data_->get_opers();
-	if (selected_.length() == 0) {
+	if (selected_.length() == 0 && data->size()) {
 		selected_ = data->begin()->first;
 	}
 	// Get bound width
@@ -240,6 +240,15 @@ void stn_oper_dlg::cb_choice(Fl_Widget* w, void* v) {
 	that->enable_widgets();
 }
 
+//! Set default button
+void stn_oper_dlg::cb_default(Fl_Widget* w, void* v) {
+	stn_oper_dlg* that = ancestor_view<stn_oper_dlg>(w);
+	stn_default defaults = stn_data_->defaults();
+	defaults.name = that->operator_;
+	stn_data_->set_defaults(defaults);
+	that->enable_widgets();
+}
+
 //! Instantiate component widgets
 void stn_oper_dlg::create_form() {
 	int cx = x() + GAP;
@@ -263,6 +272,12 @@ void stn_oper_dlg::create_form() {
 	bn_clear_ = new Fl_Button(cx, cy, WBUTTON, HBUTTON, "Clear");
 	bn_clear_->callback(cb_clear);
 	bn_clear_->tooltip("Clears the selected record");
+
+	// "Set default"
+	cx += WBUTTON + GAP;
+	bn_default_ = new Fl_Button(cx, cy, WBUTTON, HBUTTON, "Set default");
+	bn_default_->callback(cb_default);
+	bn_default_->tooltip("Set the current location as default");
 
 	cx = x() + GAP;
 	cy += HBUTTON + GAP;
@@ -297,8 +312,10 @@ void stn_oper_dlg::enable_widgets() {
 
 //! Load data
 void stn_oper_dlg::load_data() {
+	if (operator_.length() == 0) operator_ = stn_data_->defaults().name;
 	populate_operators();
 	table_->set_selected(operator_);
+	ip_new_->value(operator_.c_str());
 }
 
 // ! Populate locations
@@ -314,6 +331,8 @@ void stn_oper_dlg::populate_operators() {
 void stn_oper_dlg::set_operator(std::string s) {
 	if (stn_data_->known_oper(s)) {
 		table_->set_selected(s);
+		ip_new_->value(s.c_str());
+		ip_new_->update_menubutton();
 	}
 	else {
 		oper_info_t* info = new oper_info_t;

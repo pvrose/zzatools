@@ -125,7 +125,8 @@ public:
     //! callback from choice
     static void cb_choice(Fl_Widget* w, void* v);
 
-
+    //! CAllback from "Set Default" button
+    static void cb_default(Fl_Widget* w, void* v);
 
 protected:
     //! Load data
@@ -142,6 +143,7 @@ protected:
     Fl_Button* bn_add_;              //!< Add an entry to call data
     Fl_Input_Choice* ip_new_;        //!< Select location name
     Fl_Button* bn_delete_;           //!< Selete selected entry
+    Fl_Button* bn_default_;          //!< Set as default
     stn_call_cntnr* table_;           //!< Table displaying call details
 
     bool selected_new_;              //!< A new location has been enetered (for Add or REname)

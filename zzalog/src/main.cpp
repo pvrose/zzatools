@@ -431,7 +431,8 @@ std::string get_file(char * arg_filename) {
 		else {
 			status_->misc_status(ST_WARNING, "ZZALOG: No log file - assuming a new installation.");
 			free(filename);
-			string def_filename = to_lower(station_defaults_.callsign) + ".adi";
+			stn_default defaults = stn_data_->defaults();
+			string def_filename = to_lower(defaults.callsign) + ".adi";
 			Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
 			chooser->title("Select log file name");
 			chooser->preset_file(def_filename.c_str());
@@ -527,6 +528,9 @@ void add_data() {
 	// Add the Station details database
 	if (!closing_) {
 		stn_data_ = new stn_data;
+		stn_window_ = new stn_window();
+		stn_window_->hide();
+		stn_data_->load_data();
 	}
 	// Add the contest details database
 	if (!closing_) {
@@ -898,46 +902,6 @@ void save_switches() {
 	switch_settings.set("Auto Save QSOs", (bool)AUTO_SAVE);
 }
 
-// Open system settings to see if it's a club or individual installation
-void check_settings() {
-	// Open the system settings file 
-	Fl_Preferences sys_settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-
-	char* stemp;
-
-	int temp;
-	if (sys_settings.get("Installation Type", temp, stn_type::NOT_USED)) {
-		station_defaults_.type = (stn_type)temp;
-		Fl_Preferences station_settings(sys_settings, "Station");
-		switch (station_defaults_.type) {
-		case stn_type::CLUB:
-			station_settings.get("Club Name", stemp, "");
-			station_defaults_.name = stemp;
-			break;
-		case stn_type::INDIVIDUAL:
-			station_settings.get("Operator", stemp, "");
-			station_defaults_.name = stemp;
-			break;
-		default:
-			break;
-		} 
-		station_settings.get("Callsign", stemp, "");
-		station_defaults_.callsign = stemp;
-		station_settings.get("Location", stemp, "");
-		station_defaults_.location = stemp;
-		new_installation_ = false;
-	}
-	else {
-		new_installation_ = true;
-		// First use - open dialog to get station defaults.
-		init_dialog* dlg = new init_dialog();
-		while (dlg->visible()) Fl::check();
-		station_defaults_ = dlg->get_default();
-		sys_settings.set("Installation Type", (int)station_defaults_.type);
-		sys_settings.flush();
-	}
-}
-
 // Open preferences and save them - it is possible to corrupt the settings
 // file if an exception occurs while they are being saved.
 bool open_settings() {
@@ -1003,24 +967,6 @@ bool open_settings() {
 	return true;
 }
 
-void save_station_settings() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences station_settings(settings, "Station");
-	char* temp;
-	station_settings.get("Callsign", temp, "");
-	if (strlen(temp) == 0) {
-		if (station_defaults_.type == CLUB) {
-			station_settings.set("Club Name", station_defaults_.name.c_str());
-		}
-		station_settings.set("Callsign", station_defaults_.callsign.c_str());
-		station_settings.set("Location", station_defaults_.location.c_str());
-		if (station_defaults_.type != CLUB) {
-			station_settings.set("Operator", station_defaults_.name.c_str());
-		}
-		settings.flush();
-	}
-}
-
 // Load all the hamlib data, and then the rig connection details
 void load_rig_data() {
 	rig_set_debug(HAMLIB_DEBUG_LEVEL);
@@ -1044,11 +990,9 @@ int main(int argc, char** argv)
 	read_saved_switches();
 	customise_fltk();
 	// Create the settings before anything else 
-	check_settings();
 	if (!open_settings()) {
 		return 255;
 	}
-	save_station_settings();
 
 	// Create the ticker first of all
 	ticker_ = new ticker();

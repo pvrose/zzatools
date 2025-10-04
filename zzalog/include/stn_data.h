@@ -16,10 +16,10 @@ enum stn_type : uint8_t {
 //! Default station data
 struct stn_default {
 	stn_type type{ NOT_USED };        //!< Station type: individual or club
-	std::string callsign{ "" };       //!< Station callsign
-	std::string location{ "" };       //!< Location identifier
-	std::string grid{ "" };           //!< Grid square locator
-	std::string name{ "" };           //!< Club or individual name
+	std::string callsign{ "" };       //!< Default station callsign
+	std::string location{ "" };       //!< Default location
+	std::string club_name{ "" };      //!< Club name
+	std::string name{ "" };           //!< Default operator
 };
 
 //! Identifiers for ADIF fields indicating user's location
@@ -182,13 +182,31 @@ public:
 	//! Match \p qso record against QTHs, result matching \p QTH, returns stn_match_t
 	stn_match_t match_qso_qths(record* qso, std::string& qth);
 
+	//! Match \p qso record against NAME and OPERATOR
+	stn_match_t match_qso_opers(record* qso, std::string& oper);
+
+	//! Return station defaults
+	stn_default defaults();
+
+	//! Set defaults to \p def
+	void set_defaults(const stn_default def);
+
+	//! Set station type
+	void set_type(const stn_type t);
+
 protected:
 
-	//! MAtch \p qso against one QTH \p id
+	//! MAtch \p qso against one QTH \p qth
 	stn_match_t match_qso_qth(record* qso, qth_info_t qth);
+
+	//! Match \p qso against one operatort \p oper
+	stn_match_t match_qso_oper(record* qso, oper_info_t qth);
 
 	//! Update QTH from QSO
 	void update_qth_qso(std::string qth, record* qso);
+
+	//! Update Operator from QSO
+	void update_oper_qso(std::string oper, record* qso);
 
 	//! Station location data
 	std::map<std::string, qth_info_t*> qths_;
@@ -197,8 +215,10 @@ protected:
 	//! Station callsign data
 	std::map<std::string, std::string> calls_;
 	//! Loaded station defaults
-	stn_default loaded_stn_defaults_;
+	stn_default defaults_;
 	//! Current unknown QTH identifier
 	int unknown_qth_index_;
+	//! Current unknown operator identifier
+	int unknown_oper_index_{ 0 };
 };
 

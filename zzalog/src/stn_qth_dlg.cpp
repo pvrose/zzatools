@@ -173,8 +173,10 @@ void stn_qth_cntnr::redraw_widgets() {
 		// Create widget
 		stn_qth_widget* w = new stn_qth_widget(rx, cy, rw, ROW_HEIGHT * 5);
 		w->copy_label(it.first.c_str());
-		if (it.first == selected_) w->labelfont(FL_BOLD);
-		else w->labelfont(FL_ITALIC);
+		if (it.first == selected_) w->activate();
+		else w->deactivate();
+		if (it.first == stn_data_->defaults().location) w->labelfont(FL_BOLD);
+		else w->labelfont(0);
 		w->enable_widgets();
 		// remember widget
 		widgets_[it.first] = w;
@@ -314,7 +316,15 @@ void stn_qth_dlg::cb_check(Fl_Widget* w, void* v) {
 		num_do, num_dont, num_cant, num_extra, num_multi);
 	status_->misc_status(ST_NOTE, msg);
 	that->enable_widgets();
+}
 
+//! Set default button
+void stn_qth_dlg::cb_default(Fl_Widget* w, void* v) {
+	stn_qth_dlg* that = ancestor_view<stn_qth_dlg>(w);
+	stn_default defaults = stn_data_->defaults();
+	defaults.location = that->location_;
+	stn_data_->set_defaults(defaults);
+	that->enable_widgets();
 }
 
 //! Instantiate component widgets
@@ -346,9 +356,15 @@ void stn_qth_dlg::create_form() {
 	bn_rename_ = new Fl_Button(cx, cy, WBUTTON, HBUTTON, "Rename");
 	bn_rename_->callback(cb_rename);
 	bn_rename_->tooltip("Rename the selected record as new name"); 
+	// "Set default"
+	cx += WBUTTON + GAP;
+	bn_default_ = new Fl_Button(cx, cy, WBUTTON, HBUTTON, "Set default");
+	bn_default_->callback(cb_default);
+	bn_default_->tooltip("Set the current location as default");
 	
 	// Callsign input
-	cx += WBUTTON;
+	cx = x() + GAP;
+	cy += HBUTTON;
 	ch_call_ = new Fl_Input_Choice(cx, cy, WINPUT, HBUTTON);
 	ch_call_->tooltip("Select or enter a callsign to pre-populate selected record");
 	// "Use call" button
@@ -412,9 +428,11 @@ void stn_qth_dlg::update_from_call() {
 
 //! Load data
 void stn_qth_dlg::load_data() {
+	if (location_.length() == 0) location_ = stn_data_->defaults().location;
 	populate_calls();
 	populate_locations();
 	table_->set_selected(location_);
+	ip_new_->value(location_.c_str());
 }
 
 //! Populate call choice
@@ -433,18 +451,20 @@ void stn_qth_dlg::populate_locations() {
 	for (auto it : *qths) {
 		ip_new_->add(escape_menu(it.first).c_str());
 	}
+	ip_new_->value(location_.c_str());
 }
 
 //! Set selected qTH
 void stn_qth_dlg::set_location(std::string s) {
 	if (stn_data_->known_qth(s)) {
 		table_->set_selected(s);
+		ip_new_->value(s.c_str());
 	}
 	else {
 		qth_info_t* info = new qth_info_t;
 		stn_data_->add_qth(s, info);
-		location_ = s;
-		selected_new_ = false;
-		enable_widgets();
 	}
+	location_ = s;
+	selected_new_ = false;
+	enable_widgets();
 }

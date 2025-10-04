@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include <FL/Fl_Double_Window.H>
+#include <FL/Fl_Group.H>
 
 class Fl_Button;
 class Fl_Input;
@@ -13,12 +13,18 @@ struct stn_default;
 
 //! This class provides a dialog to enter data for a new installation
 class init_dialog :
-    public Fl_Double_Window
+    public Fl_Group
 {
 public:
 
     //! Constructor - sizes and labels itself
-    init_dialog();
+
+    //! \param X horizontal position within host window
+    //! \param Y vertical position with hosr window
+    //! \param W width 
+    //! \param H height
+    //! \param L label
+    init_dialog(int X, int Y, int W, int H, const char* L = nullptr);
 
     //! Destructor
     ~init_dialog();
@@ -29,11 +35,8 @@ public:
     //! Copy initial values from staion_defaults_ if the exist
     void load_values();
 
-    //! Remember details in settings to set club login
-    void save_values();
-
-    //! Returns the station details
-    stn_default get_default();
+    //! Configure widgets
+    void enable_widgets();
 
 protected:
     //! Callback when "Accept" button clicked
@@ -49,14 +52,9 @@ protected:
     Fl_Radio_Round_Button* bn_club_;        //!< Club station
     Fl_Radio_Round_Button* bn_indiv_;       //!< Individual station
     Fl_Input* ip_call_;                     //!< Station callsign
+    Fl_Input* ip_club_;                     //!< Club name
     Fl_Input* ip_location_;                 //!< Location name
-    Fl_Input* ip_grid_;                     //!< Gridsquare locator
     Fl_Input* ip_name_;                     //!< Club or individual's name
     Fl_Button* bn_accept_;                  //!< Accept these data items
-
-    stn_type station_type_;                 //!< Club or individual
-    stn_default* default_station_;          //!< Default details
-
-
 };
 

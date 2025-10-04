@@ -1,16 +1,19 @@
 #include "stn_data.h"
 
+#include "config.h"
 #include "init_dialog.h"
 #include "record.h"
 #include "status.h"
+#include "stn_dialog.h"
 
 #include "nlohmann/json.hpp"
 
 #include <vector>
 
+extern config* config_;
 extern status* status_;
+extern stn_window* stn_window_;
 extern std::string default_data_directory_;
-extern stn_default station_defaults_;
 
 using json = nlohmann::json;
 
@@ -72,7 +75,6 @@ static void to_json(json& j, const stn_default& s) {
 		{ "Station type", s.type },
 		{ "Callsign", s.callsign},
 		{ "Location", s.location },
-		{ "Gridsquare", s.grid },
 		{ "Name", s.name }
 	};
 }
@@ -82,14 +84,12 @@ static void from_json(const json& j, stn_default& s) {
 	j.at("Station type").get_to(s.type);
 	j.at("Callsign").get_to(s.callsign);
 	j.at("Location").get_to(s.location);
-	j.at("Gridsquare").get_to(s.grid);
 	j.at("Name").get_to(s.name);
 }
 
 stn_data::stn_data()
 {
 	unknown_qth_index_ = 0;
-	load_data();
 }
 
 stn_data::~stn_data() {
@@ -101,44 +101,33 @@ void stn_data::load_data() {
 	char msg[128];
 	status_->misc_status(ST_NOTE, "STN DATA: Loading operation data");
 	bool loaded = load_json();
-	if (loaded_stn_defaults_.callsign.length() ==0 && (
-		station_defaults_.type == NOT_USED || station_defaults_.callsign.length() == 0)) {
-		status_->misc_status(ST_ERROR, "STN DATA: We have no default callsign etc.");
-		// First use - open dialog to get station defaults.
-		init_dialog* dlg = new init_dialog();
-		while (dlg->visible()) Fl::check();
-		station_defaults_ = dlg->get_default();
-
-	}
-	else if (loaded_stn_defaults_.callsign.length() && (
-		station_defaults_.type == NOT_USED || station_defaults_.callsign.length() == 0)) {
-		stn_type save_type = station_defaults_.type;
-		station_defaults_ = loaded_stn_defaults_;
-		station_defaults_.type = save_type;
-	
-		status_->misc_status(ST_NOTE, "STN DATA: Using saved station defaults");
-	}
-	else {
-		status_->misc_status(ST_NOTE, "STN DATA: Using initial station defaults");
-	}
-	snprintf(msg, sizeof(msg), "STN DATA: Station defaults: Call=%s, Location=%s(%s), Name=%s",
-		station_defaults_.callsign.c_str(),
-		station_defaults_.location.c_str(),
-		station_defaults_.grid.c_str(),
-		station_defaults_.name.c_str());
-	status_->misc_status(ST_NOTE, msg);
-	// If no data loaded
-	if (!loaded) {
+	// If no data loaded or default callsign is not set
+	if (!loaded || defaults_.callsign.length() == 0) {
 		// Create a set of initial values from input defaults.
-		qth_info_t* qth_info = new qth_info_t;
-		qth_info->data.clear();
-		(qth_info->data)[LOCATOR] = station_defaults_.grid;
-		add_qth(station_defaults_.location, qth_info);
-		oper_info_t* oper_info = new oper_info_t;
-		oper_info->data.clear();
-		add_oper(station_defaults_.name, oper_info);
-		add_call(station_defaults_.callsign);
+		stn_window_->set_tab(stn_dialog::DEFAULTS, "", "No station data loaded, set default values.");
+		while (stn_window_->visible()) Fl::check();
 	}
+	else if (qths_.find(defaults_.location) == qths_.end()) {
+		// Create a set of initial values from input defaults.
+		stn_window_->set_tab(stn_dialog::QTH, defaults_.location, "QTH not known, please enter details.");
+		while (stn_window_->visible()) Fl::check();
+	}
+	else if (defaults_.type == INDIVIDUAL &&
+		opers_.find(defaults_.name) == opers_.end()) {
+		// Create a set of initial values from input defaults.
+		stn_window_->set_tab(stn_dialog::OPERATOR, defaults_.name, "Operator not known, please enter details.");
+		while (stn_window_->visible()) Fl::check();
+	}
+	else if (calls_.find(defaults_.callsign) == calls_.end()) {
+		// Create a set of initial values from input defaults.
+		stn_window_->set_tab(stn_dialog::CALLSIGN, defaults_.callsign, "Station callsign not known, please enter details.");
+		while (stn_window_->visible()) Fl::check();
+	}
+	snprintf(msg, sizeof(msg), "STN DATA: Station defaults: Call=%s, Location=%s, Name=%s",
+		defaults_.callsign.c_str(),
+		defaults_.location.c_str(),
+		defaults_.name.c_str());
+	status_->misc_status(ST_NOTE, msg);
 }
 
 // Load data from station.json
@@ -188,7 +177,7 @@ bool stn_data::load_json() {
 			calls_[it.first] = it.second;
 		}
 		if (j.find("Defaults") != j.end()) {
-			j.at("Defaults").get_to(loaded_stn_defaults_);
+			j.at("Defaults").get_to(defaults_);
 		}
 	}
 	catch (const json::exception& e) {
@@ -233,7 +222,7 @@ bool stn_data::store_json() {
 			}
 		}
 		jall["Station callsigns"] = jc;
-		jall["Defaults"] = station_defaults_;
+		jall["Defaults"] = defaults_;
 		json j;
 
 		j["Station"] = jall;
@@ -578,6 +567,117 @@ stn_data::stn_match_t stn_data::match_qso_qth(record* qso, qth_info_t qth) {
 	else return DO;
 }
 
+//! Match \p qso record against QTHs, result matching \p QTH, returns stn_match_t
+stn_data::stn_match_t stn_data::match_qso_opers(record* qso, std::string& oper) {
+	char msg[128];
+	// Lists of QTHs that match one way or another
+	std::vector<std::string> cant_matches;
+	std::vector<std::string> do_matches;
+	std::vector<std::string> extra_matches;
+	std::vector<std::string> dont_matches;
+	if (opers_.size() == 0) {
+		std::string new_oper = "Operator " + std::to_string(++unknown_oper_index_);
+		update_oper_qso(new_oper, qso);
+		return EXTRA;
+	}
+	// For all opers - get result
+	for (auto oper : opers_) {
+		stn_match_t result = match_qso_oper(qso, *oper.second);
+		switch (result) {
+		case CANT:
+			cant_matches.push_back(oper.first);
+			break;
+		case DO:
+			do_matches.push_back(oper.first);
+			break;
+		case EXTRA:
+			extra_matches.push_back(oper.first);
+			break;
+		case DONT:
+			dont_matches.push_back(oper.first);
+			break;
+		default:
+			break;
+		}
+	}
+	if (cant_matches.size() == opers_.size()) {
+		snprintf(msg, sizeof(msg), "STN DATA: Record %s %s %s has no oper data",
+			qso->item("QSO_DATE").c_str(),
+			qso->item("TIME_ON").c_str(),
+			qso->item("CALL").c_str());
+		status_->misc_status(ST_NOTE, msg);
+		oper = "";
+		return CANT;
+	}
+	else if ((do_matches.size() + extra_matches.size()) > 1) {
+		snprintf(msg, sizeof(msg), "STN DATA: Record %s %s %s matches multiple opers",
+			qso->item("QSO_DATE").c_str(),
+			qso->item("TIME_ON").c_str(),
+			qso->item("CALL").c_str());
+		status_->misc_status(ST_NOTE, msg);
+		if (do_matches.size()) oper = do_matches[0];
+		else oper = extra_matches[0];
+		return MULTIPLE;
+	}
+	else if (do_matches.size() == 1) {
+		oper = do_matches[0];
+		return DO;
+	}
+	else if (extra_matches.size() == 1) {
+		update_oper_qso(extra_matches[0], qso);
+		oper = extra_matches[0];
+		return EXTRA;
+	}
+	else {
+		snprintf(msg, sizeof(msg), "STN DATA: Record %s %s %s matches no operators",
+			qso->item("QSO_DATE").c_str(),
+			qso->item("TIME_ON").c_str(),
+			qso->item("CALL").c_str());
+		status_->misc_status(ST_WARNING, msg);
+		std::string new_oper = "Unknown " + std::to_string(++unknown_oper_index_);
+		update_oper_qso(new_oper, qso);
+		oper = new_oper;
+		return DONT;
+	}
+}
+
+//! MAtch \p qso against one oper \p id
+stn_data::stn_match_t stn_data::match_qso_oper(record* qso, oper_info_t oper) {
+	bool extra = false;
+	bool cant = true;
+	for (int ix = 0; ix < 3; ix++) {
+		const oper_value_t& qv = (oper_value_t)ix;
+		std::string qsov = qso->item(OPER_ADIF_MAP.at(qv));
+		if (qsov.length()) {
+			//QSO has this field
+			cant = false;
+			if (oper.data.find(qv) == oper.data.end() || oper.data.at(qv).length() == 0) {
+				extra = true;
+			}
+			else {
+				const std::string& operv = oper.data.at(qv);
+				if (qv == LOCATOR) {
+					// Only match minimum length
+					int len = min(qsov.length(), operv.length());
+					if (qsov.substr(0, len) != operv.substr(0, len)) {
+						return DONT;
+					}
+					// If QSO has more detailed GRIDSQUARE value
+					if (qsov.length() > operv.length()) {
+						extra = true;
+					}
+				}
+				else if (qsov != operv) {
+					return DONT;
+				}
+			}
+		}
+	}
+	if (cant) return CANT;
+	else if (extra) return EXTRA;
+	else return DO;
+}
+
 //! Update QTH from QSO
 void stn_data::update_qth_qso(std::string qth, record* qso) {
 	char msg[128];
@@ -622,3 +722,73 @@ void stn_data::update_qth_qso(std::string qth, record* qso) {
 	}
 }
 
+//! Update oper from QSO
+void stn_data::update_oper_qso(std::string oper, record* qso) {
+	char msg[128];
+	if (opers_.find(oper) == opers_.end()) {
+		add_oper(oper, new oper_info_t);
+	}
+	for (int ix = 0; ix < 3; ix++) {
+		const oper_value_t& qv = (oper_value_t)ix;
+		std::string qsov = qso->item(OPER_ADIF_MAP.at(qv));
+		std::string operv = "";
+		if (opers_.at(oper)->data.find(qv) != opers_.at(oper)->data.end()) {
+			operv = opers_.at(oper)->data.at(qv);
+		}
+		if (qsov.length()) {
+			if (qv == LOCATOR) {
+				if (qsov.length() > operv.length()) {
+					snprintf(msg, sizeof(msg), "STN DATA: Record %s %s %s Update operator \"%s\": %s=\"%s\"",
+						qso->item("QSO_DATE").c_str(),
+						qso->item("TIME_ON").c_str(),
+						qso->item("CALL").c_str(),
+						oper.c_str(),
+						OPER_ADIF_MAP.at(qv).c_str(),
+						qsov.c_str());
+					status_->misc_status(ST_WARNING, msg);
+					opers_.at(oper)->data[qv] = qsov;
+				}
+			}
+			else {
+				if (operv.length() == 0) {
+					snprintf(msg, sizeof(msg), "STN DATA: Record %s %s %s Update operator \"%s\": %s=\"%s\"",
+						qso->item("QSO_DATE").c_str(),
+						qso->item("TIME_ON").c_str(),
+						qso->item("CALL").c_str(),
+						oper.c_str(),
+						OPER_ADIF_MAP.at(qv).c_str(),
+						qsov.c_str());
+					status_->misc_status(ST_WARNING, msg);
+					opers_.at(oper)->data[qv] = qsov;
+				}
+			}
+		}
+	}
+}
+
+// Return station defaults
+stn_default stn_data::defaults() {
+	return defaults_;
+}
+
+// Set station defaults
+void stn_data::set_defaults(const stn_default def) {
+	defaults_ = def;
+	if (defaults_.location.length() && qths_.find(defaults_.location) == qths_.end()) {
+		qths_[defaults_.location] = new qth_info_t;
+		qths_.at(defaults_.location)->data[DESCRIPTION] = "Main address";
+	}
+	if (defaults_.name.length() && opers_.find(defaults_.name) == opers_.end()) {
+		opers_[defaults_.name] = new oper_info_t;
+		opers_.at(defaults_.name)->data[NAME] = defaults_.name;
+
+	}
+	if (defaults_.callsign.length() && calls_.find(defaults_.callsign) == calls_.end()) {
+		calls_[defaults_.callsign] = "Principal callsign";
+	}
+}
+
+// Set station type
+void stn_data::set_type(const stn_type t) {
+	defaults_.type = t;
+}

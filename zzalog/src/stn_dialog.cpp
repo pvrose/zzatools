@@ -1,6 +1,7 @@
 #include "stn_dialog.h"
 
 #include "cty_data.h"
+#include "init_dialog.h"
 #include "qso_data.h"
 #include "qso_manager.h"
 #include "record.h"
@@ -16,6 +17,7 @@
 
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Check_Button.H>
+#include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Input_Choice.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Multiline_Input.H>
@@ -29,7 +31,8 @@ extern stn_data* stn_data_;
 extern void open_html(const char*);
 
 stn_dialog::stn_dialog(int X, int Y, int W, int H, const char* L) :
-	page_dialog(X, Y, W, H, L),
+	Fl_Group(X, Y, W, H, L),
+	g_defs_(nullptr),
 	g_qth_(nullptr),
 	g_oper_(nullptr),
 	g_call_(nullptr)
@@ -44,7 +47,7 @@ stn_dialog::~stn_dialog() {}
 
 // Handle
 int stn_dialog::handle(int event) {
-	int result = page_dialog::handle(event);
+	int result = Fl_Group::handle(event);
 	// Now handle F1 regardless
 	switch (event) {
 	case FL_FOCUS:
@@ -80,14 +83,28 @@ void stn_dialog::load_values() {
 
 // Used to create the form
 void stn_dialog::create_form(int X, int Y) {
+	int cx = x() + GAP;
+	int cy = y() + GAP;
+	int cw = w() - GAP - GAP;
+
+	message_ = new Fl_Box(cx, cy, cw, HBUTTON * 3 / 2);
+	message_->box(FL_FLAT_BOX);
+	message_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+
+	cy += message_->h();
+	int ch = y() + h() - cy;
+
 	// Create an Fl_Tabs
-	tabs_ = new Fl_Tabs(x() + GAP, y() + GAP, w() - GAP - GAP, h() - GAP - GAP);
+	tabs_ = new Fl_Tabs(cx, cy, cw, ch);
 	tabs_->callback(cb_tab);
 	tabs_->box(FL_FLAT_BOX);
 
 	int rx = 0, ry = 0, rw = 0, rh = 0;
 	// Get individual area
 	tabs_->client_area(rx, ry, rw, rh);
+
+	g_defs_ = new init_dialog(rx, ry, rw, rh, "Defaults");
+	g_defs_->tooltip("Specify the default station callsign, location and club or operator");
 
 	g_qth_ = new stn_qth_dlg(rx, ry, rw, rh, "QTHs");
 	g_qth_->tooltip("Allows the editing of location (QTH) data");
@@ -114,10 +131,9 @@ void stn_dialog::save_values() {
 void stn_dialog::enable_widgets() {
 	// Standard tab formats
 // value() returns the selected widget. We need to test which widget it is.
-	Fl_Tabs* tabs = (Fl_Tabs*)child(0);
-	Fl_Widget* tab = tabs->value();
-	for (int ix = 0; ix < tabs->children(); ix++) {
-		Fl_Widget* wx = tabs->child(ix);
+	Fl_Widget* tab = tabs_->value();
+	for (int ix = 0; ix < tabs_->children(); ix++) {
+		Fl_Widget* wx = tabs_->child(ix);
 		if (wx == tab) {
 			wx->labelfont((wx->labelfont() | FL_BOLD) & (~FL_ITALIC));
 			wx->labelcolor(FL_FOREGROUND_COLOR);
@@ -129,6 +145,7 @@ void stn_dialog::enable_widgets() {
 			wx->deactivate();
 		}
 	}
+	g_defs_->enable_widgets();
 	g_qth_->enable_widgets();
 	g_oper_->enable_widgets();
 	g_call_->enable_widgets();
@@ -141,8 +158,12 @@ void stn_dialog::cb_tab(Fl_Widget* w, void* v) {
 }
 
 // Set tab
-void stn_dialog::set_tab(tab_type t, std::string id) {
+void stn_dialog::set_tab(tab_type t, std::string id, std::string message) {
 	switch (t) {
+	case DEFAULTS:
+		g_defs_->activate();
+		tabs_->value(g_defs_);
+		break;
 	case QTH:
 		g_qth_->activate();
 		g_qth_->set_location(id);
@@ -159,6 +180,11 @@ void stn_dialog::set_tab(tab_type t, std::string id) {
 		tabs_->value(g_call_);
 		break;
 	}
+	message_->copy_label(message.c_str());
 	enable_widgets();
 }
 
+//! Update other widgets
+void stn_dialog::update() {
+	qso_manager_->enable_widgets();
+}

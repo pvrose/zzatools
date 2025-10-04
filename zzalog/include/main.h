@@ -11,7 +11,6 @@
 #include "banner.h"
 #include "book.h"
 #include "club_handler.h"
-#include "club_stn_dlg.h"
 #include "config.h"
 #include "contest_data.h"
 #include "cty_data.h"
@@ -193,6 +192,7 @@ rig_data* rig_data_ = nullptr;
 spec_data* spec_data_ = nullptr;
 status* status_ = nullptr;
 stn_data* stn_data_ = nullptr;
+stn_window* stn_window_ = nullptr;
 tabbed_forms* tabbed_forms_ = nullptr;
 ticker* ticker_ = nullptr;
 toolbar* toolbar_ = nullptr;
@@ -323,9 +323,6 @@ void save_switches();
 //! \return true if file was opened successfully, otherwise false.
 bool open_settings();
 
-//! Check whether system or user config (club or individual).
-void check_settings();
-
 //! Initialise hamlib
 void load_rig_data();
 
@@ -394,6 +391,3 @@ bool keep_banner_ = false;
 
 //! This run is a new installation
 bool new_installation_ = false;
-
-//! Default values of a station
-stn_default station_defaults_;

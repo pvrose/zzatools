@@ -88,8 +88,6 @@ public:
     void enable_widgets();
     //! Load previous session's values from settings.
     void load_data();
-    //! SAve current settings to settings.
-    void store_data();
 
     //! Callback from "QTH" input.
     static void cb_qth(Fl_Widget* w, void* v);
@@ -120,11 +118,11 @@ public:
 
 protected:
     //! A new QTH has been entered, open edit dialog.
-    void new_qth();
+    void new_qth(bool is_new);
     //! A new Operator has been entered, open edit dialog.
-    void new_oper();
+    void new_oper(bool is_new);
     //! A new station callsign has been entered, open edit dialog.
-    void new_call();
+    void new_call(bool is_new);
 
     // Widgets
     Fl_Input_Choice* ch_qth_;      //!< Input for specifyinh station location

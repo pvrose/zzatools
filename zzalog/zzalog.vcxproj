@@ -178,7 +178,6 @@
     <ClCompile Include="src\calendar_table.cpp" />
     <ClCompile Include="src\change_dialog.cpp" />
     <ClCompile Include="src\club_handler.cpp" />
-    <ClCompile Include="src\club_stn_dlg.cpp" />
     <ClCompile Include="src\condx_view.cpp" />
     <ClCompile Include="src\config.cpp" />
     <ClCompile Include="src\config_tree.cpp" />
@@ -295,7 +294,6 @@
     <ClInclude Include="include\calendar_table.h" />
     <ClInclude Include="include\change_dialog.h" />
     <ClInclude Include="include\club_handler.h" />
-    <ClInclude Include="include\club_stn_dlg.h" />
     <ClInclude Include="include\condx_view.h" />
     <ClInclude Include="include\config.h" />
     <ClInclude Include="include\config_tree.h" />

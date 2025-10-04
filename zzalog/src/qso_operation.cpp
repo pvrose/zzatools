@@ -18,7 +18,7 @@
 extern config *config_;
 extern status *status_;
 extern stn_data *stn_data_;
-extern stn_default station_defaults_;
+extern stn_window* stn_window_;
 
 extern std::string PROGRAM_ID;
 extern std::string VENDOR;
@@ -29,18 +29,16 @@ qso_operation::qso_operation(int X, int Y, int W, int H, const char *L) : Fl_Gro
 																		  current_oper_(""),
 																		  current_qso_(nullptr)
 {
-	tooltip("Displays the current station opertaion: QTH, Operator and callsign used");
+	tooltip("Displays the current station operation: QTH, Operator and callsign used");
 	label("Station");
 	box(FL_BORDER_BOX);
-	load_data();
 	create_form();
-	populate_choices();
+	load_data();
 	enable_widgets();
 }
 
 qso_operation::~qso_operation()
 {
-	store_data();
 }
 
 // Handle
@@ -115,7 +113,7 @@ void qso_operation::create_form()
 // Update the widget values
 void qso_operation::enable_widgets()
 {
-	store_data();
+	load_data();
 	ch_qth_->value(current_qth_.c_str());
 	ch_oper_->value(current_oper_.c_str());
 	ch_call_->value(current_call_.c_str());
@@ -126,36 +124,11 @@ void qso_operation::enable_widgets()
 
 // Load data
 void qso_operation::load_data() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences station_settings(settings, "Station");
-	char* temp;
-	station_settings.get("Operator", temp, "");
-	current_oper_ = temp;
-	if (current_oper_.length() == 0 && station_defaults_.type != CLUB) {
-		current_oper_ = station_defaults_.name;
-	}
-	free(temp);
-	station_settings.get("Callsign", temp, "");
-	current_call_ = to_upper(std::string(temp));
-	if (current_call_.length() == 0) {
-		current_call_ = station_defaults_.callsign;
-	}
-	free(temp);
-	station_settings.get("Location", temp, "");
-	current_qth_ = temp;
-	if (current_qth_.length() == 0) {
-		current_qth_ = station_defaults_.location;
-	}
-	free(temp);
-}
-
-// Store data
-void qso_operation::store_data() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences station_settings(settings, "Station");
-	station_settings.set("Operator", current_oper_.c_str());
-	station_settings.set("Callsign", current_call_.c_str());
-	station_settings.set("Location", current_qth_.c_str());
+	stn_default defaults = stn_data_->defaults();
+	current_oper_ = defaults.name;
+	current_call_ = defaults.callsign;
+	current_qth_ = defaults.location;
+	populate_choices();
 }
 
 // QTH button clicked
@@ -169,7 +142,7 @@ void qso_operation::cb_qth(Fl_Widget *w, void *v)
 		// New QTH typed in - check if it's really new
 		if (!stn_data_->known_qth(that->current_qth_))
 		{
-			that->new_qth();
+			that->new_qth(true);
 			return;
 		}
 	}
@@ -185,7 +158,7 @@ void qso_operation::cb_oper(Fl_Widget *w, void *v)
 		// New QTH typed in - check if it's really new
 		if (!stn_data_->known_oper(that->current_oper_))
 		{
-			that->new_oper();
+			that->new_oper(true);
 			return;
 		}
 	}
@@ -201,7 +174,7 @@ void qso_operation::cb_call(Fl_Widget *w, void *v)
 		// New QTH typed in - check if it's really new
 		if (!stn_data_->known_call(that->current_call_))
 		{
-			that->new_call();
+			that->new_call(true);
 			return;
 		}
 	}
@@ -214,13 +187,13 @@ void qso_operation::cb_show(Fl_Widget *w, void *v)
 	switch (t)
 	{
 	case stn_dialog::QTH:
-		that->new_qth();
+		that->new_qth(false);
 		break;
 	case stn_dialog::OPERATOR:
-		that->new_oper();
+		that->new_oper(false);
 		break;
 	case stn_dialog::CALLSIGN:
-		that->new_call();
+		that->new_call(false);
 		break;
 	}
 }
@@ -293,29 +266,32 @@ void qso_operation::populate_choices()
 
 
 // Handle new QTH
-void qso_operation::new_qth()
+void qso_operation::new_qth(bool is_new)
 {
-	config_->show();
-	stn_dialog *dlg = (stn_dialog *)config_->get_tab(config::DLG_STATION);
-	dlg->set_tab(stn_dialog::QTH, current_qth_);
+	std::string msg = is_new ?
+		"New QTH: Please enter details." :
+		"Editing QTH details.";
+	stn_window_->set_tab(stn_dialog::QTH, current_qth_, msg);
 	enable_widgets();
 }
 
 // handle new Operator
-void qso_operation::new_oper()
+void qso_operation::new_oper(bool is_new)
 {
-	config_->show();
-	stn_dialog *dlg = (stn_dialog *)config_->get_tab(config::DLG_STATION);
-	dlg->set_tab(stn_dialog::OPERATOR, current_oper_);
+	std::string msg = is_new ?
+		"New Operator: Please enter details." :
+		"Editing Operator details.";
+	stn_window_->set_tab(stn_dialog::OPERATOR, current_oper_, msg);
 	enable_widgets();
 }
 
 // Handle new call
-void qso_operation::new_call()
+void qso_operation::new_call(bool is_new)
 {
-	config_->show();
-	stn_dialog *dlg = (stn_dialog *)config_->get_tab(config::DLG_STATION);
-	dlg->set_tab(stn_dialog::CALLSIGN, current_call_);
+	std::string msg = is_new ?
+		"New Station callsign: Please enter details." :
+		"Editing Station callsign details.";
+	stn_window_->set_tab(stn_dialog::CALLSIGN, current_call_, msg);
 	enable_widgets();
 }
 

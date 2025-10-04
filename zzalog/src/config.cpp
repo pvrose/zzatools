@@ -6,7 +6,6 @@
 #include "page_dialog.h"
 #include "qsl_editor.h"
 #include "user_dialog.h"
-#include "stn_dialog.h"
 #include "web_dialog.h"
 
 #include "utils.h"
@@ -66,12 +65,6 @@ config::config(int W, int H, const char* label) :
 	fields->labelsize(FL_NORMAL_SIZE + 2);
 	fields->tooltip("Allows the specification of which fields to display in the various applications");
 	children_ids_.push_back(DLG_COLUMN);
-	// Station dialog - allows config of station QTH/Operator/Callsign
-	stn_dialog* station = new stn_dialog(rx, ry, rw, rh, "Station");
-	station->labelfont(FL_BOLD);
-	station->labelsize(FL_NORMAL_SIZE + 2);
-	station->tooltip("Allows the description of station QTH, operators andused callsigns");
-	children_ids_.push_back(DLG_STATION);
 
 	// User config - allows user to control cetain aspects of the displayed information
 	user_dialog* user = new user_dialog(rx, ry, rw, rh, "User config");
@@ -232,9 +225,6 @@ void config::set_label(config::cfg_dialog_t active) {
 		break;
 	case DLG_USER:
 		label("Configuration: Define the way certain items are viewed");
-		break;
-	case DLG_STATION:
-		label("Configuration: Define QTH, Operator and working calligns");
 		break;
 	case DLG_QSLE:
 		label("Configuration: Define QSL layout and print configuration");

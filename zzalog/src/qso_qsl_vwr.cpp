@@ -31,7 +31,7 @@ extern status* status_;
 extern book* book_;
 extern tabbed_forms* tabbed_forms_;
 extern qsl_dataset* qsl_dataset_;
-extern stn_default station_defaults_;
+extern stn_data* stn_data_;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
 extern void open_html(const char*);
@@ -683,7 +683,7 @@ void qso_qsl_vwr::set_image() {
 						std::string testname = filename;
 						if (ia == 1) {
 							size_t pos = testname.find(station);
-							testname.replace(pos, station.length(), station_defaults_.callsign);
+							testname.replace(pos, station.length(), stn_data_->defaults().callsign);
 							use_default = true;
 						}
 						for (int i = 0; i < num_types && !found_image; i++) {
@@ -753,7 +753,7 @@ void qso_qsl_vwr::set_image() {
 			if (found_image && use_default) {
 				char message[200];
 				switch(fl_choice("Image for station call: %s found looking for %s - Replace?", 
-					"no", "yes", nullptr, station_defaults_.callsign.c_str(),
+					"no", "yes", nullptr, stn_data_->defaults().callsign.c_str(),
 					current_qso_->item("STATION_CALLSIGN").c_str())) {
 				case 0:
 					snprintf(message, sizeof(message), 

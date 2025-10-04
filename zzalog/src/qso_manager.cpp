@@ -60,12 +60,12 @@ extern tabbed_forms* tabbed_forms_;
 extern import_data* import_data_;
 extern qrz_handler* qrz_handler_;
 extern main_window* main_window_;
+extern stn_data* stn_data_;
 extern bool closing_;
 extern std::string COPYRIGHT;
 extern std::string CONTACT;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
-extern stn_default station_defaults_;
 
 
 // The main dialog constructor
@@ -222,6 +222,7 @@ void qso_manager::enable_widgets() {
 	// Not all widgets may exist yet!
 	if (!created_) return;
 
+	
 	rig_group_->enable_widgets();
 	info_group_->enable_widgets();
 	data_group_->enable_widgets();
@@ -418,12 +419,12 @@ std::string qso_manager::get_default(stn_item_t item) {
 	else {
 		switch (item) {
 		case CALLSIGN:
-			return station_defaults_.callsign;
+			return stn_data_->defaults().callsign;
 		case QTH:
-			return station_defaults_.location;
+			return stn_data_->defaults().location;
 		case OP:
-			if (station_defaults_.type == stn_type::INDIVIDUAL)
-				return station_defaults_.name;
+			if (stn_data_->defaults().type == stn_type::INDIVIDUAL)
+				return stn_data_->defaults().name;
 			else
 				return "";
 		default:

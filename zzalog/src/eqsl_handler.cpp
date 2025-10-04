@@ -32,6 +32,7 @@
 
 extern book* book_;
 extern status* status_;
+extern stn_data* stn_data_;
 extern qso_manager* qso_manager_;
 extern ticker* ticker_;
 extern url_handler* url_handler_;
@@ -41,7 +42,6 @@ extern fields* fields_;
 extern qsl_dataset* qsl_dataset_;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
-extern stn_default station_defaults_;
 
 // Constructor
 eqsl_handler::eqsl_handler()
@@ -307,7 +307,7 @@ std::string eqsl_handler::card_filename_l(record* record, bool use_default) {
 	std::string mode = record->item("MODE");
 	std::string band = record->item("BAND");
 	std::string station = use_default ? 
-		station_defaults_.callsign : record->item("STATION_CALLSIGN");
+		stn_data_->defaults().callsign : record->item("STATION_CALLSIGN");
 	de_slash(station);
 	// Location of top-directory for QSL card images
 	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());

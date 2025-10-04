@@ -1,6 +1,7 @@
 #include "init_dialog.h"
 
 #include "stn_data.h"
+#include "stn_dialog.h"
 
 #include "drawing.h"
 #include "utils.h"
@@ -9,12 +10,14 @@
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Radio_Round_Button.H>
 
-extern stn_default station_defaults_;
 extern std::string PROGRAM_ID;
 extern std::string VENDOR;
+extern stn_data* stn_data_;
+extern stn_dialog* stn_dialog_;
 
 //! Constructor - sizes and labels itself
-init_dialog::init_dialog() : Fl_Double_Window(100, 100, "New installation")
+init_dialog::init_dialog(int X, int Y, int W, int H, const char* L) :
+	Fl_Group(X, Y, W, H, L)
 {
 	create_form();
 	load_values();
@@ -23,13 +26,12 @@ init_dialog::init_dialog() : Fl_Double_Window(100, 100, "New installation")
 
 //! Destructor
 init_dialog::~init_dialog() {
-	save_values();
 }
 
 //! Instantiate the component widgets
 void init_dialog::create_form() {
-	int cx = GAP + WLABEL;
-	int cy = GAP;
+	int cx = x() + GAP + WLABEL;
+	int cy = y() + GAP;
 	const int cw = WLABEL + WSMEDIT;
 
 	Fl_Group* g_radio = new Fl_Group(cx, cy, WBUTTON, 2 * HBUTTON);
@@ -53,20 +55,20 @@ void init_dialog::create_form() {
 	ip_call_->tooltip("Enter the station callsign");
 
 	cy += HBUTTON;
+	ip_club_ = new Fl_Input(cx, cy, WSMEDIT, HBUTTON, "Club name");
+	ip_club_->align(FL_ALIGN_LEFT);
+	ip_club_->tooltip("Input the club name");
+
+	cy += HBUTTON + GAP;
 	ip_location_ = new Fl_Input(cx, cy, WSMEDIT, HBUTTON, "Location");
 	ip_location_->align(FL_ALIGN_LEFT);
-	ip_location_->tooltip("Enter a description of the location");
+	ip_location_->tooltip("Enter the default location");
 	ip_location_->value("Main station");
 
 	cy += HBUTTON;
-	ip_grid_ = new Fl_Input(cx, cy, WSMEDIT, HBUTTON, "Gridsquare");
-	ip_grid_->align(FL_ALIGN_LEFT);
-	ip_grid_->tooltip("Enter the Maidenhead gridsquare locator");
-
-	cy += HBUTTON;
-	ip_name_ = new Fl_Input(cx, cy, WSMEDIT, HBUTTON, "Name");
+	ip_name_ = new Fl_Input(cx, cy, WSMEDIT, HBUTTON, "Operator");
 	ip_name_->align(FL_ALIGN_LEFT);
-	ip_name_->tooltip("Enter the opretaor's ot the club's name");
+	ip_name_->tooltip("Enter the default operator's name");
 
 	cy += HBUTTON + GAP;
 	cx = GAP + cw - WBUTTON;
@@ -85,16 +87,17 @@ void init_dialog::create_form() {
 //! Copy from station_defauts_
 
 void init_dialog::load_values() {
-	if (station_defaults_.type == NOT_USED) {
+	stn_default defaults = stn_data_->defaults();
+	if (defaults.type == NOT_USED) {
 		bn_club_->value(false);
 		bn_indiv_->value(false);
+		ip_club_->value("");
 		ip_call_->value("");
 		ip_location_->value("Main station");
-		ip_grid_->value("");
 		ip_name_->value("");
 	}
 	else {
-		switch (station_defaults_.type) {
+		switch (defaults.type) {
 		case CLUB:
 			bn_club_->value(true);
 			bn_indiv_->value(false);
@@ -106,29 +109,26 @@ void init_dialog::load_values() {
 		default:
 			break;
 		}
-		ip_call_->value(station_defaults_.callsign.c_str());
-		ip_location_->value(station_defaults_.location.c_str());
-		ip_grid_->value(station_defaults_.grid.c_str());
-		ip_name_->value(station_defaults_.name.c_str());
+		ip_call_->value(defaults.callsign.c_str());
+		ip_location_->value(defaults.location.c_str());
+		ip_name_->value(defaults.name.c_str());
+		ip_club_->value(defaults.club_name.c_str());
 	}
 }
 
-//! Returns the station details
-stn_default init_dialog::get_default() {
-	return *default_station_;
-}
 
 //! Callback when "Accept" button clicked
 void init_dialog::cb_accept(Fl_Widget* w, void* v) {
 	init_dialog* that = ancestor_view<init_dialog>(w);
-	that->default_station_ = new stn_default;
-	that->default_station_->type = that->station_type_;
-	that->default_station_->callsign = to_upper(that->ip_call_->value());
-	that->default_station_->location = that->ip_location_->value();
-	that->default_station_->grid = to_upper(that->ip_grid_->value());
-	that->default_station_->name = that->ip_name_->value();
-	that->hide();
-	that->save_values();
+	stn_default defaults = stn_data_->defaults();
+	defaults.callsign = to_upper(that->ip_call_->value());
+	defaults.location = that->ip_location_->value();
+	defaults.name = that->ip_name_->value();
+	defaults.club_name = that->ip_club_->value();
+	stn_data_->set_defaults(defaults);
+	stn_dialog* dlg = ancestor_view<stn_dialog>(that);
+	dlg->enable_widgets();
+	dlg->set_tab(stn_dialog::QTH, defaults.location, "Set initial values.");
 }
 
 //! Callback when radio button is selected
@@ -137,10 +137,49 @@ void init_dialog::cb_accept(Fl_Widget* w, void* v) {
 //! \param v: object of type stn_type indicates the new station type
 void init_dialog::cb_type(Fl_Widget* w, void* v) {
 	init_dialog* that = ancestor_view<init_dialog>(w);
-	that->station_type_ = (stn_type)(intptr_t)v;
+	stn_data_->set_type((stn_type)(intptr_t)v);
+	that->enable_widgets();
 }
 
 //! SAvevalues for club use
-void init_dialog::save_values() {
-
+void init_dialog::enable_widgets() {
+	stn_default defaults = stn_data_->defaults();
+	switch (defaults.type) {
+	case NOT_USED:
+		bn_club_->value(false);
+		bn_indiv_->value(false);
+		ip_club_->deactivate();
+		ip_club_->value("");
+		ip_call_->deactivate();
+		ip_call_->value("");
+		ip_name_->deactivate();
+		ip_name_->value("");
+		ip_location_->deactivate();
+		ip_location_->value("");
+		break;
+	case CLUB:
+		bn_club_->value(true);
+		bn_indiv_->value(false);
+		ip_club_->activate();
+		ip_club_->value(defaults.club_name.c_str());
+		ip_call_->activate();
+		ip_call_->value(defaults.callsign.c_str());
+		ip_name_->deactivate();
+		ip_name_->value("");
+		ip_location_->activate();
+		ip_location_->value(defaults.location.c_str());
+		break;
+	case INDIVIDUAL:
+		bn_club_->value(false);
+		bn_indiv_->value(true);
+		ip_club_->deactivate();
+		ip_club_->value("");
+		ip_call_->activate();
+		ip_call_->value(defaults.callsign.c_str());
+		ip_name_->activate();
+		ip_name_->value(defaults.name.c_str());
+		ip_location_->activate();
+		ip_location_->value(defaults.location.c_str());
+		break;
+	}
 }
