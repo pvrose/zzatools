@@ -4,6 +4,8 @@
 #include <map>
 #include <set>
 
+class record;
+
 //! Station type
 enum stn_type : uint8_t {
 	NOT_USED,                         //!< Default - not valid
@@ -114,7 +116,6 @@ const std::map<oper_value_t, std::string> OPER_ADIF_MAP = {
 };
 
 //! This calls manages the database for station details (location, operators and callsigns)
-
 class stn_data
 {
 public:
@@ -169,7 +170,26 @@ public:
 	//! Delete \p call
 	bool delete_call(std::string id);
 
+	//! Match QSO results for QTH and operator
+	enum stn_match_t : char {
+		CANT,                  //!< No information to attempt a match
+		DO,                    //!< QSO has all fields in station item that match or null in QSO
+		MULTIPLE,              //!< More than one item matches 
+		EXTRA,                 //!< QSO matches but has values that are null in item
+		DONT,                  //!< QSO mismatches in any field
+	};
+
+	//! Match \p qso record against QTHs, result matching \p QTH, returns stn_match_t
+	stn_match_t match_qso_qths(record* qso, std::string& qth);
+
 protected:
+
+	//! MAtch \p qso against one QTH \p id
+	stn_match_t match_qso_qth(record* qso, qth_info_t qth);
+
+	//! Update QTH from QSO
+	void update_qth_qso(std::string qth, record* qso);
+
 	//! Station location data
 	std::map<std::string, qth_info_t*> qths_;
 	//! Station operator data
@@ -178,5 +198,7 @@ protected:
 	std::map<std::string, std::string> calls_;
 	//! Loaded station defaults
 	stn_default loaded_stn_defaults_;
+	//! Current unknown QTH identifier
+	int unknown_qth_index_;
 };
 

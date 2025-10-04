@@ -1,8 +1,10 @@
 #include "stn_qth_dlg.h"
 
+#include "book.h"
 #include "cty_data.h"
 #include "qso_manager.h"
 #include "record.h"
+#include "status.h"
 #include "stn_data.h"
 
 #include "drawing.h"
@@ -13,8 +15,10 @@
 #include <FL/Fl_Input_Choice.H>
 #include <FL/Fl_Output.H>
 
+extern book* navigation_book_;
 extern cty_data* cty_data_;
 extern qso_manager* qso_manager_;
+extern status* status_;
 extern stn_data* stn_data_;
 
 const std::string LABELS[] = {"Strret", "City", "Postcode", "Locator", "Country", "DXCC",
@@ -155,7 +159,7 @@ void stn_qth_cntnr::redraw_widgets() {
 	// Begin adding new widgets
 	// Get the data
 	const std::map<std::string, qth_info_t*>* data = stn_data_->get_qths();
-	if (selected_.length() == 0) {
+	if (selected_.length() == 0 && data->size()) {
 		selected_ = data->begin()->first;
 	}
 	// Get bound width
@@ -248,6 +252,7 @@ void stn_qth_dlg::cb_rename(Fl_Widget* w, void* v) {
 	qth_info_t* info = new qth_info_t;
 	*info = *stn_data_->get_qth(that->location_);
 	stn_data_->add_qth(that->new_location_, info);
+	stn_data_->delete_qth(that->location_);
 	that->location_ = that->new_location_;
 	that->enable_widgets();
 }
@@ -273,16 +278,56 @@ void stn_qth_dlg::cb_choice(Fl_Widget* w, void* v) {
 	that->enable_widgets();
 }
 
+// Callback from "Check log"
+void stn_qth_dlg::cb_check(Fl_Widget* w, void* v) {
+	status_->progress(navigation_book_->size(), OT_STN, "QTH match ", "records");
+	int num_cant = 0;
+	int num_do = 0;
+	int num_dont = 0;
+	int num_extra = 0;
+	int num_multi = 0;
+	int ix = 0;
+	for (auto qso : *navigation_book_) {
+		std::string s;
+		switch (stn_data_->match_qso_qths(qso, s)) {
+		case stn_data::CANT:
+			num_cant++;
+			break;
+		case stn_data::DO:
+			num_do++;
+			break;
+		case stn_data::DONT:
+			num_dont++;
+			break;
+		case stn_data::EXTRA:
+			num_extra++;
+			break;
+		case stn_data::MULTIPLE:
+			num_multi++;
+			break;
+		}
+		status_->progress(++ix, OT_STN);
+	}
+	stn_qth_dlg* that = ancestor_view<stn_qth_dlg>(w);
+	char msg[128];
+	snprintf(msg, sizeof(msg), "STN DATA: %d do match; %d don't; %d can't; %d extra; %d multi",
+		num_do, num_dont, num_cant, num_extra, num_multi);
+	status_->misc_status(ST_NOTE, msg);
+	that->enable_widgets();
+
+}
+
 //! Instantiate component widgets
 void stn_qth_dlg::create_form() {
 	int cx = x() + GAP;
 	int cy = y() + GAP;
+	const int WINPUT = WBUTTON * 3 / 2;
 	// New IS
-	ip_new_ = new Fl_Input_Choice(cx, cy, WSMEDIT, HBUTTON);
+	ip_new_ = new Fl_Input_Choice(cx, cy, WINPUT, HBUTTON);
 	ip_new_->callback(cb_choice);
 	ip_new_->tooltip("Name of location to ba added");
 	// "Add" button - adds a record
-	cx += WSMEDIT;
+	cx += WINPUT;
 	bn_add_ = new Fl_Button(cx, cy, WBUTTON, HBUTTON, "Add");
 	bn_add_->callback(cb_add);
 	bn_add_->tooltip("Add a record to the table");
@@ -303,14 +348,19 @@ void stn_qth_dlg::create_form() {
 	bn_rename_->tooltip("Rename the selected record as new name"); 
 	
 	// Callsign input
-	cx += WBUTTON + GAP;
-	ch_call_ = new Fl_Input_Choice(cx, cy, WSMEDIT, HBUTTON);
+	cx += WBUTTON;
+	ch_call_ = new Fl_Input_Choice(cx, cy, WINPUT, HBUTTON);
 	ch_call_->tooltip("Select or enter a callsign to pre-populate selected record");
 	// "Use call" button
-	cx += WSMEDIT;
+	cx += WINPUT;
 	bn_update_ = new Fl_Button(cx, cy, WBUTTON, HBUTTON, "Use call");
 	bn_update_->callback(cb_update);
 	bn_update_->tooltip("Decode callsign and enter details to record");
+	// "Check all button
+	cx += WBUTTON;
+	bn_check_ = new Fl_Button(cx, cy, WBUTTON, HBUTTON, "Check Log");
+	bn_check_->callback(cb_check);
+	bn_check_->tooltip("Check the log or extracted data for QTH fields");
 
 	cx = x() + GAP;
 	cy += HBUTTON + GAP;

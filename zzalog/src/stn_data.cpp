@@ -1,9 +1,12 @@
 #include "stn_data.h"
 
 #include "init_dialog.h"
+#include "record.h"
 #include "status.h"
 
 #include "nlohmann/json.hpp"
+
+#include <vector>
 
 extern status* status_;
 extern std::string default_data_directory_;
@@ -85,6 +88,7 @@ static void from_json(const json& j, stn_default& s) {
 
 stn_data::stn_data()
 {
+	unknown_qth_index_ = 0;
 	load_data();
 }
 
@@ -461,5 +465,160 @@ bool stn_data::set_call_descr(std::string id, std::string d) {
 		return true;
 	}
 
+}
+
+//! Match \p qso record against QTHs, result matching \p QTH, returns stn_match_t
+stn_data::stn_match_t stn_data::match_qso_qths(record* qso, std::string& qth) {
+	char msg[128];
+	// Lists of QTHs that match one way or another
+	std::vector<std::string> cant_matches;
+	std::vector<std::string> do_matches;
+	std::vector<std::string> extra_matches;
+	std::vector<std::string> dont_matches;
+	if (qths_.size() == 0) {
+		std::string new_qth = "Unknown " + std::to_string(++unknown_qth_index_);
+		update_qth_qso(new_qth, qso);
+		return EXTRA;
+	}
+	// For all QTHs - get result
+	for (auto qth : qths_) {
+		stn_match_t result = match_qso_qth(qso, *qth.second);
+		switch (result) {
+		case CANT:
+			cant_matches.push_back(qth.first);
+			break;
+		case DO:
+			do_matches.push_back(qth.first);
+			break;
+		case EXTRA:
+			extra_matches.push_back(qth.first);
+			break;
+		case DONT:
+			dont_matches.push_back(qth.first);
+			break;
+		default:
+			break;
+		}
+	}
+	if (cant_matches.size() == qths_.size()) {
+		snprintf(msg, sizeof(msg), "STN DATA: Record %s %s %s has no QTH data",
+			qso->item("QSO_DATE").c_str(),
+			qso->item("TIME_ON").c_str(),
+			qso->item("CALL").c_str());
+		status_->misc_status(ST_NOTE, msg);
+		qth = "";
+		return CANT;
+	}
+	else if ((do_matches.size() + extra_matches.size()) > 1) {
+		snprintf(msg, sizeof(msg), "STN DATA: Record %s %s %s matches multiple QTHs",
+			qso->item("QSO_DATE").c_str(),
+			qso->item("TIME_ON").c_str(),
+			qso->item("CALL").c_str());
+		status_->misc_status(ST_NOTE, msg);
+		if (do_matches.size()) qth = do_matches[0];
+		else qth = extra_matches[0];
+		return MULTIPLE;
+	}
+	else if (do_matches.size() == 1) {
+		qth = do_matches[0];
+		return DO;
+	}
+	else if (extra_matches.size() == 1) {
+		update_qth_qso(extra_matches[0], qso);
+		qth = extra_matches[0];
+		return EXTRA;
+	}
+	else {
+		snprintf(msg, sizeof(msg), "STN DATA: Record %s %s %s matches no QTHs",
+			qso->item("QSO_DATE").c_str(),
+			qso->item("TIME_ON").c_str(),
+			qso->item("CALL").c_str());
+		status_->misc_status(ST_WARNING, msg);
+		std::string new_qth = "Unknown " + std::to_string(++unknown_qth_index_);
+		update_qth_qso(new_qth, qso);
+		qth = new_qth;
+		return DONT;
+	}
+}
+
+//! MAtch \p qso against one QTH \p id
+stn_data::stn_match_t stn_data::match_qso_qth(record* qso, qth_info_t qth) {
+	bool extra = false;
+	bool cant = true;
+	for (int ix = 0; ix < qth_value_t::DESCRIPTION; ix++) {
+		const qth_value_t& qv = (qth_value_t)ix;
+		std::string qsov = qso->item(QTH_ADIF_MAP.at(qv));
+		if (qsov.length()) {
+			//QSO has this field
+			cant = false;
+			if (qth.data.find(qv) == qth.data.end() || qth.data.at(qv).length() == 0) {
+				extra = true;
+			}
+			else {
+				const std::string& qthv = qth.data.at(qv);
+				if (qv == LOCATOR) {
+					// Only match minimum length
+					int len = min(qsov.length(), qthv.length());
+					if (qsov.substr(0, len) != qthv.substr(0, len)) {
+						return DONT;
+					}
+					// If QSO has more detailed GRIDSQUARE value
+					if (qsov.length() > qthv.length()) {
+						extra = true;
+					}
+				}
+				else if (qsov != qthv) {
+					return DONT;
+				}
+			}
+		}
+	}
+	if (cant) return CANT;
+	else if (extra) return EXTRA;
+	else return DO;
+}
+
+//! Update QTH from QSO
+void stn_data::update_qth_qso(std::string qth, record* qso) {
+	char msg[128];
+	if (qths_.find(qth) == qths_.end()) {
+		add_qth(qth, new qth_info_t);
+	}
+	for (int ix = 0; ix < qth_value_t::DESCRIPTION; ix++) {
+		const qth_value_t& qv = (qth_value_t)ix;
+		std::string qsov = qso->item(QTH_ADIF_MAP.at(qv));
+		std::string qthv = "";
+		if (qths_.at(qth)->data.find(qv) != qths_.at(qth)->data.end()) {
+			qthv = qths_.at(qth)->data.at(qv);
+		}
+		if (qsov.length()) {
+			if (qv == LOCATOR) {
+				if (qsov.length() > qthv.length()) {
+					snprintf(msg, sizeof(msg), "STN DATA: Record %s %s %s Update QTH \"%s\": %s=\"%s\"",
+						qso->item("QSO_DATE").c_str(),
+						qso->item("TIME_ON").c_str(),
+						qso->item("CALL").c_str(),
+						qth.c_str(),
+						QTH_ADIF_MAP.at(qv).c_str(),
+						qsov.c_str());
+					status_->misc_status(ST_WARNING, msg);
+					qths_.at(qth)->data[qv] = qsov;
+				}
+			}
+			else {
+				if (qthv.length() == 0) {
+					snprintf(msg, sizeof(msg), "STN DATA: Record %s %s %s Update QTH \"%s\": %s=\"%s\"",
+						qso->item("QSO_DATE").c_str(),
+						qso->item("TIME_ON").c_str(),
+						qso->item("CALL").c_str(),
+						qth.c_str(),
+						QTH_ADIF_MAP.at(qv).c_str(),
+						qsov.c_str());
+					status_->misc_status(ST_WARNING, msg);
+					qths_.at(qth)->data[qv] = qsov;
+				}
+			}
+		}
+	}
 }
 
