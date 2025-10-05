@@ -1,8 +1,10 @@
 #include "stn_oper_dlg.h"
 
+#include "book.h"
 #include "cty_data.h"
 #include "qso_manager.h"
 #include "record.h"
+#include "status.h"
 #include "stn_data.h"
 
 #include "drawing.h"
@@ -13,7 +15,9 @@
 #include <FL/Fl_Input_Choice.H>
 #include <FL/Fl_Output.H>
 
+extern book* navigation_book_;
 extern qso_manager* qso_manager_;
+extern status* status_;
 extern stn_data* stn_data_;
 
 const std::string LABELS[] = { "Name", "Callsign" };
@@ -240,6 +244,44 @@ void stn_oper_dlg::cb_choice(Fl_Widget* w, void* v) {
 	that->enable_widgets();
 }
 
+// Callback from "Check log"
+void stn_oper_dlg::cb_check(Fl_Widget* w, void* v) {
+	status_->progress(navigation_book_->size(), OT_STN, "Operator match ", "records");
+	int num_cant = 0;
+	int num_do = 0;
+	int num_dont = 0;
+	int num_extra = 0;
+	int num_multi = 0;
+	int ix = 0;
+	for (auto qso : *navigation_book_) {
+		std::string s;
+		switch (stn_data_->match_qso_opers(qso, s)) {
+		case stn_data::CANT:
+			num_cant++;
+			break;
+		case stn_data::DO:
+			num_do++;
+			break;
+		case stn_data::DONT:
+			num_dont++;
+			break;
+		case stn_data::EXTRA:
+			num_extra++;
+			break;
+		case stn_data::MULTIPLE:
+			num_multi++;
+			break;
+		}
+		status_->progress(++ix, OT_STN);
+	}
+	stn_oper_dlg* that = ancestor_view<stn_oper_dlg>(w);
+	char msg[128];
+	snprintf(msg, sizeof(msg), "STN DATA: %d do match; %d don't; %d can't; %d extra; %d multi",
+		num_do, num_dont, num_cant, num_extra, num_multi);
+	status_->misc_status(ST_NOTE, msg);
+	that->enable_widgets();
+}
+
 //! Set default button
 void stn_oper_dlg::cb_default(Fl_Widget* w, void* v) {
 	stn_oper_dlg* that = ancestor_view<stn_oper_dlg>(w);
@@ -279,6 +321,11 @@ void stn_oper_dlg::create_form() {
 	bn_default_->callback(cb_default);
 	bn_default_->tooltip("Set the current location as default");
 
+	// "Check all button
+	cx += WBUTTON + GAP;
+	bn_check_ = new Fl_Button(cx, cy, WBUTTON, HBUTTON, "Check Log");
+	bn_check_->callback(cb_check);
+	bn_check_->tooltip("Check the log or extracted data for operator fields");
 	cx = x() + GAP;
 	cy += HBUTTON + GAP;
 
@@ -315,7 +362,6 @@ void stn_oper_dlg::load_data() {
 	if (operator_.length() == 0) operator_ = stn_data_->defaults().name;
 	populate_operators();
 	table_->set_selected(operator_);
-	ip_new_->value(operator_.c_str());
 }
 
 // ! Populate locations

@@ -90,6 +90,7 @@ void stn_dialog::create_form(int X, int Y) {
 	message_ = new Fl_Box(cx, cy, cw, HBUTTON * 3 / 2);
 	message_->box(FL_FLAT_BOX);
 	message_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+	message_->labelsize(FL_NORMAL_SIZE + 2);
 
 	cy += message_->h();
 	int ch = y() + h() - cy;

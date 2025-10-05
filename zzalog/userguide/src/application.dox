@@ -9,6 +9,8 @@ The application provides a number of windows:
 - \subpage config
 - \subpage search_dialog
 - \subpage change_dialog
+- \subpage stn_dialog
+
 
 There is also a command-line interface:
 

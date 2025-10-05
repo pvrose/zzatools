@@ -288,7 +288,6 @@ void stn_call_dlg::load_data() {
 	if (callsign_.length() == 0) callsign_ = stn_data_->defaults().callsign;
 	populate_callsigns();
 	table_->set_selected(callsign_);
-	ip_new_->value(callsign_.c_str());
 }
 
 // ! Populate locations

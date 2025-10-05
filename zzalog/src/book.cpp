@@ -1210,6 +1210,11 @@ void book::deprecate_macros(record* use_record) {
 		}
 		use_record->item("APP_ZZA_QTH", std::string(""));
 	}
+	else {
+		// Attempt to parse QSO to find QTH
+		std::string qth;
+		stn_data_->match_qso_qths(use_record, qth);
+	}
 	// If APP_ZZA_OP is present - take its values and send to stn_data
 	std::string oper_id = use_record->item("APP_ZZA_OP");
 	if (oper_id.length()) {
@@ -1236,6 +1241,11 @@ void book::deprecate_macros(record* use_record) {
 			}
 		}
 		use_record->item("APP_ZZA_OP", std::string(""));
+	}
+	else {
+		// Attempt to parse QSO to find Operator
+		std::string oper;
+		stn_data_->match_qso_opers(use_record, oper);
 	}
 	// Not strictly a macro, but part of the operation parameters
 	std::string call = use_record->item("STATION_CALLSIGN");

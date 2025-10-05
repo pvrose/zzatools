@@ -601,7 +601,7 @@ stn_data::stn_match_t stn_data::match_qso_opers(record* qso, std::string& oper) 
 		}
 	}
 	if (cant_matches.size() == opers_.size()) {
-		snprintf(msg, sizeof(msg), "STN DATA: Record %s %s %s has no oper data",
+		snprintf(msg, sizeof(msg), "STN DATA: Record %s %s %s has no operator data",
 			qso->item("QSO_DATE").c_str(),
 			qso->item("TIME_ON").c_str(),
 			qso->item("CALL").c_str());
@@ -610,7 +610,7 @@ stn_data::stn_match_t stn_data::match_qso_opers(record* qso, std::string& oper) 
 		return CANT;
 	}
 	else if ((do_matches.size() + extra_matches.size()) > 1) {
-		snprintf(msg, sizeof(msg), "STN DATA: Record %s %s %s matches multiple opers",
+		snprintf(msg, sizeof(msg), "STN DATA: Record %s %s %s matches multiple operatorss",
 			qso->item("QSO_DATE").c_str(),
 			qso->item("TIME_ON").c_str(),
 			qso->item("CALL").c_str());
@@ -645,7 +645,7 @@ stn_data::stn_match_t stn_data::match_qso_opers(record* qso, std::string& oper) 
 stn_data::stn_match_t stn_data::match_qso_oper(record* qso, oper_info_t oper) {
 	bool extra = false;
 	bool cant = true;
-	for (int ix = 0; ix < 3; ix++) {
+	for (int ix = 0; ix < MAX_OPER; ix++) {
 		const oper_value_t& qv = (oper_value_t)ix;
 		std::string qsov = qso->item(OPER_ADIF_MAP.at(qv));
 		if (qsov.length()) {
@@ -728,7 +728,7 @@ void stn_data::update_oper_qso(std::string oper, record* qso) {
 	if (opers_.find(oper) == opers_.end()) {
 		add_oper(oper, new oper_info_t);
 	}
-	for (int ix = 0; ix < 3; ix++) {
+	for (int ix = 0; ix < MAX_OPER; ix++) {
 		const oper_value_t& qv = (oper_value_t)ix;
 		std::string qsov = qso->item(OPER_ADIF_MAP.at(qv));
 		std::string operv = "";

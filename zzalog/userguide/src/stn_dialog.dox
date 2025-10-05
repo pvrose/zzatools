@@ -1,11 +1,19 @@
 /** \page stn_dialog Setting this station details
 
-This dialog allows the user to set various parameters about the current station. It has three tabs:
-QTH, Operator and Station callsign.
+This dialog allows the user to set various parameters about the current station. It has four tabs:
+Defaults, QTH, Operator and Station callsign.
+
+\section sd_def Specifying station defaults
+
+This tab allows the specification of the default operating parameters. It is generally only used
+when first starting ZZALOG. See \ref initial_run.
+
+\image html stn_dialog_0.png "Station defaults"
+\image latex stn_dialog_0.png "Station defaults" width=10cm
 
 \section sd_qth Specifying QTH details
 
-The first tab, QTH provides the user with the ability to define a number of QSO record fields under
+This tab, QTH ,provides the user with the ability to define a number of QSO record fields under
 a single identifier.
 
 The station location, or QTH, should be identified by one or two words. A new location can be typed into 
@@ -13,6 +21,7 @@ the control labeled "Id", or an existing location can be selected from the drop-
 
 The user can then enter as much or as little information about the location in the fields in the dialog:
 
+- <B>Description</B> A brief description of the location.
 - <B>Street</B> The street name as part of the postal address of the station (QSO field MY_STREET).
 - <B>City</B> The town or city name as part of the postal address (QSO field MY_CITY).
 - <B>Postcode</B> The postal code (QSO field MY_POSTAL_CODE),
@@ -29,6 +38,20 @@ QSO field MY_CNTY) - disabled if not relevant to the DXCC entity.
 - <B>IOTA</B> The designation of the island group for Islands on the Air awards (QSO field MY_IOTA).
 - <B>WAB</B> The Ordnance Survey location for Worked all Britain awards (QSO field APP_ZZA_MY_WAB).
 
+The available controls are:-
+
+- <B>Add</B> Type in the name of the location and click to add a new location. Then modify it.
+- <B>Delete</B> This deletes the selecetd location.
+- <B>Clear</B> This clears all the data about the selected location.
+- <B>Rename</B> This renames the selecetd location as that typed in.
+- <B>Set Default</B> Set the selected location as the default.
+- <B>Check Log</B> This checks the log and reports about QSOs that do not match any location.
+- <B>Use call</B> See below.
+
+The default location is shown with its name in bold.
+
+Locations that are not selected are greyed-out.
+
 It is possible to populate some of the fields by decoding the station callsign being used
 at this location. If the user clicks the check box "Update from call" a drop-down menu
 of callsigns current used in the log is presented. If the user selects a callsign then the following
@@ -39,7 +62,7 @@ fields: Country, DXCC, CQ Zone and Continent are entered automatically.
 
 \section sd_oper Specifying an Operator
 
-The second tab, Operators, allows the user to add operators entitled to use the station.
+This tab, Operators, allows the user to add operators entitled to use the station.
 
 The user or operator may enter their initials into the control labeled "Id", or select them from
 the drop-down list.
@@ -48,6 +71,19 @@ The user can then enter as much or as little information about the location in t
 
 - <B>Name</B> The name of the operator as can be exchanged in the QSO (QSO field MY_NAME).
 - <B>Callsign</B> The callsign of the operator (QSO field OPERATOR).
+
+The available controls are:-
+
+- <B>Add</B> Type in the name of the location and click to add a new location. Then modify it.
+- <B>Delete</B> This deletes the selecetd location.
+- <B>Clear</B> This clears all the data about the selected location.
+- <B>Set Default</B> Set the selected location as the default.
+- <B>Check Log</B> This checks the log and reports about QSOs that do not match any location.
+
+The default operator is shown with its name in bold.
+
+Operators that are not selected are greyed-out.
+
 
 \image html stn_dialog_2.png "Tab showing specification of operator details"
 \image latex stn_dialog_2.png "Tab showing specification of operator details"
@@ -62,6 +98,15 @@ list.
 
 \image html stn_dialog_3.png "Tab allowing the choice of a differnt station callsign"
 \image latex stn_dialog_3.png "Tab allowing the choice of a differnt station callsign"
+
+The available controls are:-
+
+- <B>Add</B> Type in the name of the location and click to add a new location. Then modify it.
+- <B>Delete</B> This deletes the selecetd location.
+- <B>Clear</B> This clears all the data about the selected location.
+- <B>Set Default</B> Set the selected location as the default.
+
+The default callsign is shown with its name in bold.
 
 */
 

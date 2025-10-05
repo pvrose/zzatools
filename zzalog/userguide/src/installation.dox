@@ -58,39 +58,65 @@ The selection can be either for a club station or an individual station.
 Select one or the other, then fill in the form.
 
 \image html init_1.png "New installaton"
-\image latex init_1.png "New installaton" width=5cm
+\image latex init_1.png "New installaton" width=8cm
 
-- <B>Callsign</B> the default station callsign to be used.
-- <B>Location</B> an identifier to know the main station address by.
-- <B>Gridsquare</B> the Maidenhead gridsquare locator - used for initially locatong the station.
-- <B>Name</B> the name of the usual operator.
+- <B>Club</B> Select this for a club installation.
+- <B>Individual</B> Select this for a personal installation.
+- <B>Callsign</B> Enter the default station callsign to be used. This will be
+used to generate the default filename for the logbook.
+- <B>Club name</B> Enter the club's name (not available for individual).
+- <B>Location</B> Enter an identifier to know the main station address by.
+- <B>Gridsquare</B> Enter the Maidenhead gridsquare locator - 
+used for initially locating the station.
+- <B>Name</B> Enter the name of the usual operator (not available for a club).
+
+\image html init_2.png "Individual details"
+\image latex init_2.png "Individual details" width=8cm
 
 Select "Accept" to proceed.
+
+The other tabs can then be used to provide further information on the station.
+
+\image html init_4.png "Specifying location details"
+\image latex init_4.png "Specifying location details" width=8cm
+\image html init_5.png "Specifying operator details"
+\image latex init_5.png "Specifying operator details" width=8cm
+\image html init_6.png "Specifying callsign details"
+\image latex init_6.png "Specifying callsign details" width=8cm
+
+Close this window to proceed.
 
 Dialogs then open to select:
 - a directory to store QSL card images.
 - a file to store the logbook. The name of the file will default to the 
 staion callsign.
 
-\subsection init_club Club Initialisation.
+\subsection warm_start "Warm start"
 
-If the installation is for a club station, a dialog opens up to allow
-the user to enter the following:
-- Club Name.
-- Club callsign.
-- Club location identifier.
+A warm start is where a logbook file already exists. ZZALOG will use information in that 
+logbook to provide more information about locations, operators and station callsigns
+already present.
 
-This dialog also acts a login dialog when using ZZALOG. This allows
-the operator to enter
-- Their nickname.
-- Their name.
-- Their callsign - this is required for logging.
+\image html warm_1.png "Adding location data from logbook"
+\image latex warm_1.png "Adding location data from logbook" width=10cm
 
-The image below shows the completed dialog
+In the above image the status log shows that data from the logbook has been added to the
+station data. This is shown in the dialog below:
 
-\image html init_4.png "Club operator log-in dialog"
-\image latex init_4.png "Club operator log-in dialog" width=5cm
+\image html warm_2.png "More details about location"
+\image latex warm_2.png "More details about location" width=10cm
 
-The image above shows the completed dialog.
+It also shows that another location has been used. In this case a different Maidenhead
+locator is used. The location "Unknown 1" has been created to represent it. This
+can be renamed as in the image below.
+
+\image html warm_3.png "Renaming an unknown location"
+\image latex warm_3.png "Renaming an unknown location" width=10cm
+
+It can also be modified.
+
+\image html warm_4.png "Modified location"
+\image latex warm_4.png "Modified location" width=10cm
+
 
 */

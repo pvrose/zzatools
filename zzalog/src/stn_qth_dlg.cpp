@@ -361,7 +361,13 @@ void stn_qth_dlg::create_form() {
 	bn_default_ = new Fl_Button(cx, cy, WBUTTON, HBUTTON, "Set default");
 	bn_default_->callback(cb_default);
 	bn_default_->tooltip("Set the current location as default");
-	
+
+	// "Check all button
+	cx += WBUTTON + GAP;
+	bn_check_ = new Fl_Button(cx, cy, WBUTTON, HBUTTON, "Check Log");
+	bn_check_->callback(cb_check);
+	bn_check_->tooltip("Check the log or extracted data for QTH fields");
+
 	// Callsign input
 	cx = x() + GAP;
 	cy += HBUTTON;
@@ -372,11 +378,6 @@ void stn_qth_dlg::create_form() {
 	bn_update_ = new Fl_Button(cx, cy, WBUTTON, HBUTTON, "Use call");
 	bn_update_->callback(cb_update);
 	bn_update_->tooltip("Decode callsign and enter details to record");
-	// "Check all button
-	cx += WBUTTON;
-	bn_check_ = new Fl_Button(cx, cy, WBUTTON, HBUTTON, "Check Log");
-	bn_check_->callback(cb_check);
-	bn_check_->tooltip("Check the log or extracted data for QTH fields");
 
 	cx = x() + GAP;
 	cy += HBUTTON + GAP;
@@ -408,6 +409,14 @@ void stn_qth_dlg::enable_widgets() {
 		ch_call_->activate();
 
 	}
+	if (qso_manager_) {
+		ch_call_->activate();
+		bn_update_->activate();
+	}
+	else {
+		ch_call_->deactivate();
+		bn_update_->deactivate();
+	}
 	load_data();
 }
 
@@ -432,7 +441,6 @@ void stn_qth_dlg::load_data() {
 	populate_calls();
 	populate_locations();
 	table_->set_selected(location_);
-	ip_new_->value(location_.c_str());
 }
 
 //! Populate call choice
@@ -451,7 +459,6 @@ void stn_qth_dlg::populate_locations() {
 	for (auto it : *qths) {
 		ip_new_->add(escape_menu(it.first).c_str());
 	}
-	ip_new_->value(location_.c_str());
 }
 
 //! Set selected qTH
