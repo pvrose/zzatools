@@ -74,7 +74,7 @@ LINTFLAG := -Wunused -Wswitch
 # Set ccompile flags
 # include debug data
 CFLAGS += -g $(LINTFLAG) -std=c++20
-CXXFLAGS += -g $(LINTFLAG) 
+CXXFLAGS += -g $(LINTFLAG) -std=c++20
 
 ifeq ($(BUILD_TYPE), Anal)
 CXXFLAGS += -fsanitize=address
