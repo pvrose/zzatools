@@ -1,5 +1,9 @@
 /** \page release_notes Revision History
 
+\section rev_369 Revision 3.6.9
+
+- Redesigned station dialog and initialisation of station data.
+
 \section rev_368A Revision 3.6.8A
 
 - Further issues with "luke-warm" start.
@@ -20,7 +24,9 @@
   - Errors with cold-start.
   - Focus management in QSO entry broken when added userguide.
 
-\section rev_367 Revision 3.6.7
+\section older Older revisions
+
+\subsection rev_367 Revision 3.6.7
 
 - Save a copy of the latest data before each save. Upto 8 copies are saved.
 - Add further acknowledgments of third-party data and libraries.
@@ -44,8 +50,6 @@ of redundancies in the code that have been removed.
   - Timezone label on clock doesn't redraw properly.
   - Removed "using namespace " per modern coding guidelines.
   - Address performance issues in sorting extracted data.
-
-\section older Older revisions
 
 \subsection rev_366 Revision 3.6.6
 
