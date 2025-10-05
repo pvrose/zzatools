@@ -150,7 +150,6 @@ void stn_oper_cntnr::redraw_widgets() {
 	bbox(rx, ry, rw, rh);
 
 	begin();
-	int row = 0;
 	int cy = ry;
 	for (auto it : *data) {
 		// Create widget

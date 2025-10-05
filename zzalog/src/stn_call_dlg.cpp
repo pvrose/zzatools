@@ -46,7 +46,6 @@ void stn_call_widget::create_form() {
 
 	cx = x() + WLABEL + WLLABEL;
 	// Inputs for all other members of call_info_t
-	int ix = 0;
 	ip_descr_ = new Fl_Input(cx, cy, w() - WLABEL - WLLABEL, ROW_HEIGHT, "Description");
 	ip_descr_->box(FL_BORDER_BOX);
 	ip_descr_->align(FL_ALIGN_LEFT);
@@ -73,7 +72,6 @@ void stn_call_widget::enable_widgets() {
 void stn_call_widget::cb_ip_data(Fl_Widget* w, void* v) {
 	Fl_Input* ip = (Fl_Input*)w;
 	stn_call_widget* that = ancestor_view<stn_call_widget>(w);
-	call_value_t field = (call_value_t)(intptr_t)v;
 	stn_data_->set_call_descr(that->label(), ip->value());
 	// Tidy up display
 	that->enable_widgets();
@@ -121,7 +119,6 @@ void stn_call_cntnr::redraw_widgets() {
 	bbox(rx, ry, rw, rh);
 
 	begin();
-	int row = 0;
 	int cy = ry;
 	for (auto it : *data) {
 		// Create widget

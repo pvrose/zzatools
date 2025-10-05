@@ -656,18 +656,7 @@ stn_data::stn_match_t stn_data::match_qso_oper(record* qso, oper_info_t oper) {
 			}
 			else {
 				const std::string& operv = oper.data.at(qv);
-				if (qv == LOCATOR) {
-					// Only match minimum length
-					int len = min(qsov.length(), operv.length());
-					if (qsov.substr(0, len) != operv.substr(0, len)) {
-						return DONT;
-					}
-					// If QSO has more detailed GRIDSQUARE value
-					if (qsov.length() > operv.length()) {
-						extra = true;
-					}
-				}
-				else if (qsov != operv) {
+				if (qsov != operv) {
 					return DONT;
 				}
 			}
@@ -736,31 +725,16 @@ void stn_data::update_oper_qso(std::string oper, record* qso) {
 			operv = opers_.at(oper)->data.at(qv);
 		}
 		if (qsov.length()) {
-			if (qv == LOCATOR) {
-				if (qsov.length() > operv.length()) {
-					snprintf(msg, sizeof(msg), "STN DATA: Record %s %s %s Update operator \"%s\": %s=\"%s\"",
-						qso->item("QSO_DATE").c_str(),
-						qso->item("TIME_ON").c_str(),
-						qso->item("CALL").c_str(),
-						oper.c_str(),
-						OPER_ADIF_MAP.at(qv).c_str(),
-						qsov.c_str());
-					status_->misc_status(ST_WARNING, msg);
-					opers_.at(oper)->data[qv] = qsov;
-				}
-			}
-			else {
-				if (operv.length() == 0) {
-					snprintf(msg, sizeof(msg), "STN DATA: Record %s %s %s Update operator \"%s\": %s=\"%s\"",
-						qso->item("QSO_DATE").c_str(),
-						qso->item("TIME_ON").c_str(),
-						qso->item("CALL").c_str(),
-						oper.c_str(),
-						OPER_ADIF_MAP.at(qv).c_str(),
-						qsov.c_str());
-					status_->misc_status(ST_WARNING, msg);
-					opers_.at(oper)->data[qv] = qsov;
-				}
+			if (operv.length() == 0) {
+				snprintf(msg, sizeof(msg), "STN DATA: Record %s %s %s Update operator \"%s\": %s=\"%s\"",
+					qso->item("QSO_DATE").c_str(),
+					qso->item("TIME_ON").c_str(),
+					qso->item("CALL").c_str(),
+					oper.c_str(),
+					OPER_ADIF_MAP.at(qv).c_str(),
+					qsov.c_str());
+				status_->misc_status(ST_WARNING, msg);
+				opers_.at(oper)->data[qv] = qsov;
 			}
 		}
 	}

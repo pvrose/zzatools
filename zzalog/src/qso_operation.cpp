@@ -195,6 +195,8 @@ void qso_operation::cb_show(Fl_Widget *w, void *v)
 	case stn_dialog::CALLSIGN:
 		that->new_call(false);
 		break;
+	default:
+		break;
 	}
 }
 // std::set the QSO
