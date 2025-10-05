@@ -178,7 +178,7 @@ void record::item(std::string field, std::string value, bool formatted/* = false
 					upper_value = value;
 				}
 			}
-			else if (datatype == "Enumeration") {
+			else if (datatype == "Enumeration" && field != "BAND" && field != "BAND_RX") {
 				// Treat all enumerations as upper case. ADIF can accept either
 				upper_value = to_upper(value);
 			}

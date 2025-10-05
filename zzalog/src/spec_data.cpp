@@ -299,14 +299,14 @@ std::string spec_data::band_for_freq(double frequency_MHz) {
 			found = true;
 		}
 	}
-	return to_upper(result);
+	return result;
 }
 
 // Get the Lower frequency for a band
 double spec_data::freq_for_band(std::string band) {
 	// Get the Band dataset
 	spec_dataset* table = dataset("Band");
-	auto it = table->data.find(to_lower(band));
+	auto it = table->data.find(band);
 	if (it != table->data.end()) {
 		// Return the Lower Freq filed for the band entry
 		return std::stod(it->second->at("Lower Freq (MHz)"));
@@ -321,7 +321,7 @@ double spec_data::freq_for_band(std::string band) {
 void spec_data::freq_for_band(std::string band, double& lower, double& upper) {
 	// Get the Band dataset
 	spec_dataset* table = dataset("Band");
-	auto it = table->data.find(to_lower(band));
+	auto it = table->data.find(band);
 	if (it != table->data.end()) {
 		// Return the Lower Freq filed for the band entry
 		lower = std::stod(it->second->at("Lower Freq (MHz)"));

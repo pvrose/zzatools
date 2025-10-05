@@ -204,8 +204,11 @@ std::istream& adi_reader::load_record(record* in_record, std::istream& in, load_
 						if (validity == NO_ERROR || validity == DUPLICATE) {
 							// Get the expected datatype
 							char data_type_indicator = spec_data_->datatype_indicator(field);
-							// All enumerated values are treated as upper-case
-							if (data_type_indicator == 'E') {
+							// All enumerated values are treated as upper-case (except band)
+							if (field == "BAND" || field == "BAND_RX") {
+								value = to_lower(value);
+							}
+							else if (data_type_indicator == 'E') {
 								value = to_upper(value);
 							}
 							// Add the item to the record
