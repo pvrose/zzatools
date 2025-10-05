@@ -53,7 +53,7 @@ void stn_qth_widget::create_form() {
 
 	cx += WWIDGET + WLABEL;
 	// Description input
-	ip_descr_ = new Fl_Input(cx, cy, (WIDGETS_PER_ROW - 1) * WWIDGET + (WIDGETS_PER_ROW * 2) * WLABEL, ROW_HEIGHT, "Descr'n");
+	ip_descr_ = new Fl_Input(cx, cy, (WIDGETS_PER_ROW - 1) * WWIDGET + (WIDGETS_PER_ROW * 2) * WLABEL, ROW_HEIGHT, "Description");
 	ip_descr_->align(FL_ALIGN_LEFT);
 	ip_descr_->callback(cb_ip_data, (void*)(intptr_t)DESCRIPTION);
 	ip_descr_->box(FL_BORDER_BOX);

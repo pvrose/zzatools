@@ -35,7 +35,7 @@ public:
 
     //! Callback - entering value into an input
 
-    //! \param widget that raised the callback
+    //! \param w widget that raised the callback
     //! \param v call_value_t 
     static void cb_ip_data(Fl_Widget* w, void* v);
 
