@@ -3,6 +3,8 @@
 \section rev_369 Revision 3.6.9
 
 - Redesigned station dialog and initialisation of station data.
+- Cosmetic changes.
+- Performance improvements.
 - Bug fixes:
   - Wrong include file.
 

@@ -104,9 +104,10 @@ void record::item(std::string field, std::string value, bool formatted/* = false
 	// Check we are not deleting an important field - crash the program if this was unintentional
 	char message[256];
 	snprintf(message, 256, "You are deleting %s, are you sure", field.c_str());
-	if ((field == "CALL" || field == "QSO_DATE" || field == "QSO_DATE_OFF" || field == "TIME_ON" ||
+	if (!value.length() && 
+		(field == "CALL" || field == "QSO_DATE" || field == "QSO_DATE_OFF" || field == "TIME_ON" ||
 		field == "TIME_OFF") &&
-		item(field).length() && !value.length() && item("QSO_COMPLETE") == "" &&
+		item(field).length() && item("QSO_COMPLETE") == "" &&
 		fl_choice(message, "Yes", "No", nullptr) == 1) {
 		snprintf(message, 256, "Unexpected deletion of the field, %s", field.c_str());
 		status_->misc_status(ST_FATAL, message);
@@ -356,6 +357,7 @@ std::string record::item(std::string field, bool formatted/* = false*/) {
 				}
 				snprintf(as_c, 15, "%g", as_d);
 				result = std::string(as_c);
+				break;
 			default:
 				// If any other data indicator gets returned - it shouldn't
 				result = unformatted_value;
