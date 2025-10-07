@@ -80,7 +80,18 @@ ifeq ($(BUILD_TYPE), Anal)
 CXXFLAGS += -fsanitize=address
 LDFLAGS += -fsanitize=address -static-libasan
 endif
-# DEBUG_FLAG := -Og
+
+ifeq ($(BUILD_TYPE), Profile)
+CXXFLAGS += -pg
+LDFLAGS += -pg
+endif
+
+ifeq ($(BUILD_TYPE), Release)
+CXXFLAGS += -O2
+CFLAGS += -O2
+endif
+
+DEBUG_FLAG := -Og
 
 # The final build step.
 $(EXEC_DIR)/$(TARGET_EXEC): $(OBJS) ${INSTALL_DIR}/fltk-config $(LIBRARY_DIR)/libhamlib.so
