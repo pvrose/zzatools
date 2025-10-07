@@ -210,96 +210,11 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 // See show_help() for meaning of switches
 int cb_args(int argc, char** argv, int& i) {
 	int i_orig = i;
-	// Look for read_only (-r or --read_only)
-	if (strcmp("-r", argv[i]) == 0 || strcmp("--read_only", argv[i]) == 0) {
-		READ_ONLY = true;
-		i += 1;
-	}
-	// Look for test mode (-t or --test) 
-	else if (strcmp("-t", argv[i]) == 0 || strcmp("--test", argv[i]) == 0) {
-		AUTO_UPLOAD = false;
-		AUTO_SAVE = false;
-		AUTO_UPLOAD_S = true;
-		AUTO_SAVE_S = true;
-		i += 1;
-	}
-	// Look for normal mode (-u or --usual) 
-	else if (strcmp("-u", argv[i]) == 0 || strcmp("--usual", argv[i]) == 0) {
-		AUTO_UPLOAD = true;
-		AUTO_SAVE = true;
-		AUTO_UPLOAD_S = true;
-		AUTO_SAVE_S = true;
-		i += 1;
-	}
-	// No auto upload
-	else if (strcmp("-q", argv[i]) == 0 || strcmp("--quiet", argv[i]) == 0) {
-		AUTO_UPLOAD = false;
-		AUTO_UPLOAD_S = true;
-		i += 1;
-	} 
-	// auto upload
-	else if (strcmp("-n", argv[i]) == 0 || strcmp("--noisy", argv[i]) == 0) {
-		AUTO_UPLOAD = true;
-		AUTO_UPLOAD_S = true;
-		i += 1;
-	} 
 	// auto save
-	else if (strcmp("-a", argv[i]) == 0 || strcmp("--auto_save", argv[i]) == 0) {
+	if (strcmp("-a", argv[i]) == 0 || strcmp("--auto_save", argv[i]) == 0) {
 		AUTO_SAVE = true;
 		AUTO_SAVE_S = true;
 		i += 1;
-	}
-	// No auto save
-	else if (strcmp("-w", argv[i]) == 0 || strcmp("--wait_save", argv[i]) == 0) {
-		AUTO_SAVE = false;
-		AUTO_SAVE_S = true;
-		i += 1;
-	}
-	// Resume session
-	else if (strcmp("-m", argv[i]) == 0 || strcmp("--resume", argv[i]) == 0) {
-		RESUME_SESSION = true;
-		i += 1;
-	}
-	// Private log - do not update recent files
-	else if (strcmp("-p", argv[i]) == 0 || strcmp("--private", argv[i]) == 0) {
-		PRIVATE = true;
-		i += 1;
-	}
-	// Help
-	else if (strcmp("-h", argv[i]) == 0 || strcmp("--help", argv[i]) == 0) {
-		HELP = true;
-		i += 1;
-	}
-	// Dark
-	else if (strcmp("-k", argv[i]) == 0 || strcmp("--dark", argv[i]) == 0) {
-		DARK = true;
-		DARK_S = true;
-		i += 1;
-	}
-	// Dark
-	else if (strcmp("-l", argv[i]) == 0 || strcmp("--light", argv[i]) == 0) {
-		DARK = false;
-		DARK_S = true;
-		i += 1;
-	}
-	// Version
-	else if (strcmp("-v", argv[i]) == 0 || strcmp("--version", argv[i]) == 0) {
-		DISPLAY_VERSION = true;
-		i+= 1;
-	}
-	// New file
-	else if (strcmp("-e", argv[i]) == 0 || strcmp("--new", argv[i]) == 0) {
-		NEW_BOOK = true;
-		i+=1;
-	}
-	// HTML Directory - expecetd to be "-g ./" when run in development 
-	else if (strcmp("-g", argv[i]) == 0 || strcmp("--userguide", argv[i]) == 0) {
-		i += 1;
-		if (i < argc) {
-			default_html_directory_ = argv[i];
-			default_ref_directory_ = argv[i];
-			i += 1;
-		}
 	}
 	// Debug
 	else if (strcmp("-d", argv[i]) == 0 || strcmp("--debug", argv[i]) == 0) {
@@ -334,7 +249,7 @@ int cb_args(int argc, char** argv, int& i) {
 			else if (strcmp("q", argv[i]) == 0 || strcmp("quick", argv[i]) == 0) {
 				DEBUG_QUICK = true;
 				i += 1;
-			} 
+			}
 			else if (strncmp("h=", argv[i], 2) == 0) {
 				int v = atoi(argv[i] + 2);
 				HAMLIB_DEBUG_LEVEL = (rig_debug_level_e)v;
@@ -356,6 +271,91 @@ int cb_args(int argc, char** argv, int& i) {
 			// Not processed any parameter
 			if (i == save_i) debugs = false;
 		}
+	}
+	// New file
+	else if (strcmp("-e", argv[i]) == 0 || strcmp("--new", argv[i]) == 0) {
+		NEW_BOOK = true;
+		i += 1;
+	}
+	// HTML Directory - expecetd to be "-g ./" when run in development 
+	else if (strcmp("-g", argv[i]) == 0 || strcmp("--userguide", argv[i]) == 0) {
+		i += 1;
+		if (i < argc) {
+			default_html_directory_ = argv[i];
+			default_ref_directory_ = argv[i];
+			i += 1;
+		}
+	}
+	// Help
+	else if (strcmp("-h", argv[i]) == 0 || strcmp("--help", argv[i]) == 0) {
+		HELP = true;
+		i += 1;
+	}
+	// Dark
+	else if (strcmp("-k", argv[i]) == 0 || strcmp("--dark", argv[i]) == 0) {
+		DARK = true;
+		DARK_S = true;
+		i += 1;
+	}
+	// Dark
+	else if (strcmp("-l", argv[i]) == 0 || strcmp("--light", argv[i]) == 0) {
+		DARK = false;
+		DARK_S = true;
+		i += 1;
+	}
+	// Resume session
+	else if (strcmp("-m", argv[i]) == 0 || strcmp("--resume", argv[i]) == 0) {
+		RESUME_SESSION = true;
+		i += 1;
+	}
+	// auto upload
+	else if (strcmp("-n", argv[i]) == 0 || strcmp("--noisy", argv[i]) == 0) {
+		AUTO_UPLOAD = true;
+		AUTO_UPLOAD_S = true;
+		i += 1;
+	}
+	// Private log - do not update recent files
+	else if (strcmp("-p", argv[i]) == 0 || strcmp("--private", argv[i]) == 0) {
+		PRIVATE = true;
+		i += 1;
+	}
+	// No auto upload
+	else if (strcmp("-q", argv[i]) == 0 || strcmp("--quiet", argv[i]) == 0) {
+		AUTO_UPLOAD = false;
+		AUTO_UPLOAD_S = true;
+		i += 1;
+	} 
+	// Look for read_only (-r or --read_only)
+	else if (strcmp("-r", argv[i]) == 0 || strcmp("--read_only", argv[i]) == 0) {
+		READ_ONLY = true;
+		i += 1;
+	}
+	// Look for test mode (-t or --test) 
+	else if (strcmp("-t", argv[i]) == 0 || strcmp("--test", argv[i]) == 0) {
+		AUTO_UPLOAD = false;
+		AUTO_SAVE = false;
+		AUTO_UPLOAD_S = true;
+		AUTO_SAVE_S = true;
+		i += 1;
+	}
+	// Look for normal mode (-u or --usual) 
+	else if (strcmp("-u", argv[i]) == 0 || strcmp("--usual", argv[i]) == 0) {
+		AUTO_UPLOAD = true;
+		AUTO_SAVE = true;
+		AUTO_UPLOAD_S = true;
+		AUTO_SAVE_S = true;
+		i += 1;
+	}
+	// Version
+	else if (strcmp("-v", argv[i]) == 0 || strcmp("--version", argv[i]) == 0) {
+		DISPLAY_VERSION = true;
+		i+= 1;
+	}
+	// No auto save
+	else if (strcmp("-w", argv[i]) == 0 || strcmp("--wait_save", argv[i]) == 0) {
+		AUTO_SAVE = false;
+		AUTO_SAVE_S = true;
+		i += 1;
 	}
 	if (i == i_orig ) {
 		// Not processed any argumant
@@ -383,7 +383,6 @@ void show_help() {
 	"\n"
 	"switches:\n"
 	"\t-a|--auto_save\tDo automatically save each change (sticky)\n"
-	"\t-c|--club_mode\tAsks for operater on start-up (sticky)\n"
   	"\t-d|--debug [mode...]\n"
 	"\t\tc|curl\tincrease verbosity from libcurl\n"
 	"\t\t\tnoc|nocurl\n"
@@ -400,7 +399,6 @@ void show_help() {
 	"\t-e|--new\tCreate new file\n"
 	"\t-g|--userguide\tSpecify HTML Directory\n"
 	"\t-h|--help\tPrint this\n"
-	"\t-i|--individual\tIndividual mode (sticky)\n"
 	"\t-k|--dark\tDark mode (sticky)\n"
 	"\t-l|--light\tLight mode (sticky)\n"
 	"\t-m|--resume\tResume the previous session\n"
