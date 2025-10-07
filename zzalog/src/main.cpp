@@ -283,6 +283,7 @@ int cb_args(int argc, char** argv, int& i) {
 		if (i < argc) {
 			default_html_directory_ = argv[i];
 			default_ref_directory_ = argv[i];
+			default_code_directory_ = argv[i];
 			i += 1;
 		}
 	}

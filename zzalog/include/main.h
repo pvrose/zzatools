@@ -386,6 +386,9 @@ std::string default_html_directory_ = "";
 //! Default location for reference data
 std::string default_ref_directory_ = "";
 
+//! Default location for auto-generated compile fodder
+std::string default_code_directory_ = "";
+
 //! Do not close banner. Kept \p false unless banner is not deleted at ZZALOG closure in error cases.
 bool keep_banner_ = false;
 

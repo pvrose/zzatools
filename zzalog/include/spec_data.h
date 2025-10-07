@@ -192,6 +192,8 @@ typedef size_t qso_num_t;
 		std::string report_timestamp(std::string field, std::string data);
 		//! Process subdivision datasets
 		void process_subdivision(std::string name);
+		//! generate adif.h file
+		bool generate_adif_hfile();
 		// protected attributes
 	protected:
 		//! ADIF Version

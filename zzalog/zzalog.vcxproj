@@ -279,6 +279,7 @@
   <ItemGroup>
     <ClInclude Include="..\common\include\pugixml.hpp" />
     <ClInclude Include="..\common\include\utils.h" />
+    <ClInclude Include="Header.h" />
     <ClInclude Include="include\about_dialog.h" />
     <ClInclude Include="include\adi_reader.h" />
     <ClInclude Include="include\adi_writer.h" />

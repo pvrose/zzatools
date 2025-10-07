@@ -6,13 +6,15 @@ All Rights Reserved
 record.cpp - Individual record data item: implementation file
 */
 
-#include "record.h"
-#include "utils.h"
+#include "adif.h"
+#include "book.h"
 #include "cty_data.h"
+#include "record.h"
 #include "spec_data.h"
 #include "status.h"
 #include "view.h"
-#include "book.h"
+
+#include "utils.h"
 
 #include <ctime>
 #include <chrono>

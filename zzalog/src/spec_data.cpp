@@ -1,6 +1,7 @@
 #include "spec_data.h"
 
 #include "adi_writer.h"
+#include "adif.h"
 #include "band.h"
 #include "book.h"
 #include "corr_dialog.h"
@@ -33,6 +34,7 @@ extern cty_data* cty_data_;
 extern status* status_;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
+extern std::string default_code_directory_;
 extern std::string default_ref_directory_;
 extern url_handler* url_handler_;
 
@@ -171,8 +173,20 @@ bool spec_data::load_json() {
 			process_subdivision("Primary_Administrative_Subdivision");
 			process_subdivision("Secondary_Administrative_Subdivision");
 			process_subdivision("Secondary_Administrative_Subdivision_Alt");
-			std::snprintf(msg, sizeof(msg), "ADIF SPEC: File %s loaded OK", filename.c_str());
+			snprintf(msg, sizeof(msg), "ADIF SPEC: File %s loaded OK", filename.c_str());
 			status_->misc_status(ST_OK, msg);
+			if (adif_version_ != ADIF::VERSION) {
+				snprintf(msg, sizeof(msg), "ADIF SPEC: Built-in ADIF values are based on version %s, version %s loaded",
+					ADIF::VERSION.c_str(), adif_version_.c_str());
+				status_->misc_status(ST_WARNING, msg);
+				if (generate_adif_hfile()) {
+					status_->misc_status(ST_WARNING, "ADIF SPEC: Recompile with new ADIF header file");
+				}
+				else {
+					status_->misc_status(ST_ERROR, "ADIF SPEC: Contact the development team");
+				}
+				return false;
+			}
 			return true;
 		}
 		catch (const json::exception& e) {
@@ -2436,3 +2450,57 @@ std::string spec_data::summarise_enumaration(std::string name, std::string value
 
 bool spec_data::valid() { return data_loaded_; }
 
+bool spec_data::generate_adif_hfile() {
+	if (default_code_directory_.length() == 0) {
+		status_->misc_status(ST_ERROR, "Cannot regenerate adif.h - not in development mode");
+		return false;
+	}
+	std::string filename = default_code_directory_ + "include/adif.h";
+	// Add my application defined fields
+	add_my_appdefs();
+	ofstream os(filename);
+	os << "#pragma once" << endl;
+	os << endl;
+	os << "#include <cstdint>" << endl;
+	os << "#include <map>" << endl;
+	os << "#include <string>" << endl;
+
+	os << endl;
+	os << "//! This namespace holds the ADIF version dependent maps" << endl;
+	os << "namespace ADIF {" << endl;
+	os << endl;
+	os << "  //! Populated with all the valid ADIF field names plus ZLG Applixation specific ones" << endl;
+	os << "  enum field_t : uint16_t {" << endl;
+	spec_dataset* fields = dataset("Fields");
+	for (auto f : fields->data) {
+		os << "    " << f.first << ",     //!<" << f.second->at("Description") << endl;
+	}
+	os << "    MAX_FIELD               //!< Used to get maximum value" << endl;
+	os << "  };";
+	os << endl;
+	os << "	 //! Maps the enumerated value to string: used when exporting data" << endl;
+	os << "  static const std::map< field_t, std::string> FIELD_2_STRING = " << endl;
+	os << "  {" << endl;
+	for (auto f : fields->data) {
+		os << "    { " << f.first << ", \"" << f.first << "\" }," << endl;
+	}
+	os << "    { MAX_FIELD, \"\" }" << endl;
+	os << "  };" << endl;
+	os << endl;
+	os << "  //! Maps the string to enumerated value: used when importing data" << endl;
+	os << "  static const std::map< std::string, field_t> STRING_2_FIELD = " << endl;
+	os << "  {" << endl;
+	for (auto f : fields->data) {
+		os << "    { \" " << f.first << "\", " << f.first << " }, " << endl;
+	}
+	os << "  };" << endl;
+	os << endl;
+	os << "  //! Current version knwon to compiler" << endl;
+	os << "  static const std::string VERSION = \"" << adif_version_ << "\";";
+    os << endl;
+	os << "};";
+
+	os.close();
+
+	return true;
+}
