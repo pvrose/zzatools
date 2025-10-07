@@ -145,7 +145,8 @@ record.h - Individual record data item: header file
 		//! Returns the timestamp as time_t of the record.
 		
 		//! \param time_off if true use QSO_DATE_OFF + TIME_OFF rather than QS_DATE + TIME_ON for the QSO time.
-		time_t timestamp(bool time_off = false);
+		//! \param force recalculation of timestamp
+		time_t timestamp(bool time_off = false, bool force = false);
 		//! Returns the timestamp as time_point of the record.
 		
 		//! \param time_off if true use QSO_DATE_OFF + TIME_OFF rather than QS_DATE + TIME_ON for the QSO time.
@@ -159,6 +160,9 @@ record.h - Individual record data item: header file
 
 		// protected attributes
 	protected:
+		//! Set timestamp
+		void set_timestamp();
+
 		//! record is a header
 		bool is_header_;
 		//! header comment
@@ -168,6 +172,9 @@ record.h - Individual record data item: header file
 
 		//! Expecting a header record
 		static bool expecting_header_;
+
+		//! Timestamp - updated whenever QSO_DATE/TIME_ON are changed
+		time_t timestamp_{ -1 };
 
 	public:
 		//! Avoid reporting errors too many times

@@ -41,12 +41,10 @@ bool record::inhibit_error_reporting_ = false;
 // Comparison operator - compares QSO_DATE and TIME_ON - orders the records by time.
 bool record::operator > (record& them) {
 	// Basic std::string comparison "YYYYMMDDHHMMSS"
-	std::string my_time = item("QSO_DATE") + item("TIME_ON");
-	std::string their_time = them.item("QSO_DATE") + them.item("TIME_ON");
-	if (my_time > their_time) {
+	if (timestamp_ > them.timestamp_) {
 		return true;
 	}
-	else if (my_time == their_time && item("CALL") > them.item("CALL")) {
+	else if (timestamp_ == them.timestamp_ && item("CALL") > them.item("CALL")) {
 		// If times are equal then sort on call
 		return true;
 	} else {
@@ -131,6 +129,7 @@ void record::item(std::string field, std::string value, bool formatted/* = false
 			}
 		}
 		erase(field);
+		if (field == "QSO_DATE" || field == "TIME_ON") 
 		return;
 	}
 	// Certain fields - always log in upper case
@@ -296,6 +295,8 @@ void record::item(std::string field, std::string value, bool formatted/* = false
 	}
 	// Set in item
 	(*this)[field] = formatted_value;
+	if (field == "TIME_ON" || field == "QSO_DATE")
+		set_timestamp();
 }
 
 // Get an item - as std::string
@@ -1061,7 +1062,7 @@ std::chrono::system_clock::time_point record::ctimestamp(bool time_off) {
 }
 
 // get the date and time as a time_t object
-time_t record::timestamp(bool time_off /*= false*/) {
+time_t record::timestamp(bool time_off /*= false*/, bool force /*=false*/) {
 	try {
 		// Convert date and time to a tm struct
 		tm qso_time;
@@ -1096,7 +1097,8 @@ time_t record::timestamp(bool time_off /*= false*/) {
 						}
 					}
 				}
-			} else {
+			}
+			else {
 				// Assume QSO is 10 minutes long
 				// Check this is 10 mins
 				std::chrono::system_clock::time_point time_on = std::chrono::system_clock::from_time_t(timestamp());
@@ -1111,28 +1113,42 @@ time_t record::timestamp(bool time_off /*= false*/) {
 			if (item("TIME_OFF").length() == 6) {
 				qso_time.tm_sec = std::stoi(item("TIME_OFF").substr(4, 2));
 			}
-		}
-		else {
-			// Get start timestamp
-			qso_time.tm_year = std::stoi(item("QSO_DATE").substr(0, 4)) - 1900;
-			qso_time.tm_mon = std::stoi(item("QSO_DATE").substr(4, 2)) - 1;
-			qso_time.tm_mday = std::stoi(item("QSO_DATE").substr(6, 2));
-			qso_time.tm_hour = std::stoi(item("TIME_ON").substr(0, 2));
-			qso_time.tm_min = std::stoi(item("TIME_ON").substr(2, 2));
-			qso_time.tm_sec = 0;
-			if (item("TIME_ON").length() == 6) {
-				qso_time.tm_sec = std::stoi(item("TIME_ON").substr(4, 2));
-			}
-		}
-		// To stop it getting randomly std::set in implementations that do not consistently initialise structures
-		qso_time.tm_isdst = false;
+			qso_time.tm_isdst = false;
 
-		return mktime(&qso_time);
+			return mktime(&qso_time);
+		}
+		else { 
+			if (force) {
+				// Get start timestamp
+				qso_time.tm_year = std::stoi(item("QSO_DATE").substr(0, 4)) - 1900;
+				qso_time.tm_mon = std::stoi(item("QSO_DATE").substr(4, 2)) - 1;
+				qso_time.tm_mday = std::stoi(item("QSO_DATE").substr(6, 2));
+				qso_time.tm_hour = std::stoi(item("TIME_ON").substr(0, 2));
+				qso_time.tm_min = std::stoi(item("TIME_ON").substr(2, 2));
+				qso_time.tm_sec = 0;
+				if (item("TIME_ON").length() == 6) {
+					qso_time.tm_sec = std::stoi(item("TIME_ON").substr(4, 2));
+				}
+				// To stop it getting randomly std::set in implementations that do not consistently initialise structures
+				qso_time.tm_isdst = false;
+
+				return mktime(&qso_time);
+			}
+			else {
+
+				return timestamp_;
+			}
+		} 
 	}
 	catch (invalid_argument&) {
 		// Return an invalid time
 		return time_t(-1);
 	}
+}
+
+//! Set the timestamp value 
+void record::set_timestamp() {
+	timestamp_ = timestamp(false, true);
 }
 
 // Update the time the QSO finishes
