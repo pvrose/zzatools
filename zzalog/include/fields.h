@@ -47,8 +47,6 @@ enum field_app_t : char {
 };
 
 //! Default columns when no saved configuration and used for restore defaults.
-
-//! \todo Check that all usages have a restore default feature.
 const field_info_t DEFAULT_FIELDS[] = {
 	{ "QSO_DATE", "Date", 62 },
 	{ "TIME_ON", "Start", 50 },
