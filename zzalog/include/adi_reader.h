@@ -1,8 +1,6 @@
 #ifndef __ADI_READER__
 #define __ADI_READER__
 
-#include "files.h"
-
 #include<istream>
 #include <string>
 #include <set>
@@ -32,6 +30,14 @@ class record;
 
 		// public methods
 	public:
+
+		//! Results from loading a file
+		enum load_result_t {
+			LR_GOOD,     //!< loaded OK.
+			LR_BAD,      //!< failed to complete loading
+			LR_EOF,      //!< EOF read
+		};
+
 		//! Load data from the specified input stream \a in into the specified \p book.
 		//! \param book logbook that will be loaded.
 		//! \param in input stream.
@@ -46,6 +52,8 @@ class record;
 		//! Used to report progress while reading
 		//! \return fraction of the input stream loaded into the book.
 		double progress();
+
+
 
 		// protected methods
 	protected:

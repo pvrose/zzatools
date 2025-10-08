@@ -1,12 +1,12 @@
 #include "adi_writer.h"
 
-#include "status.h"
-#include "record.h"
 #include "book.h"
-#include "files.h"
-#include "spec_data.h"
-#include "utils.h"
 #include "fields.h"
+#include "record.h"
+#include "spec_data.h"
+#include "status.h"
+
+#include "utils.h"
 
 #include <fstream>
 #include<ostream>
@@ -40,7 +40,7 @@ adi_writer::~adi_writer()
 bool adi_writer::store_book(book* out_book, std::ostream& out, bool clean, field_list* fields /* = nullptr */) {
 	// Takes a finite time so put the timer cursor up.
 	fl_cursor(FL_CURSOR_WAIT);
-	load_result_t result = LR_GOOD;
+	bool result = true;
 	clean_records_ = clean;
 	out_book_ = out_book;
 
@@ -64,13 +64,13 @@ bool adi_writer::store_book(book* out_book, std::ostream& out, bool clean, field
 		store_record(out_book->header(), out, result, nullptr);
 		status_->progress(1, out_book->book_type());
 	}
-	for (current_ = 0; current_ < out_book->size() && result == LR_GOOD; current_++) {
+	for (current_ = 0; current_ < out_book->size() && result; current_++) {
 		// Output the record
 		store_record(out_book->get_record(current_, false), out, result, fields);
 		status_->progress(current_ + 1, out_book->book_type());
 	}
 	// Update the progress bar with complete or failed
-	if (result == LR_GOOD) {
+	if (result) {
 		status_->progress(out_book->size() + 1, out_book->book_type());
 		status_->misc_status(ST_OK, "LOG: Writing done!");
 	}
@@ -85,7 +85,7 @@ bool adi_writer::store_book(book* out_book, std::ostream& out, bool clean, field
 }
 
 // write record to output stream. If fields is not null, then only these fields. Output result not used
-std::ostream& adi_writer::store_record(record* record, std::ostream& out, load_result_t& result, field_list* fields /* = nullptr */) {
+std::ostream& adi_writer::store_record(record* record, std::ostream& out, bool& result, field_list* fields /* = nullptr */) {
 	// convert to text
 	to_adif(record, out, fields);
 	if (clean_records_) out_book_->delete_dirty_record(record);

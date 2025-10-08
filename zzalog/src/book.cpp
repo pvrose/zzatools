@@ -412,7 +412,7 @@ bool book::store_data(std::string filename, bool force, field_list* fields) {
 					}
 					file.open(filename_.c_str(), fstream::out);
 					adi_writer_ = new adi_writer;
-					if (adi_writer_->store_book(this, file, book_type_ == OT_MAIN ? true : false, fields) != LR_GOOD) {
+					if (!adi_writer_->store_book(this, file, book_type_ == OT_MAIN ? true : false, fields)) {
 						// Store failed
 						char* message = new char[filename_.length() + 100];
 						sprintf(message, "LOG: Failed to open %s", filename_.c_str());

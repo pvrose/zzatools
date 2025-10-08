@@ -461,9 +461,6 @@
     <ClInclude Include="include\file_viewer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\files.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\fllog_emul.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -1,7 +1,6 @@
 #ifndef __ADI_WRITER__
 #define __ADI_WRITER__
 
-#include "files.h"
 #include "fields.h"
 
 #include <string>
@@ -58,7 +57,7 @@
 		//! \param fields a std::list of fields to include in the output. Include all fields if this is 
 		//! \p nullptr.
 		//! \return true if successful false if not.
-		std::ostream & store_record(record* record, std::ostream& out, load_result_t& result, field_list* fields = nullptr);
+		std::ostream & store_record(record* record, std::ostream& out, bool& result, field_list* fields = nullptr);
 
 		//! Data is ASCII compliant.
 		const unsigned char ASCII = 0;

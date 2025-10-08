@@ -6,7 +6,6 @@
 #include "book.h"
 #include "corr_dialog.h"
 #include "cty_data.h"
-#include "files.h"
 #include "record.h"
 #include "regices.h"
 #include "status.h"

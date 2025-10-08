@@ -318,7 +318,6 @@
     <ClInclude Include="include\fields.h" />
     <ClInclude Include="include\fields_dialog.h" />
     <ClInclude Include="include\field_choice.h" />
-    <ClInclude Include="include\files.h" />
     <ClInclude Include="include\file_viewer.h" />
     <ClInclude Include="include\fllog_emul.h" />
     <ClInclude Include="include\font_dialog.h" />

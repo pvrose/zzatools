@@ -232,7 +232,7 @@ int fllog_emul::add_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 		std::stringstream ss;
 		ss.str(item->get_string());
 		adi_reader* reader = new adi_reader();
-		load_result_t dummy;
+		adi_reader::load_result_t dummy;
 		record* qso = that_->putative_qso_;
 		reader->load_record(qso, ss, dummy);
 		// Frig - fldigi sets MY_STATE incorrectly, and only uses MODE
@@ -257,7 +257,7 @@ int fllog_emul::update_record(rpc_data_item::rpc_list& params, rpc_data_item& re
 		std::stringstream ss;
 		ss.str(item->get_string());
 		adi_reader* reader = new adi_reader();
-		load_result_t dummy;
+		adi_reader::load_result_t dummy;
 		record* changes = new record();
 		reader->load_record(changes, ss, dummy);
 		that_->current_qso_->merge_records(changes);
