@@ -224,10 +224,6 @@ typedef size_t qso_num_t;
 		std::string username_;
 		//! Password
 		std::string password_;
-		//! Number of fetches remaining this session.
-		//! \todo Maximum number of eQSL card image fetches depends on eQSL.cc
-		//! membership level. This needs to be user-configurable.
-		int allowed_fetches_;
 		//! Thread to run eQSL.cc requests in.
 		std::thread* th_upload_;
 		//! Enable for threads - normally true and std::set false when closing ZZALOG.

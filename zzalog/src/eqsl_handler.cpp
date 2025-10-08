@@ -68,8 +68,6 @@ eqsl_handler::eqsl_handler()
 	Fl_Group::current(sv);
 
 	set_adif_fields();
-
-	allowed_fetches_ = 100;
 }
 
 // Destructor
@@ -135,14 +133,6 @@ void eqsl_handler::progress_download() {
 void eqsl_handler::dequeue_request() {
 	char message[512];
 	// Do not send any requests if we have reached the limit in a session
-	if (allowed_fetches_ == 0) {
-		snprintf(message, sizeof(message), "EQSL: Reached the session limit for fetching card images - abandoning");
-		status_->misc_status(ST_ERROR, message);
-		while (!request_queue_.empty()) {
-			request_queue_.pop();
-			book_->enable_save(true, "Cancelling eQSL image request");
-		}
-	}
 	if (!request_queue_.empty() && empty_queue_enable_) {
 		// send the next eQSL request in the std::queue - but leave it in the std::queue until we've seen the response
 		request_t request = request_queue_.front();
@@ -185,7 +175,6 @@ void eqsl_handler::dequeue_request() {
 			// request succeeded - remove request from std::queue
 			request_queue_.pop();
 			book_->enable_save(true, "Dequeued eQSL image request");
-			allowed_fetches_--;
 			break;
 		case ER_SKIPPED:
 			// request skipped - remove request from std::queue
