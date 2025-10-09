@@ -10,7 +10,8 @@
                 "Lower": 0.1357,
                 "Upper": 0.1378
             },
-            "Summary": "CW, QRSS and narrow-band digital modes"
+            "Summary": "CW, QRSS and narrow-band digital modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.5,
@@ -22,7 +23,8 @@
                 "Lower": 0.472,
                 "Upper": 0.479
             },
-            "Summary": "CW, QRSS and narrow-band digital modes (Note-1)"
+            "Summary": "CW, QRSS and narrow-band digital modes (Note-1)",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.2,
@@ -33,7 +35,8 @@
                 "Lower": 1.81,
                 "Upper": 1.838
             },
-            "Summary": "Telegraphy"
+            "Summary": "Telegraphy",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.5,
@@ -44,7 +47,8 @@
                 "Lower": 1.838,
                 "Upper": 1.84
             },
-            "Summary": "Narrow band modes"
+            "Summary": "Narrow band modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 2.7,
@@ -57,7 +61,8 @@
                 "Lower": 1.84,
                 "Upper": 1.843
             },
-            "Summary": "All modes"
+            "Summary": "All modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 2.7,
@@ -69,7 +74,8 @@
                 "Lower": 1.843,
                 "Upper": 2.0
             },
-            "Summary": "Telephony, Telegraphy  "
+            "Summary": "Telephony, Telegraphy  ",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -78,7 +84,8 @@
                 "Lower": 1.836,
                 "Upper": 1.836
             },
-            "Summary": "QRP (low power) Centre of Activity, "
+            "Summary": "QRP (low power) Centre of Activity, ",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -87,7 +94,8 @@
                 "Lower": 1.96,
                 "Upper": 1.96
             },
-            "Summary": "DF Contest beacons (14dBW)"
+            "Summary": "DF Contest beacons (14dBW)",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.2,
@@ -98,7 +106,8 @@
                 "Lower": 3.5,
                 "Upper": 3.51
             },
-            "Summary": "Telegraphy - Priority for inter-continental operation"
+            "Summary": "Telegraphy - Priority for inter-continental operation",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.2,
@@ -109,7 +118,8 @@
                 "Lower": 3.51,
                 "Upper": 3.56
             },
-            "Summary": "Telegraphy - contest preferred."
+            "Summary": "Telegraphy - contest preferred.",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -118,7 +128,8 @@
                 "Lower": 3.555,
                 "Upper": 3.555
             },
-            "Summary": "QRS (slow telegraphy) Centre of Activity"
+            "Summary": "QRS (slow telegraphy) Centre of Activity",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.2,
@@ -129,7 +140,8 @@
                 "Lower": 3.56,
                 "Upper": 3.57
             },
-            "Summary": "Telegraphy"
+            "Summary": "Telegraphy",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -138,7 +150,8 @@
                 "Lower": 3.56,
                 "Upper": 3.56
             },
-            "Summary": "QRP (low power) Centre of Activity, "
+            "Summary": "QRP (low power) Centre of Activity, ",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.2,
@@ -150,7 +163,8 @@
                 "Lower": 3.57,
                 "Upper": 3.58
             },
-            "Summary": "Narrow band modes"
+            "Summary": "Narrow band modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.5,
@@ -162,7 +176,8 @@
                 "Lower": 3.58,
                 "Upper": 3.59
             },
-            "Summary": "Narrow band modes"
+            "Summary": "Narrow band modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.5,
@@ -174,7 +189,8 @@
                 "Lower": 3.59,
                 "Upper": 3.6
             },
-            "Summary": "Narrow band modes - automatically controlled data stations (unattended)"
+            "Summary": "Narrow band modes - automatically controlled data stations (unattended)",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 2.7,
@@ -187,7 +203,8 @@
                 "Lower": 3.6,
                 "Upper": 3.62
             },
-            "Summary": "All modes - automatically controlled data stations (unattended)"
+            "Summary": "All modes - automatically controlled data stations (unattended)",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 2.7,
@@ -200,7 +217,8 @@
                 "Lower": 3.6,
                 "Upper": 3.65
             },
-            "Summary": "All modes - Phone contest preferred."
+            "Summary": "All modes - Phone contest preferred.",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -209,7 +227,8 @@
                 "Lower": 3.63,
                 "Upper": 3.63
             },
-            "Summary": "digital voice Centre of Activity"
+            "Summary": "digital voice Centre of Activity",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 2.7,
@@ -222,7 +241,8 @@
                 "Lower": 3.65,
                 "Upper": 3.7
             },
-            "Summary": "All modes - Telephony, Telegraphy"
+            "Summary": "All modes - Telephony, Telegraphy",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -231,7 +251,8 @@
                 "Lower": 3.663,
                 "Upper": 3.663
             },
-            "Summary": "may be used for UK emergency comms traffic."
+            "Summary": "may be used for UK emergency comms traffic.",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -240,7 +261,8 @@
                 "Lower": 3.69,
                 "Upper": 3.69
             },
-            "Summary": "3,690 SSB QRP (low power) Centre of Activity."
+            "Summary": "3,690 SSB QRP (low power) Centre of Activity.",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 2.7,
@@ -253,7 +275,8 @@
                 "Lower": 3.7,
                 "Upper": 3.775
             },
-            "Summary": "All modes - Phone contest preferred"
+            "Summary": "All modes - Phone contest preferred",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -262,7 +285,8 @@
                 "Lower": 3.735,
                 "Upper": 3.735
             },
-            "Summary": "Image mode Centre of Activity"
+            "Summary": "Image mode Centre of Activity",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -271,7 +295,8 @@
                 "Lower": 3.76,
                 "Upper": 3.76
             },
-            "Summary": "IARU Region 1 Emergency Centre of Activity"
+            "Summary": "IARU Region 1 Emergency Centre of Activity",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 2.7,
@@ -284,7 +309,8 @@
                 "Lower": 3.775,
                 "Upper": 3.8
             },
-            "Summary": "All modes - Phone contest preferred. Priority for inter-continental telephony (SSB) operation"
+            "Summary": "All modes - Phone contest preferred. Priority for inter-continental telephony (SSB) operation",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 5.5,
@@ -297,7 +323,8 @@
                 "Lower": 5.2585,
                 "Upper": 5.264
             },
-            "Summary": "All Modes. "
+            "Summary": "All Modes. ",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -306,7 +333,8 @@
                 "Lower": 5.262,
                 "Upper": 5.262
             },
-            "Summary": "CW QRP Centre of Activity"
+            "Summary": "CW QRP Centre of Activity",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 8.0,
@@ -319,7 +347,8 @@
                 "Lower": 5.276,
                 "Upper": 5.284
             },
-            "Summary": "All modes"
+            "Summary": "All modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -328,7 +357,8 @@
                 "Lower": 5.2785,
                 "Upper": 5.2785
             },
-            "Summary": "May be used for UK emergency comms traffic"
+            "Summary": "May be used for UK emergency comms traffic",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 3.5,
@@ -341,7 +371,8 @@
                 "Lower": 5.2885,
                 "Upper": 5.292
             },
-            "Summary": "All modes"
+            "Summary": "All modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -350,7 +381,8 @@
                 "Lower": 5.29,
                 "Upper": 5.29
             },
-            "Summary": "Beacons"
+            "Summary": "Beacons",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 9.0,
@@ -363,7 +395,8 @@
                 "Lower": 5.298,
                 "Upper": 5.307
             },
-            "Summary": "All modes"
+            "Summary": "All modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 10.0,
@@ -376,7 +409,8 @@
                 "Lower": 5.313,
                 "Upper": 5.323
             },
-            "Summary": "All modes"
+            "Summary": "All modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 6.0,
@@ -385,7 +419,8 @@
                 "Lower": 5.317,
                 "Upper": 5.317
             },
-            "Summary": "AM Spot frequency"
+            "Summary": "AM Spot frequency",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 5.0,
@@ -398,7 +433,8 @@
                 "Lower": 5.333,
                 "Upper": 5.338
             },
-            "Summary": "All modes"
+            "Summary": "All modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 4.0,
@@ -411,7 +447,8 @@
                 "Lower": 5.354,
                 "Upper": 5.358
             },
-            "Summary": "All modes – within WRC-15 Band"
+            "Summary": "All modes – within WRC-15 Band",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 12.5,
@@ -424,7 +461,8 @@
                 "Lower": 5.362,
                 "Upper": 5.3745
             },
-            "Summary": "All modes – partly within WRC-15 band, WSPR"
+            "Summary": "All modes – partly within WRC-15 band, WSPR",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 4.0,
@@ -437,7 +475,8 @@
                 "Lower": 5.378,
                 "Upper": 5.382
             },
-            "Summary": "All modes"
+            "Summary": "All modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 6.5,
@@ -450,7 +489,8 @@
                 "Lower": 5.395,
                 "Upper": 5.4015
             },
-            "Summary": "All modes"
+            "Summary": "All modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 3.0,
@@ -463,7 +503,8 @@
                 "Lower": 5.4035,
                 "Upper": 5.4065
             },
-            "Summary": "All modes"
+            "Summary": "All modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.2,
@@ -474,7 +515,8 @@
                 "Lower": 7.0,
                 "Upper": 7.04
             },
-            "Summary": "Telegraphy"
+            "Summary": "Telegraphy",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -483,7 +525,8 @@
                 "Lower": 7.03,
                 "Upper": 7.03
             },
-            "Summary": "QRP Centre of Activity "
+            "Summary": "QRP Centre of Activity ",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.5,
@@ -495,7 +538,8 @@
                 "Lower": 7.04,
                 "Upper": 7.047
             },
-            "Summary": "Narrow band modes"
+            "Summary": "Narrow band modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.5,
@@ -507,7 +551,8 @@
                 "Lower": 7.047,
                 "Upper": 7.05
             },
-            "Summary": "Narrow band modes, automatically controlled data stations (unattended) "
+            "Summary": "Narrow band modes, automatically controlled data stations (unattended) ",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 2.7,
@@ -520,7 +565,8 @@
                 "Lower": 7.05,
                 "Upper": 7.053
             },
-            "Summary": "All modes, automatically controlled data stations (unattended)"
+            "Summary": "All modes, automatically controlled data stations (unattended)",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 2.7,
@@ -533,7 +579,8 @@
                 "Lower": 7.053,
                 "Upper": 7.06
             },
-            "Summary": "All modes, digimodes"
+            "Summary": "All modes, digimodes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 2.7,
@@ -546,7 +593,8 @@
                 "Lower": 7.06,
                 "Upper": 7.1
             },
-            "Summary": "All modes"
+            "Summary": "All modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -555,7 +603,8 @@
                 "Lower": 7.07,
                 "Upper": 7.07
             },
-            "Summary": "digital voice Centre of Activity"
+            "Summary": "digital voice Centre of Activity",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -564,7 +613,8 @@
                 "Lower": 7.09,
                 "Upper": 7.09
             },
-            "Summary": "SSB QRP Centre of Activity"
+            "Summary": "SSB QRP Centre of Activity",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 2.7,
@@ -577,7 +627,8 @@
                 "Lower": 7.1,
                 "Upper": 7.13
             },
-            "Summary": "All modes"
+            "Summary": "All modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -586,7 +637,8 @@
                 "Lower": 7.11,
                 "Upper": 7.11
             },
-            "Summary": "Region 1 Emergency Centre of Activity."
+            "Summary": "Region 1 Emergency Centre of Activity.",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 2.7,
@@ -599,7 +651,8 @@
                 "Lower": 7.13,
                 "Upper": 7.2
             },
-            "Summary": "All modes, SSB Contest Preferred Segment"
+            "Summary": "All modes, SSB Contest Preferred Segment",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -608,7 +661,8 @@
                 "Lower": 7.165,
                 "Upper": 7.165
             },
-            "Summary": "Image Centre of Activity"
+            "Summary": "Image Centre of Activity",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 2.7,
@@ -621,7 +675,8 @@
                 "Lower": 7.175,
                 "Upper": 7.2
             },
-            "Summary": "All modes, priority for intercontinental operation"
+            "Summary": "All modes, priority for intercontinental operation",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.2,
@@ -632,7 +687,8 @@
                 "Lower": 10.1,
                 "Upper": 10.13
             },
-            "Summary": "Telegraphy (CW)"
+            "Summary": "Telegraphy (CW)",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -641,7 +697,8 @@
                 "Lower": 10.116,
                 "Upper": 10.116
             },
-            "Summary": "QRP (low power) Centre of Activity"
+            "Summary": "QRP (low power) Centre of Activity",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.5,
@@ -653,7 +710,8 @@
                 "Lower": 10.13,
                 "Upper": 10.15
             },
-            "Summary": "Narrow band modes "
+            "Summary": "Narrow band modes ",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.2,
@@ -664,7 +722,8 @@
                 "Lower": 14.0,
                 "Upper": 14.06
             },
-            "Summary": "Telegraphy - contest preferred"
+            "Summary": "Telegraphy - contest preferred",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -673,7 +732,8 @@
                 "Lower": 14.055,
                 "Upper": 14.055
             },
-            "Summary": "QRS (slow telegraphy Centre of Activity"
+            "Summary": "QRS (slow telegraphy Centre of Activity",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.2,
@@ -684,7 +744,8 @@
                 "Lower": 14.06,
                 "Upper": 14.07
             },
-            "Summary": "Telegraphy "
+            "Summary": "Telegraphy ",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -693,7 +754,8 @@
                 "Lower": 14.06,
                 "Upper": 14.06
             },
-            "Summary": "QRP (low power) Centre of Activity "
+            "Summary": "QRP (low power) Centre of Activity ",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.5,
@@ -705,7 +767,8 @@
                 "Lower": 14.07,
                 "Upper": 14.089
             },
-            "Summary": "Narrow band modes"
+            "Summary": "Narrow band modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.5,
@@ -717,7 +780,8 @@
                 "Lower": 14.089,
                 "Upper": 14.099
             },
-            "Summary": "Narrow band modes - automatically controlled data stations (unattended)"
+            "Summary": "Narrow band modes - automatically controlled data stations (unattended)",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -728,7 +792,8 @@
                 "Lower": 14.099,
                 "Upper": 14.101
             },
-            "Summary": "IBP - reserved exclusively for beacons"
+            "Summary": "IBP - reserved exclusively for beacons",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 2.7,
@@ -741,7 +806,8 @@
                 "Lower": 14.101,
                 "Upper": 14.112
             },
-            "Summary": "All modes - automatically controlled data stations (unattended)    "
+            "Summary": "All modes - automatically controlled data stations (unattended)    ",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 2.7,
@@ -753,7 +819,8 @@
                 "Lower": 14.112,
                 "Upper": 14.125
             },
-            "Summary": "All modes (excluding digimodes)"
+            "Summary": "All modes (excluding digimodes)",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 2.7,
@@ -766,7 +833,8 @@
                 "Lower": 14.125,
                 "Upper": 14.3
             },
-            "Summary": "All modes -       SSB contest preferred segment "
+            "Summary": "All modes -       SSB contest preferred segment ",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -775,7 +843,8 @@
                 "Lower": 14.13,
                 "Upper": 14.13
             },
-            "Summary": "digital voice Centre of Activity"
+            "Summary": "digital voice Centre of Activity",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -784,7 +853,8 @@
                 "Lower": 14.195,
                 "Upper": 14.195
             },
-            "Summary": "+/-5  Priority for Dxpeditions"
+            "Summary": "+/-5  Priority for Dxpeditions",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -793,7 +863,8 @@
                 "Lower": 14.23,
                 "Upper": 14.23
             },
-            "Summary": "Image Centre of Activity."
+            "Summary": "Image Centre of Activity.",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -802,7 +873,8 @@
                 "Lower": 14.285,
                 "Upper": 14.285
             },
-            "Summary": "QRP Centre of Activity"
+            "Summary": "QRP Centre of Activity",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 2.7,
@@ -815,7 +887,8 @@
                 "Lower": 14.3,
                 "Upper": 14.35
             },
-            "Summary": "All modes"
+            "Summary": "All modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -824,7 +897,8 @@
                 "Lower": 14.3,
                 "Upper": 14.3
             },
-            "Summary": "Global Emergency Centre of Activity"
+            "Summary": "Global Emergency Centre of Activity",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.2,
@@ -835,7 +909,8 @@
                 "Lower": 18.068,
                 "Upper": 18.095
             },
-            "Summary": "Telegraphy"
+            "Summary": "Telegraphy",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -844,7 +919,8 @@
                 "Lower": 18.086,
                 "Upper": 18.086
             },
-            "Summary": "QRP (low power) Centre of Activity. "
+            "Summary": "QRP (low power) Centre of Activity. ",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.5,
@@ -856,7 +932,8 @@
                 "Lower": 18.095,
                 "Upper": 18.105
             },
-            "Summary": "Narrow band modes"
+            "Summary": "Narrow band modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.5,
@@ -868,7 +945,8 @@
                 "Lower": 18.105,
                 "Upper": 18.109
             },
-            "Summary": "Narrow band modes - automatically controlled data stations (unattended)  "
+            "Summary": "Narrow band modes - automatically controlled data stations (unattended)  ",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -879,7 +957,8 @@
                 "Lower": 18.109,
                 "Upper": 18.111
             },
-            "Summary": "IBP - reserved exclusively for beacons"
+            "Summary": "IBP - reserved exclusively for beacons",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 2.7,
@@ -892,7 +971,8 @@
                 "Lower": 18.111,
                 "Upper": 18.12
             },
-            "Summary": "All modes - automatically controlled data stations (unattended)"
+            "Summary": "All modes - automatically controlled data stations (unattended)",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 2.7,
@@ -905,7 +985,8 @@
                 "Lower": 18.12,
                 "Upper": 18.168
             },
-            "Summary": "All modes"
+            "Summary": "All modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -914,7 +995,8 @@
                 "Lower": 18.13,
                 "Upper": 18.13
             },
-            "Summary": "SSB QRP Centre of Activity"
+            "Summary": "SSB QRP Centre of Activity",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -923,7 +1005,8 @@
                 "Lower": 18.15,
                 "Upper": 18.15
             },
-            "Summary": "digital voice Centre of Activity"
+            "Summary": "digital voice Centre of Activity",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -932,7 +1015,8 @@
                 "Lower": 18.16,
                 "Upper": 18.16
             },
-            "Summary": "Global Emergency Centre of Activity"
+            "Summary": "Global Emergency Centre of Activity",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.2,
@@ -943,7 +1027,8 @@
                 "Lower": 21.0,
                 "Upper": 21.07
             },
-            "Summary": "Telegraphy"
+            "Summary": "Telegraphy",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -952,7 +1037,8 @@
                 "Lower": 21.055,
                 "Upper": 21.055
             },
-            "Summary": "QRS (slow telegraphy) Centre of Activity. "
+            "Summary": "QRS (slow telegraphy) Centre of Activity. ",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -961,7 +1047,8 @@
                 "Lower": 21.06,
                 "Upper": 21.06
             },
-            "Summary": "QRP (low power) Centre of Activity"
+            "Summary": "QRP (low power) Centre of Activity",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.5,
@@ -973,7 +1060,8 @@
                 "Lower": 21.07,
                 "Upper": 21.09
             },
-            "Summary": "Narrow band modes"
+            "Summary": "Narrow band modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.5,
@@ -985,7 +1073,8 @@
                 "Lower": 21.09,
                 "Upper": 21.11
             },
-            "Summary": "Narrow band modes - automatically controlled data stations (unattended)"
+            "Summary": "Narrow band modes - automatically controlled data stations (unattended)",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 2.7,
@@ -997,7 +1086,8 @@
                 "Lower": 21.11,
                 "Upper": 21.12
             },
-            "Summary": "All modes (excluding SSB) - automatically controlled data stations (unattended)"
+            "Summary": "All modes (excluding SSB) - automatically controlled data stations (unattended)",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.5,
@@ -1009,7 +1099,8 @@
                 "Lower": 21.12,
                 "Upper": 21.149
             },
-            "Summary": "Narrow band modes"
+            "Summary": "Narrow band modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -1020,7 +1111,8 @@
                 "Lower": 21.149,
                 "Upper": 21.151
             },
-            "Summary": "IBP - reserved exclusively for beacons"
+            "Summary": "IBP - reserved exclusively for beacons",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 2.7,
@@ -1033,7 +1125,8 @@
                 "Lower": 21.151,
                 "Upper": 21.45
             },
-            "Summary": "All modes. "
+            "Summary": "All modes. ",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -1042,7 +1135,8 @@
                 "Lower": 21.18,
                 "Upper": 21.18
             },
-            "Summary": "digital voice Centre of Activity"
+            "Summary": "digital voice Centre of Activity",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1051,7 +1145,8 @@
                 "Lower": 21.285,
                 "Upper": 21.285
             },
-            "Summary": "QRP Centre of Activity.   "
+            "Summary": "QRP Centre of Activity.   ",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1060,7 +1155,8 @@
                 "Lower": 21.34,
                 "Upper": 21.34
             },
-            "Summary": "Image Centre of Activity."
+            "Summary": "Image Centre of Activity.",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1069,7 +1165,8 @@
                 "Lower": 21.36,
                 "Upper": 21.36
             },
-            "Summary": "Global Emergency Centre of Activity"
+            "Summary": "Global Emergency Centre of Activity",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.2,
@@ -1080,7 +1177,8 @@
                 "Lower": 24.89,
                 "Upper": 24.915
             },
-            "Summary": "Telegraphy "
+            "Summary": "Telegraphy ",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -1089,7 +1187,8 @@
                 "Lower": 24.906,
                 "Upper": 24.906
             },
-            "Summary": "QRP (low power) Centre of Activity"
+            "Summary": "QRP (low power) Centre of Activity",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.5,
@@ -1101,7 +1200,8 @@
                 "Lower": 24.915,
                 "Upper": 24.925
             },
-            "Summary": "Narrow band modes"
+            "Summary": "Narrow band modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.5,
@@ -1113,7 +1213,8 @@
                 "Lower": 24.925,
                 "Upper": 24.929
             },
-            "Summary": "Narrow band modes  - automatically controlled data stations (unattended) "
+            "Summary": "Narrow band modes  - automatically controlled data stations (unattended) ",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -1124,7 +1225,8 @@
                 "Lower": 24.929,
                 "Upper": 24.931
             },
-            "Summary": "IBP - reserved exclusively for beacons"
+            "Summary": "IBP - reserved exclusively for beacons",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 2.7,
@@ -1137,7 +1239,8 @@
                 "Lower": 24.931,
                 "Upper": 24.94
             },
-            "Summary": "All modes - automatically controlled data stations (unattended)"
+            "Summary": "All modes - automatically controlled data stations (unattended)",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 2.7,
@@ -1150,7 +1253,8 @@
                 "Lower": 24.94,
                 "Upper": 24.99
             },
-            "Summary": "All modes"
+            "Summary": "All modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -1159,7 +1263,8 @@
                 "Lower": 24.95,
                 "Upper": 24.95
             },
-            "Summary": "SSB QRP Centre of Activity"
+            "Summary": "SSB QRP Centre of Activity",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1168,7 +1273,8 @@
                 "Lower": 24.96,
                 "Upper": 24.96
             },
-            "Summary": "digital voice Centre of Activity"
+            "Summary": "digital voice Centre of Activity",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.2,
@@ -1179,7 +1285,8 @@
                 "Lower": 28.0,
                 "Upper": 28.07
             },
-            "Summary": "Telegraphy"
+            "Summary": "Telegraphy",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -1188,7 +1295,8 @@
                 "Lower": 28.055,
                 "Upper": 28.055
             },
-            "Summary": "QRS (slow telegraphy) Centre of Activity.  "
+            "Summary": "QRS (slow telegraphy) Centre of Activity.  ",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1197,7 +1305,8 @@
                 "Lower": 28.06,
                 "Upper": 28.06
             },
-            "Summary": "QRP (low power) Centre of Activity. "
+            "Summary": "QRP (low power) Centre of Activity. ",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.5,
@@ -1209,7 +1318,8 @@
                 "Lower": 28.07,
                 "Upper": 28.12
             },
-            "Summary": "Narrow band modes"
+            "Summary": "Narrow band modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.5,
@@ -1221,7 +1331,8 @@
                 "Lower": 28.12,
                 "Upper": 28.15
             },
-            "Summary": "Narrow band modes - automatically controlled data stations (unattended) "
+            "Summary": "Narrow band modes - automatically controlled data stations (unattended) ",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.5,
@@ -1233,7 +1344,8 @@
                 "Lower": 28.15,
                 "Upper": 28.19
             },
-            "Summary": "Narrow band modes"
+            "Summary": "Narrow band modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -1244,7 +1356,8 @@
                 "Lower": 28.19,
                 "Upper": 28.199
             },
-            "Summary": "IBP - regional time shared beacons"
+            "Summary": "IBP - regional time shared beacons",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -1255,7 +1368,8 @@
                 "Lower": 28.199,
                 "Upper": 28.201
             },
-            "Summary": "IBP - world wide time shared beacons"
+            "Summary": "IBP - world wide time shared beacons",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -1266,7 +1380,8 @@
                 "Lower": 28.201,
                 "Upper": 28.225
             },
-            "Summary": "IBP - continuous-duty beacons"
+            "Summary": "IBP - continuous-duty beacons",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 2.7,
@@ -1279,7 +1394,8 @@
                 "Lower": 28.225,
                 "Upper": 28.3
             },
-            "Summary": "All modes - beacons"
+            "Summary": "All modes - beacons",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 2.7,
@@ -1292,7 +1408,8 @@
                 "Lower": 28.3,
                 "Upper": 28.32
             },
-            "Summary": "All modes - automatically controlled data stations (unattended) "
+            "Summary": "All modes - automatically controlled data stations (unattended) ",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 2.7,
@@ -1305,7 +1422,8 @@
                 "Lower": 28.32,
                 "Upper": 29.0
             },
-            "Summary": "All modes"
+            "Summary": "All modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -1314,7 +1432,8 @@
                 "Lower": 28.33,
                 "Upper": 28.33
             },
-            "Summary": "digital voice Centre of Activity"
+            "Summary": "digital voice Centre of Activity",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1323,7 +1442,8 @@
                 "Lower": 28.36,
                 "Upper": 28.36
             },
-            "Summary": "QRP Centre of Activity. "
+            "Summary": "QRP Centre of Activity. ",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1332,7 +1452,8 @@
                 "Lower": 28.68,
                 "Upper": 28.68
             },
-            "Summary": "Image Centre of Activity."
+            "Summary": "Image Centre of Activity.",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 6.0,
@@ -1345,7 +1466,8 @@
                 "Lower": 29.0,
                 "Upper": 29.1
             },
-            "Summary": "All modes"
+            "Summary": "All modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 6.0,
@@ -1358,7 +1480,8 @@
                 "Lower": 29.1,
                 "Upper": 29.2
             },
-            "Summary": "All modes - FM simplex - 10 channels"
+            "Summary": "All modes - FM simplex - 10 channels",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 6.0,
@@ -1371,7 +1494,8 @@
                 "Lower": 29.2,
                 "Upper": 29.3
             },
-            "Summary": "All modes - automatically controlled data stations (unattended) "
+            "Summary": "All modes - automatically controlled data stations (unattended) ",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -1380,7 +1504,8 @@
                 "Lower": 29.27,
                 "Upper": 29.27
             },
-            "Summary": "Internet voice gateway - unattended"
+            "Summary": "Internet voice gateway - unattended",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1389,7 +1514,8 @@
                 "Lower": 29.28,
                 "Upper": 29.28
             },
-            "Summary": "UK Internet voice gateway - unattended"
+            "Summary": "UK Internet voice gateway - unattended",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1398,7 +1524,8 @@
                 "Lower": 29.29,
                 "Upper": 29.29
             },
-            "Summary": "UK Internet voice gateway - unattended"
+            "Summary": "UK Internet voice gateway - unattended",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 6.0,
@@ -1409,7 +1536,8 @@
                 "Lower": 29.3,
                 "Upper": 29.51
             },
-            "Summary": "Satellite links"
+            "Summary": "Satellite links",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -1420,7 +1548,8 @@
                 "Lower": 29.51,
                 "Upper": 29.52
             },
-            "Summary": "Guard channel"
+            "Summary": "Guard channel",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 6.0,
@@ -1432,7 +1561,8 @@
                 "Lower": 29.52,
                 "Upper": 29.7
             },
-            "Summary": ""
+            "Summary": "",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 6.0,
@@ -1441,7 +1571,8 @@
                 "Lower": 29.52,
                 "Upper": 29.59
             },
-            "Summary": "All modes - FM repeater inputs (RH1-RH8)"
+            "Summary": "All modes - FM repeater inputs (RH1-RH8)",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 6.0,
@@ -1450,7 +1581,8 @@
                 "Lower": 29.6,
                 "Upper": 29.6
             },
-            "Summary": "All modes - FM calling channel"
+            "Summary": "All modes - FM calling channel",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 6.0,
@@ -1459,7 +1591,8 @@
                 "Lower": 29.61,
                 "Upper": 29.61
             },
-            "Summary": "All modes - FM simplex repeater (parrot) - input and output"
+            "Summary": "All modes - FM simplex repeater (parrot) - input and output",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 6.0,
@@ -1468,7 +1601,8 @@
                 "Lower": 29.62,
                 "Upper": 29.7
             },
-            "Summary": "All modes - FM repeater outputs (RH1-RH8)"
+            "Summary": "All modes - FM repeater outputs (RH1-RH8)",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 0.5,
@@ -1479,7 +1613,8 @@
                 "Lower": 50.0,
                 "Upper": 50.1
             },
-            "Summary": "Telegraphy only - beacon project (50000-50030)"
+            "Summary": "Telegraphy only - beacon project (50000-50030)",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -1488,7 +1623,8 @@
                 "Lower": 50.05,
                 "Upper": 50.05
             },
-            "Summary": "Future International CoA"
+            "Summary": "Future International CoA",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1497,7 +1633,8 @@
                 "Lower": 50.09,
                 "Upper": 50.09
             },
-            "Summary": "Intercontinental DX CoA"
+            "Summary": "Intercontinental DX CoA",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 2.7,
@@ -1509,7 +1646,8 @@
                 "Lower": 50.1,
                 "Upper": 50.2
             },
-            "Summary": "SSB/Telegraphy - international"
+            "Summary": "SSB/Telegraphy - international",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -1518,7 +1656,8 @@
                 "Lower": 50.11,
                 "Upper": 50.11
             },
-            "Summary": "Intercontinental DX CoA"
+            "Summary": "Intercontinental DX CoA",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1527,7 +1666,8 @@
                 "Lower": 50.15,
                 "Upper": 50.15
             },
-            "Summary": "International CoA"
+            "Summary": "International CoA",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 2.7,
@@ -1539,7 +1679,8 @@
                 "Lower": 50.2,
                 "Upper": 50.3
             },
-            "Summary": "SSB/Telegraphy - general"
+            "Summary": "SSB/Telegraphy - general",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -1548,7 +1689,8 @@
                 "Lower": 50.285,
                 "Upper": 50.285
             },
-            "Summary": "Crossband CoA"
+            "Summary": "Crossband CoA",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 2.7,
@@ -1560,7 +1702,8 @@
                 "Lower": 50.3,
                 "Upper": 50.4
             },
-            "Summary": "MGM/Narrowband/Telegraphy"
+            "Summary": "MGM/Narrowband/Telegraphy",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -1569,7 +1712,8 @@
                 "Lower": 50.305,
                 "Upper": 50.305
             },
-            "Summary": "PSK CoA"
+            "Summary": "PSK CoA",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1578,7 +1722,8 @@
                 "Lower": 50.31,
                 "Upper": 50.32
             },
-            "Summary": "EME"
+            "Summary": "EME",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 0.0,
@@ -1587,7 +1732,8 @@
                 "Lower": 50.32,
                 "Upper": 50.38
             },
-            "Summary": "MS"
+            "Summary": "MS",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 0.0,
@@ -1598,7 +1744,8 @@
                 "Lower": 50.4,
                 "Upper": 50.5
             },
-            "Summary": "Propagation Beacons only"
+            "Summary": "Propagation Beacons only",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 12.5,
@@ -1610,7 +1757,8 @@
                 "Lower": 50.5,
                 "Upper": 50.7
             },
-            "Summary": "All modes"
+            "Summary": "All modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -1619,7 +1767,8 @@
                 "Lower": 50.52,
                 "Upper": 50.52
             },
-            "Summary": "FM/DV Internet Gateway"
+            "Summary": "FM/DV Internet Gateway",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1628,7 +1777,8 @@
                 "Lower": 50.53,
                 "Upper": 50.53
             },
-            "Summary": "FM/DV Internet Gateway"
+            "Summary": "FM/DV Internet Gateway",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1637,7 +1787,8 @@
                 "Lower": 50.54,
                 "Upper": 50.54
             },
-            "Summary": "FM/DV Internet Gateway"
+            "Summary": "FM/DV Internet Gateway",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1646,7 +1797,8 @@
                 "Lower": 50.6,
                 "Upper": 50.7
             },
-            "Summary": "Digital Communications"
+            "Summary": "Digital Communications",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 0.0,
@@ -1655,7 +1807,8 @@
                 "Lower": 50.63,
                 "Upper": 50.63
             },
-            "Summary": "DV Calling"
+            "Summary": "DV Calling",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 12.0,
@@ -1668,7 +1821,8 @@
                 "Lower": 50.7,
                 "Upper": 50.9
             },
-            "Summary": "FM/DV Repeater outputs @ 10 kHz channels"
+            "Summary": "FM/DV Repeater outputs @ 10 kHz channels",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -1683,7 +1837,8 @@
                 "Lower": 50.9,
                 "Upper": 51.2
             },
-            "Summary": "All modes"
+            "Summary": "All modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -1696,7 +1851,8 @@
                 "Lower": 51.2,
                 "Upper": 51.4
             },
-            "Summary": "FM/DV Repeater inputs @ 10 kHz channels"
+            "Summary": "FM/DV Repeater inputs @ 10 kHz channels",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -1711,7 +1867,8 @@
                 "Lower": 51.4,
                 "Upper": 52.0
             },
-            "Summary": "All modes"
+            "Summary": "All modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -1720,7 +1877,8 @@
                 "Lower": 51.41,
                 "Upper": 51.59
             },
-            "Summary": "FM/DV Simplex"
+            "Summary": "FM/DV Simplex",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 0.0,
@@ -1729,7 +1887,8 @@
                 "Lower": 51.51,
                 "Upper": 51.51
             },
-            "Summary": "FM Calling Channel"
+            "Summary": "FM Calling Channel",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1738,7 +1897,8 @@
                 "Lower": 51.53,
                 "Upper": 51.53
             },
-            "Summary": "GB2RS News Broadcast and Slow Morse"
+            "Summary": "GB2RS News Broadcast and Slow Morse",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 1.0,
@@ -1749,7 +1909,8 @@
                 "Lower": 70.0,
                 "Upper": 70.09
             },
-            "Summary": "Propagation Beacons Only"
+            "Summary": "Propagation Beacons Only",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 1.0,
@@ -1760,7 +1921,8 @@
                 "Lower": 70.09,
                 "Upper": 70.1
             },
-            "Summary": "Personal Beacons"
+            "Summary": "Personal Beacons",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 2.7,
@@ -1773,7 +1935,8 @@
                 "Lower": 70.1,
                 "Upper": 70.25
             },
-            "Summary": "Narrowband Modes"
+            "Summary": "Narrowband Modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -1782,7 +1945,8 @@
                 "Lower": 70.185,
                 "Upper": 70.185
             },
-            "Summary": "Crossband CoA"
+            "Summary": "Crossband CoA",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1791,7 +1955,8 @@
                 "Lower": 70.2,
                 "Upper": 70.2
             },
-            "Summary": "CW/SSB CoA"
+            "Summary": "CW/SSB CoA",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1800,7 +1965,8 @@
                 "Lower": 70.25,
                 "Upper": 70.25
             },
-            "Summary": "MS CoA"
+            "Summary": "MS CoA",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 12.0,
@@ -1813,7 +1979,8 @@
                 "Lower": 70.25,
                 "Upper": 70.294
             },
-            "Summary": "All modes"
+            "Summary": "All modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -1822,7 +1989,8 @@
                 "Lower": 70.26,
                 "Upper": 70.26
             },
-            "Summary": "AM/FM Calling Channel"
+            "Summary": "AM/FM Calling Channel",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1831,7 +1999,8 @@
                 "Lower": 70.27,
                 "Upper": 70.27
             },
-            "Summary": "MGM CoA"
+            "Summary": "MGM CoA",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 12.0,
@@ -1843,7 +2012,8 @@
                 "Lower": 70.294,
                 "Upper": 70.5
             },
-            "Summary": "All modes - channelised operation @ 12.5 kHz - specialised channels"
+            "Summary": "All modes - channelised operation @ 12.5 kHz - specialised channels",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -1852,7 +2022,8 @@
                 "Lower": 70.3125,
                 "Upper": 70.3125
             },
-            "Summary": "Digital modes"
+            "Summary": "Digital modes",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1861,7 +2032,8 @@
                 "Lower": 70.325,
                 "Upper": 70.325
             },
-            "Summary": "DX Cluster"
+            "Summary": "DX Cluster",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1870,7 +2042,8 @@
                 "Lower": 70.3375,
                 "Upper": 70.3375
             },
-            "Summary": "Digital Modes"
+            "Summary": "Digital Modes",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1879,7 +2052,8 @@
                 "Lower": 70.35,
                 "Upper": 70.35
             },
-            "Summary": "Internet Voice gateway"
+            "Summary": "Internet Voice gateway",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1888,7 +2062,8 @@
                 "Lower": 70.3625,
                 "Upper": 70.3625
             },
-            "Summary": "Internet Voice gateway"
+            "Summary": "Internet Voice gateway",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1897,7 +2072,8 @@
                 "Lower": 70.3875,
                 "Upper": 70.3875
             },
-            "Summary": "Internet Voice gateway"
+            "Summary": "Internet Voice gateway",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1906,7 +2082,8 @@
                 "Lower": 70.4125,
                 "Upper": 70.4125
             },
-            "Summary": "Internet Voice gateway"
+            "Summary": "Internet Voice gateway",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1915,7 +2092,8 @@
                 "Lower": 70.425,
                 "Upper": 70.425
             },
-            "Summary": "FM Simplex"
+            "Summary": "FM Simplex",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1924,7 +2102,8 @@
                 "Lower": 70.4375,
                 "Upper": 70.4375
             },
-            "Summary": "Digital Modes (special projects)"
+            "Summary": "Digital Modes (special projects)",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1933,7 +2112,8 @@
                 "Lower": 70.45,
                 "Upper": 70.45
             },
-            "Summary": "FM Calling channel"
+            "Summary": "FM Calling channel",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1942,7 +2122,8 @@
                 "Lower": 70.4265,
                 "Upper": 70.4265
             },
-            "Summary": "Digital Modes"
+            "Summary": "Digital Modes",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1951,7 +2132,8 @@
                 "Lower": 70.4875,
                 "Upper": 70.4875
             },
-            "Summary": "Digital Modes"
+            "Summary": "Digital Modes",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 2.7,
@@ -1964,7 +2146,8 @@
                 "Lower": 144.0,
                 "Upper": 144.025
             },
-            "Summary": "All modes - incl. Satellite downlinks"
+            "Summary": "All modes - incl. Satellite downlinks",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.5,
@@ -1975,7 +2158,8 @@
                 "Lower": 144.025,
                 "Upper": 144.1
             },
-            "Summary": "Telegraphy - incl. EME"
+            "Summary": "Telegraphy - incl. EME",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -1984,7 +2168,8 @@
                 "Lower": 144.05,
                 "Upper": 144.05
             },
-            "Summary": "Telegraphy CoA"
+            "Summary": "Telegraphy CoA",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -1993,7 +2178,8 @@
                 "Lower": 144.1,
                 "Upper": 144.1
             },
-            "Summary": "Random MS Telegraphy"
+            "Summary": "Random MS Telegraphy",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.5,
@@ -2005,7 +2191,8 @@
                 "Lower": 144.1,
                 "Upper": 144.15
             },
-            "Summary": "Telegraphy and MGM"
+            "Summary": "Telegraphy and MGM",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 2.7,
@@ -2018,7 +2205,8 @@
                 "Lower": 144.15,
                 "Upper": 144.4
             },
-            "Summary": "Limited band modse"
+            "Summary": "Limited band modse",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -2027,7 +2215,8 @@
                 "Lower": 144.25,
                 "Upper": 144.25
             },
-            "Summary": "GB2RS and Slow Morse"
+            "Summary": "GB2RS and Slow Morse",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2036,7 +2225,8 @@
                 "Lower": 144.3,
                 "Upper": 144.3
             },
-            "Summary": "SSB CoA"
+            "Summary": "SSB CoA",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2045,7 +2235,8 @@
                 "Lower": 144.37,
                 "Upper": 144.37
             },
-            "Summary": "MGM MS Calling"
+            "Summary": "MGM MS Calling",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2056,7 +2247,8 @@
                 "Lower": 144.4,
                 "Upper": 144.49
             },
-            "Summary": "Propagation Beacons"
+            "Summary": "Propagation Beacons",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -2067,7 +2259,8 @@
                 "Lower": 144.49,
                 "Upper": 144.5
             },
-            "Summary": "Personal Beacons"
+            "Summary": "Personal Beacons",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -2076,7 +2269,8 @@
                 "Lower": 144.491,
                 "Upper": 144.493
             },
-            "Summary": "Weak Signal MGM beacons"
+            "Summary": "Weak Signal MGM beacons",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 20.0,
@@ -2089,7 +2283,8 @@
                 "Lower": 144.5,
                 "Upper": 144.794
             },
-            "Summary": "All modes"
+            "Summary": "All modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -2098,7 +2293,8 @@
                 "Lower": 144.5,
                 "Upper": 144.5
             },
-            "Summary": "Image Modes CoA"
+            "Summary": "Image Modes CoA",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2107,7 +2303,8 @@
                 "Lower": 144.6,
                 "Upper": 144.6
             },
-            "Summary": "Data CoA"
+            "Summary": "Data CoA",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2116,7 +2313,8 @@
                 "Lower": 144.6125,
                 "Upper": 144.6125
             },
-            "Summary": "UK DV Calling"
+            "Summary": "UK DV Calling",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2125,7 +2323,8 @@
                 "Lower": 144.75,
                 "Upper": 144.75
             },
-            "Summary": "ATV Callback"
+            "Summary": "ATV Callback",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 12.0,
@@ -2136,7 +2335,8 @@
                 "Lower": 144.794,
                 "Upper": 144.99
             },
-            "Summary": "MGM Digital"
+            "Summary": "MGM Digital",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -2145,7 +2345,8 @@
                 "Lower": 144.8,
                 "Upper": 144.8
             },
-            "Summary": "Unconnected nets: APRS, Uview etc."
+            "Summary": "Unconnected nets: APRS, Uview etc.",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2154,7 +2355,8 @@
                 "Lower": 144.8125,
                 "Upper": 144.8125
             },
-            "Summary": "DV Internet voice gateway"
+            "Summary": "DV Internet voice gateway",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2163,7 +2365,8 @@
                 "Lower": 144.825,
                 "Upper": 144.825
             },
-            "Summary": "DV Internet voice gateway"
+            "Summary": "DV Internet voice gateway",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2172,7 +2375,8 @@
                 "Lower": 144.8375,
                 "Upper": 144.8375
             },
-            "Summary": "DV Internet voice gateway"
+            "Summary": "DV Internet voice gateway",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2181,7 +2385,8 @@
                 "Lower": 144.85,
                 "Upper": 144.85
             },
-            "Summary": "DV Internet voice gateway"
+            "Summary": "DV Internet voice gateway",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2190,7 +2395,8 @@
                 "Lower": 144.8625,
                 "Upper": 144.8625
             },
-            "Summary": "DV Internet voice gateway"
+            "Summary": "DV Internet voice gateway",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2199,7 +2405,8 @@
                 "Lower": 144.875,
                 "Upper": 144.9125
             },
-            "Summary": "Internet gateways"
+            "Summary": "Internet gateways",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 0.0,
@@ -2208,7 +2415,8 @@
                 "Lower": 144.925,
                 "Upper": 144.925
             },
-            "Summary": "Digital Usage"
+            "Summary": "Digital Usage",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2217,7 +2425,8 @@
                 "Lower": 144.9375,
                 "Upper": 144.9375
             },
-            "Summary": "Digital Usage"
+            "Summary": "Digital Usage",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2226,7 +2435,8 @@
                 "Lower": 144.95,
                 "Upper": 144.95
             },
-            "Summary": "Digital Usage"
+            "Summary": "Digital Usage",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2235,7 +2445,8 @@
                 "Lower": 144.9625,
                 "Upper": 144.9625
             },
-            "Summary": "FM Internet Voice gateway"
+            "Summary": "FM Internet Voice gateway",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2244,7 +2455,8 @@
                 "Lower": 144.975,
                 "Upper": 144.975
             },
-            "Summary": "Low power, ad-hoc repeaters"
+            "Summary": "Low power, ad-hoc repeaters",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2253,7 +2465,8 @@
                 "Lower": 144.9875,
                 "Upper": 144.9875
             },
-            "Summary": "Low power, ad-hoc repeaters"
+            "Summary": "Low power, ad-hoc repeaters",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 12.0,
@@ -2266,7 +2479,8 @@
                 "Lower": 144.99,
                 "Upper": 145.1935
             },
-            "Summary": "FM/DV Repeater inputs @ 12.5 kHz channels"
+            "Summary": "FM/DV Repeater inputs @ 12.5 kHz channels",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 12.0,
@@ -2278,7 +2492,8 @@
                 "Lower": 145.1935,
                 "Upper": 145.5935
             },
-            "Summary": "FM/DV Simplex @ 12.5 kHz channels"
+            "Summary": "FM/DV Simplex @ 12.5 kHz channels",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -2287,7 +2502,8 @@
                 "Lower": 145.2,
                 "Upper": 145.2
             },
-            "Summary": "FM/DV Space Communications – Earth to Space"
+            "Summary": "FM/DV Space Communications – Earth to Space",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2296,7 +2512,8 @@
                 "Lower": 145.2125,
                 "Upper": 145.2125
             },
-            "Summary": "FM Internet Voice gateway"
+            "Summary": "FM Internet Voice gateway",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2305,7 +2522,8 @@
                 "Lower": 145.225,
                 "Upper": 145.225
             },
-            "Summary": "FM Internet Voice gateway"
+            "Summary": "FM Internet Voice gateway",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2314,7 +2532,8 @@
                 "Lower": 145.23770000000002,
                 "Upper": 145.23770000000002
             },
-            "Summary": "FM Internet Voice gateway"
+            "Summary": "FM Internet Voice gateway",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2323,7 +2542,8 @@
                 "Lower": 145.25,
                 "Upper": 145.25
             },
-            "Summary": "Slow Morse Transmission"
+            "Summary": "Slow Morse Transmission",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2332,7 +2552,8 @@
                 "Lower": 145.2625,
                 "Upper": 145.2625
             },
-            "Summary": "FM Internet Voice gateway"
+            "Summary": "FM Internet Voice gateway",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2341,7 +2562,8 @@
                 "Lower": 145.2875,
                 "Upper": 145.2875
             },
-            "Summary": "FM Internet Voice gateway"
+            "Summary": "FM Internet Voice gateway",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2350,7 +2572,8 @@
                 "Lower": 145.3125,
                 "Upper": 145.3125
             },
-            "Summary": "FM Internet Voice gateway"
+            "Summary": "FM Internet Voice gateway",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2359,7 +2582,8 @@
                 "Lower": 145.3375,
                 "Upper": 145.3375
             },
-            "Summary": "FM Internet Voice gateway"
+            "Summary": "FM Internet Voice gateway",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2368,7 +2592,8 @@
                 "Lower": 145.5,
                 "Upper": 145.5
             },
-            "Summary": "FM Calling Channel"
+            "Summary": "FM Calling Channel",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2377,7 +2602,8 @@
                 "Lower": 145.525,
                 "Upper": 145.525
             },
-            "Summary": "Used for GB2RS"
+            "Summary": "Used for GB2RS",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2386,7 +2612,8 @@
                 "Lower": 145.55,
                 "Upper": 145.55
             },
-            "Summary": "Used for rally/exhibition talk-in"
+            "Summary": "Used for rally/exhibition talk-in",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2395,7 +2622,8 @@
                 "Lower": 145.575,
                 "Upper": 145.575
             },
-            "Summary": "Low power, ad-hoc repeaters"
+            "Summary": "Low power, ad-hoc repeaters",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2404,7 +2632,8 @@
                 "Lower": 145.5875,
                 "Upper": 145.5875
             },
-            "Summary": ""
+            "Summary": "",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 12.0,
@@ -2417,7 +2646,8 @@
                 "Lower": 145.5935,
                 "Upper": 145.7935
             },
-            "Summary": "FM/DV Repeater outputs @ 12.5 kHz channels"
+            "Summary": "FM/DV Repeater outputs @ 12.5 kHz channels",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 12.0,
@@ -2429,7 +2659,8 @@
                 "Lower": 145.7935,
                 "Upper": 145.806
             },
-            "Summary": "FM/DV Space downlink @145800"
+            "Summary": "FM/DV Space downlink @145800",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 12.0,
@@ -2443,7 +2674,8 @@
                 "Lower": 145.806,
                 "Upper": 146.0
             },
-            "Summary": "All modes - satellite exclusive"
+            "Summary": "All modes - satellite exclusive",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 500.0,
@@ -2454,7 +2686,8 @@
                 "Lower": 146.0,
                 "Upper": 146.9
             },
-            "Summary": "Wideband digital modes (high-speed data or DATV)"
+            "Summary": "Wideband digital modes (high-speed data or DATV)",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -2463,7 +2696,8 @@
                 "Lower": 146.5,
                 "Upper": 146.5
             },
-            "Summary": "Centre Frequency"
+            "Summary": "Centre Frequency",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 12.0,
@@ -2474,7 +2708,8 @@
                 "Lower": 146.9,
                 "Upper": 147.0
             },
-            "Summary": "Narrow band digital (incl. DV)"
+            "Summary": "Narrow band digital (incl. DV)",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -2483,7 +2718,8 @@
                 "Lower": 146.9375,
                 "Upper": 146.9375
             },
-            "Summary": "Not available in/near Scotland"
+            "Summary": "Not available in/near Scotland",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 20.0,
@@ -2496,7 +2732,8 @@
                 "Lower": 430.0,
                 "Upper": 432.0
             },
-            "Summary": "FM/DV Various"
+            "Summary": "FM/DV Various",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -2505,7 +2742,8 @@
                 "Lower": 430.0125,
                 "Upper": 430.1
             },
-            "Summary": "FM Internet Voice gateway"
+            "Summary": "FM Internet Voice gateway",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 0.0,
@@ -2514,7 +2752,8 @@
                 "Lower": 430.125,
                 "Upper": 430.1375
             },
-            "Summary": "DV 9 MHz split repeater inputs"
+            "Summary": "DV 9 MHz split repeater inputs",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 0.0,
@@ -2523,7 +2762,8 @@
                 "Lower": 430.25,
                 "Upper": 430.3
             },
-            "Summary": "DV 9 MHz reverse-split repeater outputs"
+            "Summary": "DV 9 MHz reverse-split repeater outputs",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 0.0,
@@ -2532,7 +2772,8 @@
                 "Lower": 430.4,
                 "Upper": 430.775
             },
-            "Summary": "DV 9 MHz split repeater inputs"
+            "Summary": "DV 9 MHz split repeater inputs",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 0.0,
@@ -2541,7 +2782,8 @@
                 "Lower": 430.7875,
                 "Upper": 430.7875
             },
-            "Summary": "7.6 MHz reverse-split repeater inputs"
+            "Summary": "7.6 MHz reverse-split repeater inputs",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2550,7 +2792,8 @@
                 "Lower": 430.8,
                 "Upper": 430.8
             },
-            "Summary": "7.6 MHz talk-through"
+            "Summary": "7.6 MHz talk-through",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2559,7 +2802,8 @@
                 "Lower": 430.8125,
                 "Upper": 430.975
             },
-            "Summary": "7.6 MHz split repeater outputs"
+            "Summary": "7.6 MHz split repeater outputs",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 0.0,
@@ -2568,7 +2812,8 @@
                 "Lower": 430.99,
                 "Upper": 431.9
             },
-            "Summary": "Digital Communications"
+            "Summary": "Digital Communications",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 0.0,
@@ -2577,7 +2822,8 @@
                 "Lower": 431.015,
                 "Upper": 431.25
             },
-            "Summary": "DV Internet voice gateway"
+            "Summary": "DV Internet voice gateway",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 2.7,
@@ -2590,7 +2836,8 @@
                 "Lower": 432.0,
                 "Upper": 432.4
             },
-            "Summary": "Narrowband modes"
+            "Summary": "Narrowband modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -2599,7 +2846,8 @@
                 "Lower": 432.2,
                 "Upper": 432.2
             },
-            "Summary": "CW CoA"
+            "Summary": "CW CoA",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2608,7 +2856,8 @@
                 "Lower": 432.35,
                 "Upper": 432.35
             },
-            "Summary": "Microwave talk-back"
+            "Summary": "Microwave talk-back",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2619,7 +2868,8 @@
                 "Lower": 432.4,
                 "Upper": 432.49
             },
-            "Summary": "Propagation beacons only"
+            "Summary": "Propagation beacons only",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 12.0,
@@ -2632,7 +2882,8 @@
                 "Lower": 432.49,
                 "Upper": 432.994
             },
-            "Summary": "All modes non-channelised"
+            "Summary": "All modes non-channelised",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -2641,7 +2892,8 @@
                 "Lower": 432.491,
                 "Upper": 432.493
             },
-            "Summary": "Personal Beacons"
+            "Summary": "Personal Beacons",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 0.0,
@@ -2650,7 +2902,8 @@
                 "Lower": 432.5,
                 "Upper": 432.5
             },
-            "Summary": "Narrowband SSTV CoA"
+            "Summary": "Narrowband SSTV CoA",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2659,7 +2912,8 @@
                 "Lower": 432.625,
                 "Upper": 432.675
             },
-            "Summary": "Digital Communications"
+            "Summary": "Digital Communications",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 0.0,
@@ -2668,7 +2922,8 @@
                 "Lower": 432.775,
                 "Upper": 432.775
             },
-            "Summary": "1.6 MHz Talk-through"
+            "Summary": "1.6 MHz Talk-through",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 12.0,
@@ -2680,7 +2935,8 @@
                 "Lower": 432.994,
                 "Upper": 433.3875
             },
-            "Summary": "FM Repeater outputs"
+            "Summary": "FM Repeater outputs",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 12.0,
@@ -2689,7 +2945,8 @@
                 "Lower": 433.3875,
                 "Upper": 433.6
             },
-            "Summary": "FM/DV Simplex"
+            "Summary": "FM/DV Simplex",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 0.0,
@@ -2698,7 +2955,8 @@
                 "Lower": 433.5,
                 "Upper": 433.5
             },
-            "Summary": "FM Calling Channel"
+            "Summary": "FM Calling Channel",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2707,7 +2965,8 @@
                 "Lower": 433.55,
                 "Upper": 433.55
             },
-            "Summary": "Used for rally/exhibition talk-in"
+            "Summary": "Used for rally/exhibition talk-in",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 12.0,
@@ -2721,7 +2980,8 @@
                 "Lower": 433.6,
                 "Upper": 434.0
             },
-            "Summary": "All modes"
+            "Summary": "All modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -2730,7 +2990,8 @@
                 "Lower": 433.625,
                 "Upper": 433.675
             },
-            "Summary": "Digital Communications"
+            "Summary": "Digital Communications",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 0.0,
@@ -2739,7 +3000,8 @@
                 "Lower": 433.8,
                 "Upper": 433.8
             },
-            "Summary": "Alternate APRS"
+            "Summary": "Alternate APRS",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2748,7 +3010,8 @@
                 "Lower": 433.8,
                 "Upper": 434.25
             },
-            "Summary": "Digital Communications and Experiments"
+            "Summary": "Digital Communications and Experiments",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 0.0,
@@ -2757,7 +3020,8 @@
                 "Lower": 434.0,
                 "Upper": 434.0
             },
-            "Summary": "Low-power hot-spot"
+            "Summary": "Low-power hot-spot",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 12.0,
@@ -2769,7 +3033,8 @@
                 "Lower": 434.0,
                 "Upper": 434.594
             },
-            "Summary": "FM/DV "
+            "Summary": "FM/DV ",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -2778,7 +3043,8 @@
                 "Lower": 433.95,
                 "Upper": 434.05
             },
-            "Summary": "Internet Voice gateway"
+            "Summary": "Internet Voice gateway",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 0.0,
@@ -2787,7 +3053,8 @@
                 "Lower": 434.375,
                 "Upper": 434.375
             },
-            "Summary": "1.6 MHz Talk-through"
+            "Summary": "1.6 MHz Talk-through",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2796,7 +3063,8 @@
                 "Lower": 434.475,
                 "Upper": 434.525
             },
-            "Summary": "DV Internet voice gateway"
+            "Summary": "DV Internet voice gateway",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 12.0,
@@ -2809,7 +3077,8 @@
                 "Lower": 434.594,
                 "Upper": 435.0
             },
-            "Summary": "FM/DV Repeater inputs"
+            "Summary": "FM/DV Repeater inputs",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -2820,7 +3089,8 @@
                 "Lower": 435.0,
                 "Upper": 436.0
             },
-            "Summary": "Satellites only"
+            "Summary": "Satellites only",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -2832,7 +3102,8 @@
                 "Lower": 436.0,
                 "Upper": 438.0
             },
-            "Summary": "Satellites and experimental DATV"
+            "Summary": "Satellites and experimental DATV",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -2841,7 +3112,8 @@
                 "Lower": 437.0,
                 "Upper": 437.0
             },
-            "Summary": "Experimental DATV CoA"
+            "Summary": "Experimental DATV CoA",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2854,7 +3126,8 @@
                 "Lower": 438.0,
                 "Upper": 440.0
             },
-            "Summary": "All modes"
+            "Summary": "All modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -2863,7 +3136,8 @@
                 "Lower": 438.0,
                 "Upper": 438.375
             },
-            "Summary": "5 MHz split repeater inputs"
+            "Summary": "5 MHz split repeater inputs",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 0.0,
@@ -2872,7 +3146,8 @@
                 "Lower": 438.4,
                 "Upper": 438.4
             },
-            "Summary": "7.6 MHz talk-through"
+            "Summary": "7.6 MHz talk-through",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2881,7 +3156,8 @@
                 "Lower": 438.4125,
                 "Upper": 438.575
             },
-            "Summary": "7.6 MHz split repeater inputs"
+            "Summary": "7.6 MHz split repeater inputs",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 0.0,
@@ -2890,7 +3166,8 @@
                 "Lower": 438.6125,
                 "Upper": 438.6125
             },
-            "Summary": "DV Calling"
+            "Summary": "DV Calling",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2899,7 +3176,8 @@
                 "Lower": 438.8,
                 "Upper": 438.8
             },
-            "Summary": "Low-power hot-spot"
+            "Summary": "Low-power hot-spot",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2908,7 +3186,8 @@
                 "Lower": 439.125,
                 "Upper": 439.1375
             },
-            "Summary": "9 MHz split repeater outputs"
+            "Summary": "9 MHz split repeater outputs",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 0.0,
@@ -2917,7 +3196,8 @@
                 "Lower": 439.6,
                 "Upper": 440.0
             },
-            "Summary": "Digital Communications"
+            "Summary": "Digital Communications",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 0.0,
@@ -2926,7 +3206,8 @@
                 "Lower": 439.4,
                 "Upper": 439.775
             },
-            "Summary": "9 MHz split repeater outputs"
+            "Summary": "9 MHz split repeater outputs",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 0.0,
@@ -2935,7 +3216,8 @@
                 "Lower": 439.9,
                 "Upper": 439.9875
             },
-            "Summary": "Digital Communications"
+            "Summary": "Digital Communications",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 2.7,
@@ -2947,7 +3229,8 @@
                 "Lower": 1240.0,
                 "Upper": 1240.75
             },
-            "Summary": "Alternative narrow-band operations"
+            "Summary": "Alternative narrow-band operations",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 20.0,
@@ -2960,7 +3243,8 @@
                 "Lower": 1240.75,
                 "Upper": 1241.0
             },
-            "Summary": "FM/DV Repeater inputs"
+            "Summary": "FM/DV Repeater inputs",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 150.0,
@@ -2971,7 +3255,8 @@
                 "Lower": 1241.0,
                 "Upper": 1241.75
             },
-            "Summary": "High-speed digital data"
+            "Summary": "High-speed digital data",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 20.0,
@@ -2983,7 +3268,8 @@
                 "Lower": 1241.75,
                 "Upper": 1242.0
             },
-            "Summary": "FM/DV Simplex @ 25 kHz channels"
+            "Summary": "FM/DV Simplex @ 25 kHz channels",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -2994,7 +3280,8 @@
                 "Lower": 1242.0,
                 "Upper": 1249.0
             },
-            "Summary": "Repeater inputs"
+            "Summary": "Repeater inputs",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 20.0,
@@ -3007,7 +3294,8 @@
                 "Lower": 1249.0,
                 "Upper": 1249.25
             },
-            "Summary": "FM/DV Repeater outputs"
+            "Summary": "FM/DV Repeater outputs",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -3018,7 +3306,8 @@
                 "Lower": 1249.25,
                 "Upper": 1250.0
             },
-            "Summary": ""
+            "Summary": "",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -3029,7 +3318,8 @@
                 "Lower": 1250.0,
                 "Upper": 1290.0
             },
-            "Summary": "Amateur Satellite service"
+            "Summary": "Amateur Satellite service",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 20.0,
@@ -3042,7 +3332,8 @@
                 "Lower": 1290.0,
                 "Upper": 1291.5
             },
-            "Summary": "FM/DV Repeater – inputs"
+            "Summary": "FM/DV Repeater – inputs",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -3057,7 +3348,8 @@
                 "Lower": 1291.5,
                 "Upper": 1296.0
             },
-            "Summary": "All mdes"
+            "Summary": "All mdes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.5,
@@ -3069,7 +3361,8 @@
                 "Lower": 1296.0,
                 "Upper": 1296.15
             },
-            "Summary": "Narrow band "
+            "Summary": "Narrow band ",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 2.7,
@@ -3082,7 +3375,8 @@
                 "Lower": 1296.15,
                 "Upper": 1296.8
             },
-            "Summary": ""
+            "Summary": "",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -3093,7 +3387,8 @@
                 "Lower": 1296.8,
                 "Upper": 1296.994
             },
-            "Summary": "Beacons"
+            "Summary": "Beacons",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 20.0,
@@ -3106,7 +3401,8 @@
                 "Lower": 1296.994,
                 "Upper": 1297.4875
             },
-            "Summary": "FM/DV Repeater outputs"
+            "Summary": "FM/DV Repeater outputs",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 20.0,
@@ -3118,7 +3414,8 @@
                 "Lower": 1297.4875,
                 "Upper": 1298.0
             },
-            "Summary": "FM/DV Simplex"
+            "Summary": "FM/DV Simplex",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 20.0,
@@ -3133,7 +3430,8 @@
                 "Lower": 1298.0,
                 "Upper": 1299.0
             },
-            "Summary": "All modes"
+            "Summary": "All modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 150.0,
@@ -3144,7 +3442,8 @@
                 "Lower": 1299.0,
                 "Upper": 1299.75
             },
-            "Summary": "High-speed digital data"
+            "Summary": "High-speed digital data",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 20.0,
@@ -3156,7 +3455,8 @@
                 "Lower": 1299.75,
                 "Upper": 1300.0
             },
-            "Summary": "FM/DV Simplex"
+            "Summary": "FM/DV Simplex",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -3168,7 +3468,8 @@
                 "Lower": 1300.0,
                 "Upper": 1325.0
             },
-            "Summary": "TV Repeaters"
+            "Summary": "TV Repeaters",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 2.7,
@@ -3181,7 +3482,8 @@
                 "Lower": 2300.0,
                 "Upper": 2300.4
             },
-            "Summary": "Narrowband modes"
+            "Summary": "Narrowband modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 500.0,
@@ -3194,7 +3496,8 @@
                 "Lower": 2300.4,
                 "Upper": 2301.8
             },
-            "Summary": "Wideband modes"
+            "Summary": "Wideband modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 2.7,
@@ -3207,7 +3510,8 @@
                 "Lower": 2301.8,
                 "Upper": 2301.0
             },
-            "Summary": "Narrowband modes"
+            "Summary": "Narrowband modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 200.0,
@@ -3219,7 +3523,8 @@
                 "Lower": 2310.0,
                 "Upper": 2320.0
             },
-            "Summary": ""
+            "Summary": "",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 2.7,
@@ -3230,7 +3535,8 @@
                 "Lower": 2320.0,
                 "Upper": 2320.8
             },
-            "Summary": ""
+            "Summary": "",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -3241,7 +3547,8 @@
                 "Lower": 2320.8,
                 "Upper": 2321.0
             },
-            "Summary": ""
+            "Summary": "",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 20.0,
@@ -3253,7 +3560,8 @@
                 "Lower": 2321.0,
                 "Upper": 2322.0
             },
-            "Summary": ""
+            "Summary": "",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -3265,7 +3573,8 @@
                 "Lower": 2322.0,
                 "Upper": 2350.0
             },
-            "Summary": "Wideband modes"
+            "Summary": "Wideband modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -3277,7 +3586,8 @@
                 "Lower": 2390.0,
                 "Upper": 2400.0
             },
-            "Summary": ""
+            "Summary": "",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -3289,7 +3599,8 @@
                 "Lower": 2400.0,
                 "Upper": 2450.0
             },
-            "Summary": ""
+            "Summary": "",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 2.7,
@@ -3302,7 +3613,8 @@
                 "Lower": 3400.0,
                 "Upper": 3400.8
             },
-            "Summary": "Narrowband modes"
+            "Summary": "Narrowband modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -3313,7 +3625,8 @@
                 "Lower": 3400.8,
                 "Upper": 3401.0
             },
-            "Summary": ""
+            "Summary": "",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 200.0,
@@ -3324,7 +3637,8 @@
                 "Lower": 3401.0,
                 "Upper": 3402.0
             },
-            "Summary": "Wideband "
+            "Summary": "Wideband ",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -3336,7 +3650,8 @@
                 "Lower": 3402.0,
                 "Upper": 3410.0
             },
-            "Summary": "Wideband modes"
+            "Summary": "Wideband modes",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -3347,7 +3662,8 @@
                 "Lower": 5650.0,
                 "Upper": 5850.0
             },
-            "Summary": ""
+            "Summary": "",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -3358,7 +3674,8 @@
                 "Lower": 10000.0,
                 "Upper": 10500.0
             },
-            "Summary": ""
+            "Summary": "",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -3369,7 +3686,8 @@
                 "Lower": 24000.0,
                 "Upper": 24250.0
             },
-            "Summary": ""
+            "Summary": "",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -3380,7 +3698,8 @@
                 "Lower": 47000.0,
                 "Upper": 47090.0
             },
-            "Summary": ""
+            "Summary": "",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -3391,7 +3710,8 @@
                 "Lower": 75500.0,
                 "Upper": 81000.0
             },
-            "Summary": ""
+            "Summary": "",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -3402,7 +3722,8 @@
                 "Lower": 122250.0,
                 "Upper": 123000.0
             },
-            "Summary": ""
+            "Summary": "",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -3413,7 +3734,8 @@
                 "Lower": 134000.0,
                 "Upper": 141000.0
             },
-            "Summary": ""
+            "Summary": "",
+            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,
@@ -3424,7 +3746,8 @@
                 "Lower": 241000.0,
                 "Upper": 250000.0
             },
-            "Summary": ""
+            "Summary": "",
+            "Type": "Sub-band"
         }
     ]
 }

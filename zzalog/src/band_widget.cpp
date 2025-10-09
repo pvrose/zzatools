@@ -439,6 +439,7 @@ void band_widget::generate_items() {
 		double u = (*it)->range.upper;
 		double ll = max(l, scale_range_.lower);
 		double lu = min(u, scale_range_.upper);
+		band_data::entry_t type = (*it)->type;
 		bool include;
 		if ((l >= scale_range_.lower && l < scale_range_.upper) ||
 			(u > scale_range_.lower && u <= scale_range_.upper)) {
@@ -456,7 +457,7 @@ void band_widget::generate_items() {
 			}
 		}
 		// Now process the data item
-		if (l == u) {
+		if (type == SPOT) {
 			// SPOT
 			if (include) {
 				snprintf(text, 128, FREQ_FORMAT " %s", l, (*it)->summary.c_str());
@@ -467,7 +468,7 @@ void band_widget::generate_items() {
 		else {
 			if (include) {
 				if (verbose_) {
-					if ((*it)->modes.size()) {
+					if (type == band_data::SUB_BAND) {
 						// SUBBAND
 						snprintf(text, 128, FREQ_FORMAT "-" FREQ_FORMAT " [%g] %s", 
 							l, u, (*it)->bandwidth, (*it)->summary.c_str());
@@ -490,7 +491,7 @@ void band_widget::generate_items() {
 						}
 					}
 				} else {
-					if ((*it)->modes.size()) {
+					if (type == band_data::SUB_BAND) {
 						// SUBBAND
 						snprintf(text, 128, FREQ_FORMAT " [%g] %s", 
 							l, (*it)->bandwidth, (*it)->summary.c_str());

@@ -18,6 +18,15 @@ extern std::string VENDOR;
 extern std::string PROGRAM_ID;
 extern std::string default_ref_directory_;
 
+// MAp band_data::entry_t
+NLOHMANN_JSON_SERIALIZE_ENUM(band_data::entry_t, {
+	{ band_data::UNKNOWN, nullptr },
+	{ band_data::BAND, "Band" },
+	{ band_data::SUB_BAND, "Sub-band" },
+	{ band_data::SPOT, "Spot frequency" },
+	{ band_data::SPOT_SET, "Set of spots"}
+})
+
 void to_json(json& j, const range_t& r) {
 	j = json {
 		{ "Lower", r.lower },
@@ -34,6 +43,7 @@ void from_json(const json& j, range_t& r) {
 //! band_entry_t to json convertor
 void to_json(json& j, const band_data::band_entry_t& e) {
 	j = json{
+		{ "Type", json(e.type) },
 		{ "Range", json(e.range) },
 		{ "Bandwidth", e.bandwidth },
 		{ "Modes", e.modes },
@@ -41,13 +51,24 @@ void to_json(json& j, const band_data::band_entry_t& e) {
 	};
 }
 void from_json(const json& j, band_data::band_entry_t& e) {
+	if (j.find("Type") == j.end()) e.type = band_data::UNKNOWN;
+	else j.at("Type").get_to(e.type);
 	j.at("Range").get_to(e.range);
 	j.at("Bandwidth").get_to(e.bandwidth);
 	j.at("Modes").get_to(e.modes);
 	j.at("Summary").get_to(e.summary);
+	if (e.type == band_data::UNKNOWN) {
+		if (e.range.lower == e.range.upper) {
+			e.type = band_data::SPOT;
+		}
+		else if (e.modes.size() == 0) {
+			e.type = band_data::SPOT_SET;
+		}
+		else {
+			e.type = band_data::SUB_BAND;
+		}
+	}
 }
-
-
 
 // Constructor 
 band_data::band_data()
@@ -60,7 +81,7 @@ band_data::band_data()
 // Destructor
 band_data::~band_data()
 {
-//	save_json();
+	save_json();
 	for (auto it = entries_.begin(); it != entries_.end(); it++) {
 		delete* it;
 	}

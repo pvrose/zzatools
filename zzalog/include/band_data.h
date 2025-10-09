@@ -32,12 +32,22 @@ struct range_t {
 class band_data
 {
 public:
+	//! BAnd entry type
+	enum entry_t : uint8_t {
+		UNKNOWN = 0,        //!< Unknown type - evaluate from modes and range
+		BAND,               //!< Full band
+		SUB_BAND,           //!< Mode-specific sub-band
+		SPOT,               //!< Individual spot frequency
+		SPOT_SET            //!< A set of spot frequencies
+	};
+
 	//! Band entry structure
 	struct band_entry_t {
-		range_t range;      //!< Lower to upper frequency range (MHz)
-		double bandwidth;   //!< Maximum bandwidth usable in sub-band
+		entry_t type;                 //!< Type of entry
+		range_t range;                //!< Lower to upper frequency range (MHz)
+		double bandwidth;             //!< Maximum bandwidth usable in sub-band
 		std::set<std::string> modes;  //!< Modes allowed
-		std::string summary;     //!< Summary display
+		std::string summary;          //!< Summary display
 
 		//! Default Constructor 
 		band_entry_t() :
