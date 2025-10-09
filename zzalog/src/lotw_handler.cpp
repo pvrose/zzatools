@@ -268,6 +268,15 @@ bool lotw_handler::upload_single_qso(qso_num_t record_num) {
 		status_->misc_status(ST_WARNING, message);
 		upload_qso = false;
 	}
+	else if (this_record->item("LOTW_SENT") == "N") {
+		char message[128];
+		snprintf(message, 128, "LOTW: QSO %s %s %s marked \"No QSL\" - not uploading",
+			this_record->item("QSO_DATE").c_str(),
+			this_record->item("TIME_ON").c_str(),
+			this_record->item("CALL").c_str());
+		status_->misc_status(ST_WARNING, message);
+		upload_qso = false;
+	}
 	if (upload_qso) {
 		// Create book with single record
 		extract_data* one_qso = new extract_data;

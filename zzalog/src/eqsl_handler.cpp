@@ -969,6 +969,15 @@ bool eqsl_handler::upload_single_qso(qso_num_t record_num) {
 		status_->misc_status(ST_WARNING, message);
 		upload_qso = false;
 	}
+	else if (this_record->item("EQSL_QSL_SENT") == "N") {
+		char message[128];
+		snprintf(message, 128, "EQSL: QSO %s %s %s marked \"no QSL\" - not uploading",
+			this_record->item("QSO_DATE").c_str(),
+			this_record->item("TIME_ON").c_str(),
+			this_record->item("CALL").c_str());
+		status_->misc_status(ST_WARNING, message);
+		upload_qso = false;
+	}
 	if (upload_qso) {
 		// Get login details
 		std::string username;

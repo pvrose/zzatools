@@ -73,6 +73,8 @@ public:
 	static void cb_bn_card_reqd(Fl_Widget* w, void* v);
 	//! Callback when switching tabs: formats labels.
 	static void cb_tabs(Fl_Widget* w, void* v);
+	//! Callback from QSL Declined (in Status): /p v indicates the QSL server
+	static void cb_bn_decline(Fl_Widget* w, void* v);
 
 	//! Set QSO record \p qso and its index \p number.
 	void set_qso(record* qso, qso_num_t number);
@@ -88,6 +90,8 @@ protected:
 	void set_log_buttons();
 	//! Configure the QSL received sttaus buttons.
 	void set_qsl_status();
+	//! Set the *declined widgets
+	void set_declines();
 	//! Update the full-size image display window.
 	void update_full_view();
 
@@ -134,6 +138,11 @@ protected:
 	Fl_Check_Button* bn_qrz_sstatus_;         //!< Check: QRZ.com sent
 	Fl_Check_Button* bn_club_sstatus_;        //!< Check: Clublog sent.
 	Fl_Check_Button* bn_card_sstatus_;        //!< Check: Card sent.
+	Fl_Check_Button* bn_eqsl_decline_;        //!< Check: Decline eQSL
+	Fl_Check_Button* bn_lotw_decline_;        //!< Check: Decline LotW
+	Fl_Check_Button* bn_qrz_decline_;         //!< Check: Decline QRZ.com
+	Fl_Check_Button* bn_club_decline_;        //!< Check: Decline Clublog
+	Fl_Check_Button* bn_card_decline_;        //!< Check: Decline card
 	// "Edit" tab
 	Fl_Group* grp_editor_;
 	Fl_Button* bn_fetch_;                     //!< Button: Fetch image from eQSL.cc

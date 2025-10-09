@@ -216,6 +216,9 @@ bool club_handler::upload_single_qso(qso_num_t record_num) {
 	if (this_record->item("CLUBLOG_QSO_UPLOAD_STATUS") == "Y") {
 		upload_qso = false;
 	}
+	else if (this_record->item("CLUBLOG_QSO_UPLOAD_STATUS") == "N") {
+		upload_qso = false;
+	}
 	if (upload_qso) {
 		// Suspend saving
 		book_->enable_save(false, "Uploading to Clublog");

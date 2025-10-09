@@ -223,7 +223,7 @@ void qso_qsl_vwr::create_form() {
 	curr_y = grp_status_->y() + GAP;
 	curr_x = grp_status_->x() + GAP;
 	const int W2 = WBUTTON / 2;
-	const int W1 = grp_viewer_->w() - 2 * GAP - 2 * W2;
+	const int W1 = grp_viewer_->w() - 2 * GAP - 3 * W2;
 	curr_x += W1;
 
 	Fl_Box* labelC2= new Fl_Box(curr_x, curr_y, W2, HBUTTON, "R");
@@ -237,6 +237,12 @@ void qso_qsl_vwr::create_form() {
 	labelC3->box(FL_FLAT_BOX);
 	labelC3->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 	labelC3->color(FL_BACKGROUND_COLOR);
+
+	curr_x += W2;
+	Fl_Box* labelC4 = new Fl_Box(curr_x, curr_y, W2, HBUTTON, "No");
+	labelC4->box(FL_FLAT_BOX);
+	labelC4->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+	labelC4->color(FL_BACKGROUND_COLOR);
 
 	curr_x = grp_status_->x() + GAP;
 	curr_y += HBUTTON;
@@ -257,6 +263,12 @@ void qso_qsl_vwr::create_form() {
 	bn_eqsl_sstatus_ = new Fl_Check_Button(curr_x, curr_y, W2, HRADIO);
 	bn_eqsl_sstatus_->box(FL_FLAT_BOX);
 	bn_eqsl_sstatus_->type(bn_eqsl_sstatus_->type() & ~FL_TOGGLE_BUTTON);
+
+	curr_x += W2;
+	bn_eqsl_decline_ = new Fl_Check_Button(curr_x, curr_y, W2, HRADIO);
+	bn_eqsl_decline_->box(FL_FLAT_BOX);
+	bn_eqsl_decline_->callback(cb_bn_decline, (new std::string("EQSL_QSL_SENT")));
+	bn_eqsl_decline_->tooltip("Indicates that a QSL is not to be sent");
 
 	curr_x = grp_status_->x() + GAP;
 	curr_y += HBUTTON;
@@ -279,6 +291,12 @@ void qso_qsl_vwr::create_form() {
 	bn_lotw_sstatus_->box(FL_FLAT_BOX);
 	bn_lotw_sstatus_->type(bn_lotw_sstatus_->type() & ~FL_TOGGLE_BUTTON);
 
+	curr_x += W2;
+	bn_lotw_decline_ = new Fl_Check_Button(curr_x, curr_y, W2, HRADIO);
+	bn_lotw_decline_->box(FL_FLAT_BOX);
+	bn_lotw_decline_->callback(cb_bn_decline, (new std::string("LOTW_QSL_SENT")));
+	bn_lotw_decline_->tooltip("Indicates that a QSL is not to be sent");
+
 	curr_x = grp_status_->x() + GAP;
 	curr_y += HBUTTON;
 
@@ -299,6 +317,12 @@ void qso_qsl_vwr::create_form() {
 	bn_qrz_sstatus_->box(FL_FLAT_BOX);
 	bn_qrz_sstatus_->type(bn_lotw_sstatus_->type() & ~FL_TOGGLE_BUTTON);
 
+	curr_x += W2;
+	bn_qrz_decline_ = new Fl_Check_Button(curr_x, curr_y, W2, HRADIO);
+	bn_qrz_decline_->box(FL_FLAT_BOX);
+	bn_qrz_decline_->callback(cb_bn_decline, (new std::string("QRZCOM_QSO_UPLOAD_STATUS")));
+	bn_qrz_decline_->tooltip("Indicates that a QSL is not to be sent");
+
 	curr_x = grp_status_->x() + GAP;
 	curr_y += HBUTTON;
 
@@ -311,6 +335,12 @@ void qso_qsl_vwr::create_form() {
 	bn_club_sstatus_ = new Fl_Check_Button(curr_x, curr_y, W2, HRADIO);
 	bn_club_sstatus_->box(FL_FLAT_BOX);
 	bn_club_sstatus_->type(bn_lotw_sstatus_->type() & ~FL_TOGGLE_BUTTON);
+
+	curr_x += W2;
+	bn_club_decline_ = new Fl_Check_Button(curr_x, curr_y, W2, HRADIO);
+	bn_club_decline_->box(FL_FLAT_BOX);
+	bn_club_decline_->callback(cb_bn_decline, (new std::string("CLUBLOG_QSO_UPLOAD_STATUS")));
+	bn_club_decline_->tooltip("Indicates that a QSL is not to be sent");
 
 	curr_x = grp_status_->x() + GAP;
 	curr_y += HBUTTON;
@@ -332,6 +362,12 @@ void qso_qsl_vwr::create_form() {
 	bn_card_sstatus_ = new Fl_Check_Button(curr_x, curr_y, W2, HRADIO);
 	bn_card_sstatus_->box(FL_FLAT_BOX);
 	bn_card_sstatus_->type(bn_card_sstatus_->type() & ~FL_TOGGLE_BUTTON);
+
+	curr_x += W2;
+	bn_card_decline_ = new Fl_Check_Button(curr_x, curr_y, W2, HRADIO);
+	bn_card_decline_->box(FL_FLAT_BOX);
+	bn_card_decline_->callback(cb_bn_decline, (new std::string("QSL_SENT")));
+	bn_card_decline_->tooltip("Indicates that a QSL is not to be sent");
 
 	curr_y += HBUTTON + GAP;
 	curr_x = x() + GAP;
@@ -526,6 +562,21 @@ void qso_qsl_vwr::cb_tabs(Fl_Widget* w, void* v) {
 	that->enable_widgets();
 }
 
+// Decline QSL 
+void qso_qsl_vwr::cb_bn_decline(Fl_Widget* w, void* v) {
+	qso_qsl_vwr* that = ancestor_view<qso_qsl_vwr>(w);
+	std::string* s = (std::string*)v;
+	bool value = ((Fl_Check_Button*)w)->value();
+	if (value) {
+		// QSL not wanted
+		that->current_qso_->item(*s, std::string("N"));
+	}
+	else {
+		// QSL may be wanted
+		that->current_qso_->item(*s, std::string(""));
+	}
+}
+
 // std::set the current QSO
 void qso_qsl_vwr::set_qso(record* qso, qso_num_t number) {
 	if (current_qso_ == qso) qso_changed_ = false;
@@ -552,6 +603,7 @@ void qso_qsl_vwr::enable_widgets() {
     }
 	set_image();
 	set_qsl_status();
+	set_declines();
 	char title[128];
 	if (current_qso_ == nullptr || current_qso_->item("CALL").length() == 0) {
 		strcpy(title, "No contact");
@@ -571,6 +623,31 @@ void qso_qsl_vwr::enable_widgets() {
 	// update_full_view();
 	redraw();
 }
+
+// Set the declined widgets
+void qso_qsl_vwr::set_declines() {
+	if (current_qso_ && current_qso_->item("QSL_SENT") == "N")
+		bn_card_decline_->value(true);
+	else bn_card_decline_->value(false);
+
+	if (current_qso_ && current_qso_->item("EQSL_QSL_SENT") == "N")
+		bn_eqsl_decline_->value(true);
+	else bn_eqsl_decline_->value(false);
+
+	if (current_qso_ && current_qso_->item("LOTW_QSL_SENT") == "N")
+		bn_lotw_decline_->value(true);
+	else bn_lotw_decline_->value(false);
+
+	if (current_qso_ && current_qso_->item("CLUBLOG_QSO_UPLOAD_STATUS") == "N")
+		bn_club_decline_->value(true);
+	else bn_club_decline_->value(false);
+
+	if (current_qso_ && current_qso_->item("QRZCOM_QSO_UPLOAD_STATUS") == "N")
+		bn_qrz_decline_->value(true);
+	else bn_qrz_decline_->value(false);
+	qso_data* data = ancestor_view<qso_data>(this);
+}
+
 
 // Get the card image to display and put it in the image widget.
 void qso_qsl_vwr::set_image() {
