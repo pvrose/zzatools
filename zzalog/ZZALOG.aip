@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DOCUMENT Type="Advanced Installer" CreateVersion="22.8" version="23.0" Modules="simple" RootPath="." Language="en_GB" Id="{023CFA17-61FC-4142-B8CC-CD8CA63951A9}">
+<DOCUMENT Type="Advanced Installer" CreateVersion="22.8" version="23.0.1" Modules="simple" RootPath="." Language="en_GB" Id="{023CFA17-61FC-4142-B8CC-CD8CA63951A9}">
   <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
     <ROW Property="AI_APP_FILE" Value="[#zzalog.exe]"/>
     <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
@@ -2108,6 +2108,8 @@
     <ROW File="condx_view_3.png" Component_="adding.html" FileName="CONDX_~3.PNG|condx_view_3.png" Attributes="0" SourcePath="userguide\images\condx_view_3.png" SelfReg="false"/>
     <ROW File="condx_view_4.png" Component_="adding.html" FileName="CONDX_~4.PNG|condx_view_4.png" Attributes="0" SourcePath="userguide\images\condx_view_4.png" SelfReg="false"/>
     <ROW File="condx_view_5.png" Component_="adding.html" FileName="CONDX_~5.PNG|condx_view_5.png" Attributes="0" SourcePath="userguide\images\condx_view_5.png" SelfReg="false"/>
+    <ROW File="googlemaps.png" Component_="all.xml" FileName="GOOGLE~1.PNG|google-maps.png" Attributes="0" SourcePath="..\reference\google-maps.png" SelfReg="false"/>
+    <ROW File="qrz_1.jpg" Component_="all.xml" FileName="qrz_1.jpg" Attributes="0" SourcePath="..\reference\qrz_1.jpg" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.custcomp.MsiShortcutPropertyComponent">
     <ROW MsiShortcutProperty="ZZALOG.pdf0" Shortcut_="ZZALOG.pdf" PropertyKey="System.AppUserModel.PreventPinning" PropVariantValue="1"/>

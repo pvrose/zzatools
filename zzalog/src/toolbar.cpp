@@ -20,6 +20,7 @@
 
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Help_Dialog.H>
+#include <FL/Fl_JPEG_Image.H>
 #include <FL/Fl_PNG_Image.H>
 #include <FL/Fl_RGB_Image.H>
 #include <FL/Fl_Single_Window.H>
@@ -38,6 +39,7 @@ extern qso_manager* qso_manager_;
 extern status* status_;
 extern tabbed_forms* tabbed_forms_;
 extern Fl_PNG_Image main_icon_;
+extern std::string default_ref_directory_;
 
 extern bool DARK;
 extern void open_html(const char*);
@@ -167,7 +169,8 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	bn = new Fl_Button(curr_x, Y, H, H, 0);
 	bn->callback(cb_bn_menu, (void*)"&Import/Download e&QSL");
 	bn->when(FL_WHEN_RELEASE);
-	bn->image(new Fl_RGB_Image(ICON_DL_EQSL, 16, 16, 4));
+	bn->labelsize(FL_NORMAL_SIZE * 2 / 3);
+	bn->label("eQSL\n\342\206\223\342\206\223");
 	bn->tooltip("Download and import eQSL records");
 	add(bn);
 	curr_x += H;
@@ -175,7 +178,8 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	bn = new Fl_Button(curr_x, Y, H, H, 0);
 	bn->callback(cb_bn_menu, (void*)"&Import/Download &LotW");
 	bn->when(FL_WHEN_RELEASE);
-	bn->image(new Fl_RGB_Image(ICON_DL_LOTW, 16, 16, 4));
+	bn->labelsize(FL_NORMAL_SIZE * 2 / 3);
+	bn->label("LotW\n\342\206\223\342\206\223");
 	bn->tooltip("Download and import LotW records");
 	add(bn);
 	curr_x += H;
@@ -183,7 +187,8 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	bn = new Fl_Button(curr_x, Y, H, H, 0);
 	bn->callback(cb_bn_menu, (void*)"E&xtract/e&QSL");
 	bn->when(FL_WHEN_RELEASE);
-	bn->image(new Fl_RGB_Image(ICON_EXTR_EQSL, 16, 16, 4));
+	bn->labelsize(FL_NORMAL_SIZE * 2 / 3);
+	bn->label("eQSL\n??");
 	bn->tooltip("Extract unsent eQSL records");
 	add(bn);
 	curr_x += H;
@@ -191,7 +196,8 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	bn = new Fl_Button(curr_x, Y, H, H, 0);
 	bn->callback(cb_bn_menu, (void*)"E&xtract/&LotW");
 	bn->when(FL_WHEN_RELEASE);
-	bn->image(new Fl_RGB_Image(ICON_EXTR_LOTW, 16, 16, 4));
+	bn->labelsize(FL_NORMAL_SIZE * 2 / 3);
+	bn->label("LotWL\n??");
 	bn->tooltip("Extract unsent LotW records");
 	add(bn);
 	curr_x += H;
@@ -199,7 +205,8 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	bn = new Fl_Button(curr_x, Y, H, H, 0);
 	bn->callback(cb_bn_menu, (void*)"E&xtract/Club&Log");
 	bn->when(FL_WHEN_RELEASE);
-	bn->image(new Fl_RGB_Image(ICON_EXTR_CLOG, 16, 16, 4));
+	bn->labelsize(FL_NORMAL_SIZE * 2 / 3);
+	bn->label("CLog\n??");
 	bn->tooltip("Extract unsent ClubLog records");
 	add(bn);
 	curr_x += H;
@@ -207,7 +214,7 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	bn = new Fl_Button(curr_x, Y, H, H, 0);
 	bn->callback(cb_bn_menu, (void*)"E&xtract/&Upload");
 	bn->when(FL_WHEN_RELEASE);
-	bn->image(new Fl_RGB_Image(ICON_UPLOAD, 16, 16, 4));
+	bn->label("\342\206\221\342\206\221");
 	bn->tooltip("Upload extracted records");
 	add(bn);
 	curr_x += H + TOOL_GAP;
@@ -248,7 +255,12 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	bn = new Fl_Button(curr_x, Y, H, H, 0);
 	bn->callback(cb_bn_menu, (void*)"&Information/Google &Maps");
 	bn->when(FL_WHEN_RELEASE);
-	bn->image(new Fl_RGB_Image(ICON_MAP, 16, 16, 4));
+	std::string gmap_filename = default_ref_directory_ + "google-maps.png";
+	Fl_PNG_Image* pi = new Fl_PNG_Image(gmap_filename.c_str());
+	if (pi && !pi->fail())
+		bn->image(pi->copy(H, H));
+	else
+		bn->label("MAP");
 	bn->tooltip("Look up location in Google Maps");
 	add(bn);
 	curr_x += H;
@@ -256,7 +268,12 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	bn = new Fl_Button(curr_x, Y, H, H, 0);
 	bn->callback(menu::cb_mi_info_qrz, &search_text_);
 	bn->when(FL_WHEN_RELEASE);
-	bn->image(new Fl_RGB_Image(ICON_QRZ_COM, 16, 16, 4));
+	std::string qrz_filename = default_ref_directory_ + "qrz_1.jpg";
+	Fl_JPEG_Image* qi = new Fl_JPEG_Image(qrz_filename.c_str());
+	if (qi && !qi->fail())
+		bn->image(qi->copy(H, H));
+	else
+		bn->label("QRZ");
 	bn->tooltip("Look up contact in QRZ.com");
 	add(bn);
 	curr_x += H;
