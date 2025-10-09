@@ -457,7 +457,7 @@ void band_widget::generate_items() {
 			}
 		}
 		// Now process the data item
-		if (type == SPOT) {
+		if (type == band_data::SPOT) {
 			// SPOT
 			if (include) {
 				snprintf(text, 128, FREQ_FORMAT " %s", l, (*it)->summary.c_str());

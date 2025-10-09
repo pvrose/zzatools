@@ -28,14 +28,22 @@ NLOHMANN_JSON_SERIALIZE_ENUM(band_data::entry_t, {
 })
 
 void to_json(json& j, const range_t& r) {
-	j = json {
-		{ "Lower", r.lower },
-		{ "Upper", r.upper }
-	};
+	if (isnan(r.upper) || r.upper == r.lower) {
+		j = json{
+			{ "Lower", r.lower }
+		};
+	}
+	else {
+		j = json{
+			{ "Lower", r.lower },
+			{ "Upper", r.upper }
+		};
+	}
 }
 
 void from_json(const json& j, range_t& r) {
-	j.at("Upper").get_to(r.upper);
+	if (j.find("Upper") == j.end()) r.upper = nan("");
+	else j.at("Upper").get_to(r.upper);
 	j.at("Lower").get_to(r.lower);
 }
 

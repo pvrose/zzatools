@@ -81,8 +81,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 1.836,
-                "Upper": 1.836
+                "Lower": 1.836
             },
             "Summary": "QRP (low power) Centre of Activity, ",
             "Type": "Spot frequency"
@@ -91,8 +90,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 1.96,
-                "Upper": 1.96
+                "Lower": 1.96
             },
             "Summary": "DF Contest beacons (14dBW)",
             "Type": "Spot frequency"
@@ -125,8 +123,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 3.555,
-                "Upper": 3.555
+                "Lower": 3.555
             },
             "Summary": "QRS (slow telegraphy) Centre of Activity",
             "Type": "Spot frequency"
@@ -147,8 +144,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 3.56,
-                "Upper": 3.56
+                "Lower": 3.56
             },
             "Summary": "QRP (low power) Centre of Activity, ",
             "Type": "Spot frequency"
@@ -224,8 +220,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 3.63,
-                "Upper": 3.63
+                "Lower": 3.63
             },
             "Summary": "digital voice Centre of Activity",
             "Type": "Spot frequency"
@@ -248,8 +243,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 3.663,
-                "Upper": 3.663
+                "Lower": 3.663
             },
             "Summary": "may be used for UK emergency comms traffic.",
             "Type": "Spot frequency"
@@ -258,8 +252,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 3.69,
-                "Upper": 3.69
+                "Lower": 3.69
             },
             "Summary": "3,690 SSB QRP (low power) Centre of Activity.",
             "Type": "Spot frequency"
@@ -282,8 +275,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 3.735,
-                "Upper": 3.735
+                "Lower": 3.735
             },
             "Summary": "Image mode Centre of Activity",
             "Type": "Spot frequency"
@@ -292,8 +284,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 3.76,
-                "Upper": 3.76
+                "Lower": 3.76
             },
             "Summary": "IARU Region 1 Emergency Centre of Activity",
             "Type": "Spot frequency"
@@ -330,8 +321,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 5.262,
-                "Upper": 5.262
+                "Lower": 5.262
             },
             "Summary": "CW QRP Centre of Activity",
             "Type": "Spot frequency"
@@ -354,8 +344,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 5.2785,
-                "Upper": 5.2785
+                "Lower": 5.2785
             },
             "Summary": "May be used for UK emergency comms traffic",
             "Type": "Spot frequency"
@@ -378,8 +367,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 5.29,
-                "Upper": 5.29
+                "Lower": 5.29
             },
             "Summary": "Beacons",
             "Type": "Spot frequency"
@@ -416,8 +404,7 @@
             "Bandwidth": 6.0,
             "Modes": [],
             "Range": {
-                "Lower": 5.317,
-                "Upper": 5.317
+                "Lower": 5.317
             },
             "Summary": "AM Spot frequency",
             "Type": "Spot frequency"
@@ -522,8 +509,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 7.03,
-                "Upper": 7.03
+                "Lower": 7.03
             },
             "Summary": "QRP Centre of Activity ",
             "Type": "Spot frequency"
@@ -600,8 +586,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 7.07,
-                "Upper": 7.07
+                "Lower": 7.07
             },
             "Summary": "digital voice Centre of Activity",
             "Type": "Spot frequency"
@@ -610,8 +595,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 7.09,
-                "Upper": 7.09
+                "Lower": 7.09
             },
             "Summary": "SSB QRP Centre of Activity",
             "Type": "Spot frequency"
@@ -634,8 +618,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 7.11,
-                "Upper": 7.11
+                "Lower": 7.11
             },
             "Summary": "Region 1 Emergency Centre of Activity.",
             "Type": "Spot frequency"
@@ -658,8 +641,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 7.165,
-                "Upper": 7.165
+                "Lower": 7.165
             },
             "Summary": "Image Centre of Activity",
             "Type": "Spot frequency"
@@ -694,8 +676,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 10.116,
-                "Upper": 10.116
+                "Lower": 10.116
             },
             "Summary": "QRP (low power) Centre of Activity",
             "Type": "Spot frequency"
@@ -729,8 +710,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 14.055,
-                "Upper": 14.055
+                "Lower": 14.055
             },
             "Summary": "QRS (slow telegraphy Centre of Activity",
             "Type": "Spot frequency"
@@ -751,8 +731,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 14.06,
-                "Upper": 14.06
+                "Lower": 14.06
             },
             "Summary": "QRP (low power) Centre of Activity ",
             "Type": "Spot frequency"
@@ -840,8 +819,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 14.13,
-                "Upper": 14.13
+                "Lower": 14.13
             },
             "Summary": "digital voice Centre of Activity",
             "Type": "Spot frequency"
@@ -850,8 +828,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 14.195,
-                "Upper": 14.195
+                "Lower": 14.195
             },
             "Summary": "+/-5  Priority for Dxpeditions",
             "Type": "Spot frequency"
@@ -860,8 +837,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 14.23,
-                "Upper": 14.23
+                "Lower": 14.23
             },
             "Summary": "Image Centre of Activity.",
             "Type": "Spot frequency"
@@ -870,8 +846,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 14.285,
-                "Upper": 14.285
+                "Lower": 14.285
             },
             "Summary": "QRP Centre of Activity",
             "Type": "Spot frequency"
@@ -894,8 +869,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 14.3,
-                "Upper": 14.3
+                "Lower": 14.3
             },
             "Summary": "Global Emergency Centre of Activity",
             "Type": "Spot frequency"
@@ -916,8 +890,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 18.086,
-                "Upper": 18.086
+                "Lower": 18.086
             },
             "Summary": "QRP (low power) Centre of Activity. ",
             "Type": "Spot frequency"
@@ -992,8 +965,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 18.13,
-                "Upper": 18.13
+                "Lower": 18.13
             },
             "Summary": "SSB QRP Centre of Activity",
             "Type": "Spot frequency"
@@ -1002,8 +974,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 18.15,
-                "Upper": 18.15
+                "Lower": 18.15
             },
             "Summary": "digital voice Centre of Activity",
             "Type": "Spot frequency"
@@ -1012,8 +983,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 18.16,
-                "Upper": 18.16
+                "Lower": 18.16
             },
             "Summary": "Global Emergency Centre of Activity",
             "Type": "Spot frequency"
@@ -1034,8 +1004,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 21.055,
-                "Upper": 21.055
+                "Lower": 21.055
             },
             "Summary": "QRS (slow telegraphy) Centre of Activity. ",
             "Type": "Spot frequency"
@@ -1044,8 +1013,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 21.06,
-                "Upper": 21.06
+                "Lower": 21.06
             },
             "Summary": "QRP (low power) Centre of Activity",
             "Type": "Spot frequency"
@@ -1132,8 +1100,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 21.18,
-                "Upper": 21.18
+                "Lower": 21.18
             },
             "Summary": "digital voice Centre of Activity",
             "Type": "Spot frequency"
@@ -1142,8 +1109,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 21.285,
-                "Upper": 21.285
+                "Lower": 21.285
             },
             "Summary": "QRP Centre of Activity.   ",
             "Type": "Spot frequency"
@@ -1152,8 +1118,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 21.34,
-                "Upper": 21.34
+                "Lower": 21.34
             },
             "Summary": "Image Centre of Activity.",
             "Type": "Spot frequency"
@@ -1162,8 +1127,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 21.36,
-                "Upper": 21.36
+                "Lower": 21.36
             },
             "Summary": "Global Emergency Centre of Activity",
             "Type": "Spot frequency"
@@ -1184,8 +1148,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 24.906,
-                "Upper": 24.906
+                "Lower": 24.906
             },
             "Summary": "QRP (low power) Centre of Activity",
             "Type": "Spot frequency"
@@ -1260,8 +1223,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 24.95,
-                "Upper": 24.95
+                "Lower": 24.95
             },
             "Summary": "SSB QRP Centre of Activity",
             "Type": "Spot frequency"
@@ -1270,8 +1232,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 24.96,
-                "Upper": 24.96
+                "Lower": 24.96
             },
             "Summary": "digital voice Centre of Activity",
             "Type": "Spot frequency"
@@ -1292,8 +1253,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 28.055,
-                "Upper": 28.055
+                "Lower": 28.055
             },
             "Summary": "QRS (slow telegraphy) Centre of Activity.  ",
             "Type": "Spot frequency"
@@ -1302,8 +1262,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 28.06,
-                "Upper": 28.06
+                "Lower": 28.06
             },
             "Summary": "QRP (low power) Centre of Activity. ",
             "Type": "Spot frequency"
@@ -1429,8 +1388,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 28.33,
-                "Upper": 28.33
+                "Lower": 28.33
             },
             "Summary": "digital voice Centre of Activity",
             "Type": "Spot frequency"
@@ -1439,8 +1397,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 28.36,
-                "Upper": 28.36
+                "Lower": 28.36
             },
             "Summary": "QRP Centre of Activity. ",
             "Type": "Spot frequency"
@@ -1449,8 +1406,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 28.68,
-                "Upper": 28.68
+                "Lower": 28.68
             },
             "Summary": "Image Centre of Activity.",
             "Type": "Spot frequency"
@@ -1501,8 +1457,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 29.27,
-                "Upper": 29.27
+                "Lower": 29.27
             },
             "Summary": "Internet voice gateway - unattended",
             "Type": "Spot frequency"
@@ -1511,8 +1466,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 29.28,
-                "Upper": 29.28
+                "Lower": 29.28
             },
             "Summary": "UK Internet voice gateway - unattended",
             "Type": "Spot frequency"
@@ -1521,8 +1475,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 29.29,
-                "Upper": 29.29
+                "Lower": 29.29
             },
             "Summary": "UK Internet voice gateway - unattended",
             "Type": "Spot frequency"
@@ -1578,8 +1531,7 @@
             "Bandwidth": 6.0,
             "Modes": [],
             "Range": {
-                "Lower": 29.6,
-                "Upper": 29.6
+                "Lower": 29.6
             },
             "Summary": "All modes - FM calling channel",
             "Type": "Spot frequency"
@@ -1588,8 +1540,7 @@
             "Bandwidth": 6.0,
             "Modes": [],
             "Range": {
-                "Lower": 29.61,
-                "Upper": 29.61
+                "Lower": 29.61
             },
             "Summary": "All modes - FM simplex repeater (parrot) - input and output",
             "Type": "Spot frequency"
@@ -1620,8 +1571,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 50.05,
-                "Upper": 50.05
+                "Lower": 50.05
             },
             "Summary": "Future International CoA",
             "Type": "Spot frequency"
@@ -1630,8 +1580,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 50.09,
-                "Upper": 50.09
+                "Lower": 50.09
             },
             "Summary": "Intercontinental DX CoA",
             "Type": "Spot frequency"
@@ -1653,8 +1602,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 50.11,
-                "Upper": 50.11
+                "Lower": 50.11
             },
             "Summary": "Intercontinental DX CoA",
             "Type": "Spot frequency"
@@ -1663,8 +1611,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 50.15,
-                "Upper": 50.15
+                "Lower": 50.15
             },
             "Summary": "International CoA",
             "Type": "Spot frequency"
@@ -1686,8 +1633,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 50.285,
-                "Upper": 50.285
+                "Lower": 50.285
             },
             "Summary": "Crossband CoA",
             "Type": "Spot frequency"
@@ -1709,8 +1655,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 50.305,
-                "Upper": 50.305
+                "Lower": 50.305
             },
             "Summary": "PSK CoA",
             "Type": "Spot frequency"
@@ -1764,8 +1709,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 50.52,
-                "Upper": 50.52
+                "Lower": 50.52
             },
             "Summary": "FM/DV Internet Gateway",
             "Type": "Spot frequency"
@@ -1774,8 +1718,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 50.53,
-                "Upper": 50.53
+                "Lower": 50.53
             },
             "Summary": "FM/DV Internet Gateway",
             "Type": "Spot frequency"
@@ -1784,8 +1727,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 50.54,
-                "Upper": 50.54
+                "Lower": 50.54
             },
             "Summary": "FM/DV Internet Gateway",
             "Type": "Spot frequency"
@@ -1804,8 +1746,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 50.63,
-                "Upper": 50.63
+                "Lower": 50.63
             },
             "Summary": "DV Calling",
             "Type": "Spot frequency"
@@ -1884,8 +1825,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 51.51,
-                "Upper": 51.51
+                "Lower": 51.51
             },
             "Summary": "FM Calling Channel",
             "Type": "Spot frequency"
@@ -1894,8 +1834,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 51.53,
-                "Upper": 51.53
+                "Lower": 51.53
             },
             "Summary": "GB2RS News Broadcast and Slow Morse",
             "Type": "Spot frequency"
@@ -1942,8 +1881,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 70.185,
-                "Upper": 70.185
+                "Lower": 70.185
             },
             "Summary": "Crossband CoA",
             "Type": "Spot frequency"
@@ -1952,8 +1890,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 70.2,
-                "Upper": 70.2
+                "Lower": 70.2
             },
             "Summary": "CW/SSB CoA",
             "Type": "Spot frequency"
@@ -1962,8 +1899,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 70.25,
-                "Upper": 70.25
+                "Lower": 70.25
             },
             "Summary": "MS CoA",
             "Type": "Spot frequency"
@@ -1986,8 +1922,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 70.26,
-                "Upper": 70.26
+                "Lower": 70.26
             },
             "Summary": "AM/FM Calling Channel",
             "Type": "Spot frequency"
@@ -1996,8 +1931,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 70.27,
-                "Upper": 70.27
+                "Lower": 70.27
             },
             "Summary": "MGM CoA",
             "Type": "Spot frequency"
@@ -2019,8 +1953,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 70.3125,
-                "Upper": 70.3125
+                "Lower": 70.3125
             },
             "Summary": "Digital modes",
             "Type": "Spot frequency"
@@ -2029,8 +1962,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 70.325,
-                "Upper": 70.325
+                "Lower": 70.325
             },
             "Summary": "DX Cluster",
             "Type": "Spot frequency"
@@ -2039,8 +1971,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 70.3375,
-                "Upper": 70.3375
+                "Lower": 70.3375
             },
             "Summary": "Digital Modes",
             "Type": "Spot frequency"
@@ -2049,8 +1980,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 70.35,
-                "Upper": 70.35
+                "Lower": 70.35
             },
             "Summary": "Internet Voice gateway",
             "Type": "Spot frequency"
@@ -2059,8 +1989,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 70.3625,
-                "Upper": 70.3625
+                "Lower": 70.3625
             },
             "Summary": "Internet Voice gateway",
             "Type": "Spot frequency"
@@ -2069,8 +1998,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 70.3875,
-                "Upper": 70.3875
+                "Lower": 70.3875
             },
             "Summary": "Internet Voice gateway",
             "Type": "Spot frequency"
@@ -2079,8 +2007,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 70.4125,
-                "Upper": 70.4125
+                "Lower": 70.4125
             },
             "Summary": "Internet Voice gateway",
             "Type": "Spot frequency"
@@ -2089,8 +2016,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 70.425,
-                "Upper": 70.425
+                "Lower": 70.425
             },
             "Summary": "FM Simplex",
             "Type": "Spot frequency"
@@ -2099,8 +2025,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 70.4375,
-                "Upper": 70.4375
+                "Lower": 70.4375
             },
             "Summary": "Digital Modes (special projects)",
             "Type": "Spot frequency"
@@ -2109,8 +2034,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 70.45,
-                "Upper": 70.45
+                "Lower": 70.45
             },
             "Summary": "FM Calling channel",
             "Type": "Spot frequency"
@@ -2119,8 +2043,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 70.4265,
-                "Upper": 70.4265
+                "Lower": 70.4265
             },
             "Summary": "Digital Modes",
             "Type": "Spot frequency"
@@ -2129,8 +2052,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 70.4875,
-                "Upper": 70.4875
+                "Lower": 70.4875
             },
             "Summary": "Digital Modes",
             "Type": "Spot frequency"
@@ -2165,8 +2087,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 144.05,
-                "Upper": 144.05
+                "Lower": 144.05
             },
             "Summary": "Telegraphy CoA",
             "Type": "Spot frequency"
@@ -2175,8 +2096,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 144.1,
-                "Upper": 144.1
+                "Lower": 144.1
             },
             "Summary": "Random MS Telegraphy",
             "Type": "Spot frequency"
@@ -2212,8 +2132,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 144.25,
-                "Upper": 144.25
+                "Lower": 144.25
             },
             "Summary": "GB2RS and Slow Morse",
             "Type": "Spot frequency"
@@ -2222,8 +2141,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 144.3,
-                "Upper": 144.3
+                "Lower": 144.3
             },
             "Summary": "SSB CoA",
             "Type": "Spot frequency"
@@ -2232,8 +2150,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 144.37,
-                "Upper": 144.37
+                "Lower": 144.37
             },
             "Summary": "MGM MS Calling",
             "Type": "Spot frequency"
@@ -2290,8 +2207,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 144.5,
-                "Upper": 144.5
+                "Lower": 144.5
             },
             "Summary": "Image Modes CoA",
             "Type": "Spot frequency"
@@ -2300,8 +2216,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 144.6,
-                "Upper": 144.6
+                "Lower": 144.6
             },
             "Summary": "Data CoA",
             "Type": "Spot frequency"
@@ -2310,8 +2225,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 144.6125,
-                "Upper": 144.6125
+                "Lower": 144.6125
             },
             "Summary": "UK DV Calling",
             "Type": "Spot frequency"
@@ -2320,8 +2234,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 144.75,
-                "Upper": 144.75
+                "Lower": 144.75
             },
             "Summary": "ATV Callback",
             "Type": "Spot frequency"
@@ -2342,8 +2255,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 144.8,
-                "Upper": 144.8
+                "Lower": 144.8
             },
             "Summary": "Unconnected nets: APRS, Uview etc.",
             "Type": "Spot frequency"
@@ -2352,8 +2264,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 144.8125,
-                "Upper": 144.8125
+                "Lower": 144.8125
             },
             "Summary": "DV Internet voice gateway",
             "Type": "Spot frequency"
@@ -2362,8 +2273,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 144.825,
-                "Upper": 144.825
+                "Lower": 144.825
             },
             "Summary": "DV Internet voice gateway",
             "Type": "Spot frequency"
@@ -2372,8 +2282,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 144.8375,
-                "Upper": 144.8375
+                "Lower": 144.8375
             },
             "Summary": "DV Internet voice gateway",
             "Type": "Spot frequency"
@@ -2382,8 +2291,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 144.85,
-                "Upper": 144.85
+                "Lower": 144.85
             },
             "Summary": "DV Internet voice gateway",
             "Type": "Spot frequency"
@@ -2392,8 +2300,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 144.8625,
-                "Upper": 144.8625
+                "Lower": 144.8625
             },
             "Summary": "DV Internet voice gateway",
             "Type": "Spot frequency"
@@ -2412,8 +2319,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 144.925,
-                "Upper": 144.925
+                "Lower": 144.925
             },
             "Summary": "Digital Usage",
             "Type": "Spot frequency"
@@ -2422,8 +2328,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 144.9375,
-                "Upper": 144.9375
+                "Lower": 144.9375
             },
             "Summary": "Digital Usage",
             "Type": "Spot frequency"
@@ -2432,8 +2337,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 144.95,
-                "Upper": 144.95
+                "Lower": 144.95
             },
             "Summary": "Digital Usage",
             "Type": "Spot frequency"
@@ -2442,8 +2346,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 144.9625,
-                "Upper": 144.9625
+                "Lower": 144.9625
             },
             "Summary": "FM Internet Voice gateway",
             "Type": "Spot frequency"
@@ -2452,8 +2355,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 144.975,
-                "Upper": 144.975
+                "Lower": 144.975
             },
             "Summary": "Low power, ad-hoc repeaters",
             "Type": "Spot frequency"
@@ -2462,8 +2364,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 144.9875,
-                "Upper": 144.9875
+                "Lower": 144.9875
             },
             "Summary": "Low power, ad-hoc repeaters",
             "Type": "Spot frequency"
@@ -2499,8 +2400,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 145.2,
-                "Upper": 145.2
+                "Lower": 145.2
             },
             "Summary": "FM/DV Space Communications – Earth to Space",
             "Type": "Spot frequency"
@@ -2509,8 +2409,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 145.2125,
-                "Upper": 145.2125
+                "Lower": 145.2125
             },
             "Summary": "FM Internet Voice gateway",
             "Type": "Spot frequency"
@@ -2519,8 +2418,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 145.225,
-                "Upper": 145.225
+                "Lower": 145.225
             },
             "Summary": "FM Internet Voice gateway",
             "Type": "Spot frequency"
@@ -2529,8 +2427,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 145.23770000000002,
-                "Upper": 145.23770000000002
+                "Lower": 145.23770000000002
             },
             "Summary": "FM Internet Voice gateway",
             "Type": "Spot frequency"
@@ -2539,8 +2436,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 145.25,
-                "Upper": 145.25
+                "Lower": 145.25
             },
             "Summary": "Slow Morse Transmission",
             "Type": "Spot frequency"
@@ -2549,8 +2445,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 145.2625,
-                "Upper": 145.2625
+                "Lower": 145.2625
             },
             "Summary": "FM Internet Voice gateway",
             "Type": "Spot frequency"
@@ -2559,8 +2454,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 145.2875,
-                "Upper": 145.2875
+                "Lower": 145.2875
             },
             "Summary": "FM Internet Voice gateway",
             "Type": "Spot frequency"
@@ -2569,8 +2463,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 145.3125,
-                "Upper": 145.3125
+                "Lower": 145.3125
             },
             "Summary": "FM Internet Voice gateway",
             "Type": "Spot frequency"
@@ -2579,8 +2472,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 145.3375,
-                "Upper": 145.3375
+                "Lower": 145.3375
             },
             "Summary": "FM Internet Voice gateway",
             "Type": "Spot frequency"
@@ -2589,8 +2481,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 145.5,
-                "Upper": 145.5
+                "Lower": 145.5
             },
             "Summary": "FM Calling Channel",
             "Type": "Spot frequency"
@@ -2599,8 +2490,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 145.525,
-                "Upper": 145.525
+                "Lower": 145.525
             },
             "Summary": "Used for GB2RS",
             "Type": "Spot frequency"
@@ -2609,8 +2499,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 145.55,
-                "Upper": 145.55
+                "Lower": 145.55
             },
             "Summary": "Used for rally/exhibition talk-in",
             "Type": "Spot frequency"
@@ -2619,8 +2508,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 145.575,
-                "Upper": 145.575
+                "Lower": 145.575
             },
             "Summary": "Low power, ad-hoc repeaters",
             "Type": "Spot frequency"
@@ -2629,8 +2517,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 145.5875,
-                "Upper": 145.5875
+                "Lower": 145.5875
             },
             "Summary": "",
             "Type": "Spot frequency"
@@ -2693,8 +2580,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 146.5,
-                "Upper": 146.5
+                "Lower": 146.5
             },
             "Summary": "Centre Frequency",
             "Type": "Spot frequency"
@@ -2715,8 +2601,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 146.9375,
-                "Upper": 146.9375
+                "Lower": 146.9375
             },
             "Summary": "Not available in/near Scotland",
             "Type": "Spot frequency"
@@ -2779,8 +2664,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 430.7875,
-                "Upper": 430.7875
+                "Lower": 430.7875
             },
             "Summary": "7.6 MHz reverse-split repeater inputs",
             "Type": "Spot frequency"
@@ -2789,8 +2673,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 430.8,
-                "Upper": 430.8
+                "Lower": 430.8
             },
             "Summary": "7.6 MHz talk-through",
             "Type": "Spot frequency"
@@ -2843,8 +2726,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 432.2,
-                "Upper": 432.2
+                "Lower": 432.2
             },
             "Summary": "CW CoA",
             "Type": "Spot frequency"
@@ -2853,8 +2735,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 432.35,
-                "Upper": 432.35
+                "Lower": 432.35
             },
             "Summary": "Microwave talk-back",
             "Type": "Spot frequency"
@@ -2899,8 +2780,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 432.5,
-                "Upper": 432.5
+                "Lower": 432.5
             },
             "Summary": "Narrowband SSTV CoA",
             "Type": "Spot frequency"
@@ -2919,8 +2799,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 432.775,
-                "Upper": 432.775
+                "Lower": 432.775
             },
             "Summary": "1.6 MHz Talk-through",
             "Type": "Spot frequency"
@@ -2952,8 +2831,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 433.5,
-                "Upper": 433.5
+                "Lower": 433.5
             },
             "Summary": "FM Calling Channel",
             "Type": "Spot frequency"
@@ -2962,8 +2840,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 433.55,
-                "Upper": 433.55
+                "Lower": 433.55
             },
             "Summary": "Used for rally/exhibition talk-in",
             "Type": "Spot frequency"
@@ -2997,8 +2874,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 433.8,
-                "Upper": 433.8
+                "Lower": 433.8
             },
             "Summary": "Alternate APRS",
             "Type": "Spot frequency"
@@ -3017,8 +2893,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 434.0,
-                "Upper": 434.0
+                "Lower": 434.0
             },
             "Summary": "Low-power hot-spot",
             "Type": "Spot frequency"
@@ -3050,8 +2925,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 434.375,
-                "Upper": 434.375
+                "Lower": 434.375
             },
             "Summary": "1.6 MHz Talk-through",
             "Type": "Spot frequency"
@@ -3109,8 +2983,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 437.0,
-                "Upper": 437.0
+                "Lower": 437.0
             },
             "Summary": "Experimental DATV CoA",
             "Type": "Spot frequency"
@@ -3143,8 +3016,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 438.4,
-                "Upper": 438.4
+                "Lower": 438.4
             },
             "Summary": "7.6 MHz talk-through",
             "Type": "Spot frequency"
@@ -3163,8 +3035,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 438.6125,
-                "Upper": 438.6125
+                "Lower": 438.6125
             },
             "Summary": "DV Calling",
             "Type": "Spot frequency"
@@ -3173,8 +3044,7 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 438.8,
-                "Upper": 438.8
+                "Lower": 438.8
             },
             "Summary": "Low-power hot-spot",
             "Type": "Spot frequency"
