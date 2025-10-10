@@ -89,7 +89,10 @@ protected:
         CURRENT_LOCUM,    //!< Used for transmit frequency if ooutwith the displayed range.
         CURRENT_RX,       //!< Current receive frequency.
         CURRENT_QSO,      //!< Frequency of log QSO if tig not connected.
-        SPOT              //!< Single spot frequency.
+        SPOT,             //!< Single spot frequency.
+        BAND_UPPER,       //!< Upper limit of a band.
+        BAND_LOWER,       //!< Lower limit of a band.
+        BAND_LOCUM        //!< Used if lower is outwith the displayed frequency range.
     };
     //! Parameters describing a marker.
     struct marker {
@@ -182,7 +185,7 @@ protected:
     //! Frequency range of the band.
     range_t band_limits_;
     //! Complete std::set of band_entry_t items.
-    std::set<band_data::band_entry_t*> data_;
+    std::set<band_data::band_entry_t*, band_data::ptr_lt> data_;
     //! Used to std::map mode name to mode bar number.
     std::map<std::string, int> modes_;
     //! Used to std::map modes that are within the range.

@@ -272,6 +272,13 @@ void band_widget::draw_markers() {
 				fl_line(x_scale_, m.y_scale, x_kink1_, m.y_text);
 			}
 			break;
+		case BAND_LOWER:
+		case BAND_LOCUM:
+			fl_color(FL_FOREGROUND_COLOR);
+			draw_line(m.y_scale, m.y_text, FL_DOT);
+			fl_font(FL_BOLD, FL_NORMAL_SIZE);
+			fl_draw(m.text, x_text_, m.y_text + h_offset_);
+			break;
 		}
 	}
 }
@@ -441,22 +448,11 @@ void band_widget::generate_items() {
 		double lu = min(u, scale_range_.upper);
 		band_data::entry_t type = (*it)->type;
 		bool include;
-		switch ((*it)->type) {
-		case band_data::UNKNOWN:
-		case band_data::BAND:
-			include = false;
-			break;
-		case band_data::SPOT:
-		case band_data::SPOT_SET:
-		case band_data::SUB_BAND:
-			include = true;
-			break;
-		}
 		if ((l >= scale_range_.lower && l < scale_range_.upper) ||
 			(u > scale_range_.lower && u <= scale_range_.upper)) {
-			include &= true;
+			include = true;
 		} else {
-			include &= false;
+			include = false;
 		}
 		for (auto iu = (*it)->modes.begin(); iu != (*it)->modes.end(); iu++) {
 			// Add the mode bars
@@ -467,64 +463,75 @@ void band_widget::generate_items() {
 				}
 			}
 		}
-		// Now process the data item
-		if (type == band_data::SPOT) {
-			// SPOT
-			if (include) {
-				snprintf(text, 128, FREQ_FORMAT " %s", l, (*it)->summary.c_str());
-				add_marker({ l, SPOT, y_for_f(l), y_for_f(l), text});
-				num_spots_++;
-			}
-		}
-		else {
-			if (include) {
+		if (include) {
+			switch (type) {
+			case band_data::UNKNOWN:
+				break;
+			case band_data::BAND:
+				snprintf(text, 128, FREQ_FORMAT "-" FREQ_FORMAT " %s",
+					l, u, (*it)->summary.c_str());
+				if (l == ll) {
+					add_marker({ u, BAND_UPPER, y_for_f(u), y_for_f(u), nullptr });
+					add_marker({ l, BAND_LOWER, y_for_f(l), y_for_f(l), text });
+					num_subbands_++;
+				}
+				else {
+					add_marker({ ll, BAND_LOCUM, y_for_f(ll), y_for_f(ll), text });
+					num_subbands_++;
+				}
+				break;
+			case band_data::SUB_BAND:
 				if (verbose_) {
-					if (type == band_data::SUB_BAND) {
-						// SUBBAND
-						snprintf(text, 128, FREQ_FORMAT "-" FREQ_FORMAT " [%g] %s", 
-							l, u, (*it)->bandwidth, (*it)->summary.c_str());
-						if (l == ll) {
-							add_marker({ u, SUBBAND_UPPER, y_for_f(u), y_for_f(u), nullptr });
-							add_marker({ l, SUBBAND_LOWER, y_for_f(l), y_for_f(l), text });
-							num_subbands_++;
-						} else {
-							add_marker({ ll, SUBBAND_LOCUM, y_for_f(ll), y_for_f(ll), text});
-							num_subbands_++;
-						}
-					} else {
-						// SPOTGROUP
-						snprintf(text, 128, FREQ_FORMAT "-" FREQ_FORMAT " %s", 
-							l, u, (*it)->summary.c_str());
-						if (l == ll) {
-							add_marker({ u, SPOTGROUP_UPPER, y_for_f(u), y_for_f(u), nullptr });
-							add_marker({ l, SPOTGROUP_LOWER, y_for_f(l), y_for_f(l), text });
-							num_spots_++;
-						}
+					snprintf(text, 128, FREQ_FORMAT "-" FREQ_FORMAT " [%g] %s",
+						l, u, (*it)->bandwidth, (*it)->summary.c_str());
+					if (l == ll) {
+						add_marker({ u, SUBBAND_UPPER, y_for_f(u), y_for_f(u), nullptr });
+						add_marker({ l, SUBBAND_LOWER, y_for_f(l), y_for_f(l), text });
+						num_subbands_++;
 					}
-				} else {
-					if (type == band_data::SUB_BAND) {
-						// SUBBAND
-						snprintf(text, 128, FREQ_FORMAT " [%g] %s", 
-							l, (*it)->bandwidth, (*it)->summary.c_str());
-						if (l == ll) {
-							add_marker({ u, SUBBAND_UPPER, y_for_f(u), y_for_f(u), nullptr });
-							add_marker({ l, SUBBAND_LOWER, y_for_f(l), y_for_f(l), text });
-							num_subbands_++;
-						} else {
-							add_marker({ ll, SUBBAND_LOCUM, y_for_f(ll), y_for_f(ll), text});
-							num_subbands_++;
-						}
-					} else {
-						// SPOTGROUP
-						snprintf(text, 128, FREQ_FORMAT " %s", 
-							l, (*it)->summary.c_str());
-						if (l == ll) {
-							add_marker({ u, SPOTGROUP_UPPER, y_for_f(u), y_for_f(u), nullptr });
-							add_marker({ l, SPOTGROUP_LOWER, y_for_f(l), y_for_f(l), text });
-							num_spots_++;
-						}
+					else {
+						add_marker({ ll, SUBBAND_LOCUM, y_for_f(ll), y_for_f(ll), text });
+						num_subbands_++;
 					}
 				}
+				else {
+					snprintf(text, 128, FREQ_FORMAT " [%g] %s",
+						l, (*it)->bandwidth, (*it)->summary.c_str());
+					if (l == ll) {
+						add_marker({ u, SUBBAND_UPPER, y_for_f(u), y_for_f(u), nullptr });
+						add_marker({ l, SUBBAND_LOWER, y_for_f(l), y_for_f(l), text });
+						num_subbands_++;
+					}
+					else {
+						add_marker({ ll, SUBBAND_LOCUM, y_for_f(ll), y_for_f(ll), text });
+						num_subbands_++;
+					}
+				}
+				break;
+			case band_data::SPOT_SET:
+				if (verbose_) {
+					snprintf(text, 128, FREQ_FORMAT "-" FREQ_FORMAT " %s",
+						l, u, (*it)->summary.c_str());
+					if (l == ll) {
+						add_marker({ u, SPOTGROUP_UPPER, y_for_f(u), y_for_f(u), nullptr });
+						add_marker({ l, SPOTGROUP_LOWER, y_for_f(l), y_for_f(l), text });
+						num_spots_++;
+					}
+				}
+				else {
+					snprintf(text, 128, FREQ_FORMAT " %s",
+						l, (*it)->summary.c_str());
+					if (l == ll) {
+						add_marker({ u, SPOTGROUP_UPPER, y_for_f(u), y_for_f(u), nullptr });
+						add_marker({ l, SPOTGROUP_LOWER, y_for_f(l), y_for_f(l), text });
+						num_spots_++;
+					}
+				}
+				break;
+			case band_data::SPOT:
+				snprintf(text, 128, FREQ_FORMAT " %s", l, (*it)->summary.c_str());
+				add_marker({ l, SPOT, y_for_f(l), y_for_f(l), text });
+				num_spots_++;
 			}
 		}
 	}
@@ -704,10 +711,13 @@ bool band_widget::is_text_marker(marker m) {
 	switch(m.type) {
 	case SUBBAND_UPPER:
 	case SPOTGROUP_UPPER:
+	case BAND_UPPER:
 		return false;
 	case CURRENT:
 	case CURRENT_RX:
 	case CURRENT_QSO:
+	case BAND_LOWER:
+	case BAND_LOCUM:
 		return true;
 	case SUBBAND_LOWER:
 	case SUBBAND_LOCUM:

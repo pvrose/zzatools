@@ -1,6 +1,16 @@
 {
     "Band plan": [
         {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 0.1357,
+                "Upper": 0.1378
+            },
+            "Summary": "2190m",
+            "Type": "Band"
+        },
+        {
             "Bandwidth": 0.2,
             "Modes": [
                 "CW",
@@ -12,6 +22,16 @@
             },
             "Summary": "CW, QRSS and narrow-band digital modes",
             "Type": "Sub-band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 0.472,
+                "Upper": 0.479
+            },
+            "Summary": "630m",
+            "Type": "Band"
         },
         {
             "Bandwidth": 0.5,
@@ -27,6 +47,16 @@
             "Type": "Sub-band"
         },
         {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 1.81,
+                "Upper": 2.0
+            },
+            "Summary": "160m",
+            "Type": "Band"
+        },
+        {
             "Bandwidth": 0.2,
             "Modes": [
                 "CW"
@@ -37,6 +67,15 @@
             },
             "Summary": "Telegraphy",
             "Type": "Sub-band"
+        },
+        {
+            "Bandwidth": 0.0,
+            "Modes": [],
+            "Range": {
+                "Lower": 1.836
+            },
+            "Summary": "QRP (low power) Centre of Activity, ",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.5,
@@ -81,19 +120,20 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 1.836
-            },
-            "Summary": "QRP (low power) Centre of Activity, ",
-            "Type": "Spot frequency"
-        },
-        {
-            "Bandwidth": 0.0,
-            "Modes": [],
-            "Range": {
                 "Lower": 1.96
             },
             "Summary": "DF Contest beacons (14dBW)",
             "Type": "Spot frequency"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 3.5,
+                "Upper": 3.8
+            },
+            "Summary": "80m",
+            "Type": "Band"
         },
         {
             "Bandwidth": 0.2,
@@ -304,6 +344,16 @@
             "Type": "Sub-band"
         },
         {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 5.2585,
+                "Upper": 5.4065
+            },
+            "Summary": "60m",
+            "Type": "Band"
+        },
+        {
             "Bandwidth": 5.5,
             "Modes": [
                 "CW",
@@ -494,6 +544,16 @@
             "Type": "Sub-band"
         },
         {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 7.0,
+                "Upper": 7.2
+            },
+            "Summary": "40m",
+            "Type": "Band"
+        },
+        {
             "Bandwidth": 0.2,
             "Modes": [
                 "CW"
@@ -661,6 +721,16 @@
             "Type": "Sub-band"
         },
         {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 10.1,
+                "Upper": 10.15
+            },
+            "Summary": "30m",
+            "Type": "Band"
+        },
+        {
             "Bandwidth": 0.2,
             "Modes": [
                 "CW"
@@ -693,6 +763,16 @@
             },
             "Summary": "Narrow band modes ",
             "Type": "Sub-band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 14.0,
+                "Upper": 14.35
+            },
+            "Summary": "20m",
+            "Type": "Band"
         },
         {
             "Bandwidth": 0.2,
@@ -875,6 +955,16 @@
             "Type": "Spot frequency"
         },
         {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 18.068,
+                "Upper": 18.168
+            },
+            "Summary": "17m",
+            "Type": "Band"
+        },
+        {
             "Bandwidth": 0.2,
             "Modes": [
                 "CW"
@@ -987,6 +1077,16 @@
             },
             "Summary": "Global Emergency Centre of Activity",
             "Type": "Spot frequency"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 21.0,
+                "Upper": 21.45
+            },
+            "Summary": "15m",
+            "Type": "Band"
         },
         {
             "Bandwidth": 0.2,
@@ -1133,6 +1233,16 @@
             "Type": "Spot frequency"
         },
         {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 24.89,
+                "Upper": 24.99
+            },
+            "Summary": "12m",
+            "Type": "Band"
+        },
+        {
             "Bandwidth": 0.2,
             "Modes": [
                 "CW"
@@ -1236,6 +1346,16 @@
             },
             "Summary": "digital voice Centre of Activity",
             "Type": "Spot frequency"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 28.0,
+                "Upper": 29.7
+            },
+            "Summary": "10m",
+            "Type": "Band"
         },
         {
             "Bandwidth": 0.2,
@@ -1556,6 +1676,16 @@
             "Type": "Set of spots"
         },
         {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 50.0,
+                "Upper": 52.0
+            },
+            "Summary": "6m",
+            "Type": "Band"
+        },
+        {
             "Bandwidth": 0.5,
             "Modes": [
                 "CW"
@@ -1840,6 +1970,16 @@
             "Type": "Spot frequency"
         },
         {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 70.0,
+                "Upper": 70.5
+            },
+            "Summary": "4m",
+            "Type": "Band"
+        },
+        {
             "Bandwidth": 1.0,
             "Modes": [
                 "Beacons"
@@ -1896,15 +2036,6 @@
             "Type": "Spot frequency"
         },
         {
-            "Bandwidth": 0.0,
-            "Modes": [],
-            "Range": {
-                "Lower": 70.25
-            },
-            "Summary": "MS CoA",
-            "Type": "Spot frequency"
-        },
-        {
             "Bandwidth": 12.0,
             "Modes": [
                 "CW",
@@ -1917,6 +2048,15 @@
             },
             "Summary": "All modes",
             "Type": "Sub-band"
+        },
+        {
+            "Bandwidth": 0.0,
+            "Modes": [],
+            "Range": {
+                "Lower": 70.25
+            },
+            "Summary": "MS CoA",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -2025,6 +2165,15 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
+                "Lower": 70.4265
+            },
+            "Summary": "Digital Modes",
+            "Type": "Spot frequency"
+        },
+        {
+            "Bandwidth": 0.0,
+            "Modes": [],
+            "Range": {
                 "Lower": 70.4375
             },
             "Summary": "Digital Modes (special projects)",
@@ -2043,19 +2192,20 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 70.4265
+                "Lower": 70.4875
             },
             "Summary": "Digital Modes",
             "Type": "Spot frequency"
         },
         {
-            "Bandwidth": 0.0,
+            "Bandwidth": null,
             "Modes": [],
             "Range": {
-                "Lower": 70.4875
+                "Lower": 144.0,
+                "Upper": 147.0
             },
-            "Summary": "Digital Modes",
-            "Type": "Spot frequency"
+            "Summary": "2m",
+            "Type": "Band"
         },
         {
             "Bandwidth": 2.7,
@@ -2093,15 +2243,6 @@
             "Type": "Spot frequency"
         },
         {
-            "Bandwidth": 0.0,
-            "Modes": [],
-            "Range": {
-                "Lower": 144.1
-            },
-            "Summary": "Random MS Telegraphy",
-            "Type": "Spot frequency"
-        },
-        {
             "Bandwidth": 0.5,
             "Modes": [
                 "CW",
@@ -2113,6 +2254,15 @@
             },
             "Summary": "Telegraphy and MGM",
             "Type": "Sub-band"
+        },
+        {
+            "Bandwidth": 0.0,
+            "Modes": [],
+            "Range": {
+                "Lower": 144.1
+            },
+            "Summary": "Random MS Telegraphy",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 2.7,
@@ -2607,6 +2757,16 @@
             "Type": "Spot frequency"
         },
         {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 430.0,
+                "Upper": 440.0
+            },
+            "Summary": "70cm",
+            "Type": "Band"
+        },
+        {
             "Bandwidth": 20.0,
             "Modes": [
                 "DV",
@@ -2874,15 +3034,6 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 433.8
-            },
-            "Summary": "Alternate APRS",
-            "Type": "Spot frequency"
-        },
-        {
-            "Bandwidth": 0.0,
-            "Modes": [],
-            "Range": {
                 "Lower": 433.8,
                 "Upper": 434.25
             },
@@ -2893,10 +3044,20 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 434.0
+                "Lower": 433.8
             },
-            "Summary": "Low-power hot-spot",
+            "Summary": "Alternate APRS",
             "Type": "Spot frequency"
+        },
+        {
+            "Bandwidth": 0.0,
+            "Modes": [],
+            "Range": {
+                "Lower": 433.95,
+                "Upper": 434.05
+            },
+            "Summary": "Internet Voice gateway",
+            "Type": "Set of spots"
         },
         {
             "Bandwidth": 12.0,
@@ -2915,11 +3076,10 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 433.95,
-                "Upper": 434.05
+                "Lower": 434.0
             },
-            "Summary": "Internet Voice gateway",
-            "Type": "Set of spots"
+            "Summary": "Low-power hot-spot",
+            "Type": "Spot frequency"
         },
         {
             "Bandwidth": 0.0,
@@ -3063,20 +3223,20 @@
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 439.6,
-                "Upper": 440.0
+                "Lower": 439.4,
+                "Upper": 439.775
             },
-            "Summary": "Digital Communications",
+            "Summary": "9 MHz split repeater outputs",
             "Type": "Set of spots"
         },
         {
             "Bandwidth": 0.0,
             "Modes": [],
             "Range": {
-                "Lower": 439.4,
-                "Upper": 439.775
+                "Lower": 439.6,
+                "Upper": 440.0
             },
-            "Summary": "9 MHz split repeater outputs",
+            "Summary": "Digital Communications",
             "Type": "Set of spots"
         },
         {
@@ -3088,6 +3248,16 @@
             },
             "Summary": "Digital Communications",
             "Type": "Set of spots"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 1240.0,
+                "Upper": 1325.0
+            },
+            "Summary": "23cm",
+            "Type": "Band"
         },
         {
             "Bandwidth": 2.7,
@@ -3342,6 +3512,16 @@
             "Type": "Sub-band"
         },
         {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 2300.0,
+                "Upper": 2450.0
+            },
+            "Summary": "13cm",
+            "Type": "Band"
+        },
+        {
             "Bandwidth": 2.7,
             "Modes": [
                 "CW",
@@ -3473,6 +3653,16 @@
             "Type": "Sub-band"
         },
         {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 3400.0,
+                "Upper": 3410.0
+            },
+            "Summary": "9cm",
+            "Type": "Band"
+        },
+        {
             "Bandwidth": 2.7,
             "Modes": [
                 "CW",
@@ -3524,6 +3714,16 @@
             "Type": "Sub-band"
         },
         {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 5650.0,
+                "Upper": 5850.0
+            },
+            "Summary": "6cm",
+            "Type": "Band"
+        },
+        {
             "Bandwidth": 0.0,
             "Modes": [
                 "All"
@@ -3534,6 +3734,16 @@
             },
             "Summary": "",
             "Type": "Sub-band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 10000.0,
+                "Upper": 10500.0
+            },
+            "Summary": "3cm",
+            "Type": "Band"
         },
         {
             "Bandwidth": 0.0,
@@ -3548,6 +3758,16 @@
             "Type": "Sub-band"
         },
         {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 24000.0,
+                "Upper": 24250.0
+            },
+            "Summary": "1.25cm",
+            "Type": "Band"
+        },
+        {
             "Bandwidth": 0.0,
             "Modes": [
                 "All"
@@ -3558,6 +3778,16 @@
             },
             "Summary": "",
             "Type": "Sub-band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 47000.0,
+                "Upper": 47090.0
+            },
+            "Summary": "6mm",
+            "Type": "Band"
         },
         {
             "Bandwidth": 0.0,
@@ -3572,6 +3802,16 @@
             "Type": "Sub-band"
         },
         {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 75500.0,
+                "Upper": 81000.0
+            },
+            "Summary": "4mm",
+            "Type": "Band"
+        },
+        {
             "Bandwidth": 0.0,
             "Modes": [
                 "All"
@@ -3584,6 +3824,16 @@
             "Type": "Sub-band"
         },
         {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 122250.0,
+                "Upper": 123000.0
+            },
+            "Summary": "2.5mm",
+            "Type": "Band"
+        },
+        {
             "Bandwidth": 0.0,
             "Modes": [
                 "All"
@@ -3594,6 +3844,16 @@
             },
             "Summary": "",
             "Type": "Sub-band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 134000.0,
+                "Upper": 141000.0
+            },
+            "Summary": "2mm",
+            "Type": "Band"
         },
         {
             "Bandwidth": 0.0,
@@ -3623,380 +3883,10 @@
             "Bandwidth": null,
             "Modes": [],
             "Range": {
-                "Lower": 0.1357,
-                "Upper": 0.1378
+                "Lower": 1.7976931348623157e+308,
+                "Upper": 0.0
             },
-            "Summary": "2190m",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 0.472,
-                "Upper": 0.479
-            },
-            "Summary": "630m",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 1.81,
-                "Upper": 2.0
-            },
-            "Summary": "160m",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 3.5,
-                "Upper": 3.8
-            },
-            "Summary": "80m",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 5.2585,
-                "Upper": 5.264
-            },
-            "Summary": "60m A",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 5.276,
-                "Upper": 5.284
-            },
-            "Summary": "60m B",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 5.2885,
-                "Upper": 5.292
-            },
-            "Summary": "60m C",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 5.298,
-                "Upper": 5.307
-            },
-            "Summary": "60m D",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 5.313,
-                "Upper": 5.323
-            },
-            "Summary": "60m E",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 5.333,
-                "Upper": 5.338
-            },
-            "Summary": "60m F",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 5.354,
-                "Upper": 5.358
-            },
-            "Summary": "60m G",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 5.362,
-                "Upper": 5.3745
-            },
-            "Summary": "60m H",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 5.378,
-                "Upper": 5.382
-            },
-            "Summary": "60m I",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 5.395,
-                "Upper": 5.4015
-            },
-            "Summary": "60m J",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 5.4035,
-                "Upper": 5.4065
-            },
-            "Summary": "60m K",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 7.0,
-                "Upper": 7.2
-            },
-            "Summary": "40m",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 10.1,
-                "Upper": 10.15
-            },
-            "Summary": "30m",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 14.0,
-                "Upper": 14.35
-            },
-            "Summary": "20m",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 18.068,
-                "Upper": 18.168
-            },
-            "Summary": "17m",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 21.0,
-                "Upper": 21.45
-            },
-            "Summary": "15m",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 24.89,
-                "Upper": 24.99
-            },
-            "Summary": "12m",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 28.0,
-                "Upper": 29.7
-            },
-            "Summary": "10m",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 50.0,
-                "Upper": 52.0
-            },
-            "Summary": "6m",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 70.0,
-                "Upper": 70.5
-            },
-            "Summary": "4m",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 144.0,
-                "Upper": 147.0
-            },
-            "Summary": "2m",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 430.0,
-                "Upper": 440.0
-            },
-            "Summary": "70cm",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 1240.0,
-                "Upper": 1325.0
-            },
-            "Summary": "23cm",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 2300.0,
-                "Upper": 2301.8
-            },
-            "Summary": "13cm A",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 2310.0,
-                "Upper": 2350.0
-            },
-            "Summary": "13cm B",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 2390.0,
-                "Upper": 2450.0
-            },
-            "Summary": "13cm C",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 3400.0,
-                "Upper": 3410.0
-            },
-            "Summary": "9cm",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 5650.0,
-                "Upper": 5850.0
-            },
-            "Summary": "6cm",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 10000.0,
-                "Upper": 10500.0
-            },
-            "Summary": "3cm",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 24000.0,
-                "Upper": 24250.0
-            },
-            "Summary": "1.25cm",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 47000.0,
-                "Upper": 47090.0
-            },
-            "Summary": "6mm",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 75500.0,
-                "Upper": 81000.0
-            },
-            "Summary": "4mm",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 122250.0,
-                "Upper": 123000.0
-            },
-            "Summary": "2.5mm",
-            "Type": "Band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 134000.0,
-                "Upper": 141000.0
-            },
-            "Summary": "2mm",
+            "Summary": "1mm",
             "Type": "Band"
         }
     ]

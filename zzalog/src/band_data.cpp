@@ -62,7 +62,8 @@ void from_json(const json& j, band_data::band_entry_t& e) {
 	if (j.find("Type") == j.end()) e.type = band_data::UNKNOWN;
 	else j.at("Type").get_to(e.type);
 	j.at("Range").get_to(e.range);
-	j.at("Bandwidth").get_to(e.bandwidth);
+	if (j.at("Bandwidth").is_null()) e.bandwidth = nan("");
+	else j.at("Bandwidth").get_to(e.bandwidth);
 	j.at("Modes").get_to(e.modes);
 	j.at("Summary").get_to(e.summary);
 	if (e.type == band_data::UNKNOWN) {
@@ -110,7 +111,7 @@ bool band_data::load_json() {
 			i.close();
 			for (auto jt : j.at("Band plan")) {
 				band_entry_t* e = new band_entry_t(jt.template get<band_entry_t>());
-				entries_.push_back(e);
+				entries_.insert(e);
 			}
 			std::snprintf(msg, sizeof(msg), "BAND: File %s loaded OK", filename.c_str());
 			status_->misc_status(ST_OK, msg);
@@ -155,21 +156,17 @@ std::string band_data::get_path() {
 
 // Get the band plan data entry for the specified frequency
 band_data::band_entry_t* band_data::get_entry(double frequency) {
-	for (unsigned int ix = 0; ix < entries_.size(); ix++) {
-		if (entries_[ix]->range.lower <= frequency && entries_[ix]->range.upper >= frequency) {
-			return entries_[ix];
+	for (auto e : entries_) {
+		if (e->range.lower <= frequency && e->range.upper >= frequency) {
+			return e;
 		}
 	}
 	return nullptr;
 }
 
 // Get the band plan data entries for the frequency range
-std::set<band_data::band_entry_t*> band_data::get_entries() {
-	std::set<band_entry_t*> result;
-	for (unsigned int ix = 0; ix < entries_.size(); ix++) {
-		result.insert(entries_[ix]);
-	}
-	return result;
+std::set<band_data::band_entry_t*, band_data::ptr_lt> band_data::get_entries() {
+	return entries_;
 }
 
 // Is the supplied frequency in a band
@@ -213,28 +210,26 @@ void band_data::create_bands() {
 			}
 			current_range = (*it)->range;
 		} else {
-			current_range.upper = max(current_range.upper, (*it)->range.upper);
+			if (!isnan((*it)->range.upper)) {
+				current_range.upper = max(current_range.upper, (*it)->range.upper);
+			}
 		}
 	}
 	if (!has_bands) {
 		// Add entried for the bands
 		for (auto b : bands_) {
-			char fragment = 'A';
 			std::string band_name = b.first;
+			band_entry_t* entry = new band_entry_t;
+			entry->type = band_data::BAND;
+			entry->range = { DBL_MAX, 0.0 };
+			entry->bandwidth = nan("");
+			entry->modes = {};
+			entry->summary = band_name;
 			for (auto b1 : b.second) {
-				band_entry_t* entry = new band_entry_t;
-				entry->type = band_data::BAND;
-				entry->range = b1;
-				entry->bandwidth = nan("");
-				entry->modes = {};
-				if (b.second.size() > 1) {
-					entry->summary = band_name + " " + fragment++;
-				}
-				else {
-					entry->summary = band_name;
-				}
-				entries_.push_back(entry);
+				entry->range.lower = min(entry->range.lower, b1.lower);
+				entry->range.upper = max(entry->range.upper, b1.upper);
 			}
+			entries_.insert(entry);
 		}
 	}
 }

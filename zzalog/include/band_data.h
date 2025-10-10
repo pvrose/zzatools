@@ -4,10 +4,10 @@
 
 #include "nlohmann/json.hpp"
 
+#include <map>
+#include <set>
 #include <string>
 #include <vector>
-#include <set>
-#include <map>
 
 using json = nlohmann::json;
 
@@ -37,8 +37,9 @@ public:
 		UNKNOWN = 0,        //!< Unknown type - evaluate from modes and range
 		BAND,               //!< Full band
 		SUB_BAND,           //!< Mode-specific sub-band
+		SPOT_SET,           //!< A set of spot frequencies
 		SPOT,               //!< Individual spot frequency
-		SPOT_SET            //!< A set of spot frequencies
+		USER_SPOT,          //!< User defined spot
 	};
 
 	//! Band entry structure
@@ -55,6 +56,29 @@ public:
 			bandwidth(0.0),
 			modes({}),
 			summary("") {};
+
+		//! Less-than operator
+	
+		//! \param rhs RHS of &lt; operator
+		//! \return comparison between the lower frequencies of the two ranges then band type.
+		bool operator< (const band_entry_t& rhs) const {
+
+			if (range < rhs.range) return true;
+			if (rhs.range < range) return false;
+			if ((int)type < (int)rhs.type) return true;
+			if ((int)rhs.type < (int)type) return false;
+			if (range.upper < rhs.range.upper) return true;
+			return false;
+		}
+	};
+
+	//! Enclosing structure for special < operator for set<band_entry_t*>
+	struct ptr_lt {
+		bool operator() (band_entry_t* lhs, band_entry_t* rhs) const {
+			if (lhs == nullptr || rhs == nullptr) return false;
+			if (*lhs < *rhs) return true;
+			return false;
+		}
 	};
 
 	//! Constructor
@@ -75,7 +99,7 @@ public:
 	//! Get all the band_entry_t items.
 	
 	//! \return all band_entry_t items.
-	std::set<band_entry_t*> get_entries();
+	std::set<band_entry_t*, ptr_lt> get_entries();
 	//! Get the bands data
 	
 	//! \return the band database.
@@ -99,7 +123,7 @@ protected:
 	//! \return true if successful, false if not.
 	bool find_and_copy_data();
 	//! The database of band_entry_t items.
-	std::vector<band_entry_t*> entries_;
+	std::set<band_entry_t*, ptr_lt> entries_;
 	//! A std::map referencing band names to frequency ranges.
 	band_map<std::set<range_t> > bands_;
 
