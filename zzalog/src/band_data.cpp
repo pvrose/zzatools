@@ -4,6 +4,7 @@
 
 #include "nlohmann/json.hpp"
 
+#include <cfloat>
 #include <fstream>
 #include <iostream>
 

@@ -279,6 +279,10 @@ void band_widget::draw_markers() {
 			fl_font(FL_BOLD, FL_NORMAL_SIZE);
 			fl_draw(m.text, x_text_, m.y_text + h_offset_);
 			break;
+		case BAND_UPPER:
+			fl_color(FL_FOREGROUND_COLOR);
+			fl_line(x_scale_, m.y_scale, x_kink1_, m.y_text);
+			break;
 		}
 	}
 }
@@ -532,6 +536,9 @@ void band_widget::generate_items() {
 				snprintf(text, 128, FREQ_FORMAT " %s", l, (*it)->summary.c_str());
 				add_marker({ l, SPOT, y_for_f(l), y_for_f(l), text });
 				num_spots_++;
+				break;
+			default:
+				break;
 			}
 		}
 	}
