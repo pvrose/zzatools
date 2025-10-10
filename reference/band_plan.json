@@ -3618,6 +3618,386 @@
             },
             "Summary": "",
             "Type": "Sub-band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 0.1357,
+                "Upper": 0.1378
+            },
+            "Summary": "2190m",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 0.472,
+                "Upper": 0.479
+            },
+            "Summary": "630m",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 1.81,
+                "Upper": 2.0
+            },
+            "Summary": "160m",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 3.5,
+                "Upper": 3.8
+            },
+            "Summary": "80m",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 5.2585,
+                "Upper": 5.264
+            },
+            "Summary": "60m A",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 5.276,
+                "Upper": 5.284
+            },
+            "Summary": "60m B",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 5.2885,
+                "Upper": 5.292
+            },
+            "Summary": "60m C",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 5.298,
+                "Upper": 5.307
+            },
+            "Summary": "60m D",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 5.313,
+                "Upper": 5.323
+            },
+            "Summary": "60m E",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 5.333,
+                "Upper": 5.338
+            },
+            "Summary": "60m F",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 5.354,
+                "Upper": 5.358
+            },
+            "Summary": "60m G",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 5.362,
+                "Upper": 5.3745
+            },
+            "Summary": "60m H",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 5.378,
+                "Upper": 5.382
+            },
+            "Summary": "60m I",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 5.395,
+                "Upper": 5.4015
+            },
+            "Summary": "60m J",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 5.4035,
+                "Upper": 5.4065
+            },
+            "Summary": "60m K",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 7.0,
+                "Upper": 7.2
+            },
+            "Summary": "40m",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 10.1,
+                "Upper": 10.15
+            },
+            "Summary": "30m",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 14.0,
+                "Upper": 14.35
+            },
+            "Summary": "20m",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 18.068,
+                "Upper": 18.168
+            },
+            "Summary": "17m",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 21.0,
+                "Upper": 21.45
+            },
+            "Summary": "15m",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 24.89,
+                "Upper": 24.99
+            },
+            "Summary": "12m",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 28.0,
+                "Upper": 29.7
+            },
+            "Summary": "10m",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 50.0,
+                "Upper": 52.0
+            },
+            "Summary": "6m",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 70.0,
+                "Upper": 70.5
+            },
+            "Summary": "4m",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 144.0,
+                "Upper": 147.0
+            },
+            "Summary": "2m",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 430.0,
+                "Upper": 440.0
+            },
+            "Summary": "70cm",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 1240.0,
+                "Upper": 1325.0
+            },
+            "Summary": "23cm",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 2300.0,
+                "Upper": 2301.8
+            },
+            "Summary": "13cm A",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 2310.0,
+                "Upper": 2350.0
+            },
+            "Summary": "13cm B",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 2390.0,
+                "Upper": 2450.0
+            },
+            "Summary": "13cm C",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 3400.0,
+                "Upper": 3410.0
+            },
+            "Summary": "9cm",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 5650.0,
+                "Upper": 5850.0
+            },
+            "Summary": "6cm",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 10000.0,
+                "Upper": 10500.0
+            },
+            "Summary": "3cm",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 24000.0,
+                "Upper": 24250.0
+            },
+            "Summary": "1.25cm",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 47000.0,
+                "Upper": 47090.0
+            },
+            "Summary": "6mm",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 75500.0,
+                "Upper": 81000.0
+            },
+            "Summary": "4mm",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 122250.0,
+                "Upper": 123000.0
+            },
+            "Summary": "2.5mm",
+            "Type": "Band"
+        },
+        {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 134000.0,
+                "Upper": 141000.0
+            },
+            "Summary": "2mm",
+            "Type": "Band"
         }
     ]
 }

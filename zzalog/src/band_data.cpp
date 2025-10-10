@@ -189,9 +189,11 @@ band_map<std::set<range_t >>& band_data::bands() {
 
 // Generate the band std::list
 void band_data::create_bands() {
+	bool has_bands = false;
 	range_t current_range = { 0.0, 0.0 };
 	std::string current_band = ""; 
 	for (auto it = entries_.begin(); it != entries_.end(); it++) {
+		if ((*it)->type == band_data::BAND) has_bands = true;
 		if ((*it)->range.lower > current_range.upper) {
 			std::string band = spec_data_->band_for_freq((*it)->range.lower);
 			// New range - add the previous range
@@ -212,6 +214,27 @@ void band_data::create_bands() {
 			current_range = (*it)->range;
 		} else {
 			current_range.upper = max(current_range.upper, (*it)->range.upper);
+		}
+	}
+	if (!has_bands) {
+		// Add entried for the bands
+		for (auto b : bands_) {
+			char fragment = 'A';
+			std::string band_name = b.first;
+			for (auto b1 : b.second) {
+				band_entry_t* entry = new band_entry_t;
+				entry->type = band_data::BAND;
+				entry->range = b1;
+				entry->bandwidth = nan("");
+				entry->modes = {};
+				if (b.second.size() > 1) {
+					entry->summary = band_name + " " + fragment++;
+				}
+				else {
+					entry->summary = band_name;
+				}
+				entries_.push_back(entry);
+			}
 		}
 	}
 }

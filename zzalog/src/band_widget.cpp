@@ -441,11 +441,22 @@ void band_widget::generate_items() {
 		double lu = min(u, scale_range_.upper);
 		band_data::entry_t type = (*it)->type;
 		bool include;
+		switch ((*it)->type) {
+		case band_data::UNKNOWN:
+		case band_data::BAND:
+			include = false;
+			break;
+		case band_data::SPOT:
+		case band_data::SPOT_SET:
+		case band_data::SUB_BAND:
+			include = true;
+			break;
+		}
 		if ((l >= scale_range_.lower && l < scale_range_.upper) ||
 			(u > scale_range_.lower && u <= scale_range_.upper)) {
-			include = true;
+			include &= true;
 		} else {
-			include = false;
+			include &= false;
 		}
 		for (auto iu = (*it)->modes.begin(); iu != (*it)->modes.end(); iu++) {
 			// Add the mode bars
