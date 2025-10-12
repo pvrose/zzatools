@@ -1,7 +1,9 @@
 #pragma once
 #include <FL/Fl_Double_Window.H>
 
+class band_editor;
 class band_widget;
+class Fl_Tabs;
 
 //! A separate window that displays the full bandplan view.
 class band_window :
@@ -37,9 +39,19 @@ public:
     //! to switch frequency to that clicked.
     static void cb_widget(Fl_Widget* w, void* v);
 
+    //! Callback from tabs
+    static void cb_tabs(Fl_Widget* w, void* v);
+
 protected:
+    //! Enable widgets (redraw tabs)
+    void enable_widgets();
+
+    //! The tabs container
+    Fl_Tabs* tabs_;
     //! The band_widget instance.
     band_widget* bw_;
+    //! The band enditor
+    band_editor* be_;
 
 };
 

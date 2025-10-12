@@ -166,7 +166,7 @@ band_data::band_entry_t* band_data::get_entry(double frequency) {
 }
 
 // Get the band plan data entries for the frequency range
-std::set<band_data::band_entry_t*, band_data::ptr_lt> band_data::get_entries() {
+std::set<band_data::band_entry_t*, band_data::ptr_lt>& band_data::get_entries() {
 	return entries_;
 }
 
@@ -214,6 +214,10 @@ void band_data::create_bands() {
 			if (!isnan((*it)->range.upper)) {
 				current_range.upper = max(current_range.upper, (*it)->range.upper);
 			}
+		}
+		// Collate the modes
+		for (auto m : (*it)->modes) {
+			modes_.insert(m);
 		}
 	}
 	if (!has_bands) {
@@ -287,4 +291,8 @@ bool band_data::find_and_copy_data() {
 		status_->misc_status(ST_OK, "BAND: Copied");
 		return true;
 	}
+}
+
+std::set<std::string> band_data::get_modes() {
+	return modes_;
 }

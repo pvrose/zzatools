@@ -99,11 +99,14 @@ public:
 	//! Get all the band_entry_t items.
 	
 	//! \return all band_entry_t items.
-	std::set<band_entry_t*, ptr_lt> get_entries();
+	std::set<band_entry_t*, ptr_lt>& get_entries();
 	//! Get the bands data
 	
 	//! \return the band database.
 	band_map<std::set<range_t> >& bands();
+
+	//! Get the modes list
+	std::set<std::string> get_modes();
 
 protected:
 	//! Store data to JSON file
@@ -124,8 +127,10 @@ protected:
 	bool find_and_copy_data();
 	//! The database of band_entry_t items.
 	std::set<band_entry_t*, ptr_lt> entries_;
-	//! A std::map referencing band names to frequency ranges.
+	//! A map referencing band names to frequency ranges.
 	band_map<std::set<range_t> > bands_;
+	//! The modes available
+	std::set<std::string> modes_;
 
 };
 

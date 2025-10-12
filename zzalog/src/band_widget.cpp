@@ -45,7 +45,7 @@ band_widget::band_widget(int X, int Y, int W, int H, const char* L) :
 	Fl_Widget(X, Y, W, H, L) {
 	type(BAND_FULL);
 	value_tx_ = value_rx_ = 0.0;
-	Fl_Widget::color(FL_RED, FL_DARK_GREEN);
+//	Fl_Widget::color(FL_RED, FL_DARK_GREEN);
 	band_ = "";
 	bandwidth_ = 0.5;
 	process_data();
@@ -72,7 +72,7 @@ void band_widget::draw() {
 	fl_color(FL_BACKGROUND_COLOR);
 	fl_rectf(x(), y(), w(), h());
 	// Draw the outline box
-	draw_box(box(), FL_FOREGROUND_COLOR);
+	draw_box();
 	// Now restrict drawing inside the box
 	fl_push_clip(x(), y(), w(), h());
 	// Draw the valrious items

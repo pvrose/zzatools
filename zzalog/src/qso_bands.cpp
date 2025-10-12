@@ -82,7 +82,6 @@ void qso_bands::create_form() {
 	snprintf(l,sizeof(l), "%s %s: Bandplan", PROGRAM_ID.c_str(), PROGRAM_VERSION.c_str());
 	full_window_ = new band_window(left_, top_, width_, height_);
 	full_window_->copy_label(l);
-	full_window_->color(DARK ? COLOUR_ORANGE : FL_RED, DARK ? FL_GREEN : FL_DARK_GREEN);
 	if (open_window_) full_window_->show();
 	else full_window_->hide();
 
@@ -93,7 +92,6 @@ void qso_bands::create_form() {
 	int ch = h() - GAP - GAP;
 	summary_ = new band_widget(cx, cy, cw, ch);
 	summary_->type(band_widget::BAND_SUMMARY);
-	summary_->color(DARK ? COLOUR_ORANGE : FL_RED, DARK ? FL_GREEN : FL_DARK_GREEN);
 	summary_->box(FL_BORDER_FRAME);
 	summary_->callback(cb_band);
 	summary_->tooltip("Band plan display - click to open larger view");
