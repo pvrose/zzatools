@@ -5,6 +5,7 @@
 #include "drawing.h"
 #include "utils.h"
 
+#include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Float_Input.H>
@@ -132,29 +133,29 @@ band_row::band_row(int X, int Y, int W, int H, const char* L) :
 
     cx += WW * 2;
     w_lower_ = new Fl_Float_Input(cx, y(), WW, h());
-    w_lower_->callback(cb_type);
+    w_lower_->callback(cb_lower);
     w_lower_->tooltip("Select lower frequency of entry");
 
     cx += WW;
     w_upper_ = new Fl_Float_Input(cx, y(), WW, h());
-    w_upper_->callback(cb_type);
+    w_upper_->callback(cb_upper);
     w_upper_->tooltip("Select upper frequency of entry");
 
     cx += WW;
     w_width_ = new Fl_Float_Input(cx, y(), WW, h());
-    w_width_->callback(cb_type);
+    w_width_->callback(cb_width);
     w_width_->tooltip("Select bandwidth of entry");
 
     cx += WW;
     w_modes_ = new band_modechoice(cx, y(), WW * 2, h());
-    w_modes_->callback(cb_type);
+    w_modes_->callback(cb_modes);
     w_modes_->tooltip("Select multiple modes of entry");
 
     populate_mode(w_modes_);
 
     cx += WW * 2;
     w_description_ = new Fl_Input(cx, y(), WW * 3, h());
-    w_description_->callback(cb_type);
+    w_description_->callback(cb_description);
     w_description_->tooltip("Select type of entry");
 
     end();
@@ -174,9 +175,15 @@ void band_row::data(band_data::band_entry_t* d) {
 void band_row::enable_widgets() {
     char text[32];
     w_type_->value(entry_->type);
-    snprintf(text, sizeof(text), "%0.6f", entry_->range.lower);
+    if (entry_->range.lower < 2000.0)
+        snprintf(text, sizeof(text), "%0.4f", entry_->range.lower);
+    else
+        snprintf(text, sizeof(text), "%g", entry_->range.lower);
     w_lower_->value(text);
-    snprintf(text, sizeof(text), "%0.6f", entry_->range.upper);
+    if (entry_->range.upper < 2000.0)
+        snprintf(text, sizeof(text), "%0.4f", entry_->range.upper);
+    else
+        snprintf(text, sizeof(text), "%g", entry_->range.upper);
     w_upper_->value(text);
     snprintf(text, sizeof(text), "%g", entry_->bandwidth);
     w_width_->value(text);
@@ -313,10 +320,41 @@ void band_row::cb_description(Fl_Widget* w, void* v) {
 band_editor::band_editor(int X, int Y, int W, int H, const char* L) :
     Fl_Group(X, Y, W, H, L)
 {
+    scroll_freq_ = 0.0;
+
     int cx = x() + GAP;
     int cy = y() + GAP;
     int ht = h() - GAP - GAP - HBUTTON;
     int wt = w() - GAP - GAP;
+
+    int WW = wt / 10;
+
+    Fl_Box* ch1 = new Fl_Box(cx, cy, WW * 2, HBUTTON, "Type");
+    ch1->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+    ch1->box(FL_FLAT_BOX);
+    cx += ch1->w();
+    Fl_Box* ch2 = new Fl_Box(cx, cy, WW, HBUTTON, "Lower");
+    ch2->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+    ch2->box(FL_FLAT_BOX);
+    cx += ch2->w();
+    Fl_Box* ch3 = new Fl_Box(cx, cy, WW, HBUTTON, "Upper");
+    ch3->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+    ch3->box(FL_FLAT_BOX);
+    cx += ch3->w();
+    Fl_Box* ch4 = new Fl_Box(cx, cy, WW, HBUTTON, "Bandwidth");
+    ch4->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+    ch4->box(FL_FLAT_BOX);
+    cx += ch4->w();
+    Fl_Box* ch5 = new Fl_Box(cx, cy, WW * 2, HBUTTON, "Modes");
+    ch5->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+    ch5->box(FL_FLAT_BOX);
+    cx += ch5->w();
+    Fl_Box* ch6 = new Fl_Box(cx, cy, WW * 3, HBUTTON, "Summary");
+    ch6->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+    ch6->box(FL_FLAT_BOX);
+
+    cx = x() + GAP;
+    cy += HBUTTON;
     table_ = new band_table(cx, cy, wt, ht);
     
     cy += ht;
@@ -358,4 +396,21 @@ void band_editor::cb_delete(Fl_Widget* w, void* v) {
     band_data::band_entry_t* e = that->table_->selected();
     band_data_->get_entries().erase(e);
     that->redraw();
+}
+
+//! Select the band record containing \p frequency
+void band_editor::value(double frequency) {
+    int cy = 0;
+    if (frequency != scroll_freq_) {
+        scroll_freq_ = frequency;
+        for (auto e : band_data_->get_entries()) {
+            if (e->type == band_data::BAND) {
+                if (e->range.lower <= frequency && e->range.upper >= frequency) {
+                    table_->scroll_to(0, cy);
+                    break;
+                }
+            }
+            cy += HBUTTON;
+        }
+    }
 }

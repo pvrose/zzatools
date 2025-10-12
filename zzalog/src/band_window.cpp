@@ -72,6 +72,7 @@ void band_window::draw() {
 
 void band_window::set_frequency(double tx, double rx) {
 	bw_->value(tx, rx);
+	be_->value(tx);
 }
 
 // Callback from 

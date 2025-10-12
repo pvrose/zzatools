@@ -66,7 +66,14 @@ public:
     //! Callback from delete row button
     static void cb_delete(Fl_Widget* w, void* v);
 
+    //! Set the \p frequency
+    void value(double frequency);
+
+
 protected:
+
+    //! Frequency a scroll is made to
+    double scroll_freq_;
 
     Fl_Button* bn_add_;          //!< Add an entry
     Fl_Button* bn_delete_;       //!< Delete an entry
