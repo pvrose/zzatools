@@ -7,9 +7,12 @@
 #include <FL/Fl_Scroll.H>
 
 class Fl_Button;
+class Fl_Check_Button;
 class Fl_Choice;
 class Fl_Float_Input;
 class Fl_Input;
+
+class band_row;
 
 //! This class provides the editor widget for band_data.
 class band_table :
@@ -28,18 +31,21 @@ public:
     ~band_table();
 
     //! Set the selected entry
-    void selected(band_data::band_entry_t*);
+    void selected(band_row* r);
 
-    //! Get the selected entry
-    band_data::band_entry_t* selected();
+    //! Get the selected row
+    band_row* selected();
 
-protected:
+    //! Select the row with \p entry
+    void select_with_entry(band_data::band_entry_t* entry);
 
     //! Draw all the internal widgets
     void draw_widgets();
 
+protected:
+
     //! Selected entry
-    band_data::band_entry_t* selected_entry_;
+    band_row* selected_row_;
 
  };
 
@@ -66,6 +72,9 @@ public:
     //! Callback from delete row button
     static void cb_delete(Fl_Widget* w, void* v);
 
+    //! CAllback from re-order button
+    static void cb_reorder(Fl_Widget* w, void* v);
+
     //! Set the \p frequency
     void value(double frequency);
 
@@ -77,7 +86,9 @@ protected:
 
     Fl_Button* bn_add_;          //!< Add an entry
     Fl_Button* bn_delete_;       //!< Delete an entry
+    Fl_Button* bn_reorder_;      //!< Correct the row order
     band_table* table_;          //!< Table of band entries for editing
+
 };
 
 //! This class uses Fl_Input_Choice to provide a custom choice.
@@ -127,9 +138,17 @@ public:
     //! Destructor
     ~band_row();
 
-    //! Set data
-    void data(band_data::band_entry_t* d);
+    //! Set data entry
+    void entry(band_data::band_entry_t* e);
 
+    //! Get entry
+    band_data::band_entry_t* entry();
+
+    //! Set selected
+    void selected(bool value);
+
+    //! Callback from the select check buttom
+    static void cb_select(Fl_Widget* w, void* v);
     //! Callback from the Type entry field.
     static void cb_type(Fl_Widget* w, void* v);
     //! Callback from the Upper entry field.
@@ -156,6 +175,7 @@ protected:
 
     band_data::band_entry_t* entry_;
 
+    Fl_Check_Button* w_select_;    //!< Row selected
     Fl_Choice* w_type_;            //!< Type of entry choice.
     Fl_Float_Input* w_lower_;      //!< Lower frequency input.
     Fl_Float_Input* w_upper_;      //!< Upper frequency input.

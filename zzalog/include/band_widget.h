@@ -90,6 +90,7 @@ protected:
         CURRENT_RX,       //!< Current receive frequency.
         CURRENT_QSO,      //!< Frequency of log QSO if tig not connected.
         SPOT,             //!< Single spot frequency.
+        USER,             //!< User Frequency
         BAND_UPPER,       //!< Upper limit of a band.
         BAND_LOWER,       //!< Lower limit of a band.
         BAND_LOCUM        //!< Used if lower is outwith the displayed frequency range.

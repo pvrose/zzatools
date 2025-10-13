@@ -7,6 +7,7 @@
 
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Float_Input.H>
 #include <FL/Fl_Input.H>
@@ -29,25 +30,56 @@ band_table::~band_table() {
 //! Draw all the internal widgets
 void band_table::draw_widgets() {
     clear();
+    selected_row_ = nullptr;
     int r = 0;
     begin();
     int cy = y();
     for (auto e : band_data_->get_entries()) {
-        band_row* wr = new band_row(x(), cy, w(), HBUTTON);
-        wr->data(e);
+        band_row* wr = new band_row(x(), cy, 1000, HBUTTON);
+        wr->entry(e);
         cy += HBUTTON;
     }
     end();
 }
 
 //! Set selected entry
-void band_table::selected(band_data::band_entry_t* e) {
-    selected_entry_ = e;
+void band_table::selected(band_row* row) {
+    selected_row_ = row;
+    for (int ix = 0; ix < children(); ix++) {
+        band_row* r = dynamic_cast<band_row*>(child(ix));
+        if (r == row) {
+            // Mark this row selected
+            ((band_row*)child(ix))->selected(true);
+        }
+        else if (r) {
+            // If it is a band_row mark it unselected
+            ((band_row*)child(ix))->selected(false);
+        }
+    }
+    redraw();
+}
+
+//! Select row with the \p entry
+void band_table::select_with_entry(band_data::band_entry_t* entry) {
+    for (int ix = 0; ix < children(); ix++) {
+        band_row* r = dynamic_cast<band_row*>(child(ix));
+        if (r) {
+            if (r->entry() == entry) {
+                // Mark this row selected
+                selected_row_ = r;
+                ((band_row*)child(ix))->selected(true);
+            }
+            else {
+                // If it is a band_row mark it unselected
+                ((band_row*)child(ix))->selected(false);
+            }
+        }
+    }
 }
 
 //! Get the selected entry
-band_data::band_entry_t* band_table::selected() {
-    return selected_entry_;
+band_row* band_table::selected() {
+    return selected_row_;
 }
 
 
@@ -123,38 +155,44 @@ void band_modechoice::value(std::set<std::string> v) {
 band_row::band_row(int X, int Y, int W, int H, const char* L) :
     Fl_Group(X, Y, W, H, L) {
 
-    const int WW = w() / 10;
     int cx = x();
-    w_type_ = new Fl_Choice(cx, y(), WW * 2, h());
+
+    w_select_ = new Fl_Check_Button(cx, y(), HBUTTON, HBUTTON);
+    w_select_->callback(cb_select);
+    w_select_->tooltip("Click to seleect this row");
+
+    cx += w_select_->w();
+
+    w_type_ = new Fl_Choice(cx, y(), WSMEDIT, h());
     w_type_->callback(cb_type);
     w_type_->tooltip("Select type of entry");
 
     populate_type(w_type_);
 
-    cx += WW * 2;
-    w_lower_ = new Fl_Float_Input(cx, y(), WW, h());
+    cx += w_type_->w();
+    w_lower_ = new Fl_Float_Input(cx, y(), WBUTTON, h());
     w_lower_->callback(cb_lower);
     w_lower_->tooltip("Select lower frequency of entry");
 
-    cx += WW;
-    w_upper_ = new Fl_Float_Input(cx, y(), WW, h());
+    cx += w_lower_->w();;
+    w_upper_ = new Fl_Float_Input(cx, y(), WBUTTON, h());
     w_upper_->callback(cb_upper);
     w_upper_->tooltip("Select upper frequency of entry");
 
-    cx += WW;
-    w_width_ = new Fl_Float_Input(cx, y(), WW, h());
+    cx += w_upper_->w();
+    w_width_ = new Fl_Float_Input(cx, y(), WBUTTON, h());
     w_width_->callback(cb_width);
     w_width_->tooltip("Select bandwidth of entry");
 
-    cx += WW;
-    w_modes_ = new band_modechoice(cx, y(), WW * 2, h());
+    cx += w_width_->w();;
+    w_modes_ = new band_modechoice(cx, y(), WSMEDIT, h());
     w_modes_->callback(cb_modes);
     w_modes_->tooltip("Select multiple modes of entry");
 
     populate_mode(w_modes_);
 
-    cx += WW * 2;
-    w_description_ = new Fl_Input(cx, y(), WW * 3, h());
+    cx += w_modes_->w();
+    w_description_ = new Fl_Input(cx, y(), w() - (cx - x()), h());
     w_description_->callback(cb_description);
     w_description_->tooltip("Select type of entry");
 
@@ -165,25 +203,25 @@ band_row::band_row(int X, int Y, int W, int H, const char* L) :
 band_row::~band_row() {
 }
 
+
 //! Set data
-void band_row::data(band_data::band_entry_t* d) {
-    entry_ = d;
+void band_row::entry(band_data::band_entry_t* e) {
+    entry_ = e;
     enable_widgets();
+}
+
+//! Get data
+band_data::band_entry_t* band_row::entry() {
+    return entry_;
 }
 
 //! Enable widgets
 void band_row::enable_widgets() {
     char text[32];
     w_type_->value(entry_->type);
-    if (entry_->range.lower < 2000.0)
-        snprintf(text, sizeof(text), "%0.4f", entry_->range.lower);
-    else
-        snprintf(text, sizeof(text), "%g", entry_->range.lower);
+    snprintf(text, sizeof(text), "%g", entry_->range.lower);
     w_lower_->value(text);
-    if (entry_->range.upper < 2000.0)
-        snprintf(text, sizeof(text), "%0.4f", entry_->range.upper);
-    else
-        snprintf(text, sizeof(text), "%g", entry_->range.upper);
+     snprintf(text, sizeof(text), "%g", entry_->range.upper);
     w_upper_->value(text);
     snprintf(text, sizeof(text), "%g", entry_->bandwidth);
     w_width_->value(text);
@@ -239,8 +277,6 @@ void band_row::enable_widgets() {
         w_description_->activate();
         break;
     }
-    band_table* t = ancestor_view<band_table>(this);
-    t->selected(entry_);
 }
 
 // MAp band_data::entry_t
@@ -249,7 +285,8 @@ const std::map<band_data::entry_t, std::string> TYPE_MAP = {
     { band_data::BAND, "Band" },
     { band_data::SUB_BAND, "Sub-band" },
     { band_data::SPOT, "Spot frequency" },
-    { band_data::SPOT_SET, "Set of spots" }
+    { band_data::SPOT_SET, "Set of spots" },
+    { band_data::USER_SPOT, "User frequency" }
 };
 
 //! Populate the type choices
@@ -268,6 +305,21 @@ void band_row::populate_mode(band_modechoice* ch) {
     }
 }
 
+//! Select this row (or not)
+void band_row::selected(bool value) {
+    w_select_->value(value);
+}
+
+//! Callback from select button
+void band_row::cb_select(Fl_Widget* w, void* v) {
+    band_row* that = ancestor_view<band_row>(w);
+    band_table* t = ancestor_view<band_table>(that);
+    if (((Fl_Check_Button*)w)->value()) {
+        t->selected(that);
+    }
+    that->enable_widgets();
+
+}
 //! Callback from the Type entry field.
 void band_row::cb_type(Fl_Widget* w, void* v) {
     band_row* that = ancestor_view<band_row>(w);
@@ -275,15 +327,17 @@ void band_row::cb_type(Fl_Widget* w, void* v) {
     that->enable_widgets();
 }
 
-//! Callback from the Upper entry field.
-void band_row::cb_upper(Fl_Widget* w, void* v) {
+//! Callback from the Lower entry field.
+void band_row::cb_lower(Fl_Widget* w, void* v) {
     band_row* that = ancestor_view<band_row>(w);
     that->entry_->range.lower = atof(((Fl_Float_Input*)w)->value());
+    band_data_->get_entries().erase(that->entry_);
+    band_data_->get_entries().insert(that->entry_);
     that->enable_widgets();
 }
 
-//! Callback from the Lower entry field.
-void band_row::cb_lower(Fl_Widget* w, void* v) {
+//! Callback from the Upper entry field.
+void band_row::cb_upper(Fl_Widget* w, void* v) {
     band_row* that = ancestor_view<band_row>(w);
     that->entry_->range.upper = atof(((Fl_Float_Input*)w)->value());
     that->enable_widgets();
@@ -324,7 +378,7 @@ band_editor::band_editor(int X, int Y, int W, int H, const char* L) :
 
     int cx = x() + GAP;
     int cy = y() + GAP;
-    int ht = h() - GAP - GAP - HBUTTON;
+    int ht = h() - GAP - GAP - HBUTTON - HBUTTON;
     int wt = w() - GAP - GAP;
 
     int WW = wt / 10;
@@ -367,6 +421,11 @@ band_editor::band_editor(int X, int Y, int W, int H, const char* L) :
     bn_delete_->callback(cb_delete);
     bn_delete_->tooltip("Delete the selected band entry");
 
+    cx += WBUTTON + GAP;
+    bn_reorder_ = new Fl_Button(cx, cy, WBUTTON, HBUTTON, "Reorder");
+    bn_reorder_->callback(cb_reorder);
+    bn_reorder_->tooltip("Display the rows in correct order");
+
     end();
 
     resizable(table_);
@@ -382,19 +441,33 @@ band_editor::~band_editor()
 //!Callback from add row button
 void band_editor::cb_add(Fl_Widget* w, void* v) {
     band_editor* that = ancestor_view<band_editor>(w);
-    band_data::band_entry_t* e = that->table_->selected();
-    band_data::band_entry_t* new_e = new band_data::band_entry_t;
-    new_e->type = band_data::UNKNOWN;
-    new_e->range.lower = e->range.lower;
-    band_data_->get_entries().insert(new_e);
-    that->redraw();
+    if (that->table_->selected()) {
+        band_data::band_entry_t* e = that->table_->selected()->entry();
+        band_data::band_entry_t* new_e = new band_data::band_entry_t;
+        new_e->type = band_data::UNKNOWN;
+        new_e->range.lower = e->range.lower;
+        band_data_->get_entries().insert(new_e);
+        that->table_->draw_widgets();
+        that->table_->select_with_entry(new_e);
+        that->redraw();
+    }
 }
 
 //! Callback from delete row button
 void band_editor::cb_delete(Fl_Widget* w, void* v) {
     band_editor* that = ancestor_view<band_editor>(w);
-    band_data::band_entry_t* e = that->table_->selected();
-    band_data_->get_entries().erase(e);
+    if (that->table_->selected()) {
+        band_data::band_entry_t* e = that->table_->selected()->entry();
+        band_data_->get_entries().erase(e);
+        that->table_->draw_widgets();
+        that->redraw();
+    }
+}
+
+//! Callback from re-order button
+void band_editor::cb_reorder(Fl_Widget* w, void* v) {
+    band_editor* that = ancestor_view<band_editor>(w);
+    that->table_->draw_widgets();
     that->redraw();
 }
 

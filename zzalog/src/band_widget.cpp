@@ -258,6 +258,14 @@ void band_widget::draw_markers() {
 				fl_draw(m.text, x_text_, m.y_text + h_offset_);
 			}
 			break;
+		case USER:
+			if (display_spots_) {
+				fl_color(DARK ? COLOUR_ORANGE : fl_darker(COLOUR_ORANGE));
+				draw_line(m.y_scale, m.y_text, 0);
+				fl_font(0, FL_NORMAL_SIZE);
+				fl_draw(m.text, x_text_, m.y_text + h_offset_);
+			}
+			break;
 		case SPOTGROUP_LOWER:
 			if (display_spots_) {
 				fl_color(DARK ? FL_CYAN : FL_BLUE);
@@ -537,6 +545,11 @@ void band_widget::generate_items() {
 				add_marker({ l, SPOT, y_for_f(l), y_for_f(l), text });
 				num_spots_++;
 				break;
+			case band_data::USER_SPOT:
+				snprintf(text, 128, FREQ_FORMAT " %s", l, (*it)->summary.c_str());
+				add_marker({ l, USER, y_for_f(l), y_for_f(l), text });
+				num_spots_++;
+				break;
 			default:
 				break;
 			}
@@ -732,6 +745,7 @@ bool band_widget::is_text_marker(marker m) {
 		return display_subbands_;
 	case SPOT:
 	case SPOTGROUP_LOWER:
+	case USER:
 		return display_spots_;
 	}
 	return false;

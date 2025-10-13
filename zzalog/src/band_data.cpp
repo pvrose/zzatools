@@ -25,7 +25,8 @@ NLOHMANN_JSON_SERIALIZE_ENUM(band_data::entry_t, {
 	{ band_data::BAND, "Band" },
 	{ band_data::SUB_BAND, "Sub-band" },
 	{ band_data::SPOT, "Spot frequency" },
-	{ band_data::SPOT_SET, "Set of spots"}
+	{ band_data::SPOT_SET, "Set of spots"},
+	{ band_data::USER_SPOT, "User frequency" }
 })
 
 void to_json(json& j, const range_t& r) {
