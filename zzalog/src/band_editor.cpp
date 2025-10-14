@@ -1,7 +1,6 @@
 #include "band_editor.h"
 
 #include "band_data.h"
-#include "status.h"
 
 #include "drawing.h"
 #include "utils.h"
@@ -17,18 +16,10 @@
 #include <string>
 
 extern band_data* band_data_;
-extern status* status_;
-
-using band_entry_t = band_data::band_entry_t;
-
-const int ROW_WIDTH = 1000;
 
 band_table::band_table(int X, int Y, int W, int H, const char* L) :
     Fl_Scroll(X, Y, W, H, L)
 {
-    rows_ = new Fl_Group(X, Y, ROW_WIDTH, HBUTTON * band_data_->get_entries().size());
-    rows_->end();
-    rows_->resizable(nullptr);
     end();
     draw_widgets();
 }
@@ -38,87 +29,57 @@ band_table::~band_table() {
 
 //! Draw all the internal widgets
 void band_table::draw_widgets() {
-    rows_->clear();
-    selected_entry_ = nullptr;
+    clear();
+    selected_row_ = nullptr;
     int r = 0;
-    Fl_Group* save_g = Fl_Group::current();
-    rows_->begin();
-    int cy = rows_->y();
-    rows_->size(1000, band_data_->get_entries().size() * HBUTTON);
+    begin();
+    int cy = y();
     for (auto e : band_data_->get_entries()) {
-        band_row* wr = new band_row(rows_->x(), cy, ROW_WIDTH, HBUTTON);
+        band_row* wr = new band_row(x(), cy, 1000, HBUTTON);
         wr->entry(e);
         cy += HBUTTON;
     }
-    rows_->end();
-    Fl_Group::current(save_g);
+    end();
 }
 
 //! Set selected entry
-void band_table::selected(band_entry_t* entry) {
-    selected_entry_ = entry;
-    for (int ix = 0; ix < rows_->children(); ix++) {
-        band_row* r = (band_row*)rows_->child(ix);
-        if (r->entry() == entry) {
+void band_table::selected(band_row* row) {
+    selected_row_ = row;
+    for (int ix = 0; ix < children(); ix++) {
+        band_row* r = dynamic_cast<band_row*>(child(ix));
+        if (r == row) {
             // Mark this row selected
-            r->selected(true);
+            ((band_row*)child(ix))->selected(true);
         }
-        else {
+        else if (r) {
             // If it is a band_row mark it unselected
-            r->selected(false);
+            ((band_row*)child(ix))->selected(false);
         }
     }
     redraw();
 }
 
+//! Select row with the \p entry
+void band_table::select_with_entry(band_data::band_entry_t* entry) {
+    for (int ix = 0; ix < children(); ix++) {
+        band_row* r = dynamic_cast<band_row*>(child(ix));
+        if (r) {
+            if (r->entry() == entry) {
+                // Mark this row selected
+                selected_row_ = r;
+                ((band_row*)child(ix))->selected(true);
+            }
+            else {
+                // If it is a band_row mark it unselected
+                ((band_row*)child(ix))->selected(false);
+            }
+        }
+    }
+}
 
 //! Get the selected entry
-band_entry_t* band_table::selected() {
-    return selected_entry_;
-}
-
-//! Set values to all widgets
-void band_table::set_values() {
-    if (rows_->children() == band_data_->get_entries().size()) {
-        int row = 0;
-        for (auto e : band_data_->get_entries()) {
-            ((band_row*)rows_->child(row))->entry(e);
-            if (e == selected_entry_) ((band_row*)rows_->child(row))->selected(true);
-            else  ((band_row*)rows_->child(row))->selected(false);
-            row++;
-        }
-    }
-    else {
-        status_->misc_status(ST_ERROR, "BAND: Internal error - row miscount");
-    }
-}
-
-//! Add a row
-void band_table::add_row() {
-    // Increase the size of the row group by 1 row.
-    int gh = rows_->h();
-    rows_->size(rows_->w(), gh + HBUTTON);
-    // Add the new row
-    rows_->begin();
-    int cx = rows_->x();
-    int cy = rows_->y() + gh;
-    int cw = rows_->w();
-    band_row* r = new band_row(cx, cy, cw, HBUTTON);
-    rows_->end();
-    // Set the values in it
-    set_values();
-    redraw();
-}
-
-//! Delete a row
-void band_table::delete_row() {
-    // Remove the last row
-    rows_->delete_child(rows_->children() - 1);
-    // Resize the group
-    rows_->size(rows_->w(), rows_->children() * HBUTTON);
-    // Set the values in
-    set_values();
-    redraw();
+band_row* band_table::selected() {
+    return selected_row_;
 }
 
 
@@ -244,13 +205,13 @@ band_row::~band_row() {
 
 
 //! Set data
-void band_row::entry(band_entry_t* e) {
+void band_row::entry(band_data::band_entry_t* e) {
     entry_ = e;
     enable_widgets();
 }
 
 //! Get data
-band_entry_t* band_row::entry() {
+band_data::band_entry_t* band_row::entry() {
     return entry_;
 }
 
@@ -354,7 +315,7 @@ void band_row::cb_select(Fl_Widget* w, void* v) {
     band_row* that = ancestor_view<band_row>(w);
     band_table* t = ancestor_view<band_table>(that);
     if (((Fl_Check_Button*)w)->value()) {
-        t->selected(that->entry_);
+        t->selected(that);
     }
     that->enable_widgets();
 
@@ -362,27 +323,16 @@ void band_row::cb_select(Fl_Widget* w, void* v) {
 //! Callback from the Type entry field.
 void band_row::cb_type(Fl_Widget* w, void* v) {
     band_row* that = ancestor_view<band_row>(w);
-    // Remove entry before updating the sort key (type)
-    band_data_->get_entries().erase(that->entry_);
     that->entry_->type = (band_data::entry_t)((Fl_Choice*)w)->value();
-    // Add back again
-    band_data_->get_entries().insert(that->entry_);
-    band_table* table = ancestor_view<band_table>(that);
-    table->set_values();
     that->enable_widgets();
 }
 
 //! Callback from the Lower entry field.
 void band_row::cb_lower(Fl_Widget* w, void* v) {
     band_row* that = ancestor_view<band_row>(w);
-    // Remove entry before updating the sort key (frequency)
-    band_data_->get_entries().erase(that->entry_);
-    // Change frequency
     that->entry_->range.lower = atof(((Fl_Float_Input*)w)->value());
-    // Add back again
+    band_data_->get_entries().erase(that->entry_);
     band_data_->get_entries().insert(that->entry_);
-    band_table* table = ancestor_view<band_table>(that);
-    table->set_values();
     that->enable_widgets();
 }
 
@@ -471,6 +421,11 @@ band_editor::band_editor(int X, int Y, int W, int H, const char* L) :
     bn_delete_->callback(cb_delete);
     bn_delete_->tooltip("Delete the selected band entry");
 
+    cx += WBUTTON + GAP;
+    bn_reorder_ = new Fl_Button(cx, cy, WBUTTON, HBUTTON, "Reorder");
+    bn_reorder_->callback(cb_reorder);
+    bn_reorder_->tooltip("Display the rows in correct order");
+
     end();
 
     resizable(table_);
@@ -487,13 +442,13 @@ band_editor::~band_editor()
 void band_editor::cb_add(Fl_Widget* w, void* v) {
     band_editor* that = ancestor_view<band_editor>(w);
     if (that->table_->selected()) {
-        band_entry_t* e = that->table_->selected();
-        band_entry_t* new_e = new band_entry_t;
+        band_data::band_entry_t* e = that->table_->selected()->entry();
+        band_data::band_entry_t* new_e = new band_data::band_entry_t;
         new_e->type = band_data::UNKNOWN;
         new_e->range.lower = e->range.lower;
         band_data_->get_entries().insert(new_e);
-        that->table_->selected(new_e);
-        that->table_->add_row();
+        that->table_->draw_widgets();
+        that->table_->select_with_entry(new_e);
         that->redraw();
     }
 }
@@ -502,11 +457,18 @@ void band_editor::cb_add(Fl_Widget* w, void* v) {
 void band_editor::cb_delete(Fl_Widget* w, void* v) {
     band_editor* that = ancestor_view<band_editor>(w);
     if (that->table_->selected()) {
-        band_entry_t* e = that->table_->selected();
+        band_data::band_entry_t* e = that->table_->selected()->entry();
         band_data_->get_entries().erase(e);
-        that->table_->delete_row();
+        that->table_->draw_widgets();
         that->redraw();
     }
+}
+
+//! Callback from re-order button
+void band_editor::cb_reorder(Fl_Widget* w, void* v) {
+    band_editor* that = ancestor_view<band_editor>(w);
+    that->table_->draw_widgets();
+    that->redraw();
 }
 
 //! Select the band record containing \p frequency

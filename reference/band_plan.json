@@ -237,6 +237,20 @@
             ],
             "Range": {
                 "Lower": 3.6,
+                "Upper": 3.62
+            },
+            "Summary": "All modes - automatically controlled data stations (unattended)",
+            "Type": "Sub-band"
+        },
+        {
+            "Bandwidth": 2.7,
+            "Modes": [
+                "CW",
+                "Dig",
+                "Phone"
+            ],
+            "Range": {
+                "Lower": 3.6,
                 "Upper": 3.65
             },
             "Summary": "All modes - Phone contest preferred.",
@@ -273,20 +287,6 @@
             },
             "Summary": "may be used for UK emergency comms traffic.",
             "Type": "Spot frequency"
-        },
-        {
-            "Bandwidth": 2.7,
-            "Modes": [
-                "CW",
-                "Dig",
-                "Phone"
-            ],
-            "Range": {
-                "Lower": 3.68,
-                "Upper": 3.62
-            },
-            "Summary": "All modes - automatically controlled data stations (unattended)",
-            "Type": "Sub-band"
         },
         {
             "Bandwidth": 0.0,

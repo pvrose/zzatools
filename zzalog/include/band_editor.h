@@ -14,8 +14,6 @@ class Fl_Input;
 
 class band_row;
 
-using band_entry_t = band_data::band_entry_t;
-
 //! This class provides the editor widget for band_data.
 class band_table :
     public Fl_Scroll{
@@ -33,30 +31,21 @@ public:
     ~band_table();
 
     //! Set the selected entry
-    void selected(band_entry_t* e);
+    void selected(band_row* r);
 
     //! Get the selected row
-    band_entry_t* selected();
+    band_row* selected();
+
+    //! Select the row with \p entry
+    void select_with_entry(band_data::band_entry_t* entry);
 
     //! Draw all the internal widgets
     void draw_widgets();
 
-    //! Set values to all widgets
-    void set_values();
-
-    //! Add a row
-    void add_row();
-
-    //! Delete a row
-    void delete_row();
-
 protected:
 
     //! Selected entry
-    band_entry_t* selected_entry_;
-
-    //! Row group
-    Fl_Group* rows_;
+    band_row* selected_row_;
 
  };
 
@@ -83,6 +72,9 @@ public:
     //! Callback from delete row button
     static void cb_delete(Fl_Widget* w, void* v);
 
+    //! CAllback from re-order button
+    static void cb_reorder(Fl_Widget* w, void* v);
+
     //! Set the \p frequency
     void value(double frequency);
 
@@ -94,6 +86,7 @@ protected:
 
     Fl_Button* bn_add_;          //!< Add an entry
     Fl_Button* bn_delete_;       //!< Delete an entry
+    Fl_Button* bn_reorder_;      //!< Correct the row order
     band_table* table_;          //!< Table of band entries for editing
 
 };
@@ -146,10 +139,10 @@ public:
     ~band_row();
 
     //! Set data entry
-    void entry(band_entry_t* e);
+    void entry(band_data::band_entry_t* e);
 
     //! Get entry
-    band_entry_t* entry();
+    band_data::band_entry_t* entry();
 
     //! Set selected
     void selected(bool value);
@@ -180,7 +173,7 @@ protected:
     //! Enable widgets - depends on band_data::entry_t type.
     void enable_widgets();
 
-    band_entry_t* entry_;
+    band_data::band_entry_t* entry_;
 
     Fl_Check_Button* w_select_;    //!< Row selected
     Fl_Choice* w_type_;            //!< Type of entry choice.
