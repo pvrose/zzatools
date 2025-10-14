@@ -46,7 +46,7 @@ ZZALOG uses the following third-party libraries:
 - JSON (https://json.nlohmann.me/nlohmann/json) JSON support library.
 - pugixml (https://pugixml.org) XML support library.
 
-ZZALOG uses reference data from the following third-parties
+ZZALOG uses reference data from the following third-parties:
 - Clublog.org (https://clublog.org) Country data.
 - Country-files.com (https://www.country-files.com) Country data.
 - DxAtlas (http://dxatlas.com) Prefix data.
@@ -54,9 +54,10 @@ ZZALOG uses reference data from the following third-parties
 - OpenWeatherMap (https://openweathermap.org) Weather data.
 - HAMQSL (https://www.hamqsl.com) Solar and Terrestrial data.
 
-ZZALOG uses images:
+ZZALOG uses images from the following third-parties:
 - <a href="https://www.flaticon.com/free-icons/google-maps" title="google maps icons">Google maps icons created by justicon - Flaticon</a>
 - <a href="https://www.flaticon.com/free-icons/pdf" title="pdf icons">Pdf icons created by Smashicons - Flaticon</a>
+
 \copyright Philip Rose GM3ZZA 2018-2025. All rights reserved.
 
 
