@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DOCUMENT Type="Advanced Installer" CreateVersion="22.8" version="23.0.1" Modules="simple" RootPath="." Language="en_GB" Id="{023CFA17-61FC-4142-B8CC-CD8CA63951A9}">
+<DOCUMENT Type="Advanced Installer" CreateVersion="22.8" version="23.1" Modules="simple" RootPath="." Language="en_GB" Id="{023CFA17-61FC-4142-B8CC-CD8CA63951A9}">
   <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
     <ROW Property="AI_APP_FILE" Value="[#zzalog.exe]"/>
     <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
@@ -2247,6 +2247,7 @@
     <ROW File="structband__data_1_1ptr__ltmembers.html" Component_="about__dialog_8h.html" FileName="STRU~115.HTM|structband__data_1_1ptr__lt-members.html" Attributes="0" SourcePath="docs\html\structband__data_1_1ptr__lt-members.html" SelfReg="false"/>
     <ROW File="structband__data_1_1ptr__lt.html" Component_="about__dialog_8h.html" FileName="STRU~116.HTM|structband__data_1_1ptr__lt.html" Attributes="0" SourcePath="docs\html\structband__data_1_1ptr__lt.html" SelfReg="false"/>
     <ROW File="structband__data_1_1ptr__lt.js" Component_="about__dialog_8h.html" FileName="STRUC~58.JS|structband__data_1_1ptr__lt.js" Attributes="0" SourcePath="docs\html\structband__data_1_1ptr__lt.js" SelfReg="false"/>
+    <ROW File="pdf.png" Component_="all.xml" FileName="pdf.png" Attributes="0" SourcePath="..\reference\pdf.png" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.custcomp.MsiShortcutPropertyComponent">
     <ROW MsiShortcutProperty="ZZALOG.pdf0" Shortcut_="ZZALOG.pdf" PropertyKey="System.AppUserModel.PreventPinning" PropVariantValue="1"/>
