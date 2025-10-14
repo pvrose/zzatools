@@ -237,6 +237,20 @@
             ],
             "Range": {
                 "Lower": 3.6,
+                "Upper": 3.62
+            },
+            "Summary": "All modes - automatically controlled data stations (unattended)",
+            "Type": "Sub-band"
+        },
+        {
+            "Bandwidth": 2.7,
+            "Modes": [
+                "CW",
+                "Dig",
+                "Phone"
+            ],
+            "Range": {
+                "Lower": 3.6,
                 "Upper": 3.65
             },
             "Summary": "All modes - Phone contest preferred.",
@@ -3868,6 +3882,16 @@
             "Type": "Sub-band"
         },
         {
+            "Bandwidth": null,
+            "Modes": [],
+            "Range": {
+                "Lower": 241000.0,
+                "Upper": 250000.0
+            },
+            "Summary": "1mm",
+            "Type": "Band"
+        },
+        {
             "Bandwidth": 0.0,
             "Modes": [
                 "All"
@@ -3878,16 +3902,6 @@
             },
             "Summary": "",
             "Type": "Sub-band"
-        },
-        {
-            "Bandwidth": null,
-            "Modes": [],
-            "Range": {
-                "Lower": 1.7976931348623157e+308,
-                "Upper": 0.0
-            },
-            "Summary": "1mm",
-            "Type": "Band"
         }
     ]
 }
