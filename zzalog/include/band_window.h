@@ -50,7 +50,7 @@ protected:
     Fl_Tabs* tabs_;
     //! The band_widget instance.
     band_widget* bw_;
-    //! The band enditor
+    //! The band_editor instance.
     band_editor* be_;
 
 };

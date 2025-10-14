@@ -9,7 +9,7 @@ selected QSO record.
 
 This pane shows only the band segments as allocated in the band-plan, with text in black
 showing the lower frequency of the segment, the recommended maximum bandwidth and use. 
-The text in red shows the rig's TX frequency: the text in green shows the selected QSO
+The text in red shows the rig's TX frequency: the text in dark yellow shows the selected QSO
 frequency. 
 
 Note that no indication is given about the availability of any frequency according to the 
@@ -27,6 +27,37 @@ modes.
 
 This window is fully resizable. If it becomes too small, then information is removed 
 as necessary to fit the window.
+
+\image html qso_bands_3.png "Band-plan editor"
+\image latex qso_bands_3.png "Band-plan editor"
+
+The other tab in this windows allows limited editing of the band-plan file. The columns 
+of this table are:
+
+- <B>Select</B> Indicates that this record is currently selected and affects the
+"Add" and "Delete" button behaviour.
+- <B>Type</B> Shows the type of the the record:
+  - <B>Band</B> The overall allocation at this frequency band. The record cannot be edited
+  by a user.
+  - <B>Sub-band</B> A frequency range recommended by IARU for specific modes.
+  - <B>Set of spots</B> Similar to a sub-band, but a set of channelised frequencies
+  for a specific mode.
+  - <B>Spot frequency</B> An individual frequency channel suggested for a specific activity.
+  - <B>User frequency</B> An individual frequency added by the user for their specific
+  use.
+- <B>Lower</B> The lower bound of a band, sub-band or set of spots, 
+or single spot or user frequency.
+- <B>Upper</B> The upper bound of a band, sub-band or set of spots. 
+Not used for spot or user frequencies.
+- <B>Bandwidth</B> The maximum bandwidth recommended for use in a sub-band.
+- <B>Modes</B> The modes suggested for a sub-band.
+- <B>Summary</B> Notes about usage of the frequency or frequencies.
+
+\image html qso_bands_4.png "Selecting modes in band-plan editor"
+\image latex qso_bands_4.png "Selecting modes in band-plan editor" width=5cm
+
+The drop-down menu for modes presents are set of check boxes. This allows any combination
+of modes to be entered into the field.
 
 \section band_qsy Changing rig frequency
 

@@ -112,7 +112,7 @@ public:
     //! \param W width 
     //! \param H height
     //! \param L label
-    band_modechoice(int X, int Y, int, int H, const char* L = nullptr);
+    band_modechoice(int X, int Y, int W, int H, const char* L = nullptr);
 
     //! Desctructor
     ~band_modechoice();
@@ -180,6 +180,7 @@ protected:
     //! Enable widgets - depends on band_data::entry_t type.
     void enable_widgets();
 
+    //! The band_entry_t item being edited.
     band_entry_t* entry_;
 
     Fl_Check_Button* w_select_;    //!< Row selected
