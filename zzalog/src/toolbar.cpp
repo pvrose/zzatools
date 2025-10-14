@@ -290,7 +290,20 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	bn->when(FL_WHEN_RELEASE);
 	Fl_Image* icon = main_icon_.copy(H, H);
 	bn->image(icon);
-	bn->tooltip("Open Userguide");
+	bn->tooltip("Open HTML Userguide");
+	add(bn);
+	curr_x += H;
+	// Help->User Guide (PDF)
+	bn = new Fl_Button(curr_x, Y, H, H, 0);
+	bn->callback(cb_bn_menu, (void*)"&Help/User Guide (&PDF)");
+	bn->when(FL_WHEN_RELEASE);
+	std::string pdf_filename = default_ref_directory_ + "pdf.png";
+	pi = new Fl_PNG_Image(pdf_filename.c_str());
+	if (pi && !pi->fail())
+		bn->image(pi->copy(H, H));
+	else
+		bn->label("PDF");
+	bn->tooltip("Open PDF Userguide");
 	add(bn);
 
 	curr_x += H + TOOL_GAP;
