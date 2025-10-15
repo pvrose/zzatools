@@ -20,6 +20,7 @@ extern std::string CONTACT;
 extern std::string COPYRIGHT;
 extern std::string PARTY3RD_COPYRIGHT;
 extern std::string TIMESTAMP;
+extern bool DEVELOPMENT_MODE;
 extern Fl_PNG_Image main_icon_;
 
 // Creates the about box dialog and displays it.
@@ -98,7 +99,10 @@ about_dialog::about_dialog() :
 
 	const int YVERS = YICON + HICON;
 	Fl_Box* bx_vers = new Fl_Box(C1, YVERS, WICON, HBUTTON);
-	bx_vers->copy_label(PROGRAM_VERSION.c_str());
+
+	std::string version = PROGRAM_VERSION;
+	if (DEVELOPMENT_MODE) version += " DEVT";
+	bx_vers->copy_label(version.c_str());
 	bx_vers->labelfont(FL_BOLD);
 	bx_vers->labelsize(FL_NORMAL_SIZE + 4);
 	bx_vers->align(FL_ALIGN_CENTER);

@@ -149,6 +149,8 @@ bool PRIVATE = false;
 bool READ_ONLY = false;
 //! Resum logging including previous session -  by "-m"
 bool RESUME_SESSION = false;
+//! Development flag: used to enable/disable features only in development mode ("-g")
+bool DEVELOPMENT_MODE = false;
 
 //! Access to FLTK global attribute to  default text size throughout ZZALOG.
 extern int FL_NORMAL_SIZE;

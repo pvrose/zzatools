@@ -14,6 +14,7 @@
 #include <FL/Fl_Preferences.H>
 
 extern ticker* ticker_;
+extern bool DEVELOPMENT_MODE;
 extern std::string PROGRAM_ID;
 extern std::string PROGRAM_VERSION;
 extern std::string VENDOR;
@@ -79,7 +80,9 @@ void qso_bands::create_form() {
 	// CReate the window
 	Fl_Group::current(nullptr);
 	char l[128];
-	snprintf(l,sizeof(l), "%s %s: Bandplan", PROGRAM_ID.c_str(), PROGRAM_VERSION.c_str());
+	std::string version = PROGRAM_VERSION;
+	if (DEVELOPMENT_MODE) version += " DEVELOPMENT";
+	snprintf(l,sizeof(l), "%s %s: Bandplan", PROGRAM_ID.c_str(), version.c_str());
 	full_window_ = new band_window(left_, top_, width_, height_);
 	full_window_->copy_label(l);
 	if (open_window_) full_window_->show();

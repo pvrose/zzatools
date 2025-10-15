@@ -18,6 +18,7 @@
 
 extern band_data* band_data_;
 extern status* status_;
+extern bool DEVELOPMENT_MODE;
 
 using band_entry_t = band_data::band_entry_t;
 
@@ -276,12 +277,22 @@ void band_row::enable_widgets() {
         w_description_->deactivate();
         break;
     case band_data::BAND:
-        w_type_->deactivate();
-        w_lower_->deactivate();
-        w_upper_->deactivate();
-        w_width_->deactivate();
-        w_modes_->deactivate();
-        w_description_->deactivate();
+        if (DEVELOPMENT_MODE) {
+            w_type_->activate();
+            w_lower_->activate();
+            w_upper_->activate();
+            w_width_->activate();
+            w_modes_->activate();
+            w_description_->activate();
+        }
+        else {
+            w_type_->deactivate();
+            w_lower_->deactivate();
+            w_upper_->deactivate();
+            w_width_->deactivate();
+            w_modes_->deactivate();
+            w_description_->deactivate();
+        }
         break;
     case band_data::SUB_BAND:
         w_type_->activate();

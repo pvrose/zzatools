@@ -279,6 +279,7 @@ int cb_args(int argc, char** argv, int& i) {
 	}
 	// HTML Directory - expecetd to be "-g ./" when run in development 
 	else if (strcmp("-g", argv[i]) == 0 || strcmp("--userguide", argv[i]) == 0) {
+		DEVELOPMENT_MODE = true;
 		i += 1;
 		if (i < argc) {
 			default_html_directory_ = argv[i];
@@ -620,7 +621,9 @@ void add_dashboard() {
 	if (!closing_) {
 		if (!qso_manager_) {
 			char l[128];
-			snprintf(l, sizeof(l), "%s %s: Operating Dashboard", PROGRAM_ID.c_str(), PROGRAM_VERSION.c_str());
+			std::string version = PROGRAM_VERSION;
+			if (DEVELOPMENT_MODE) version += " DEVELOPMENT";
+			snprintf(l, sizeof(l), "%s %s: Operating Dashboard", PROGRAM_ID.c_str(), version.c_str());
 			qso_manager_ = new qso_manager(10, 10);
 			qso_manager_->copy_label(l);
 		}
@@ -632,7 +635,9 @@ void add_dashboard() {
 // Set the text in the main window label
 void main_window_label(std::string text) {
 	// e.g. ZZALOG 3.0.0: <filename> - PROGRAM_VERSION includes (Debug) if compiled under _DEBUG
-	std::string label = PROGRAM_ID + " " + PROGRAM_VERSION + ": " + text;
+	std::string label = PROGRAM_ID + " " + PROGRAM_VERSION;
+	if (DEVELOPMENT_MODE) label += " DEVELOPMENT";
+	label += ": " + text;
 	main_window_->copy_label(label.c_str());
 }
 
@@ -781,6 +786,9 @@ void print_args(int argc, char** argv) {
 	snprintf(message, sizeof(message), "ZZALOG: %s %s", 
 		PROGRAM_ID.c_str(), PROGRAM_VERSION.c_str());
 	status_->misc_status(ST_NOTE, message);
+	if (DEVELOPMENT_MODE) {
+		status_->misc_status(ST_WARNING, "ZZALOG: Development mode");
+	}
 	snprintf(message, sizeof(message), "ZZALOG: Compiled %s", TIMESTAMP.c_str());
 	status_->misc_status(ST_NOTE, message);
 
@@ -998,10 +1006,12 @@ int main(int argc, char** argv)
 
 	if (DISPLAY_VERSION) {
 #ifndef WIN32
+		std::string version = PROGRAM_VERSION;
+		if (DEVELOPMENT_MODE) version += " DEVELOPMENT";
 		// Display version
 		printf("%s Version %s Compiled %s\n", 
 			PROGRAM_ID.c_str(), 
-			PROGRAM_VERSION.c_str(),
+			version.c_str(),
 			TIMESTAMP.c_str());
 		curl_version_info_data* data = curl_version_info(CURLVERSION_LAST);
 		printf("|-With libraries\n  |- hamlib (%s)\n  |- FLTK (%d.%d.%d)\n  |- Curl (%s)\n",
@@ -1027,6 +1037,7 @@ int main(int argc, char** argv)
 	// Create banner
 	banner_ = new banner(400, 200);
 	std::string title = PROGRAM_ID + " " + PROGRAM_VERSION;
+	if (DEVELOPMENT_MODE) title += " DEVELOPMENT";
 	banner_->copy_label(title.c_str());
 
 	// Now display sticky switch message
