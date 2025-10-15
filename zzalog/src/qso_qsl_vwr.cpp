@@ -645,7 +645,6 @@ void qso_qsl_vwr::set_declines() {
 	if (current_qso_ && current_qso_->item("QRZCOM_QSO_UPLOAD_STATUS") == "N")
 		bn_qrz_decline_->value(true);
 	else bn_qrz_decline_->value(false);
-	qso_data* data = ancestor_view<qso_data>(this);
 }
 
 
