@@ -22,23 +22,23 @@ const std::string WSJTX = "WSJT-X";
 
 //! How the app needs to access the rig.
 enum app_rig_class_t {
-    ALL_RIGS,           //!< App applies to all rigs
-    RIG_NO_CAT,         //!< App applies to the rig without needing CAT access
-    RIG_CAT             //!< App requires CAT access to rig
+    NO_CONNECTION,      //!< App applies to all rigs
+    AUDIO_ONLY,         //!< App applies to the rig without needing CAT access
+    AUDIO_CAT           //!< App requires CAT access to rig
 };
 
 //! The app related data
 struct app_data_t {
-    std::string name;                 //!< The name of the app.
-    bool server{ false };        //!< ZZALOG acts as a log server.
-    app_rig_class_t rig_class{ ALL_RIGS };  //!< How the app requires rig access.
-    std::map<std::string, std::string> commands;//!< The commands for each rig.
-    bool admin{ false };         //!< The command needs to be run in administrator mode.
-    bool can_disable{ false };   //!< The app can be disconnected (Rig = NONE).
-    bool (*has_server)() { nullptr };       //!< Function to call to see if serever is active.
-    bool (*has_data)() { nullptr };         //!< Function to call to see if server has request.
-    std::string address{ "" };        //!< Network address.
-    int port_num{ 0 };           //!< Network port number.
+    std::string name;                            //!< The name of the app.
+    bool server{ false };                        //!< ZZALOG acts as a log server.
+    app_rig_class_t rig_class{ NO_CONNECTION };  //!< How the app requires rig access.
+    std::map<std::string, std::string> commands; //!< The commands for each rig.
+    bool admin{ false };                         //!< The command needs to be run in administrator mode.
+    bool can_disable{ false };                   //!< The app can be disconnected (Rig = NONE).
+    bool (*has_server)() { nullptr };            //!< Function to call to see if serever is active.
+    bool (*has_data)() { nullptr };              //!< Function to call to see if server has request.
+    std::string address{ "" };                   //!< Network address.
+    int port_num{ 0 };                           //!< Network port number.
 };
 
 //! \brief The class displays and controls the status of a single modem application using
@@ -146,9 +146,7 @@ public:
     //! Overide of Fl_Group::handle that takes focus to accept keybaord F1 for launching user guide.
     virtual int handle(int event);
 
-    //! Load configuration data from settings.
-   
-    //! \todo Convert this to a separate file?
+    //! Load configuration data from apps.json
     void load_values();
     //! Instantiate component widgets.
     void create_form();

@@ -11,20 +11,67 @@
 #include "file_viewer.h"
 #include "filename_input.h"
 
+#include "nlohmann/json.hpp"
+
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Int_Input.H>
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Tabs.H>
 #include <FL/Fl_Radio_Light_Button.H>
 
-
+using json = nlohmann::json;
 
 extern fllog_emul* fllog_emul_;
 extern wsjtx_handler* wsjtx_handler_;
 extern status* status_;
+extern std::string default_data_directory_;
 extern std::string VENDOR;
 extern std::string PROGRAM_ID;
 extern void open_html(const char*);
+
+// JSON mapping for app_rig_class_t
+NLOHMANN_JSON_SERIALIZE_ENUM(app_rig_class_t, {
+    { NO_CONNECTION, "No connection" },
+    { AUDIO_ONLY, "Audio only"},
+    { AUDIO_CAT, "Audio & CAT"}
+})
+
+// JSON serialisation from app_data_t
+void to_json(json& j, const app_data_t& d) {
+    j = json{
+        { "Connection", json(d.rig_class) },
+        { "Is server", d.server },
+        { "Needs administrator", d.admin },
+        { "Can disable", d.can_disable}
+    };
+    if (d.server) {
+        j["Network address"] = d.address;
+        j["Network port"] = d.port_num;
+    }
+    json js;
+    for (auto sc : d.commands) {
+        js[sc.first] = sc.second;
+    }
+    j["Scripts"] = js;
+}
+
+// JSON serialisation to app_data_t
+void from_json(const json& j, app_data_t& d) {
+    j.at("Connection").get_to(d.rig_class);
+    j.at("Is server").get_to(d.server);
+    j.at("Needs administrator").get_to(d.admin);
+    j.at("Can disaable").get_to(d.can_disable);
+    if (d.server) {
+        j.at("Network address").get_to(d.address);
+        j.at("Network port").get_to(d.port_num);
+    }
+    if (j.find("Scripts") != j.end()) {
+        auto scripts = j.at("Scripts").get<std::map<std::string, std::string> >();
+        for (auto& sc : scripts) {
+            d.commands[sc.first] = sc.second;
+        }
+    }
+}
 
 // Constructor for one std::set of modem controls
 app_grp::app_grp(int X, int Y, int W, int H, const char* L) :
@@ -49,21 +96,21 @@ void app_grp::create_form() {
 
     // Button to select common command for all rigs
     bn_common_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Common");
-    bn_common_->callback(cb_bn_class, (void*)(intptr_t)ALL_RIGS);
+    bn_common_->callback(cb_bn_class, (void*)(intptr_t)NO_CONNECTION);
     bn_common_->tooltip("Select if no configuration per rig is required");
 
     curr_x += WBUTTON;
 
     // Button to select command for rig specific, CAT mnon-specific
     bn_rig_nocat_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Audio");
-    bn_rig_nocat_->callback(cb_bn_class, (void*)(intptr_t)RIG_NO_CAT);
+    bn_rig_nocat_->callback(cb_bn_class, (void*)(intptr_t)AUDIO_ONLY);
     bn_rig_nocat_->tooltip("Select if configuration is required only for audio");
 
     curr_x += WBUTTON;
 
     // Button to select command for rig and CAT specific
     bn_rig_cat_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Aud./CAT");
-    bn_rig_cat_->callback(cb_bn_class, (void*)(intptr_t)RIG_CAT);
+    bn_rig_cat_->callback(cb_bn_class, (void*)(intptr_t)AUDIO_CAT);
     bn_rig_cat_->tooltip("Select if configuration is required for audio and CAT");
 
     radio_class_->end();
@@ -197,9 +244,9 @@ void app_grp::create_form() {
 void app_grp::enable_widgets() {
     const char* rig_name = rig_id();
     // Update the various widgets
-    bn_common_->value(app_data_->rig_class == ALL_RIGS);
-    bn_rig_nocat_->value(app_data_->rig_class == RIG_NO_CAT);
-    bn_rig_cat_->value(app_data_->rig_class == RIG_CAT);
+    bn_common_->value(app_data_->rig_class == NO_CONNECTION);
+    bn_rig_nocat_->value(app_data_->rig_class == AUDIO_ONLY);
+    bn_rig_cat_->value(app_data_->rig_class == AUDIO_CAT);
     bn_server_->value(app_data_->server);
     ip_nw_address_->value(app_data_->address.c_str());
     char temp[32];
@@ -434,17 +481,17 @@ const char* app_grp::rig_id() {
     qso_manager* mgr = ancestor_view<qso_manager>(this);
     qso_rig* rig_ctrl = mgr->rig_control();
     switch(app_data_->rig_class) {
-        case ALL_RIGS:
+        case NO_CONNECTION:
             strcpy(result, "COMMON");
             break;
-        case RIG_NO_CAT: 
+        case AUDIO_ONLY:
             if (rig_ctrl) {
                 strcpy(result, mgr->rig_control()->label());
             } else {
                 strcpy(result, "");
             }
             break;
-        case RIG_CAT:
+        case AUDIO_CAT:
             if (rig_ctrl) {
                 snprintf(result, 32, "%s %s",
                     mgr->rig_control()->label(),
@@ -500,56 +547,90 @@ int qso_apps::handle(int event) {
     return result;
 }
 
+// Load JSON
+
 
 // Load settings
 void qso_apps::load_values() {
+    std::string filename = default_data_directory_ + "apps.json";
+    std::ifstream i(filename);
+    char msg[128];
+    bool ok = false;
+    if (i.good()) {
+        ok = true;
+        try {
+            json j;
+            j << i;
+            if (!j.at("Apps").is_null()) {
+                auto apps = j.at("Apps").get<std::map<std::string, json>>();
+                for (auto a : apps) {
+                    app_data_t* data = new app_data_t(a.second);
+                    apps_data_[a.first] = data;
+                }
+            }
+        }
+        catch (const json::exception& e) {
+            std::snprintf(msg, sizeof(msg), "APPS: Reading JSON failed %d (%s)\n",
+                e.id, e.what());
+            status_->misc_status(ST_ERROR, msg);
+            i.close();
+            ok = false;
+        }
+        snprintf(msg, sizeof(msg), "APPS: %s loaded OK!", filename.c_str());
+        status_->misc_status(ST_OK, msg);
+    }
 	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-    Fl_Preferences apps_settings(settings, "Apps");
-    for (int ix = 0; ix < apps_settings.groups(); ix++) {
-        const char* app = apps_settings.group(ix);
-        Fl_Preferences app_settings(apps_settings, app);
-        app_data_t* data = new app_data_t;
-        data->name = app;
-        int tempi;
-        char* temps;
-        app_settings.get("Common", tempi, (int)RIG_CAT);
-        data->rig_class = (app_rig_class_t)tempi;
-        app_settings.get("Server", tempi, (int)false);
-        data->server = tempi;
-        if (std::string(app) == FLDIGI) {
-            app_settings.get("Address", temps, "127.0.0.1");
-            data->address = temps;
-            free(temps);
-            app_settings.get("Port Number", tempi, 8421);
-            data->port_num = tempi;
+    if (!ok) {
+        snprintf(msg, sizeof(msg), "APPS: CAnnot open %s: defaulting to settings", 
+            filename.c_str());
+        status_->misc_status(ST_WARNING, msg);
+        Fl_Preferences apps_settings(settings, "Apps");
+        for (int ix = 0; ix < apps_settings.groups(); ix++) {
+            const char* app = apps_settings.group(ix);
+            Fl_Preferences app_settings(apps_settings, app);
+            app_data_t* data = new app_data_t;
+            data->name = app;
+            int tempi;
+            char* temps;
+            app_settings.get("Common", tempi, (int)AUDIO_CAT);
+            data->rig_class = (app_rig_class_t)tempi;
+            app_settings.get("Server", tempi, (int)false);
+            data->server = tempi;
+            if (std::string(app) == FLDIGI) {
+                app_settings.get("Address", temps, "127.0.0.1");
+                data->address = temps;
+                free(temps);
+                app_settings.get("Port Number", tempi, 8421);
+                data->port_num = tempi;
+            }
+            else if (std::string(app) == WSJTX) {
+                app_settings.get("Address", temps, "127.0.0.1");
+                data->address = temps;
+                free(temps);
+                app_settings.get("Port Number", tempi, 2237);
+                data->port_num = tempi;
+            }
+            data->has_server = nullptr;
+            data->has_data = nullptr;
+            app_settings.get("Administrator", tempi, (int)false);
+            data->admin = tempi;
+            app_settings.get("Can Disconnect", tempi, (int)false);
+            data->can_disable = tempi;
+            if (data->server) add_servers(data);
+            Fl_Preferences rigs_settings(app_settings, "Rigs");
+            for (int iy = 0; iy < rigs_settings.entries(); iy++) {
+                const char* rig = rigs_settings.entry(iy);
+                char* temp;
+                rigs_settings.get(rig, temp, app);
+                data->commands[std::string(rig)] = temp;
+            }
+            if (data->rig_class == NO_CONNECTION && !data->can_disable && data->commands.size() > 1) {
+                char msg[128];
+                snprintf(msg, sizeof(msg), "APPS: Data error for app %s", app);
+                status_->misc_status(ST_WARNING, msg);
+            }
+            apps_data_[data->name] = data;
         }
-        else if (std::string(app) == WSJTX) {
-            app_settings.get("Address", temps, "127.0.0.1");
-            data->address = temps;
-            free(temps);
-            app_settings.get("Port Number", tempi, 2237);
-            data->port_num = tempi;
-        }
-        data->has_server = nullptr;
-        data->has_data = nullptr;
-        app_settings.get("Administrator", tempi, (int)false);
-        data->admin = tempi;
-        app_settings.get("Can Disconnect", tempi, (int)false);
-        data->can_disable = tempi;
-        if (data->server) add_servers(data);
-        Fl_Preferences rigs_settings(app_settings, "Rigs");
-        for (int iy = 0; iy < rigs_settings.entries(); iy++) {
-            const char* rig = rigs_settings.entry(iy);
-            char* temp;
-            rigs_settings.get(rig, temp, app);
-            data->commands[std::string(rig)] = temp;
-        }
-        if (data->rig_class == ALL_RIGS && !data->can_disable && data->commands.size() > 1) {
-            char msg[128];
-            snprintf(msg, sizeof(msg), "APPS: Data error for app %s", app);
-            status_->misc_status(ST_WARNING, msg);
-        }
-        apps_data_[data->name] = data;
     }
     // Load default tab value
     Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
@@ -650,33 +731,46 @@ void qso_apps::adjust_size() {
 
 // save settings
 void qso_apps::save_values() {
-    Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-    Fl_Preferences apps_settings(settings, "Apps");
-    apps_settings.clear();
-    for (auto it = apps_data_.begin(); it != apps_data_.end(); it++) {
-        Fl_Preferences app_settings(apps_settings, (*it).first.c_str());
-        app_settings.set("Common", (int)(*it).second->rig_class);
-        app_settings.set("Server", (*it).second->server);
-        if ((*it).second->server) {
-            app_settings.set("Address", (*it).second->address.c_str());
-            app_settings.set("Port Number", (*it).second->port_num);
-        }
-        app_settings.set("Administrator", (*it).second->admin);
-        app_settings.set("Can Disconnect", (*it).second->can_disable);
-        Fl_Preferences rigs_settings(app_settings, "Rigs");
-        for (auto iu = (*it).second->commands.begin(); 
-            iu != (*it).second->commands.end(); iu++) {
-            rigs_settings.set((*iu).first.c_str(), (*iu).second.c_str());
-        }
+    json j;
+    
+    for (auto it : apps_data_) {
+        j[it.first] = *it.second;
     }
-    Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
-    // Find the current selected tab and save its index
-    Fl_Widget* w = tabs_->value();
-    for (int ix = 0; ix != children(); ix++) {
-        if (child(ix) == w) {
-            tab_settings.set("Apps", ix);
-        }
-    }
+
+    json jout;
+    jout["Apps"] = j;
+
+    std::string filename = default_data_directory_ + "apps.json";
+    std::ofstream o(filename);
+    o << std::setw(4) << jout << '\n';
+    o.close();
+    //Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+    //Fl_Preferences apps_settings(settings, "Apps");
+    //apps_settings.clear();
+    //for (auto it = apps_data_.begin(); it != apps_data_.end(); it++) {
+    //    Fl_Preferences app_settings(apps_settings, (*it).first.c_str());
+    //    app_settings.set("Common", (int)(*it).second->rig_class);
+    //    app_settings.set("Server", (*it).second->server);
+    //    if ((*it).second->server) {
+    //        app_settings.set("Address", (*it).second->address.c_str());
+    //        app_settings.set("Port Number", (*it).second->port_num);
+    //    }
+    //    app_settings.set("Administrator", (*it).second->admin);
+    //    app_settings.set("Can Disconnect", (*it).second->can_disable);
+    //    Fl_Preferences rigs_settings(app_settings, "Rigs");
+    //    for (auto iu = (*it).second->commands.begin(); 
+    //        iu != (*it).second->commands.end(); iu++) {
+    //        rigs_settings.set((*iu).first.c_str(), (*iu).second.c_str());
+    //    }
+    //}
+    //Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
+    //// Find the current selected tab and save its index
+    //Fl_Widget* w = tabs_->value();
+    //for (int ix = 0; ix != children(); ix++) {
+    //    if (child(ix) == w) {
+    //        tab_settings.set("Apps", ix);
+    //    }
+    //}
 }
 
 // Configure widgets
@@ -711,7 +805,7 @@ void qso_apps::cb_bn_new(Fl_Widget* w, void* v) {
     app_data_t* new_data = new app_data_t;
     new_data->name = that->new_name_;
     new_data->commands = {};
-    new_data->rig_class = RIG_CAT;
+    new_data->rig_class = AUDIO_CAT;
     new_data->server = false;
     new_data->has_data = nullptr;
     new_data->has_server = nullptr;

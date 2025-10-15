@@ -4,6 +4,7 @@
 
 - Redesigned station dialog and initialisation of station data.
 - Add ability to edit band plan data.
+- Move qso_apps configuration data to separate JSON file.
 - Cosmetic changes.
 - Performance improvements.
 - Bug fixes:
