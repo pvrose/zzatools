@@ -130,8 +130,13 @@ endif
 all: $(EXEC_DIR)/$(TARGET_EXEC) $(TREFS) documents
 
 # Create a target to run the compiled code
+.PHONY: run_all
+run_all: all
+	@$(EXEC_DIR)/$(TARGET_EXEC) $(ARGS) -g ./
+
+# Create a target to run the compiled code
 .PHONY: run
-run: all
+run: $(EXEC_DIR)/$(TARGET_EXEC)
 	@$(EXEC_DIR)/$(TARGET_EXEC) $(ARGS) -g ./
 
 # Create a target to run debugger
