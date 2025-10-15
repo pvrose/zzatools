@@ -41,7 +41,6 @@ band_table::~band_table() {
 void band_table::draw_widgets() {
     rows_->clear();
     selected_entry_ = nullptr;
-    int r = 0;
     Fl_Group* save_g = Fl_Group::current();
     rows_->begin();
     int cy = rows_->y();
@@ -104,7 +103,15 @@ void band_table::add_row() {
     int cx = rows_->x();
     int cy = rows_->y() + gh;
     int cw = rows_->w();
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#endif
+    // This is implicitly used.
     band_row* r = new band_row(cx, cy, cw, HBUTTON);
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
     rows_->end();
     // Set the values in it
     set_values();
