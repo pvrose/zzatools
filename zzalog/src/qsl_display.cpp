@@ -484,7 +484,7 @@ void qsl_display::set_image(Fl_Image* image) {
 
 // std::set alternate text
 void qsl_display::set_text(const char* text, Fl_Color colour) {
-	delete alt_text_;
+	if (alt_text_) delete alt_text_;
 	if (text == nullptr) alt_text_ = nullptr;
 	else {
 		alt_text_ = new char[strlen(text) + 1];
