@@ -37,7 +37,10 @@ any time from the menu or the toolbar:
 
 For help on any specific window or panel, click on it and press F1.
 
-\section ack Acknowledgments.
+
+\copyright Philip Rose GM3ZZA 2018-2025. All rights reserved.
+
+\page ack Acknowledgments.
 
 ZZALOG uses the following third-party libraries:
 - FLTK (https://www.fltk.org/doc-1.4/index.html) Graphical user interface library.
@@ -57,8 +60,6 @@ ZZALOG uses reference data from the following third-parties:
 ZZALOG uses images from the following third-parties:
 - <a href="https://www.flaticon.com/free-icons/google-maps" title="google maps icons">Google maps icons created by justicon - Flaticon</a>
 - <a href="https://www.flaticon.com/free-icons/pdf" title="pdf icons">Pdf icons created by Smashicons - Flaticon</a>
-
-\copyright Philip Rose GM3ZZA 2018-2025. All rights reserved.
 
 
 */

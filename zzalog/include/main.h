@@ -81,7 +81,7 @@
 //! See <A class="e1" HREF=file:../../userguide/html/release_notes.html>Release Notes.</A>
 //!
 //! \section ack Acknowledgements
-//! See <A class="e1" HREF=file:../../userguide/html/index.html#ack>Acknowledgements</A>
+//! See <A class="e1" HREF=file:../../userguide/html/ack.html>Acknowledgements</A>
 //!
 //! \copyright Philip Rose GM3ZZA 2018-2025. All rights reserved.
 //!
