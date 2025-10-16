@@ -60,7 +60,7 @@ void from_json(const json& j, app_data_t& d) {
     j.at("Connection").get_to(d.rig_class);
     j.at("Is server").get_to(d.server);
     j.at("Needs administrator").get_to(d.admin);
-    j.at("Can disaable").get_to(d.can_disable);
+    j.at("Can disable").get_to(d.can_disable);
     if (d.server) {
         j.at("Network address").get_to(d.address);
         j.at("Network port").get_to(d.port_num);
@@ -565,7 +565,9 @@ void qso_apps::load_values() {
                 auto apps = j.at("Apps").get<std::map<std::string, json>>();
                 for (auto a : apps) {
                     app_data_t* data = new app_data_t(a.second);
+                    data->name = a.first;
                     apps_data_[a.first] = data;
+                    if (data->server) add_servers(data);
                 }
             }
         }
