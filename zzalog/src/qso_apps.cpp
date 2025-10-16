@@ -746,7 +746,7 @@ void qso_apps::save_values() {
     std::ofstream o(filename);
     o << std::setw(4) << jout << '\n';
     o.close();
-    //Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+    Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
     //Fl_Preferences apps_settings(settings, "Apps");
     //apps_settings.clear();
     //for (auto it = apps_data_.begin(); it != apps_data_.end(); it++) {
@@ -765,14 +765,14 @@ void qso_apps::save_values() {
     //        rigs_settings.set((*iu).first.c_str(), (*iu).second.c_str());
     //    }
     //}
-    //Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
-    //// Find the current selected tab and save its index
-    //Fl_Widget* w = tabs_->value();
-    //for (int ix = 0; ix != children(); ix++) {
-    //    if (child(ix) == w) {
-    //        tab_settings.set("Apps", ix);
-    //    }
-    //}
+    Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
+    // Find the current selected tab and save its index
+    Fl_Widget* w = tabs_->value();
+    for (int ix = 0; ix != children(); ix++) {
+        if (child(ix) == w) {
+            tab_settings.set("Apps", ix);
+        }
+    }
 }
 
 // Configure widgets
