@@ -560,7 +560,7 @@ void qso_apps::load_values() {
         ok = true;
         try {
             json j;
-            j << i;
+            i >> j;
             if (!j.at("Apps").is_null()) {
                 auto apps = j.at("Apps").get<std::map<std::string, json>>();
                 for (auto a : apps) {
