@@ -24,10 +24,8 @@ settings::settings() {
 	// Ddfault filename ZZALOG.json
 	std::string filename = default_data_directory_ + PROGRAM_ID + ".json";
 	std::ifstream i(filename);
-	bool ok = false;
 	parent_ = nullptr;
 	if (i.good()) {
-		ok = true;
 		// Load in file
 		try {
 			json j;
@@ -45,7 +43,6 @@ settings::settings() {
 			printf("SETTINGS: Reading JSON failed %d (%s)\n",
 				e.id, e.what());
 			i.close();
-			ok = false;
 		}
 	}
 	else {
@@ -68,7 +65,6 @@ settings::~settings() {
 	if (parent_ == nullptr) {
 		std::string filename = default_data_directory_ + PROGRAM_ID + ".json";
 		std::ofstream o(filename);
-		bool ok = false;
 		parent_ = nullptr;
 		json j;
 		j[PROGRAM_ID] = *data_;

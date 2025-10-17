@@ -555,9 +555,7 @@ void qso_apps::load_values() {
     std::string filename = default_data_directory_ + "apps.json";
     std::ifstream i(filename);
     char msg[128];
-    bool ok = false;
     if (i.good()) {
-        ok = true;
         try {
             json j;
             i >> j;
@@ -576,7 +574,6 @@ void qso_apps::load_values() {
                 e.id, e.what());
             status_->misc_status(ST_ERROR, msg);
             i.close();
-            ok = false;
         }
         snprintf(msg, sizeof(msg), "APPS: %s loaded OK!", filename.c_str());
         status_->misc_status(ST_OK, msg);

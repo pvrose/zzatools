@@ -1237,7 +1237,6 @@ void menu::cb_mi_info_map(Fl_Widget* w, void* v) {
 void menu::cb_mi_info_web(Fl_Widget* w, void* v) {
 	// Get currently selected record
 	record* record = book_->get_record();
-	menu* that = ancestor_view<menu>(w);
 	if (record != nullptr && record->item_exists("WEB")) {
 		// Website logged for contact
 		// Open browser with URL from WEB field in record
