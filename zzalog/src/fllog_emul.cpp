@@ -14,9 +14,6 @@
 
 #include <sstream>
 
-#include <FL/Fl_Preferences.H>
-
-
 extern rpc_handler* rpc_handler_;
 extern status* status_;
 extern fllog_emul* fllog_emul_;
@@ -24,8 +21,6 @@ extern extract_data* extract_records_;
 extern book* book_;
 extern spec_data* spec_data_;
 extern qso_manager* qso_manager_;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 
 // Static - only one instance of this class supported
 fllog_emul* fllog_emul::that_ = nullptr;

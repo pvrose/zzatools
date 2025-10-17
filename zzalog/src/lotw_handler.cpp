@@ -13,7 +13,6 @@
 #include <cstdlib>
 
 #include <FL/Fl_Native_File_Chooser.H>
-// #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Window.H>
 #include <FL/fl_draw.H>

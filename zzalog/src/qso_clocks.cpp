@@ -4,6 +4,7 @@
 #include "qso_clock.h"
 #include "qso_manager.h"
 #include "qso_wx.h"
+#include "settings.h"
 #include "status.h"
 #include "wsjtx_handler.h"
 
@@ -11,7 +12,6 @@
 
 #include <algorithm>
 
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Radio_Round_Button.H>
 #include <FL/Fl_Tabs.H>
 
@@ -19,8 +19,6 @@
 extern status* status_;
 extern wsjtx_handler* wsjtx_handler_;
 extern bool closing_;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 extern void open_html(const char*);
 
 // Constructor
@@ -66,11 +64,11 @@ int qso_clocks::handle(int event) {
 
 void qso_clocks::load_values() {
 	// Load default tab value
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
-	int tempi;
-	tab_settings.get("Clocks", tempi, 0);
-	local_ = (bool)tempi;
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	settings dash_settings(&view_settings, "Dashboard");
+	settings condx_settings(&dash_settings, "Conditions");
+	condx_settings.get("Local Timezone", local_, false);
 }
 
 // Create two tabs - one each for UTC and local timezone
@@ -133,10 +131,12 @@ void qso_clocks::create_form() {
 }
 
 void qso_clocks::save_values() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	settings dash_settings(&view_settings, "Dashboard");
+	settings condx_settings(&dash_settings, "Conditions");
 	// Find the current selected tab and save its index
-	tab_settings.set("Clocks", (int)local_);
+	condx_settings.set("Local Timezone", local_);
 }
 
 // Enable the widgets

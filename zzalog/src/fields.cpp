@@ -5,12 +5,9 @@
 #include <fstream>
 #include <iostream>
 
-#include <FL/Fl_Preferences.H>
 #include <FL/fl_utf8.h>
 
 extern status* status_;
-extern std::string PROGRAM_ID;
-extern std::string VENDOR;
 extern std::string default_data_directory_;
 
 //! Convert field_info_t to JSON object

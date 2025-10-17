@@ -5,17 +5,18 @@
 #include "eqsl_handler.h"
 #include "status.h"
 #include "book.h"
-#include "record.h"
 #include "qsl_display.h"
 #include "qsl_widget.h"
 #include "qsl_dataset.h"
+#include "record.h"
+#include "settings.h"
 #include "stn_data.h"
+#include "tabbed_forms.h"
+
 #include "callback.h"
 #include "drawing.h"
-#include "tabbed_forms.h"
 #include "utils.h"
 
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_JPEG_Image.H>
 #include <FL/Fl_BMP_Image.H>
 #include <FL/Fl_PNG_Image.H>
@@ -32,8 +33,6 @@ extern book* book_;
 extern tabbed_forms* tabbed_forms_;
 extern qsl_dataset* qsl_dataset_;
 extern stn_data* stn_data_;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 extern void open_html(const char*);
 
 // Constructor
@@ -83,12 +82,9 @@ int qso_qsl_vwr::handle(int event) {
 
 // Load values
 void qso_qsl_vwr::load_values() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences display_settings(settings, "Display");
-	display_settings.get("Image Type", (int&)selected_image_, QI_NONE);
-	Fl_Preferences datapath(settings, "Datapath");
-	char* temp;
-	if (!datapath.get("QSLs", temp, "")) {
+	settings top_settings;
+	settings behav_settings(&top_settings, "Behaviour");
+	if (!behav_settings.get<std::string>("QSL Cards", qsl_directory_, "")) {
 		//Fl_File_Chooser* chooser = new Fl_File_Chooser("", nullptr, Fl_File_Chooser::DIRECTORY,
 		//	"Select QSL card directory");
 		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
@@ -96,21 +92,9 @@ void qso_qsl_vwr::load_values() {
 		if (chooser->show() == 0) {
 			qsl_directory_ = chooser->filename();
 		}
-		datapath.set("QSLs", qsl_directory_.c_str());
+		behav_settings.set("QSLs", qsl_directory_);
 		delete chooser;
 	}
-	else {
-		qsl_directory_ = temp;
-	}
-}
-
-// Save values
-void qso_qsl_vwr::save_values() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences display_settings(settings, "Display");
-	display_settings.set("Image Type", selected_image_);
-	Fl_Preferences datapath(settings, "Datapath");
-	datapath.set("QSLs", qsl_directory_.c_str());
 }
 
 // Create form

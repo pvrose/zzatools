@@ -14,7 +14,6 @@
 #include <set>
 #include <string>
 
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Light_Button.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Button.H>
@@ -35,8 +34,6 @@ extern spec_data* spec_data_;
 extern rig_data* rig_data_;
 extern bool DARK;
 extern ticker* ticker_;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 extern void open_html(const char*);
 
 

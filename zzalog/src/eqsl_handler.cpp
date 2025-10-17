@@ -7,6 +7,7 @@
 #include "qso_manager.h"
 #include "qso_qsl.h"
 #include "record.h"
+#include "settings.h"
 #include "status.h"
 #include "stn_data.h"
 #include "ticker.h"
@@ -23,7 +24,6 @@
 
 #include <FL/Fl.H>
 #include <FL/fl_ask.H>
-#include <FL/Fl_Preferences.H>
 #include <FL/fl_utf8.h>
 #include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Fl_Help_Dialog.H>
@@ -40,8 +40,6 @@ extern bool DEBUG_THREADS;
 extern fields* fields_;
 // extern uint32_t seed_;
 extern qsl_dataset* qsl_dataset_;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 
 // Constructor
 eqsl_handler::eqsl_handler()
@@ -299,13 +297,10 @@ std::string eqsl_handler::card_filename_l(record* record, bool use_default) {
 		stn_data_->defaults().callsign : record->item("STATION_CALLSIGN");
 	de_slash(station);
 	// Location of top-directory for QSL card images
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences datapath_settings(settings, "Datapath");
+	settings top_settings;
+	settings behav_settings(&top_settings, "Behaviour");
 	std::string qsl_directory;
-	char * temp;
-	datapath_settings.get("QSLs", temp, "");
-	qsl_directory = temp;
-	free(temp);
+	behav_settings.get<std::string>("QSL Cards", qsl_directory, "");
 	// If the directory name is not defined, open a chooser to get it.
 	if (!qsl_directory.length()) {
 		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
@@ -313,7 +308,7 @@ std::string eqsl_handler::card_filename_l(record* record, bool use_default) {
 		chooser->preset_file(qsl_directory.c_str());
 		while (chooser->show()) {}
 		qsl_directory = chooser->filename();
-		datapath_settings.set("QSLs", qsl_directory.c_str());
+		behav_settings.set("QSL Cards", qsl_directory);
 		delete chooser;
 	}
 	char save_filename[2048];

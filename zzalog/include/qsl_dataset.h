@@ -7,9 +7,6 @@
 #include <map>
 
 #include <FL/Fl.H>
-#include <FL/Fl_Preferences.H>
-
-
 
 enum extract_mode_t : uchar;
 
@@ -65,7 +62,7 @@ public:
 	//! Store carddesigns
 	void save_data();
 	//! Save JSON file
-	void save_json(Fl_Preferences& settings);
+	void save_json();
 	//! Create server data
 	bool new_server(std::string server);
 	//! Current server name during save
@@ -75,9 +72,9 @@ protected:
 	//! Read card designs
 	void load_data();
 	//! Read from JSON
-	bool load_json(Fl_Preferences& settings);
+	bool load_json();
 	//! Get JSON file from settings
-	std::string json_file(Fl_Preferences& settings);
+	std::string json_file();
 
 	//! QSL card data
 	std::map<qsl_data::qsl_type, std::map<std::string, qsl_data*>* > data_;

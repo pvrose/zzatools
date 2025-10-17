@@ -6,7 +6,6 @@
 
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Native_File_Chooser.H>
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Text_Editor.H>
 
@@ -14,8 +13,6 @@ extern status* status_;
 extern menu* menu_;
 extern std::string CONTACT;
 extern std::string COPYRIGHT;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 extern std::string default_ref_directory_;
 extern void open_html(const char*);
 

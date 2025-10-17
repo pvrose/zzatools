@@ -24,15 +24,12 @@
 #include <climits>
 #include <cfloat>
 
-#include <FL/Fl_Preferences.H>
 #include <FL/fl_ask.H>
 #include <FL/Fl_Native_File_Chooser.H>
 
 extern book* book_;
 extern cty_data* cty_data_;
 extern status* status_;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 extern std::string default_code_directory_;
 extern std::string default_ref_directory_;
 extern url_handler* url_handler_;

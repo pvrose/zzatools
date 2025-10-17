@@ -3,19 +3,16 @@
 #include "record.h"
 #include "qsl_image.h"
 #include "qsl_data.h"
+#include "settings.h"
 #include "status.h"
 
 #include <ctime>
 
 #include "png.h"
 #include "zlib.h"
-#include <FL/Fl_Preferences.H>
 #include <FL/fl_utf8.h>
 
-
 extern status* status_;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 
 png_writer::png_writer() {
 	// TODO: Any initialisation of the libpng
@@ -39,12 +36,10 @@ std::string png_writer::png_filename(record* qso) {
 	std::string call = qso->item("CALL");
 	std::string date = qso->item("QSO_DATE");
 
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences dp_settings(settings, "Datapath");
-	char* temp;
-	dp_settings.get("QSLs", temp, "");
-	std::string dir = temp;
-	free(temp);
+	settings top_settings;
+	settings behav_settings(&top_settings, "Behaviour");
+	std::string dir;
+	behav_settings.get<std::string>("QSL Cards", dir, "");
 
 	char result[256];
 	snprintf(result, sizeof(result), "%s/%s/png/%s_%s.png",

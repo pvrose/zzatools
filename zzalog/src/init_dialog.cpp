@@ -10,8 +10,6 @@
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Radio_Round_Button.H>
 
-extern std::string PROGRAM_ID;
-extern std::string VENDOR;
 extern stn_data* stn_data_;
 extern stn_dialog* stn_dialog_;
 

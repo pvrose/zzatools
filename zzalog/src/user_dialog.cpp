@@ -1,14 +1,17 @@
 #include "user_dialog.h"
-#include "drawing.h"
-#include "log_table.h"
+
 #include "book.h"
+#include "log_table.h"
+#include "qso_manager.h"
 #include "report_tree.h"
+#include "settings.h"
 #include "spec_tree.h"
 #include "tabbed_forms.h"
-#include "qso_manager.h"
+
 #include "callback.h"
+#include "drawing.h"
+
 #include <FL/Fl_Tooltip.H>
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Hold_Browser.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Counter.H>
@@ -16,8 +19,6 @@
 extern book* book_;
 extern qso_manager* qso_manager_;
 extern tabbed_forms* tabbed_forms_;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 extern void open_html(const char*);
 
 // constructor
@@ -67,22 +68,22 @@ int user_dialog::handle(int event) {
 
 // Load values from settings
 void user_dialog::load_values() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences user_settings(settings, "User Settings");
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
 	// Log table
-	Fl_Preferences log_settings(user_settings, "Log Table");
-	log_settings.get("Font Name", (int&)log_font_, log_font_);
-	log_settings.get("Font Size", (int&)log_size_, log_size_);
+	settings log_settings(&view_settings, "Log Table");
+	log_settings.get("Font Name", log_font_, log_font_);
+	log_settings.get("Font Size", log_size_, log_size_);
 	log_settings.get("Session Gap", session_elapse_, session_elapse_);
 	// Tooltip
-	Fl_Preferences tip_settings(user_settings, "Tooltip");
+	settings tip_settings(&view_settings, "Tooltip");
 	tip_settings.get("Duration", tip_duration_, Fl_Tooltip::delay());
-	tip_settings.get("Font Name", (int&)tip_font_, Fl_Tooltip::font());
-	tip_settings.get("Font Size", (int&)tip_size_, Fl_Tooltip::size());
+	tip_settings.get("Font Name", tip_font_, Fl_Tooltip::font());
+	tip_settings.get("Font Size", tip_size_, Fl_Tooltip::size());
 	// Tree views
-	Fl_Preferences tree_settings(user_settings, "Tree Views");
-	tree_settings.get("Font Name", (int&)tree_font_, 0);
-	tree_settings.get("Font Size", (int&)tree_size_, FL_NORMAL_SIZE);
+	settings tree_settings(&view_settings, "Log Table");
+	tree_settings.get("Font Name", tree_font_, (Fl_Font)0);
+	tree_settings.get("Font Size", tree_size_, FL_NORMAL_SIZE);
 }
 
 // Used to create the form
@@ -210,28 +211,28 @@ void user_dialog::create_form(int X, int Y) {
 
 // Used to write settings back
 void user_dialog::save_values() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences user_settings(settings, "User Settings");
-	// Log settings
-	Fl_Preferences log_settings(user_settings, "Log Table");
-	log_settings.set("Font Name", (int&)log_font_);
-	log_settings.set("Font Size", (int&)log_size_);
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	// Log table
+	settings log_settings(&view_settings, "Log Table");
+	log_settings.set("Font Name", log_font_);
+	log_settings.set("Font Size", log_size_);
 	log_settings.set("Session Gap", session_elapse_);
 	// Tell the log views
 	log_table::set_font(log_font_, log_size_);
 	// Tooltip
-	Fl_Preferences tip_settings(user_settings, "Tooltip");
+	settings tip_settings(&view_settings, "Tooltip");
 	tip_settings.set("Duration", tip_duration_);
-	tip_settings.set("Font Name", (int&)tip_font_);
-	tip_settings.set("Font Size", (int&)tip_size_);
+	tip_settings.set("Font Name", tip_font_);
+	tip_settings.set("Font Size", tip_size_);
 	// Tell the tooltips
 	Fl_Tooltip::delay(tip_duration_);
 	Fl_Tooltip::font(tip_font_);
 	Fl_Tooltip::size(tip_size_);
 	// Tree view settings
-	Fl_Preferences tree_settings(user_settings, "Tree Views");
-	tree_settings.set("Font Name", (int&)tree_font_);
-	tree_settings.set("Font Size", (int&)tree_size_);
+	settings tree_settings(&view_settings, "Log Table");
+	tree_settings.set("Font Name", tree_font_);
+	tree_settings.set("Font Size", tree_size_);
 	//((pfx_tree*)tabbed_forms_->get_view(OT_PREFIX))->set_font(tree_font_, tree_size_);
 	((report_tree*)tabbed_forms_->get_view(OT_REPORT))->set_font(tree_font_, tree_size_);
 	((spec_tree*)tabbed_forms_->get_view(OT_ADIF))->set_font(tree_font_, tree_size_);

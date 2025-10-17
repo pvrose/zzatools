@@ -28,7 +28,6 @@ class Fl_Int_Input;
 class Fl_Float_Input;
 class Fl_Value_Slider;
 class Fl_Menu_Button;
-class Fl_Preferences;
 
 //! Number of supported rig access apps.
 const int NUMBER_RIG_APPS = 2;

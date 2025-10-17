@@ -6,8 +6,6 @@
 
 #include "drawing.h"
 
-#include <FL/Fl_Preferences.H>
-
 extern book* book_;
 extern spec_data* spec_data_;
 

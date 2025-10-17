@@ -13,14 +13,12 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_Input_Choice.H>
-#include <FL/Fl_Preferences.H>
 
 extern config *config_;
 extern status *status_;
 extern stn_data *stn_data_;
 extern stn_window* stn_window_;
 
-extern std::string PROGRAM_ID;
 extern std::string VENDOR;
 extern void open_html(const char*);
 

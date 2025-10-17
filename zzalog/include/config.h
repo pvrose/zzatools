@@ -32,7 +32,6 @@ const int HCONFIG = 500;
 			DLG_USER,       //!< User formatting configuration dialog.
 			DLG_QSLE,       //!< QSL Editor.
 			DLG_CONTEST,    //!< Contest setup dialog.
-			DLG_ALL,        //!< Tree view of settiings.
 			DLG_X
 		};
 
@@ -82,8 +81,6 @@ const int HCONFIG = 500;
 	protected:
 		//! The main component with its own component tabs.
 		Fl_Tabs* tabs_;
-		//! The currently active dialog
-		Fl_Widget * settings_view_;
 		//! Any widgets that need updating on record selection
 		std::set<page_dialog*> updatable_views_;
 		//! List of the intantiated tabs.

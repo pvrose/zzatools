@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <map>
 #include <set>
 #include <string>
@@ -107,6 +106,14 @@ public:
     //! Generate exchange to send for this \p QSO.
     std::string generate_exchange(record* qso);
 
+    //! Contest status value.
+    enum  ct_status : unsigned char {
+        NO_CONTEST,           //!< Not in a contest
+        FUTURE,               //!< Selected contest has not yet started.
+        ACTIVE,               //!< Contest has started and is being activated.
+        PAUSED,               //!< Contest has started, but not currently activated.
+        PAST                  //!< Contest has finished, but still interested in the scoring.
+    } contest_status_;
 
 protected:
 
@@ -152,15 +159,7 @@ protected:
     // Next serial number
     int next_serial_;         //!< Next contest serial number to send.
 
-    //! Contest status value.
-    enum  ct_status : unsigned char {
-        NO_CONTEST,           //!< Not in a contest
-        FUTURE,               //!< Selected contest has not yet started.
-        ACTIVE,               //!< Contest has started and is being activated.
-        PAUSED,               //!< Contest has started, but not currently activated.
-        PAST                  //!< Contest has finished, but still interested in the scoring.
-    } contest_status_;
-
+   
     //! QSO records specifically in this contest.
     extract_data* qsos_;
     //! Current QSO record.

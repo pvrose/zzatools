@@ -59,7 +59,6 @@
 #include <FL/Fl_Menu_Item.H>
 #include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Fl_PNG_Image.H>
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Single_Window.H>
 #include <FL/Fl_Tabs.H>
 #include <FL/Fl_Tooltip.H>
@@ -99,13 +98,13 @@ std::string CONTACT = "gm3zza@@btinternet.com";
 std::string CONTACT2 = "gm3zza@btinternet.com";
 //! Copyright placed in exported data items.
 std::string DATA_COPYRIGHT = "\302\251 Philip Rose %s. This data may be copied for the purpose of correlation and analysis";
-//! Program identifier: used in ADIF PROGRAM_ID field and Fl_Preferences.
+//! Program identifier: used in ADIF PROGRAM_ID field and filestore
 std::string PROGRAM_ID = "ZZALOG";
 //! Short-form program identifier.
 std::string PROG_ID = "ZLG";
 //! Program version. 
 std::string PROGRAM_VERSION = "3.6.8+";
-//! Program vendor: used for Fl_Preferences.
+//! Program vendor.
 std::string VENDOR = "GM3ZZA";
 
 // Debug switches
@@ -336,6 +335,9 @@ void open_doc(std::string full_filename);
 
 //! Open the PDF version of the User Guide
 void open_pdf();
+
+//! Get \n th recent file
+std::string recent_file(int n);
 
 //! Flag to prevent more than one closure process at the same time.
 bool closing_ = false;

@@ -214,8 +214,6 @@ struct search_criteria_t;
 		void add_recent_files();
 		//! Update menu items - activeness
 		void update_items();
-		//! Get the browser form settings or if not ask user
-		string get_browser();
 		//! Update windows menu items
 		void update_windows_items();
 		//! Add userdate to windows items

@@ -12,13 +12,8 @@
 
 #include <sstream>
 
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_Native_File_Chooser.H>
-
-
-
-
 
 extern url_handler* url_handler_;
 extern status* status_;
@@ -28,8 +23,6 @@ extern bool DEBUG_THREADS;
 extern fields* fields_;
 extern qsl_dataset* qsl_dataset_;
 // extern uint32_t seed_;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 extern std::string default_ref_directory_;
 extern void open_html(const char*);
 

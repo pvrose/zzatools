@@ -1,14 +1,12 @@
 #include "dxcc_view.h"
 
 #include "dxcc_table.h"
+#include "settings.h"
 #include "utils.h"
 
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Help_Dialog.H>
-#include <FL/Fl_Preferences.H>
 
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 extern void open_html(const char*);
 
 dxcc_view::dxcc_view(int X, int Y, int W, int H, const char* L, field_app_t fo) :
@@ -146,23 +144,21 @@ void dxcc_view::cb_confirm(Fl_Widget* w, void* v) {
 
 // Get previously saved values for display and confirmation types
 void dxcc_view::load_data() {
-    Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-    Fl_Preferences user_settings(settings, "User Settings");
-    Fl_Preferences dxcc_settings(user_settings, "DXCC Table");
-    int temp;
-    dxcc_settings.get("Display Type", temp, (int)dxcc_table::BANDS);
-    display_type_ = (dxcc_table::display_t)temp;
-    dxcc_settings.get("Confirmation", temp, (int)dxcc_table::LOTW);
-    confirm_type_ = (dxcc_table::confirm_t)temp;
+    
+    settings top_settings;
+    settings view_settings(&top_settings, "Views");
+    settings dxcc_settings(&view_settings, "DXCC Table");
+    dxcc_settings.get("Display Type", display_type_, dxcc_table::BANDS);
+    dxcc_settings.get("Confirmation", confirm_type_, dxcc_table::LOTW);
 }
 
 // Remember values for display and confirmation types
 void dxcc_view::store_data() {
-    Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-    Fl_Preferences user_settings(settings, "User Settings");
-    Fl_Preferences dxcc_settings(user_settings, "DXCC Table");
-    dxcc_settings.set("Display Type", (int)display_type_);
-    dxcc_settings.set("Confirmation", (int)confirm_type_);
+    settings top_settings;
+    settings view_settings(&top_settings, "Views");
+    settings dxcc_settings(&view_settings, "DXCC Table");
+    dxcc_settings.set("Display Type", display_type_);
+    dxcc_settings.set("Confirmation", confirm_type_);
 }
 
 // something has changed in the book - usually record 1 is to be selected, record_2 usage per view

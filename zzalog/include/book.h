@@ -443,6 +443,10 @@
 		//! \param filename if the logbook is empty std::set this as the new filename and
 		//! propagate to other components of ZZALOG.
 		void set_filename(std::string filename);
+
+		//! Get filename
+		std::string get_filename();
+
 		//! Is this record in the book?
 		
 		//! \param qso QSO record to check in the log.

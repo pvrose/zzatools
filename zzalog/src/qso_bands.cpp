@@ -6,18 +6,16 @@
 #include "qso_manager.h"
 #include "record.h"
 #include "rig_if.h"
+#include "settings.h"
 #include "ticker.h"
 
 #include "drawing.h"
 #include "utils.h"
 
-#include <FL/Fl_Preferences.H>
-
 extern ticker* ticker_;
 extern bool DEVELOPMENT_MODE;
 extern std::string PROGRAM_ID;
 extern std::string PROGRAM_VERSION;
-extern std::string VENDOR;
 extern bool DARK;
 extern void open_html(const char*);
 
@@ -64,15 +62,14 @@ int qso_bands::handle(int event) {
 
 // LLoad settings
 void qso_bands::load_values() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences my_settings(settings, "Windows/Bandplan");
-	int temp;
-	my_settings.get("Open Automatically", temp, (int)false);
-	open_window_ = (bool)temp;
-	my_settings.get("Left", left_, 0);
-	my_settings.get("Top", top_, 0);
-	my_settings.get("Width", width_, 300);
-	my_settings.get("Height", height_, 400);
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	settings band_settings(&view_settings, "Band plan");
+	band_settings.get("Open Automatically", open_window_, false);
+	band_settings.get("Left", left_, 0);
+	band_settings.get("Top", top_, 0);
+	band_settings.get("Width", width_, 300);
+	band_settings.get("Height", height_, 400);
 }
 
 // Create widgets
@@ -104,13 +101,14 @@ void qso_bands::create_form() {
 
 // Save settimngs
 void qso_bands::save_values() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences my_settings(settings, "Windows/Bandplan");
-	my_settings.set("Open Automatically", (int)full_window_->visible());
-	my_settings.set("Left", full_window_->x_root());
-	my_settings.set("Top", full_window_->y_root());
-	my_settings.set("Width", full_window_->w());
-	my_settings.set("Height", full_window_->h());
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	settings band_settings(&view_settings, "Band plan");
+	band_settings.set("Open Automatically", (bool)full_window_->visible());
+	band_settings.set("Left", full_window_->x_root());
+	band_settings.set("Top", full_window_->y_root());
+	band_settings.set("Width", full_window_->w());
+	band_settings.set("Height", full_window_->h());
 }
 
 // Configure widgets

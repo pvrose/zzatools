@@ -12,6 +12,7 @@
 #include "menu.h"
 #include "qso_manager.h"
 #include "record.h"
+#include "settings.h"
 #include "spec_data.h"
 #include "status.h"
 #include "toolbar.h"
@@ -20,7 +21,6 @@
 #include "callback.h"
 
 #include <FL/fl_draw.H>
-#include <FL/Fl_Preferences.H>
 #include <FL/Enumerations.H>
 #include <FL/Fl_Help_Dialog.H>
 #include <FL/fl_ask.H>
@@ -39,8 +39,6 @@ extern toolbar* toolbar_;
 
 extern bool in_current_session(record*);
 extern bool DARK;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 extern void open_html(const char*);
 
 
@@ -67,11 +65,11 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_app_t 
 	tip_root_y_ = 0;
 
 	// These are static, but will get to the same value each time
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences user_settings(settings, "User Settings");
-	Fl_Preferences log_settings(user_settings, "Log Table");
-	log_settings.get("Font Name", (int&)font_, 0);
-	log_settings.get("Font Size", (int&)fontsize_, FL_NORMAL_SIZE);
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	settings log_settings(&view_settings, "Log Table");
+	log_settings.get("Font Name", font_, (Fl_Font)0);
+	log_settings.get("Font Size", fontsize_, FL_NORMAL_SIZE);
 	begin();
 	// Create cell input widget, zero size, hide it
 	edit_input_ = new field_input(x() + w() / 2, y() + h() / 2, 100, 20);
@@ -111,8 +109,7 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_app_t 
 	// number of rows - available internal height / default row height
 	rows_per_page_ = Fl_Table_Row::tih / (row_height);
 	// Reverse order
-	Fl_Preferences display_settings(settings, "Display");
-	display_settings.get("Recent First", (int&)order_, FIRST_TO_LAST);
+	log_settings.get("Recent First", order_, FIRST_TO_LAST);
 
 	// Set minimum resizing - width 1/3
 	min_w_ = w() / 3;
@@ -834,9 +831,10 @@ void log_table::dbl_click_column(int col) {
 		current_item_num_ = my_book_->size() - 1 - current_item_num_;
 		display_current();
 		// Save value in settings
-		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-		Fl_Preferences display_settings(settings, "Display");
-		display_settings.set("Recent First", order_);
+		settings top_settings;
+		settings view_settings(&top_settings, "Views");
+		settings log_settings(&view_settings, "Log Table");
+		log_settings.set("Recent First", order_);
 		// Redraw the window
 		redraw();
 	}

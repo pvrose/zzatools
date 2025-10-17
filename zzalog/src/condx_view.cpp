@@ -2,6 +2,7 @@
 
 #include "qso_manager.h"
 #include "qso_wx.h"
+#include "settings.h"
 #include "status.h"
 #include "ticker.h"
 #include "url_handler.h"
@@ -19,15 +20,12 @@
 #include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_Image.H>
 #include <FL/Fl_Output.H>
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Tabs.H>
 
 extern bool DARK;
 extern qso_manager* qso_manager_;
 extern status* status_;
 extern std::string default_data_directory_;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 extern ticker* ticker_;
 extern url_handler* url_handler_;
 extern void open_html(const char*);
@@ -97,10 +95,13 @@ bool condx_view::load_data() {
 	std::string filename = default_data_directory_ + "solar.xml";
 
 	// Check if saved file is > 1 hour old
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	int temp;
-	settings.get("Solar Timestamp", temp, 0);
-	time_t when = temp;
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	settings dash_settings(&view_settings, "Dashboard");
+	settings condx_settings(&dash_settings, "Conditions");
+	settings solar_settings(&condx_settings, "Solar");
+	time_t when;
+	solar_settings.get<time_t>("Timestamp", when, 0);
 	time_t now = time(nullptr);
 	if (difftime(now, when) > 3600) {
 		// Download fresh data
@@ -114,7 +115,7 @@ bool condx_view::load_data() {
 		doc.load(ss);
 		// Save file
 		doc.save_file(filename.c_str());
-		settings.set("Solar Timestamp", (int)now);
+		solar_settings.set<time_t>("Timestamp", now);
 	}
 	else {
 		// Load from old data

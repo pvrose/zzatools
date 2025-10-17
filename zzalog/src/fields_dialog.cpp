@@ -8,7 +8,6 @@
 #include "fields.h"
 
 #include <FL/Fl_Int_Input.H>
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Input_Choice.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Choice.H>

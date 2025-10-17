@@ -9,7 +9,6 @@
 #include <cmath>
 
 #include <FL/Fl.H>
-#include <FL/Fl_Preferences.H>
 #include <FL/fl_ask.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Tooltip.H>

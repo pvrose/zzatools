@@ -2,17 +2,14 @@
 #include "qso_rig.h"
 #include "qso_manager.h"
 #include "rig_data.h"
+#include "settings.h"
 #include "spec_data.h"
 #include "status.h"
-
-#include <FL/Fl_Preferences.H>
 
 extern rig_data* rig_data_;
 extern spec_data* spec_data_;
 extern status* status_;
 extern bool closing_;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 
 // Constructor for the rigs std::set of tabs
 qso_tabbed_rigs::qso_tabbed_rigs(int X, int Y, int W, int H, const char* L) :
@@ -50,9 +47,10 @@ void qso_tabbed_rigs::load_values() {
 		}
 	}
 	// Load default tab value
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
-	tab_settings.get("Rigs", default_tab_, 0);
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	settings dash_settings(&view_settings, "Dashboard");
+	dash_settings.get("Default Rig", default_tab_, 0);
 }
 
 // Create form
@@ -125,13 +123,14 @@ void qso_tabbed_rigs::enable_widgets() {
 
 // Save changes
 void qso_tabbed_rigs::save_values() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	settings dash_settings(&view_settings, "Dashboard");
 	// Find the current selected tab and save its index
 	Fl_Widget* w = value();
 	for (int ix = 0; ix != children(); ix++) {
 		if (child(ix) == w) {
-			tab_settings.set("Rigs", ix);
+			dash_settings.set("Rigs", ix);
 		}
 	}
 }

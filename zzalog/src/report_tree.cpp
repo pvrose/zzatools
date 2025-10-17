@@ -8,6 +8,7 @@
 #include "qso_data.h"
 #include "qso_manager.h"
 #include "record.h"
+#include "settings.h"
 #include "spec_data.h"
 #include "status.h"
 #include "tabbed_forms.h"
@@ -16,7 +17,6 @@
 #include "utils.h"
 
 #include <FL/fl_draw.H>
-#include <FL/Fl_Preferences.H>
 
 extern book* book_;
 extern cty_data* cty_data_;
@@ -28,8 +28,6 @@ extern status* status_;
 extern tabbed_forms* tabbed_forms_;
 
 extern bool DARK;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 extern void open_html(const char*);
 
 // Constructor
@@ -50,27 +48,28 @@ report_tree::report_tree(int X, int Y, int W, int H, const char* label, field_ap
 	, custom_field_("")
 {
 	map_order_.clear();
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences user_settings(settings, "User Settings");
-	Fl_Preferences tree_settings(user_settings, "Tree Views");
-	tree_settings.get("Font Name", (int&)font_, 0);
-	tree_settings.get("Font Size", (int&)fontsize_, FL_NORMAL_SIZE);
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	settings tree_settings(&view_settings, "Tree Views");
+	tree_settings.get("Font Name", font_, 0);
+	tree_settings.get("Font Size", fontsize_, FL_NORMAL_SIZE);
 
 	// Set tree properties
 	sortorder(FL_TREE_SORT_NONE);
 	item_labelfont(font_);
 	item_labelsize(fontsize_);
 	// Get initial filter
-	Fl_Preferences report_settings(settings, "Report");
-	report_settings.get("Filter", (int&)filter_, RF_NONE);
+	settings report_settings(&view_settings, "Report");
+	report_settings.get("Filter", filter_, RF_NONE);
 	callback(cb_tree_report);
 	delete_tree();
 	// Get initial state
-	Fl_Preferences level_settings(report_settings, "Levels");
-	map_order_.resize(level_settings.entries());
-	for (int i = 0; i < level_settings.entries(); i++) {
-		level_settings.get(level_settings.entry(i), (int&)map_order_[i], -1);
-	}
+	report_settings.get("Levels", map_order_, {});
+	//map_order_.resize(level_settings.entries());
+	//for (int i = 0; i < level_settings.entries(); i++) {
+	//	level_settings.get<report_cat_t>(
+	//		level_settings.entry(i), map_order_[i], (report_cat_t)-1);
+	//}
 	// Add state level - copy selected std::map order adding DXCC before PAS
 	adj_order_.clear();
 	adj_order_.clear();
@@ -854,8 +853,9 @@ void report_tree::update_status() {
 // Add filter - and redraw
 void report_tree::add_filter(report_filter_t filter) {
 	filter_ = filter;
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences report_settings(settings, "Report");
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	settings report_settings(&view_settings, "Report");
 	report_settings.set("Filter", filter_);
 	populate_tree(true);
 	redraw();
@@ -928,13 +928,14 @@ void report_tree::add_category(int level, report_cat_t category, std::string cus
 		// Update menu
 		menu_->report_mode(map_order_, filter_);
 		// Update settings
-		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-		Fl_Preferences report_settings(settings, "Report");
-		Fl_Preferences level_settings(report_settings, "Levels");
-		level_settings.clear();
-		for (size_t i = 0; i < map_order_.size(); i++) {
-			level_settings.set(to_string(i).c_str(), map_order_[i]);
-		}
+		settings top_settings;
+		settings view_settings(&top_settings, "Views");
+		settings report_settings(&view_settings, "Report");
+		report_settings.set("Levels", map_order_);
+		//level_settings.clear();
+		//for (size_t i = 0; i < map_order_.size(); i++) {
+		//	level_settings.set(to_string(i), map_order_[i]);
+		//}
 		// Create the report
 		populate_tree(true);
 		redraw();

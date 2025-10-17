@@ -13,7 +13,6 @@
 #include <iostream>
 
 #include <FL/Fl.H>
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Native_File_Chooser.H>
 #include <FL/fl_ask.H>
 
@@ -24,10 +23,8 @@ extern main_window* main_window_;
 extern status* status_;
 extern qso_manager* qso_manager_;
 extern bool READ_ONLY;
-extern std::string PROGRAM_ID;
 extern std::string PROGRAM_VERSION;
 extern bool DEBUG_PRETTY;
-extern std::string VENDOR;
 extern ticker* ticker_;
 extern banner* banner_;
 extern std::string default_data_directory_;
@@ -101,24 +98,6 @@ void status::misc_status(status_t status, const char* label) {
 			report_file_ = nullptr;
 			file_unusable_ = true;
 			fl_alert("STATUS: Failed to open status report file %s", report_filename_.c_str());
-			// It doesn'r exist get a new filename
-			// open file dialog, get it and std::set it.
-			report_filename_ = "";
-			while (report_filename_.length() == 0) {
-				// Create an Open dialog; the default file name extension is ".txt".
-				Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
-				chooser->title("Select file name for status report");
-				chooser->filter("Text files\t*.txt");
-				if (chooser->show() == 0) {
-					report_filename_ = chooser->filename();
-					Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-					Fl_Preferences status_settings(settings, "Status");
-					status_settings.set("Report File", report_filename_.c_str());
-				}
-				delete chooser;
-			}
-			// Create a new file 
-			report_file_ = new std::ofstream(report_filename_, std::ios::out | std::ios::trunc);
 		}
 	}
 	if (report_file_) {

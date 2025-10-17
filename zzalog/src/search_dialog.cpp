@@ -1,13 +1,15 @@
 #include "search_dialog.h"
 
-#include "calendar_input.h"
-#include "field_choice.h"
-#include "cty_data.h"
-#include "icons.h"
-#include "utils.h"
-#include "spec_data.h"
 #include "band.h"
+#include "calendar_input.h"
+#include "cty_data.h"
+#include "field_choice.h"
+#include "icons.h"
 #include "intl_widgets.h"
+#include "settings.h"
+#include "spec_data.h"
+
+#include "utils.h"
 
 #include <set>
 #include <string>
@@ -15,7 +17,6 @@
 #include <FL/Fl_Radio_Round_Button.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Light_Button.H>
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_RGB_Image.H>
 
 
@@ -26,8 +27,6 @@ extern spec_data* spec_data_;
 extern cty_data* cty_data_;
 extern std::string CONTACT;
 extern std::string COPYRIGHT;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 extern void open_html(const char*);
 
 // Constructor
@@ -417,34 +416,22 @@ void search_dialog::load_values() {
 	criteria_ = new search_criteria_t;
 	criteria_->from_date = "";
 	// Get previous criteria from settings
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences search_settings(settings, "Search");
-	char * temp;
-	search_settings.get("By Dates", (int&)criteria_->by_dates, false);
-	search_settings.get("By Comparison", (int&)criteria_->comparator, XP_EQ);
-	search_settings.get("Confirmed Card", (int&)criteria_->confirmed_card, false);
-	search_settings.get("Confirmed eQSL", (int&)criteria_->confirmed_eqsl, false);
-	search_settings.get("Confirmed LotW", (int&)criteria_->confirmed_lotw, false);
-	search_settings.get("From Date", temp, "");
-	criteria_->from_date = temp;
-	free(temp);
-	search_settings.get("To Date", temp, "");
-	criteria_->to_date = temp;
-	free(temp);
-	search_settings.get("Combine Extract", (int&)criteria_->combi_mode, XM_NEW);
-	search_settings.get("Criterion", (int&)criteria_->condition, XC_DXCC);
-	search_settings.get("Band", temp, "Any");
-	criteria_->band = temp;
-	free(temp);
-	search_settings.get("Condition", temp, "");
-	criteria_->pattern = temp;
-	free(temp);
-	search_settings.get("Field", temp, "ADDRESS");
-	criteria_->field_name = temp;
-	free(temp);
-	search_settings.get("Mode", temp, "Any");
-	criteria_->mode = temp;
-	free(temp);
+	settings top_settings;
+	settings behav_settings(&top_settings, "Behaviour");
+	settings search_settings(&behav_settings, "Search");
+	search_settings.get("By Dates", criteria_->by_dates, false);
+	search_settings.get("By Comparison", criteria_->comparator, XP_EQ);
+	search_settings.get("Confirmed Card", criteria_->confirmed_card, false);
+	search_settings.get("Confirmed eQSL", criteria_->confirmed_eqsl, false);
+	search_settings.get("Confirmed LotW", criteria_->confirmed_lotw, false);
+	search_settings.get<std::string>("From Date", criteria_->from_date, "");
+	search_settings.get<std::string>("To Date", criteria_->to_date, "");
+	search_settings.get("Combine Extract", criteria_->combi_mode, XM_NEW);
+	search_settings.get("Criterion", criteria_->condition, XC_DXCC);
+	search_settings.get<std::string>("Band", criteria_->band, "Any");
+	search_settings.get<std::string>("Condition", criteria_->pattern, "");
+	search_settings.get<std::string>("Field", criteria_->field_name, "ADDRESS");
+	search_settings.get<std::string>("Mode", criteria_->mode, "Any");
 }
 
 // Save the data to the settings
@@ -485,21 +472,22 @@ void search_dialog::save_values() {
 		break;
 	}
 	// Save criteria in settings
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences search_settings(settings, "Search");
+	settings top_settings;
+	settings behav_settings(&top_settings, "Behaviour");
+	settings search_settings(&behav_settings, "Search");
 	search_settings.set("By Dates", criteria_->by_dates);
 	search_settings.set("By Comparison", criteria_->comparator);
 	search_settings.set("Confirmed Card", criteria_->confirmed_card);
 	search_settings.set("Confirmed eQSL", criteria_->confirmed_eqsl);
 	search_settings.set("Confirmed LotW", criteria_->confirmed_lotw);
-	search_settings.set("From Date", criteria_->from_date.c_str());
-	search_settings.set("To Date", criteria_->to_date.c_str());
+	search_settings.set("From Date", criteria_->from_date);
+	search_settings.set("To Date", criteria_->to_date);
 	search_settings.set("Combine Extract", criteria_->combi_mode);
 	search_settings.set("Criterion", criteria_->condition);
-	search_settings.set("Band", criteria_->band.c_str());
-	search_settings.set("Condition", criteria_->pattern.c_str());
-	search_settings.set("Field", criteria_->field_name.c_str());
-	search_settings.set("Mode", criteria_->mode.c_str());
+	search_settings.set("Band", criteria_->band);
+	search_settings.set("Condition", criteria_->pattern);
+	search_settings.set("Field", criteria_->field_name);
+	search_settings.set("Mode", criteria_->mode);
 }
 
 // get the extract criteria

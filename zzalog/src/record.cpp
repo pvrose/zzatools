@@ -22,19 +22,12 @@ record.cpp - Individual record data item: implementation file
 #include <cmath>
 
 #include <FL/fl_ask.H>
-#include <FL/Fl_Preferences.H>
 #include <FL/fl_utf8.h>
-
-
-
-
 
 extern cty_data* cty_data_;
 extern spec_data* spec_data_;
 extern status* status_;
 extern book* book_;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 
 // initialise the static variables
 bool record::expecting_header_ = true;

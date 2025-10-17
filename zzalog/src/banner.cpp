@@ -23,7 +23,6 @@
 
 
 
-extern std::string PROGRAM_ID;
 extern std::string PROGRAM_VERSION;
 extern std::string CONTACT;
 extern std::string COPYRIGHT;

@@ -13,11 +13,7 @@
 
 #include <FL/fl_ask.H>
 #include <FL/fl_draw.H>
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Button.H>
-
-
-
 
 extern tabbed_forms* tabbed_forms_;
 extern status* status_;

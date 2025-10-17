@@ -26,7 +26,6 @@
 #include <stdio.h>
 #endif
 
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl.H>
 #include <FL/fl_ask.H>
 

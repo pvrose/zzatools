@@ -11,8 +11,6 @@
 
 using json = nlohmann::json;
 
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 extern status* status_;
 extern std::string default_data_directory_;
 

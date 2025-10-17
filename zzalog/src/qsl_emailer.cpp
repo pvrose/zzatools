@@ -8,10 +8,7 @@
 #include <string>
 #include <cstdio>
 
-#include <FL/Fl_Preferences.H>
 #include <FL/fl_ask.H>
-
-
 
 extern status* status_;
 extern url_handler* url_handler_;

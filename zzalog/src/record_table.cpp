@@ -6,7 +6,6 @@
 #include "record.h"
 
 #include <FL/fl_draw.H>
-#include <FL/Fl_Preferences.H>
 
 extern spec_data* spec_data_;
 extern fields* fields_;

@@ -9,16 +9,16 @@ main.cpp - application entry point
 // local header files
 #include "main.h"
 
+#include "settings.h"
+
 // Get the backup filename
 std::string backup_filename(std::string source) {
-	// This needs to be int and not bool as the settings.get() would corrupt the stack.
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences backup_settings(settings, "Backup");
+	settings top_settings;
+	settings behav_settings(&top_settings, "Behaviour");
+	settings backup_settings(&behav_settings, "Backup");
 	// Get back-up directory
-	char* temp;
-	backup_settings.get("Path", temp, "");
-	std::string backup = temp;
-	free(temp);
+	std::string backup;
+	backup_settings.get<std::string>("Path", backup, "");
 	while (backup.length() == 0) {
 		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
 		chooser->title("Select directory for backup");
@@ -28,7 +28,7 @@ std::string backup_filename(std::string source) {
 		delete chooser;
 	}
 	// Save the result of the chooser
-	backup_settings.set("Path", backup.c_str());
+	backup_settings.set<std::string>("Path", backup);
 
 	// ensure the correct delimiiter is appendded
 	if (backup.back() != '/' && backup.back() != '\\') {
@@ -60,13 +60,14 @@ void restore_backup() {
 	// Remove existing book
 	status_->misc_status(ST_WARNING, "LOG: Closing current book!");
 	menu::cb_mi_file_new(nullptr, nullptr);
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences backup_settings(settings, "Backup");
-	char* temp;
-	backup_settings.get("Last Backup", temp, "");
+	settings top_settings;
+	settings behav_settings(&top_settings, "Behaviour");
+	settings backup_settings(&behav_settings, "Backup");
+	std::string backup;
+	backup_settings.get<std::string>("Last Backup", backup, "");
 	// Get backup data
 	READ_ONLY = true;
-	book_->load_data(std::string(temp));
+	book_->load_data(backup);
 }
 
 // This callback intercepts the close command and performs checks and tidies up
@@ -186,13 +187,13 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		}
 
 		// Save the window position
-		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-		Fl_Preferences windows_settings(settings, "Windows");
-		Fl_Preferences window_settings(windows_settings, "Main");
-		window_settings.set("Left", main_window_->x_root());
-		window_settings.set("Top", main_window_->y_root());
-		window_settings.set("Width", main_window_->w());
-		window_settings.set("Height", main_window_->h());
+		settings top_settings;
+		settings view_settings(&top_settings, "Views");
+		settings main_settings(&view_settings, "Main Window");
+		main_settings.set("Left", main_window_->x_root());
+		main_settings.set("Top", main_window_->y_root());
+		main_settings.set("Width", main_window_->w());
+		main_settings.set("Height", main_window_->h());
 
 		// Save sticky switches
 		save_switches();
@@ -419,18 +420,10 @@ void show_help() {
 std::string get_file(char * arg_filename) {
 	std::string result = "";
 	if (!arg_filename || !(*arg_filename)) {
-		// null argument or empty cstring - get the most recent file. (Recent Files->File1 in settings)
-		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-		Fl_Preferences recent_settings(settings, "Recent Files");
-		char *filename;
-		if (recent_settings.get("File1", filename, "")) {
-			// return the obtained filename
-			result = std::string(filename);
-			free(filename);
-		}
-		else {
+		std::string filename = "";
+		if (recent_files_.size()) filename = recent_files_.front();
+		if (!filename.length()) {
 			status_->misc_status(ST_WARNING, "ZZALOG: No log file - assuming a new installation.");
-			free(filename);
 			stn_default defaults = stn_data_->defaults();
 			string def_filename = to_lower(defaults.callsign) + ".adi";
 			Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
@@ -442,6 +435,9 @@ std::string get_file(char * arg_filename) {
 			}
 			delete chooser;
 		}
+		else {
+			result = filename;
+		}
 	}
 	else {
 		result = arg_filename;
@@ -451,10 +447,9 @@ std::string get_file(char * arg_filename) {
 
 // Add some global properties
 void add_properties() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences user_settings(settings, "User Settings");
-	// Tooltip settings
-	Fl_Preferences tip_settings(user_settings, "Tooltip");
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	settings tip_settings(&view_settings, "Tooltip");
 	Fl_Font font;
 	Fl_Fontsize size;
 	float duration;
@@ -470,21 +465,11 @@ void add_properties() {
 // Get the recent files from settings
 void recent_files() {
 	recent_files_.clear();
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences recent_settings(settings, "Recent Files");
-	// Read the first four files
-	for (int i = 1; i <= 4; i++) {
-		char path[6];
-		sprintf(path, "File%d", i);
-		char* filename = nullptr;
-		recent_settings.get(path, filename, "");
-		// If we have a non empty std::string then add it to the std::list
-		if (filename) {
-			if (strlen(filename)) {
-				recent_files_.push_back(std::string(filename));
-			}
-			free(filename);
-		}
+	settings top_settings;
+	settings behav_settings(&top_settings, "Behaviour");
+	behav_settings.get("Recent Files", recent_files_, {});
+	if (recent_files_.size() > 4) {
+		recent_files_.resize(4);
 	}
 }
 
@@ -555,11 +540,11 @@ void add_book(char* arg) {
 
 
 			if (!book_->load_data(log_file)) {
-				Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-				Fl_Preferences backup_settings(settings, "Backup");
-				char * temp;
-				backup_settings.get("Last Backup", temp, "");
-				std::string backup = temp;
+				settings top_settings;
+				settings behav_settings(&top_settings, "Behaviour");
+				settings backup_settings(&behav_settings, "Backup");
+				std::string backup;
+				backup_settings.get<std::string>("Last Backup", backup, "");
 				// Cannot access book - try backup
 				if (!closing_ && fl_choice("Load %s failed - load from backup %s", "Yes", "No", nullptr, log_file.c_str(), backup.c_str()) == 0) {
 					char msg[100];
@@ -685,13 +670,13 @@ void resize_window() {
 	int width;
 	int top;
 	int height;
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences windows_settings(settings, "Windows");
-	Fl_Preferences window_settings(windows_settings, "Main");
-	window_settings.get("Left", left, 0);
-	window_settings.get("Top", top, 100);
-	window_settings.get("Width", width, WIDTH);
-	window_settings.get("Height", height, HEIGHT);
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	settings main_settings(&view_settings, "Main Window");
+	main_settings.get<int>("Left", left, 0);
+	main_settings.get<int>("Top", top, 100);
+	main_settings.get<int>("Width", width, WIDTH);
+	main_settings.get<int>("Height", height, HEIGHT);
 	// Only allow the views to resize fully - the bars will resize horizontally
 	main_window_->resizable(tabbed_forms_);
 	// Get minimum resizing from all the children - horizontal limited by views and toolbar
@@ -719,6 +704,7 @@ void tidy() {
 	// From inspection of the code - calling this a second time frees the memory
 	fl_message_title_default(nullptr);
 	delete wx_handler_;
+	delete config_;
 	delete qso_manager_;
 	delete rig_data_;
 	delete wsjtx_handler_;
@@ -871,28 +857,25 @@ void customise_fltk() {
 
 // Some switches get saved between sessions - so-called sticky switches
 void read_saved_switches() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences switch_settings(settings, "Switches");
-	int temp;
-	char msg[128];
-	memset(msg, 0, sizeof(msg));
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	settings overall_settings(&view_settings, "Overall");
+	settings behav_settings(&top_settings, "Behaviour");
 	// Read all the sticky switches
+	char msg[128];
 	strcpy(msg, "ZZALOG: Sticky switches: ");
 	if (!DARK_S) {
-		switch_settings.get("Dark Mode", temp, false);
-		DARK = (bool)temp;
+		overall_settings.get<bool>("Dark Mode", DARK, false);
 		if (DARK) strcat(msg, "-k ");
 		else strcat(msg, "-l ");
 	}
 	if (!AUTO_UPLOAD_S) {
-		switch_settings.get("Auto Update QSOs", temp, false);
-		AUTO_UPLOAD = (bool)temp;
+		behav_settings.get<bool>("Update per QSO", AUTO_UPLOAD, false);
 		if (AUTO_UPLOAD) strcat(msg, "-n ");
 		else strcat(msg, "-q ");
 	}
 	if (!AUTO_SAVE_S) {
-		switch_settings.get("Auto Save QSOs", temp, false);
-		AUTO_SAVE = (bool)temp;
+		behav_settings.get<bool>("Save per QSO", AUTO_SAVE, false);
 		if (AUTO_SAVE) strcat(msg, "-a ");
 		else strcat(msg, "-w ");
 	}
@@ -902,36 +885,33 @@ void read_saved_switches() {
 
 // Save "sticky" switches
 void save_switches() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences switch_settings(settings, "Switches");
-	switch_settings.set("Dark Mode", (int)DARK);
-	switch_settings.set("Auto Update QSOs", (int)AUTO_UPLOAD);
-	switch_settings.set("Auto Save QSOs", (bool)AUTO_SAVE);
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	settings overall_settings(&view_settings, "Overall");
+	settings behav_settings(&top_settings, "Behaviour");
+	overall_settings.set<bool>("Dark Mode", DARK);
+	behav_settings.set<bool>("Update per QSO", AUTO_UPLOAD);
+	behav_settings.set("Save per QSO", AUTO_SAVE);
 }
 
 // Open preferences and save them - it is possible to corrupt the settings
 // file if an exception occurs while they are being saved.
 bool open_settings() {
-	char stemp[128];
-
-	// SAve the staion defaults
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-
 	// Now std::set the default app data directory
 	char buffer[128];
-	settings.filename(buffer, sizeof(buffer),
+	Fl_Preferences::filename(buffer, sizeof(buffer),
 		Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	if (settings.getUserdataPath(stemp, sizeof(stemp))) {
-		default_data_directory_ = stemp;
-		if (default_ref_directory_.length()) {
-			default_ref_directory_ += "../reference/";
-		}
-		else {
-			default_ref_directory_ = stemp;
-		}
-		if (!default_html_directory_.length()) {
-			default_html_directory_ = stemp;
-		}
+	const char* period = strrchr(buffer, '.');
+
+	default_data_directory_ = std::string(buffer, period - buffer) + '/';
+	if (default_ref_directory_.length()) {
+		default_ref_directory_ += "../reference/";
+	}
+	else {
+		default_ref_directory_ = default_data_directory_;
+	}
+	if (!default_html_directory_.length()) {
+		default_html_directory_ = default_data_directory_;
 	}
 
 	// Rename all the saved preferences file 8->9, 7->8 down to ''->1
@@ -993,13 +973,13 @@ int main(int argc, char** argv)
 	// Parse command-line arguments - accept FLTK standard arguments and custom ones (in cb_args)
 	int i = 1;
 	Fl::args(argc, argv, i, cb_args);
-	// Read any switches that stick between calls
-	read_saved_switches();
-	customise_fltk();
 	// Create the settings before anything else 
 	if (!open_settings()) {
 		return 255;
 	}
+	// Read any switches that stick between calls
+	read_saved_switches();
+	customise_fltk();
 
 	// Create the ticker first of all
 	ticker_ = new ticker();
@@ -1144,9 +1124,10 @@ void backup_file() {
 		status_->misc_status(ST_ERROR, "BACKUP: failed");
 	} else {
 		status_->misc_status(ST_OK, "BACKUP: Done");
-		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-		Fl_Preferences backup_settings(settings, "Backup");
-		backup_settings.set("Last Backup", backup.c_str());
+		settings top_settings;
+		settings behav_settings(&top_settings, "Behaviour");
+		settings backup_settings(&behav_settings, "Backup");
+		backup_settings.set("Last Backup", backup);
 	}
 }
 
@@ -1160,17 +1141,12 @@ void set_recent_file(std::string filename) {
 		recent_files_.push_front(filename);
 
 		// Update recent files in the settings
-		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-		Fl_Preferences recent_settings(settings, "Recent Files");
-		// Clear the existing settings
-		recent_settings.clear();
-		// And write the top four names on the std::list to settings
-		int i = 1;
-		for (auto it = recent_files_.begin(); i <= 4 && it != recent_files_.end(); i++, it++) {
-			char path[6];
-			sprintf(path, "File%d", i);
-			recent_settings.set(path, (*it).c_str());
+		settings top_settings;
+		settings behav_settings(&top_settings, "Behaviour");
+		if (recent_files_.size() > 4) {
+			recent_files_.resize(4);
 		}
+		behav_settings.set("Recent Files", recent_files_);
 
 		menu_->add_recent_files();
 
@@ -1212,4 +1188,18 @@ void open_doc(std::string full_filename) {
 		status_->misc_status(ST_ERROR, msg);
 	}
 #endif
+}
+
+std::string recent_file(int n) {
+	if (recent_files_.size() <= n) {
+		return "";
+	}
+	else {
+		int ix = 0;
+		for (auto it = recent_files_.begin(); ; it++, ix++) {
+			if (ix == n) {
+				return *it;
+			}
+		}
+	}
 }

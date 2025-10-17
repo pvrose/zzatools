@@ -1,22 +1,24 @@
 #include "qsl_editor.h"
+
+#include "config.h"
+#include "field_choice.h"
+#include "filename_input.h"
+#include "font_dialog.h"
+#include "intl_widgets.h"
 #include "qsl_dataset.h"
 #include "qsl_display.h"
 #include "qsl_widget.h"
-#include "status.h"
-#include "qso_manager.h"
 #include "qso_data.h"
-#include "config.h"
-#include "utils.h"
-#include "field_choice.h"
-#include "intl_widgets.h"
-#include "font_dialog.h"
+#include "qso_manager.h"
+#include "settings.h"
+#include "status.h"
 #include "record.h"
-#include "filename_input.h"
+
+#include "utils.h"
 
 #include <string>
 #include <ctime>
 
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Radio_Round_Button.H>
 #include <FL/Fl_Button.H>
@@ -30,8 +32,6 @@
 extern qso_manager* qso_manager_;
 extern qsl_dataset* qsl_dataset_;
 extern status* status_;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 extern void open_html(const char*);
 
 // Constructor
@@ -113,9 +113,9 @@ void qsl_editor::load_values() {
 	}
 	qsl_type_ = qsl_data::LABEL;
 	// Get the display window position
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences windows_settings(settings, "Windows");
-	Fl_Preferences qsl_win_settings(windows_settings, "QSL Design");
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	settings qsl_win_settings(&view_settings, "QSL Design");
 	qsl_win_settings.get("Top", win_y_, 10);
 	qsl_win_settings.get("Left", win_x_, 10);
 
@@ -414,9 +414,9 @@ void qsl_editor::resize() {
 void qsl_editor::save_values() {
 
 	// Sabe the display window position
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences windows_settings(settings, "Windows");
-	Fl_Preferences qsl_win_settings(windows_settings, "QSL Design");
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	settings qsl_win_settings(&view_settings, "QSL Design");
 	qsl_win_settings.set("Top", win_y_);
 	qsl_win_settings.set("Left", win_x_);
 	qsl_dataset_->save_data();

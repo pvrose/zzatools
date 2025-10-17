@@ -5,8 +5,6 @@
 #include <map>
 #include <vector>
 
-#include <FL/Fl_Preferences.H>
-
 struct hamlib_data_t;
 
 //! This structure provides the configuration data for the rig interface.

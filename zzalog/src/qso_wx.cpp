@@ -2,21 +2,20 @@
 
 #include "qso_clocks.h"
 #include "qso_manager.h"
-#include "drawing.h"
+#include "settings.h"
 #include "wx_handler.h"
+
+#include "drawing.h"
 #include "utils.h"
 
 #include<ctime>
 
 #include <FL/Fl_Image.H>
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Image_Surface.H>
 #include <FL/Fl_RGB_Image.H>
 #include <FL/Fl_Button.H>
 
 extern wx_handler* wx_handler_;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 extern void open_html(const char*);
 
 // Weather group - constructor
@@ -72,14 +71,16 @@ int qso_wx::handle(int event) {
 // get settings
 void qso_wx::load_values() {
 	// Get last used display formats
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences user_settings(settings, "User Settings");
-	Fl_Preferences wx_settings(user_settings, "Weather");
-	wx_settings.get("Speed", (int&)display_speed_, MILE_PER_HOUR);
-	wx_settings.get("Direction", (int&)display_direction_, CARDINAL);
-	wx_settings.get("Temperature", (int&)display_temperature_, CELSIUS);
-	wx_settings.get("Pressure", (int&)display_pressure_, HECTOPASCAL);
-	wx_settings.get("Cloud", (int&)display_cloud_, PERCENT);
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	settings dash_settings(&view_settings, "Dashboard");
+	settings condx_settings(&dash_settings, "Conditions");
+	settings wx_settings(&condx_settings, "Weather");
+	wx_settings.get("Speed", display_speed_, MILE_PER_HOUR);
+	wx_settings.get("Direction", display_direction_, CARDINAL);
+	wx_settings.get("Temperature", display_temperature_, CELSIUS);
+	wx_settings.get("Pressure", display_pressure_, HECTOPASCAL);
+	wx_settings.get("Cloud", display_cloud_, PERCENT);
 }
 
 // Create form
@@ -376,14 +377,16 @@ void qso_wx::enable_widgets() {
 
 // save value
 void qso_wx::save_values() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences user_settings(settings, "User Settings");
-	Fl_Preferences wx_settings(user_settings, "Weather");
-	wx_settings.set("Speed", (int&)display_speed_);
-	wx_settings.set("Direction", (int&)display_direction_);
-	wx_settings.set("Temperature", (int&)display_temperature_);
-	wx_settings.set("Pressure", (int&)display_pressure_);
-	wx_settings.set("Cloud", (int&)display_cloud_);
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	settings dash_settings(&view_settings, "Dashboard");
+	settings condx_settings(&dash_settings, "Conditions");
+	settings wx_settings(&condx_settings, "Weather");
+	wx_settings.set("Speed", display_speed_);
+	wx_settings.set("Direction", display_direction_);
+	wx_settings.set("Temperature", display_temperature_);
+	wx_settings.set("Pressure", display_pressure_);
+	wx_settings.set("Cloud", display_cloud_);
 }
 
 // Icon clicked' - reload weather

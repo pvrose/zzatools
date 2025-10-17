@@ -9,7 +9,6 @@
 #include <string>
 
 #include <FL/Fl_Multiline_Output.H>
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_JPEG_Image.H>
 #include <FL/Fl_BMP_Image.H>
 #include <FL/Fl_PNG_Image.H>

@@ -17,9 +17,6 @@
 #include <sstream>
 
 #include <FL/fl_ask.H>
-#include <FL/Fl_Preferences.H>
-
-
 
 extern book* book_;
 extern book* navigation_book_;

@@ -10,7 +10,6 @@
 #include "qrz_handler.h"
 #include "qsl_dataset.h"
 
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Group.H>
@@ -23,8 +22,6 @@ extern wsjtx_handler* wsjtx_handler_;
 extern fllog_emul* fllog_emul_;
 extern spec_data* spec_data_;
 extern uint32_t seed_;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 extern qsl_dataset* qsl_dataset_;
 extern void open_html(const char*);
 

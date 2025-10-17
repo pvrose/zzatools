@@ -13,8 +13,6 @@
 #include <vector>
 #include <list>
 
-class Fl_Preferences;
-
 using json = nlohmann::json;
 
 //! Field data element. 

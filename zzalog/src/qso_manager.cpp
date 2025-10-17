@@ -1,35 +1,34 @@
 #include "qso_manager.h"
+
+#include "adi_writer.h"
+#include "book.h"
+#include "extract_data.h"
+#include "field_choice.h"
+#include "import_data.h"
+#include "intl_widgets.h"
+#include "main_window.h"
+#include "menu.h"
+#include "qrz_handler.h"
+#include "qso_clocks.h"
 #include "qso_data.h"
 #include "qso_log.h"
 #include "qso_misc.h"
 #include "qso_tabbed_rigs.h"
-#include "qso_clocks.h"
 #include "qso_buttons.h"
 #include "qso_qsl.h"
-#include "callback.h"
-
 #include "record.h"
-#include "status.h"
-#include "tabbed_forms.h"
-#include "intl_widgets.h"
+#include "settings.h"
 #include "spec_data.h"
-#include "book.h"
-#include "extract_data.h"
-#include "import_data.h"
-#include "menu.h"
-#include "field_choice.h"
-#include "tabbed_forms.h"
-#include "import_data.h"
-#include "utils.h"
-#include "qrz_handler.h"
-#include "main_window.h"
-#include "adi_writer.h"
+#include "status.h"
 #include "stn_data.h"
+#include "tabbed_forms.h"
+
+#include "callback.h"
+#include "utils.h"
 
 #include <set>
 #include <iostream>
 
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Input_Choice.H>
 #include <FL/Fl_Light_Button.H>
 #include <FL/Fl_Button.H>
@@ -64,8 +63,6 @@ extern stn_data* stn_data_;
 extern bool closing_;
 extern std::string COPYRIGHT;
 extern std::string CONTACT;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 
 
 // The main dialog constructor
@@ -192,9 +189,9 @@ void qso_manager::create_form(int X, int Y) {
 // Load values
 void qso_manager::load_values() {
 	// Get position of window
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences windows_settings(settings, "Windows");
-	Fl_Preferences dash_settings(windows_settings, "Dashboard");
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	settings dash_settings(&view_settings, "Dashboard");
 	int left, top;
 	dash_settings.get("Left", left, 0);
 	dash_settings.get("Top", top, 100);
@@ -205,9 +202,9 @@ void qso_manager::load_values() {
 void qso_manager::save_values() {
 
 	// Save window position
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences windows_settings(settings, "Windows");
-	Fl_Preferences dash_settings(windows_settings, "Dashboard");
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	settings dash_settings(&view_settings, "Dashboard");
 	dash_settings.set("Left", x_root());
 	dash_settings.set("Top", y_root());
 

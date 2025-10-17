@@ -8,8 +8,6 @@
 
 #include <cstring>
 
-#include <FL/Fl_Preferences.H>
-
 extern spec_data* spec_data_;
 extern cty_data* cty_data_;
 extern intl_dialog* intl_dialog_;

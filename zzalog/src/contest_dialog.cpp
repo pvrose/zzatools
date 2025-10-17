@@ -5,6 +5,7 @@
 #include "contest_algorithm.h"
 #include "contest_data.h"
 #include "field_choice.h"
+#include "settings.h"
 
 #include "drawing.h"
 #include "utils.h"
@@ -15,14 +16,11 @@
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Input_Choice.H>
 #include <FL/Fl_Multiline_Output.H>
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Text_Display.H>
 
 extern std::map<std::string, contest_algorithm*>* algorithms_;
 extern contest_data* contest_data_;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 extern void open_html(const char*);
 
 contest_dialog::contest_dialog(int X, int Y, int W, int H, const char* L) :
@@ -74,15 +72,11 @@ int contest_dialog::handle(int event) {
 
 // Load values from settings
 void contest_dialog::load_values() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences contest_settings(settings, "Contest");
-	char* temp;
-	contest_settings.get("Current ID", temp, "");
-	contest_id_ = temp;
-	free(temp);
-	contest_settings.get("Current Index", temp, "");
-	free(temp);
-	contest_index_ = temp;
+	settings top_settings;
+	settings behav_settings(&top_settings, "Behaviour");
+	settings contest_settings( &behav_settings, "Contest");
+	contest_settings.get<std::string>("Current ID", contest_id_, "");
+	contest_settings.get<std::string>("Current Index", contest_index_, "");
 }
 
 // Used to create the form

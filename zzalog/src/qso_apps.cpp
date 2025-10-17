@@ -1,21 +1,23 @@
-#include "drawing.h"
-#include "fllog_emul.h"
-#include "wsjtx_handler.h"
-#include "status.h"
 #include "qso_apps.h"
-#include "qso_manager.h"
-#include "qso_rig.h"
-#include "utils.h"
-#include "callback.h"
-#include "password_input.h"
+
 #include "file_viewer.h"
 #include "filename_input.h"
+#include "fllog_emul.h"
+#include "password_input.h"
+#include "qso_manager.h"
+#include "qso_rig.h"
+#include "settings.h"
+#include "status.h"
+#include "wsjtx_handler.h"
+
+#include "callback.h"
+#include "drawing.h"
+#include "utils.h"
 
 #include "nlohmann/json.hpp"
 
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Int_Input.H>
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Tabs.H>
 #include <FL/Fl_Radio_Light_Button.H>
 
@@ -25,8 +27,6 @@ extern fllog_emul* fllog_emul_;
 extern wsjtx_handler* wsjtx_handler_;
 extern status* status_;
 extern std::string default_data_directory_;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 extern void open_html(const char*);
 
 // JSON mapping for app_rig_class_t
@@ -581,62 +581,11 @@ void qso_apps::load_values() {
         snprintf(msg, sizeof(msg), "APPS: %s loaded OK!", filename.c_str());
         status_->misc_status(ST_OK, msg);
     }
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-    if (!ok) {
-        snprintf(msg, sizeof(msg), "APPS: CAnnot open %s: defaulting to settings", 
-            filename.c_str());
-        status_->misc_status(ST_WARNING, msg);
-        Fl_Preferences apps_settings(settings, "Apps");
-        for (int ix = 0; ix < apps_settings.groups(); ix++) {
-            const char* app = apps_settings.group(ix);
-            Fl_Preferences app_settings(apps_settings, app);
-            app_data_t* data = new app_data_t;
-            data->name = app;
-            int tempi;
-            char* temps;
-            app_settings.get("Common", tempi, (int)AUDIO_CAT);
-            data->rig_class = (app_rig_class_t)tempi;
-            app_settings.get("Server", tempi, (int)false);
-            data->server = tempi;
-            if (std::string(app) == FLDIGI) {
-                app_settings.get("Address", temps, "127.0.0.1");
-                data->address = temps;
-                free(temps);
-                app_settings.get("Port Number", tempi, 8421);
-                data->port_num = tempi;
-            }
-            else if (std::string(app) == WSJTX) {
-                app_settings.get("Address", temps, "127.0.0.1");
-                data->address = temps;
-                free(temps);
-                app_settings.get("Port Number", tempi, 2237);
-                data->port_num = tempi;
-            }
-            data->has_server = nullptr;
-            data->has_data = nullptr;
-            app_settings.get("Administrator", tempi, (int)false);
-            data->admin = tempi;
-            app_settings.get("Can Disconnect", tempi, (int)false);
-            data->can_disable = tempi;
-            if (data->server) add_servers(data);
-            Fl_Preferences rigs_settings(app_settings, "Rigs");
-            for (int iy = 0; iy < rigs_settings.entries(); iy++) {
-                const char* rig = rigs_settings.entry(iy);
-                char* temp;
-                rigs_settings.get(rig, temp, app);
-                data->commands[std::string(rig)] = temp;
-            }
-            if (data->rig_class == NO_CONNECTION && !data->can_disable && data->commands.size() > 1) {
-                char msg[128];
-                snprintf(msg, sizeof(msg), "APPS: Data error for app %s", app);
-                status_->misc_status(ST_WARNING, msg);
-            }
-            apps_data_[data->name] = data;
-        }
-    }
     // Load default tab value
-    Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
-    tab_settings.get("Apps", default_tab_, 0);
+    settings top_settings;
+    settings view_settings(&top_settings, "Views");
+    settings dash_settings(&view_settings, "Dashboard");
+    dash_settings.get("Default App", default_tab_, 0);
 }
 
 // Create the tabs
@@ -746,31 +695,14 @@ void qso_apps::save_values() {
     std::ofstream o(filename);
     o << std::setw(4) << jout << '\n';
     o.close();
-    Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-    //Fl_Preferences apps_settings(settings, "Apps");
-    //apps_settings.clear();
-    //for (auto it = apps_data_.begin(); it != apps_data_.end(); it++) {
-    //    Fl_Preferences app_settings(apps_settings, (*it).first.c_str());
-    //    app_settings.set("Common", (int)(*it).second->rig_class);
-    //    app_settings.set("Server", (*it).second->server);
-    //    if ((*it).second->server) {
-    //        app_settings.set("Address", (*it).second->address.c_str());
-    //        app_settings.set("Port Number", (*it).second->port_num);
-    //    }
-    //    app_settings.set("Administrator", (*it).second->admin);
-    //    app_settings.set("Can Disconnect", (*it).second->can_disable);
-    //    Fl_Preferences rigs_settings(app_settings, "Rigs");
-    //    for (auto iu = (*it).second->commands.begin(); 
-    //        iu != (*it).second->commands.end(); iu++) {
-    //        rigs_settings.set((*iu).first.c_str(), (*iu).second.c_str());
-    //    }
-    //}
-    Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
+    settings top_settings;
+    settings view_settings(&top_settings, "Views");
+    settings dash_settings(&view_settings, "Dashboard");
     // Find the current selected tab and save its index
     Fl_Widget* w = tabs_->value();
     for (int ix = 0; ix != children(); ix++) {
         if (child(ix) == w) {
-            tab_settings.set("Apps", ix);
+            dash_settings.set("Default App", ix);
         }
     }
 }

@@ -1,19 +1,21 @@
 ﻿#include "wsjtx_handler.h"
-#include "status.h"
-#include "menu.h"
-#include "utils.h"
-#include "toolbar.h"
-#include "qso_apps.h"
-#include "qso_manager.h"
-#include "qso_data.h"
+
 #include "adi_reader.h"
-#include "menu.h"
-#include "regices.h"
-#include "spec_data.h"
-#include "ticker.h"
 #include "book.h"
-#include "socket_server.h"
+#include "menu.h"
+#include "qso_apps.h"
+#include "qso_data.h"
+#include "qso_manager.h"
 #include "record.h"
+#include "regices.h"
+#include "settings.h"
+#include "socket_server.h"
+#include "spec_data.h"
+#include "status.h"
+#include "ticker.h"
+#include "toolbar.h"
+
+#include "utils.h"
 
 #include <stdio.h>
 #include <sstream>
@@ -27,12 +29,7 @@
 #endif
 
 #include <FL/Fl.H>
-#include <FL/Fl_Preferences.H>
 #include <FL/fl_ask.H>
-
-
-
-
 
 extern status* status_;
 extern menu* menu_;
@@ -41,7 +38,6 @@ extern qso_manager* qso_manager_;
 extern spec_data* spec_data_;
 extern std::string PROGRAM_ID;
 extern std::string PROGRAM_VERSION;
-extern std::string VENDOR;
 extern ticker* ticker_;
 
 wsjtx_handler* wsjtx_handler::that_ = nullptr;
@@ -817,11 +813,11 @@ bool wsjtx_handler::parse_all_txt(record* qso, std::string line) {
 
 // Look for details of the supplied QSO in the "ALL.TXT" file
 bool wsjtx_handler::match_all_txt(record* qso, bool update_qso) {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences datapath_settings(settings, "Datapath");
-	char* temp;
-	datapath_settings.get("WSJT-X", temp, "");
-	std::string filename = std::string(temp) + "/ALL.TXT";
+	settings top_settings;
+	settings behav_settings(&top_settings, "Behaviour");
+	std::string temp;
+	behav_settings.get<std::string>("WSJT-X", temp, "");
+	std::string filename = temp + "/ALL.TXT";
 	ifstream* all_file = new ifstream(filename.c_str());
 	if (!all_file->good()) {
 		char msg[100];

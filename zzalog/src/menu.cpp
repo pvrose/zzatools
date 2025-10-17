@@ -23,6 +23,7 @@
 #include "record.h"
 #include "report_tree.h"
 #include "search_dialog.h"
+#include "settings.h"
 #include "spec_data.h"
 #include "spec_tree.h"
 #include "status.h"
@@ -43,17 +44,12 @@
 #include <cstdlib>
 #endif
 
-
-
 #include <FL/fl_ask.H>
 #include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_Menu_Item.H>
 #include <FL/Fl_Native_File_Chooser.H>
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Single_Window.H>
 #include <FL/Fl_Tooltip.H>
-
-
 
 extern banner* banner_;
 extern book* book_;
@@ -78,10 +74,10 @@ extern wsjtx_handler* wsjtx_handler_;
 extern bool READ_ONLY;
 extern std::list<std::string> recent_files_;
 extern std::string PROGRAM_ID;
-extern std::string VENDOR;
 extern time_t session_start_;
 extern void open_html(const char*);
 extern void open_pdf();
+extern std::string recent_file(int n);
 
 
 	// The default menu - std::set of menu items
@@ -109,7 +105,6 @@ extern void open_pdf();
 		{ "&User config", 0, menu::cb_mi_settings, (void*)config::DLG_USER },
 		{ "&QSL design", 0, menu::cb_mi_settings, (void*)config::DLG_QSLE },
 		{ "&Contests", 0, menu::cb_mi_settings, (void*)config::DLG_CONTEST },
-		{ "&All settings", 0, menu::cb_mi_settings, (void*)config::DLG_ALL },
 		{ 0 },
 
 	// Windows viewing
@@ -362,7 +357,7 @@ void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 	qso_manager_->deactivate_all();
 	
 	// Set to a recent file number (1 to 4) or 0 for file_chooser
-	char file_id = (char)(intptr_t)v;
+	char file_id = (char)(intptr_t)v - '\x31';
 	std::string filename = "";
 	// Set read_only flag
 	if (file_id < 0) {
@@ -374,30 +369,20 @@ void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 	// Open chooser and open read/write (0) or read only (-1)
 	if (file_id <= 0) {
 		// Open file chooser to get file to load
-		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-		Fl_Preferences datapath_settings(settings, "Datapath");
-		char* directory;
-		datapath_settings.get("Log Directory", directory, "");
+		filename = book_->get_filename();
+		std::string directory = ::directory(filename);
 		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
 		chooser->title("Select file name to load");
-		chooser->directory(directory);
+		chooser->directory(directory.c_str());
 		chooser->filter("ADI Files\t*.adi\nADX Files\t*.adx");
 		if (chooser->show() == 0) {
 			filename = chooser->filename();
 		}
-		free(directory);
 		delete chooser;
 	}
 	else {
 		// Get the recent file with supplied ID
-		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-		Fl_Preferences recent_settings(settings, "Recent Files");
-		char * temp;
-		char path[6];
-		sprintf(path, "File%c", file_id);
-		recent_settings.get(path, temp, "");
-		filename = temp;
-		free(temp);
+		filename = recent_file(file_id);
 	}
 	if (filename.length() > 0) {
 		// Only open a file if it has a name
@@ -997,15 +982,12 @@ void menu::cb_mi_imp_file(Fl_Widget* w, void* v) {
 	import_data_->stop_update(false);
 	while (!import_data_->update_complete()) Fl::check();
 	// Get data directory
-	char* directory;
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences datapath_settings(settings, "Datapath");
-	datapath_settings.get("Log Directory", directory, "");
+	std::string filename = book_->get_filename();
+	std::string directory = ::directory(filename);
 	// Open file chooser
-	std::string filename;
 	Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
 	chooser->title("Select file name");
-	chooser->directory(directory);
+	chooser->directory(directory.c_str());
 	chooser->filter("ADI files\t*.adi\nADX Files\t*.adx");
 	import_data::update_mode_t mode = (import_data::update_mode_t)(intptr_t)v;
 	if (chooser->show() == 0) {
@@ -1013,7 +995,6 @@ void menu::cb_mi_imp_file(Fl_Widget* w, void* v) {
 		import_data_->load_data(filename, mode);
 	}
 	delete chooser;
-	free(directory);
 }
 
 // Import->Download->eQSL/LotW - fetch the data from the server into the import_data_ book
@@ -1259,11 +1240,6 @@ void menu::cb_mi_info_web(Fl_Widget* w, void* v) {
 	menu* that = ancestor_view<menu>(w);
 	if (record != nullptr && record->item_exists("WEB")) {
 		// Website logged for contact
-		// Get browser from config
-		std::string browser = that->get_browser();
-		if (browser.length() == 0) {
-			return;
-		}
 		// Open browser with URL from WEB field in record
 		std::string website = record->item("WEB");
 		char uri[256];
@@ -1691,33 +1667,6 @@ void menu::update_windows_items() {
 	}
 
 	redraw();
-}
-
-// Get the browser form config or if not ask user
-std::string menu::get_browser() {
-	// Get browser from config
-	char* temp;
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences datapath_settings(settings, "Datapath");
-	datapath_settings.get("Web Browser", temp, "");
-	std::string browser = temp;
-	free(temp);
-	if (!browser.length()) {
-		// User hasn't defined browser yet - open dialog to get it
-		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
-		chooser->title("Please select your favoured web browser");
-		chooser->filter("Applications\t*.exe");
-		if (chooser->show() != 0) {
-			status_->misc_status(ST_WARNING, "INFO: No browser selected, abandoning");
-			return "";
-		}
-		else {
-			browser = chooser->filename();
-		}
-		delete chooser;
-	}
-	datapath_settings.set("Web Browser", browser.c_str());
-	return browser;
 }
 
 // Do not allow a second upload to take place until the first has completed

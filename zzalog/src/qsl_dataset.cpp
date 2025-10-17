@@ -1,6 +1,7 @@
 #include "qsl_dataset.h"
 #include "extract_data.h"
 #include "qrz_handler.h"
+#include "settings.h"
 #include "status.h"
 #include "utils.h"
 
@@ -10,12 +11,9 @@
 #include <vector>
 #include <fstream>
 
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Native_File_Chooser.H>
 
 extern status* status_;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 extern uint32_t seed_;
 
 using json = nlohmann::json;
@@ -385,17 +383,15 @@ qsl_call_data* qsl_dataset::get_qrz_api(std::string callsign) {
 // Read card designs
 void qsl_dataset::load_data() {
 	data_.clear();
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	if (!load_json(settings)) {
+	if (!load_json()) {
 		status_->misc_status(ST_ERROR, "QSL: No QSl data loaded");
 	}
 }
 
-std::string qsl_dataset::json_file(Fl_Preferences& settings) {
-	char* temp;
-	Fl_Preferences data_settings(settings, "Datapath");
-	data_settings.get("QSLs", temp, "");
-	qsl_path_ = temp;
+std::string qsl_dataset::json_file() {
+	settings top_settings;
+	settings behav_settings(&top_settings, "Behaviour");
+	behav_settings.get<std::string>("QSL Cards", qsl_path_, "");
 	if (qsl_path_.length() == 0) {
 		status_->misc_status(ST_WARNING, "QSL: No directory in settings - please search");
 		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
@@ -404,16 +400,15 @@ std::string qsl_dataset::json_file(Fl_Preferences& settings) {
 			qsl_path_ = chooser->filename();
 		}
 		delete chooser;
-		data_settings.set("QSLs", qsl_path_.c_str());
 	}
 	std::string filename = qsl_path_ + "/config.json";
-	free(temp);
+	behav_settings.set<std::string>("QSL Cards", qsl_path_);
 	return filename;
 }
 
-bool qsl_dataset::load_json(Fl_Preferences& settings) {
+bool qsl_dataset::load_json() {
 	ifstream is;
-	string filename = json_file(settings);
+	string filename = json_file();
 	char msg[128];
 	status_->misc_status(ST_NOTE, ("QSL: Loading QSL data"));
 	is.open(filename, std::ios_base::in);
@@ -465,15 +460,13 @@ bool qsl_dataset::load_json(Fl_Preferences& settings) {
 // Store card designs
 void qsl_dataset::save_data() {
 	if (!load_failed_) {
-		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-		settings.delete_group("QSL Design");
-		save_json(settings);
+		save_json();
 	}
 }
 
-void qsl_dataset::save_json(Fl_Preferences& settings) {
+void qsl_dataset::save_json() {
 	char msg[128];
-	std::string filename = json_file(settings);
+	std::string filename = json_file();
 	status_->misc_status(ST_NOTE, "QSL: Saving QSL designs and servers");
 	std::ofstream os;
 	os.open(filename, std::ios_base::out);

@@ -8,6 +8,7 @@
 #include "qso_data.h"
 #include "qso_manager.h"
 #include "record.h"
+#include "settings.h"
 #include "stn_data.h"
 
 #include "utils.h"
@@ -19,15 +20,12 @@
 #include <FL/Fl_Counter.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Int_Input.H>
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Output.H>
 
 extern book* book_;
 extern contest_data* contest_data_;
 extern cty_data* cty_data_;
 extern stn_data* stn_data_;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 extern std::map<std::string, contest_algorithm*>* algorithms_;
 extern void open_html(const char*);
 
@@ -79,18 +77,12 @@ int contest_scorer::handle(int event) {
 }
 
 void contest_scorer::load_data() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences contest_settings(settings, "Contest");
-	char * temp;
-	contest_settings.get("Contest", temp, "");
-	contest_id_ = temp;
-	free(temp);
-	contest_settings.get("Index", temp, "");
-	contest_index_ = temp;
-	free(temp);
-	int itemp;
-	contest_settings.get("Active", itemp, (int)false);
-	active_ = itemp;
+	settings top_settings;
+	settings behav_settings(&top_settings, "Behaviour");
+	settings contest_settings(&behav_settings, "Contest");
+	contest_settings.get<std::string>("Contest", contest_id_, "");
+	contest_settings.get<std::string>("Index", contest_index_, "");
+	contest_settings.get<contest_scorer::ct_status>("Active", contest_status_, NO_CONTEST);
 	contest_settings.get("Next Serial", next_serial_, 1);
 }
 
@@ -243,11 +235,12 @@ void contest_scorer::create_form() {
 }
 
 void contest_scorer::save_data() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences contest_settings(settings, "Contest");
-	contest_settings.set("Contest", contest_id_.c_str());
-	contest_settings.set("Index", contest_index_.c_str());
-	contest_settings.set("Active", contest_status_ == ACTIVE);
+	settings top_settings;
+	settings behav_settings(&top_settings, "Behaviour");
+	settings contest_settings(&behav_settings, "Contest");
+	contest_settings.set("Contest", contest_id_);
+	contest_settings.set("Index", contest_index_);
+	contest_settings.set<contest_scorer::ct_status>("Active", contest_status_);
 	contest_settings.set("Next Serial", next_serial_);
 }
 

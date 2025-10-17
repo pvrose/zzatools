@@ -17,7 +17,6 @@
 #include <sstream>
 #include <iostream>
 
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl.H>
 #include <FL/fl_ask.H>
 #include <FL/filename.H>

@@ -22,7 +22,6 @@
 #include "qsl_dataset.h"
 #include "menu.h"
 
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Check_Button.H>
@@ -40,8 +39,6 @@ extern club_handler* club_handler_;
 extern lotw_handler* lotw_handler_;
 extern qrz_handler* qrz_handler_;
 extern qsl_dataset* qsl_dataset_;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 extern void open_html(const char*);
 
 // Constructor

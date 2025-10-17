@@ -25,7 +25,6 @@
 
 #include "utils.h"
 
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Tooltip.H>
 
 extern book* book_;
@@ -43,8 +42,6 @@ extern double prev_freq_;
 extern bool DARK;
 extern fields* fields_;
 extern config* config_;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 
 // qso_group_
 qso_data::qso_data(int X, int Y, int W, int H, const char* l) :

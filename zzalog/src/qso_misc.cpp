@@ -1,15 +1,13 @@
 #include "qso_misc.h"
+
+#include "contest_scorer.h"
 #include "qso_details.h"
 #include "qso_dxcc.h"
-#include "contest_scorer.h"
 #include "qso_qsl_vwr.h"
-#include "drawing.h"
 #include "record.h"
+#include "settings.h"
 
-#include <FL/Fl_Preferences.H>
-
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
+#include "drawing.h"
 
 // Constructor
 qso_misc::qso_misc(int X, int Y, int W, int H, const char* L) :
@@ -29,10 +27,10 @@ qso_misc::~qso_misc() {
 // get settings
 void qso_misc::load_values() {
 	// Load default tab value
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
-	tab_settings.get("Miscellaneous", default_tab_, 0);
-
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	settings dash_settings(&view_settings, "Dashboard");
+	dash_settings.get("Default Miscellaneous", default_tab_, 0);
 }
 
 // Create form
@@ -85,13 +83,14 @@ void qso_misc::enable_widgets() {
 
 // save value
 void qso_misc::save_values() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	settings dash_settings(&view_settings, "Dashboard");
 	// Find the current selected tab and save its index
 	Fl_Widget* w = value();
 	for (int ix = 0; ix != children(); ix++) {
 		if (child(ix) == w) {
-			tab_settings.set("Miscellaneous", ix);
+			dash_settings.set("Default Miscellaneous", ix);
 		}
 	}
 }

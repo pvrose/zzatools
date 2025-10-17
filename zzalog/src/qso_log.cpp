@@ -1,17 +1,12 @@
 #include "qso_log.h"
-#include "qso_log_info.h"
+
 #include "qso_apps.h"
-#include "qso_qsl.h"
 #include "qso_bands.h"
+#include "qso_log_info.h"
+#include "qso_qsl.h"
+#include "settings.h"
 
 #include <algorithm>
-
-#include <FL/Fl_Preferences.H>
-
-
-
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 
 // Constructor
 qso_log::qso_log(int X, int Y, int W, int H, const char* l) :
@@ -35,9 +30,10 @@ qso_log::~qso_log() {
 // get settings 
 void qso_log::load_values() {
 	// Load default tab value
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
-	tab_settings.get("Log", default_tab_, 0);
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	settings dash_settings(&view_settings, "Dashboard");
+	dash_settings.get("Default Log Pane", default_tab_, 0);
 }
 
 // Create form
@@ -109,13 +105,14 @@ void qso_log::enable_widgets() {
 
 // Save changes
 void qso_log::save_values() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	settings dash_settings(&view_settings, "Dashboard");
 	// Find the current selected tab and save its index
 	Fl_Widget* w = value();
 	for (int ix = 0; ix != children(); ix++) {
 		if (child(ix) == w) {
-			tab_settings.set("Log", ix);
+			dash_settings.set("Default Log Pane", ix);
 		}
 	}
 	bands_->save_values();

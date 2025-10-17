@@ -1,10 +1,10 @@
 #include "config.h"
 
-#include "config_tree.h"
 #include "contest_dialog.h"
 #include "fields_dialog.h"
 #include "page_dialog.h"
 #include "qsl_editor.h"
+#include "settings.h"
 #include "user_dialog.h"
 #include "web_dialog.h"
 
@@ -12,31 +12,25 @@
 
 #include <FL/Fl.H>
 #include <FL/Fl_Button.H>
-#include <FL/Fl_Preferences.H>
 #include <FL/Fl_Return_Button.H>
 #include <FL/Fl_Tabs.H>
 
 extern config* config_;
 extern std::string CONTACT;
 extern std::string COPYRIGHT;
-extern std::string VENDOR;
-extern std::string PROGRAM_ID;
 
 // Constructor
 config::config(int W, int H, const char* label) :
 	Fl_Window(W, H, label)
-	, settings_view_(nullptr)
 	, tabs_(nullptr)
 {
 	updatable_views_.clear();
-
-	// Set position on screen
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences windows_settings(settings, "Windows");
-	Fl_Preferences window_settings(windows_settings, "Settings");
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	settings config_settings(&view_settings, "Config");
 	int left, top;
-	window_settings.get("Left", left, 0);
-	window_settings.get("Top", top, 100);
+	config_settings.get<int>("Left", left, 0);
+	config_settings.get<int>("Top", top, 100);
 	position(left, top);
 
 	children_ids_.clear();
@@ -87,17 +81,7 @@ config::config(int W, int H, const char* label) :
 	children_ids_.push_back(DLG_CONTEST);
 	updatable_views_.insert(ctdlg);
 
-	// Lastly - a tree display showing all config
-	Fl_Group* all_settings = new config_tree(rx, ry, rw, rh, "All settings");
-	all_settings->labelfont(FL_BOLD);
-	all_settings->labelsize(FL_NORMAL_SIZE + 2);
-	all_settings->tooltip("Displays the current config in tree format");
-	children_ids_.push_back(DLG_ALL);
-
 	//all_settings->end();
-
-	// Default to show all config
-	settings_view_ = all_settings;
 
 	tabs_->end();
 	// button - save the current config and resume
@@ -140,11 +124,11 @@ config::config(int W, int H, const char* label) :
 config::~config()
 {
 	// Rememeber window position
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences windows_settings(settings, "Windows");
-	Fl_Preferences window_settings(windows_settings, "Settings");
-	window_settings.set("Left", x_root());
-	window_settings.set("Top", y_root());
+	settings top_settings;
+	settings view_settings(&top_settings, "Views");
+	settings config_settings(&view_settings, "Config");
+	config_settings.set<int>("Left", x_root());
+	config_settings.set<int>("Top", y_root());
 
 }
 
@@ -231,9 +215,6 @@ void config::set_label(config::cfg_dialog_t active) {
 		break;
 	case DLG_CONTEST:
 		label("Configuration: Define Contest - dates, exchanges and scoring");
-		break;
-	case DLG_ALL:
-		label("Configuration: Display all options in tree format");
 		break;
 	case DLG_X:
 		label("Configuration: *** UNKNOWN ***");
