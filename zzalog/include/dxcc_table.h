@@ -4,6 +4,8 @@
 #include <map>
 #include <vector>
 
+#include <nlohmann/json.hpp>
+
 #include <FL/Fl_Table.H>
 
 
@@ -90,3 +92,20 @@ protected:
  
 };
 
+//! JSON serialisation for dxcc_table::display_t
+NLOHMANN_JSON_SERIALIZE_ENUM(dxcc_table::display_t, {
+    { dxcc_table::TOTAL, "Total" },
+    { dxcc_table::BANDS, "By Bands" },
+    { dxcc_table::DXCC_MODES, "By DXCC Modes" },
+    { dxcc_table::MODES, "By ADIF Modes" }
+    }
+)
+
+//! JSON serialisation for dxcc_table::display_t
+NLOHMANN_JSON_SERIALIZE_ENUM(dxcc_table::confirm_t, {
+    { dxcc_table::WORKED, "Worked" },
+    { dxcc_table::EQSL, "eQSL.cc" },
+    { dxcc_table::LOTW, "LotW" },
+    { dxcc_table::CARD, "Paper Card" }
+    }
+)

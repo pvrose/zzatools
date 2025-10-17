@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nlohmann/json.hpp>
+
 #include <FL/Fl_Group.H>
 
 class Fl_Button;
@@ -40,6 +42,38 @@ public:
 	//! Returns in nighttime - defaults true if no data
 	bool is_night(time_t when);
 
+	//! Temperature units
+	enum temp_t : uchar {
+		CELSIUS,           //!< degrees Celsius 
+		FAHRENHEIT,        //!< degrees Fahrenheit
+	};
+	//! Wind speed
+	enum speed_t : uchar {
+		METRE_PER_SECOND,  //!< metres per second
+		MILE_PER_HOUR,     //!< miles per hour
+		KM_PER_HOUR,       //!< kilometres per hour
+		KNOTS              //!< knots
+	};
+	//! Wind direction.
+	enum dirn_t : uchar {
+		CARDINAL,          //!< one of the 16 cardinal points (eg WNW)
+		DEGREES,           //!< degrees
+		ARROW              //!< iconic representation as an arrow pointing from wind direction.
+	};
+	//! Atmospheric pressure
+	enum press_t : uchar {
+		HECTOPASCAL,       //!< hectopascals
+		MM_MERCURY,        //!< millimetres of mercury.
+		IN_MERCURY,        //!< inches of mercury
+		MILLIBARS          //!< mullibars
+	};
+	//! Clous coverage
+	enum cloud_t : uchar {
+		PERCENT,           //!< percentage 
+		OKTA,              //!< okta
+		PIE                //!< iconic representation
+	};
+
 protected:
 	//! Callback on the WX icon clicked - fetches report again
 	static void cb_bn_icon(Fl_Widget* w, void *v);
@@ -62,36 +96,15 @@ protected:
 	//! Display local time rather than UTC
 	bool display_local_;
 	//! Temperature units
-	enum {
-		CELSIUS,           //!< degrees Celsius 
-		FAHRENHEIT,        //!< degrees Fahrenheit
-	} display_temperature_;
+	temp_t display_temperature_;
 	//! Wind speed
-	enum {
-		METRE_PER_SECOND,  //!< metres per second
-		MILE_PER_HOUR,     //!< miles per hour
-		KM_PER_HOUR,       //!< kilometres per hour
-        KNOTS              //!< knots
-	} display_speed_;
+	speed_t display_speed_;
 	//! Wind direction.
-	enum {
-		CARDINAL,          //!< one of the 16 cardinal points (eg WNW)
-		DEGREES,           //!< degrees
-		ARROW              //!< iconic representation as an arrow pointing from wind direction.
-	} display_direction_;
+	dirn_t display_direction_;
 	//! Atmospheric pressure
-    enum {
-        HECTOPASCAL,       //!< hectopascals
-        MM_MERCURY,        //!< millimetres of mercury.
-        IN_MERCURY,        //!< inches of mercury
-        MILLIBARS          //!< mullibars
-    } display_pressure_;
+    press_t display_pressure_;
 	//! Clous coverage
-	enum {
-		PERCENT,           //!< percentage 
-		OKTA,              //!< okta
-		PIE                //!< iconic representation
-	} display_cloud_;
+	cloud_t display_cloud_;
 
     // Widgets
 	Fl_Button* bn_wx_icon_;          //!< Button: Iconic description of weather
@@ -108,3 +121,44 @@ protected:
 	Fl_Button* bn_cloud_;            //!< Button: Cloud cover.
 
 };
+
+//! JSON serialisation for qso_wx::temp_t
+NLOHMANN_JSON_SERIALIZE_ENUM(qso_wx::temp_t, {
+	{ qso_wx::CELSIUS, "Celsius" },
+	{ qso_wx::FAHRENHEIT, "Fahrenheight" }
+	}
+)
+
+//! JSON serialisation for qso_wx::speed_t
+NLOHMANN_JSON_SERIALIZE_ENUM(qso_wx::speed_t, {
+	{ qso_wx::METRE_PER_SECOND, "m/s" },
+	{ qso_wx::MILE_PER_HOUR, "mph" },
+	{ qso_wx::KM_PER_HOUR, "km/h" },
+	{ qso_wx::KNOTS, "knot" }
+	}
+)
+
+//! JSON serialisation for qso_wx::dirn_t
+NLOHMANN_JSON_SERIALIZE_ENUM(qso_wx::dirn_t, {
+	{ qso_wx::CARDINAL, "Cardinal Point" },
+	{ qso_wx::DEGREES, "Degress" },
+	{ qso_wx::ARROW, "Pointer" }
+	}
+)
+
+//! JSON serialisation for qso_wx::press_t
+NLOHMANN_JSON_SERIALIZE_ENUM(qso_wx::press_t, {
+	{ qso_wx::HECTOPASCAL, "Hectopascal" },
+	{ qso_wx::MILLIBARS, "Millibar" },
+	{ qso_wx::MM_MERCURY, "Millimetre Mercury" },
+	{ qso_wx::IN_MERCURY, "Inch Mercury" }
+	}
+)
+
+//! JSON serialisation for contest_scorer::ct_status
+NLOHMANN_JSON_SERIALIZE_ENUM(qso_wx::cloud_t, {
+	{ qso_wx::PERCENT, "Percentage Cover" },
+	{ qso_wx::OKTA, "Okta" },
+	{ qso_wx::PIE, "Icon" }
+	}
+)

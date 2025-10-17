@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include <nlohmann/json.hpp>
+
 #include <FL/Fl_Group.H>
 
 class contest_algorithm;
@@ -195,3 +197,12 @@ protected:
 
 };
 
+//! JSON serialisation for contest_scorer::ct_status
+NLOHMANN_JSON_SERIALIZE_ENUM(contest_scorer::ct_status, {
+    { contest_scorer::NO_CONTEST, "No contest" },
+    { contest_scorer::FUTURE, "Upcoming contest"},
+    { contest_scorer::ACTIVE, "Working contest"},
+    { contest_scorer::PAUSED, "Paused contest"},
+    { contest_scorer::PAST, "After contest "}
+    }
+)

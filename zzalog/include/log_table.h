@@ -62,6 +62,14 @@ class Fl_Window;
 		//! Returns the name and attributes of the fields currently being displayed
 		collection_t& fields();
 
+		//! Display order.
+		enum sort_order : uchar {
+			FIRST_TO_LAST,               //!< Chronological order.
+			LAST_TO_FIRST,               //!< Reverse chronological.
+			SORTED_UP,                   //!< Sorted alphabetically on a field.
+			SORTED_DOWN                  //!< Reverse alphabetical on a field.
+		};
+
 		// Protected methods
 	protected:
 		//! Callback to handle click within the table: opening edit_input_ and handling column changes.
@@ -86,6 +94,7 @@ class Fl_Window;
 		//! Adjust row height and header width to fit font and window size.
 		void adjust_row_sizes();
 
+
 		// Protected attributes:
 	protected:
 		//! Column definition
@@ -108,15 +117,8 @@ class Fl_Window;
 		field_app_t application_;
 		//! Rows per page.
 		int rows_per_page_;
-		//! Display order.
-		enum sort_order : uchar {
-			FIRST_TO_LAST,               //!< Chronological order.
-			LAST_TO_FIRST,               //!< Reverse chronological.
-			SORTED_UP,                   //!< Sorted alphabetically on a field.
-			SORTED_DOWN                  //!< Reverse alphabetical on a field.
-		} 
 		//! How the records are ordered.
-		order_;   
+		sort_order order_;   
 		//! Field on which sort was done.
 		std::string sorted_field_;
 		//! The edit input.
@@ -136,4 +138,15 @@ class Fl_Window;
 		//! Tooltip Y position (on screen).
 		int tip_root_y_;
 	};
+
+	//! JSON serialisation for log_table::sort_order
+	NLOHMANN_JSON_SERIALIZE_ENUM(log_table::sort_order, {
+		{ log_table::FIRST_TO_LAST, "Chronological" },
+		{ log_table::LAST_TO_FIRST, "Reverse Chronological" },
+		{ log_table::SORTED_UP, "Alphabetical" },
+		{ log_table::SORTED_DOWN, "Reverse Alphabetical" }
+		}
+	)
+
+
 #endif

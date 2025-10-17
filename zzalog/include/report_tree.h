@@ -165,4 +165,28 @@ template <class T> class band_map;
 		std::string station_call_;
 
 	};
+
+//! JSON serialisation for report_filter_t
+NLOHMANN_JSON_SERIALIZE_ENUM(report_filter_t, {
+	{ RF_NONE, "No display" },
+	{ RF_ALL, "All records" },
+	{ RF_ALL_CURRENT, "All records with callsign" },
+	{ RF_EXTRACTED, "Extracted records" },
+	{ RF_SELECTED, "Selected record" }
+	}
+)
+
+//! JSON serialisation for report_cat_t
+NLOHMANN_JSON_SERIALIZE_ENUM(report_cat_t, {
+	{ RC_EMPTY, "Empty data" },
+	{ RC_DXCC, "DXCC" },
+	{ RC_PAS, "DXCC and States" },
+	{ RC_BAND, "Band" },
+	{ RC_MODE, "Mode" },
+	{ RC_CALL, "Callsign" },
+	{ RC_CUSTOM, "Custom" }
+	}
+)
+
+
 #endif

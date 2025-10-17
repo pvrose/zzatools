@@ -4,11 +4,9 @@
 #ifndef __SEARCH__
 #define __SEARCH__
 
+#include <nlohmann/json.hpp>
+
 #include <string>
-
-
-
-
 
 	//! extract match condition - values match position of radio button in search_dialog.
 	enum search_cond_t : int {
@@ -33,7 +31,7 @@
 
 	//! extract comparison operator
 	enum search_comp_t : int {
-		XP_REGEX,          //!< Compare by regular expression
+		XP_REGEX = 0,      //!< Compare by regular expression
 		XP_NE,             //!< Compare if not equal
 		XP_LT,             //!< Compare if less than
 		XP_LE,             //!< Compare if less than or equal
@@ -92,5 +90,41 @@
 			pattern(n),
 			my_call(o) {};
 	};
+
+
+	//! JSON serialisation for search_cond_t
+	NLOHMANN_JSON_SERIALIZE_ENUM(search_cond_t, {
+		{ XC_DXCC, "DXCC" },
+		{ XC_CQZ, "CQ Zone" },
+		{ XC_ITUZ, "ITU Zone" },
+		{ XC_CONT, "Continent" },
+		{ XC_SQ2, "2-character Gridsquare" },
+		{ XC_SQ4, "4-character Gridsquare" },
+		{ XC_CALL, "Callsign" },
+		{ XC_UNFILTERED, "All records" },
+		{ XC_FIELD, "Named Field" }
+		}
+	)
+
+	//! JSON serialisation for search_combi_t
+	NLOHMANN_JSON_SERIALIZE_ENUM(search_combi_t, {
+		{ XM_NEW, "New search" },
+		{ XM_AND, "AND" },
+		{ XM_OR, "OR" }
+		}
+	)
+
+	//! JSON serialisation for search_comp_t
+	NLOHMANN_JSON_SERIALIZE_ENUM(search_comp_t, {
+		{ XP_REGEX, "Regex" },
+		{ XP_NE, "Not equal" },
+		{ XP_LT, "Less than"  },
+		{ XP_LE, "Less than or equal" },
+		{ XP_EQ, "Equal" },
+		{ XP_GE, "Greater than or equal" },
+		{ XP_GT, "Greater than" }
+		}
+	)
+
 
 #endif

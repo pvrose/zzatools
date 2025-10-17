@@ -378,7 +378,6 @@
     <ClInclude Include="include\search_dialog.h" />
     <ClInclude Include="include\serial.h" />
     <ClInclude Include="include\settings.h" />
-    <ClInclude Include="include\settings_enums.h" />
     <ClInclude Include="include\socket_server.h" />
     <ClInclude Include="include\spec_data.h" />
     <ClInclude Include="include\spec_tree.h" />
