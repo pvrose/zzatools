@@ -564,6 +564,8 @@
 		std::set<record*> dirty_qsos_;
 		//! Flag std::set to indicate that the book is dirty after a record has been deleted.
 		bool deleted_record_;
+		//! Flag to indicate that the book has been modified and so needs backing up.
+		bool been_modified_;
 	};
 
 #endif

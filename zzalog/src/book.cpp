@@ -314,6 +314,8 @@ bool book::load_data(std::string filename)
 		status_->misc_status(ST_ERROR, "LOG: An extract or export type of book cannot be constructed by reading a file");
 		ok = false;
 	}
+	// Loaded fresh data, no need to backup ....yet.
+	if (ok) been_modified_ = false;
 	return ok;
 }
 
@@ -1593,7 +1595,7 @@ bool book::upload_qso(qso_num_t record_num) {
 
 // Return the been_modified_ flag
 bool book::been_modified() {
-	return is_dirty();
+	return been_modified_;
 }
 
 // return entrring new record
@@ -1694,6 +1696,7 @@ void book::add_dirty_record(record* qso, std::string reason) {
 			printf("%s Marking header dirty - %s", OBJECT_NAMES.at(book_type_), reason.c_str());
 		dirty_qsos_.insert(qso);
 	}
+	if (!main_loading_) been_modified_ = true;
 }
 
 // Remove this record from the dirty std::set
