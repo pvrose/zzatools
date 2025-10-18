@@ -32,10 +32,6 @@ public:
 		CTY_LIMIT
 	};
 
-protected:
-
-	//! Data currently being loaded.
-	cty_type_t type_ = ADIF;
 
 	//! Database structure.
 	struct all_data {
@@ -46,6 +42,11 @@ protected:
 		//! All the exceptions - indexed by callsign.
 		std::map < std::string, std::list<cty_exception*> > exceptions;
 	};
+
+protected:
+
+	//! Data currently being loaded.
+	cty_type_t type_ = ADIF;
 
 public:
 
@@ -136,6 +137,8 @@ protected:
 	void parse(record* qso);
 	//! Use the attached \p suffix to "mutate" the \p call to parse eg W1ABC/2 type calls.
 	void mutate_call(std::string& call, char suffix);
+	//! Store json
+	void store_json();
 
 	//! Find element that matches the call.
 	
@@ -216,4 +219,4 @@ protected:
 
 };
 
-
+void to_json(json& j, const cty_data::all_data& d);

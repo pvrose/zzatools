@@ -1,5 +1,9 @@
 #include "cty_element.h"
 
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
+
 cty_element::cty_element() { type_ = CTY_UNSPECIFIED; }
 cty_element::~cty_element() {}
 
@@ -183,3 +187,81 @@ std::ostream& operator<<(std::ostream& os, const cty_geography& rhs) {
 	os << (cty_filter)rhs << ", PAS=" << rhs.province_;
 	return os;
 }
+
+// JSON Serialisation from cty_element
+void to_json(json& j, const cty_element& e) {
+	j = json{
+		{ "DXCC", e.dxcc_id_ },
+		{ "Name", e.name_ },
+		{ "Start", e.time_validity_.start },
+		{ "Finish", e.time_validity_.finish },
+		{ "CQ Zone", e.cq_zone_ },
+		{ "ITU Zone", e.itu_zone_ },
+		{ "Continent", e.continent_ },
+		{ "Latitude", e.coordinates_.latitude },
+		{ "Longitude", e.coordinates_.longitude },
+		{ "Deleted", e.deleted_}
+	};
+	json jf;
+	for (auto f : e.filters_) {
+		switch (f->filter_type_) {
+		case cty_filter::FT_GEOGRAPHY:
+			jf.push_back(*(cty_geography*)f);
+			break;
+		case cty_filter::FT_USAGE:
+			jf.push_back(*f);
+			break;
+		default:
+			break;
+		}
+	}
+	j["Filters"] = jf;
+}
+
+// JSON Serialisation of cty_entity
+void to_json(json& j, const cty_entity& e) {
+	j = json((cty_element&)e);
+	j["Nickname"] = e.nickname_;
+}
+
+// JSON Serialisation of cty_prefix
+void to_json(json& j, const cty_prefix& e) {
+	j = json((cty_element&)e);
+}
+
+// JSON Serialisation of cty_exception::exc_type_t
+NLOHMANN_JSON_SERIALIZE_ENUM(cty_exception::exc_type_t, {
+	{ cty_exception::EXC_INVALID, "Invalid Operation"},
+	{ cty_exception::EXC_OVERRIDE, "Override Entity"}
+	}
+)
+
+// JSON Serialisation of cty_exception
+void to_json(json& j, const cty_exception& e) {
+	j = json((cty_element&)e);
+	j["Exception Type"] = e.exc_type_;
+}
+
+// JSON Serialisation of cty_filter::filter_t 
+NLOHMANN_JSON_SERIALIZE_ENUM(cty_filter::filter_t, {
+	{ cty_filter::FT_NOT_USED, "No filter"},
+	{ cty_filter::FT_GEOGRAPHY, "Geography"},
+	{ cty_filter::FT_USAGE, "Usage"}
+	}
+)
+
+// JSON Serialisation of cty_filter
+void to_json(json& j, const cty_filter& e) {
+	j = json((cty_element&)e);
+	j["Filter Type"] = e.filter_type_;
+	j["Pattern"] = e.pattern_;
+	j["Nickname"] = e.nickname_;
+	j["Reason"] = e.reason_;
+}
+
+// JSON Serialisation from cty_geography
+void to_json(json& j, const cty_geography& e) {
+	j = json((cty_filter&)e);
+	j["Primary Subdivision"] = e.province_;
+}
+

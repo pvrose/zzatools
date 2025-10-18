@@ -2,13 +2,15 @@
 
 #include "utils.h"
 
+#include <nlohmann/json.hpp>
+
 #include <cstdint>
 #include <list>
 #include <map>
 #include<ostream>
 #include <string>
 
-
+using json = nlohmann::json;
 
 class cty_filter;
 
@@ -92,6 +94,8 @@ public:
 //! Output streaming operator "<<" for a cty_element.
 std::ostream& operator<<(std::ostream& os, const cty_element& elem);
 
+void to_json(json& j, const cty_element& e);
+
 //! Version of cty_element to be used for entities.
 class cty_entity : public cty_element {
 
@@ -114,6 +118,8 @@ public:
 //! Output streaming operator "<<" for a cty_entity.
 std::ostream& operator<<(std::ostream& os, const cty_entity& rhs);
 
+void to_json(json& j, const cty_entity& e);
+
 //! Vesrion of cty_element to be used for prefixes
 class cty_prefix : public cty_element {
 
@@ -128,6 +134,8 @@ public:
 
 //! Output streaming operator "<<" for a cty_prefix.
 std::ostream& operator<<(std::ostream& os, const cty_prefix& elem);
+
+void to_json(json& j, const cty_prefix& e);
 
 //! Version of cty_exception to be used for exceptions
 class cty_exception : public cty_element {
@@ -151,6 +159,8 @@ public:
 
 //! Output streaming operator "<<" for a cty_exception.
 std::ostream& operator<<(std::ostream& os, const cty_exception& rhs);
+
+void to_json(json& j, const cty_exception& e);
 
 //! Version of cty_element to be used in geographic or usage filter
 class cty_filter : public cty_element {
@@ -180,6 +190,8 @@ public:
 //! Output streaming operator "<<" for a cty_filter.
 std::ostream& operator <<(std::ostream& os, const cty_filter& rhs);
 
+void to_json(json& j, const cty_filter& e);
+
 //! Version of cty_element used for geographic filters.
 class cty_geography : public cty_filter {
 
@@ -195,3 +207,5 @@ public:
 
 //! Output streaming operator "<<" for a cty_geography.
 std::ostream& operator <<(std::ostream& os, const cty_geography& rhs);
+
+void to_json(json& j, const cty_geography& e);

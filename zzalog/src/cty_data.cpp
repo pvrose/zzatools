@@ -9,6 +9,8 @@
 #include "spec_data.h"
 #include "status.h"
 
+#include <nlohmann/json.hpp>
+
 #include <cctype>
 #include <chrono>
 #include<ostream>
@@ -22,7 +24,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-
+using json = nlohmann::json;
 
 extern club_handler* club_handler_;
 extern spec_data* spec_data_;
@@ -73,6 +75,9 @@ cty_data::cty_data() {
 	if (loaded) timestamps_[type_] = get_timestamp(filename, 365);
 	else timestamps_[type_] = std::chrono::system_clock::from_time_t(-1);
 	os_.close();
+
+	// TODO temporary while testing
+	store_json();
 
 }
 
@@ -938,4 +943,42 @@ bool cty_data::fetch_data(cty_type_t type) {
 // Return the version
 std::string cty_data::version(cty_type_t type) {
 	return versions_.at(type);
+}
+
+// Store JSON
+void cty_data::store_json() {
+	std::string filename = default_data_directory_ + "cty.json";
+	ofstream os(filename);
+	// TODO Add timestamps
+	json j;
+	j["Cty"] = *data_;
+	os << std::setw(2) << j;
+	os.close();
+}
+
+// JSON serialisation of cty_data::all_data
+void to_json(json& j, const cty_data::all_data& d) {
+	json jent;
+	for (auto e : d.entities) {
+		jent.push_back(*e.second);
+	}
+	j["Entities"] = jent;
+	json jpx;
+	for (auto p : d.prefixes) {
+		json jp;
+		for (auto px : p.second) {
+			jp.push_back(*px);
+		}
+		jpx[p.first] = jp;
+	}
+	j["Prefixes"] = jpx;
+	json jex;
+	for (auto e : d.exceptions) {
+		json je;
+		for (auto ex : e.second) {
+			je.push_back(*ex);
+		}
+		jex[e.first] = je;
+	}
+	j["Exceptions"] = jex;
 }
