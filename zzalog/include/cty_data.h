@@ -177,11 +177,13 @@ protected:
 	//! Get the system timestamp for the named \p filename.
 	
 	//! \param filename Filename.
-	//! \param old_age Age in days the filename is considered valid. A warning is raised if the file is older.
 	//! \return the system timestamp of the file.
 	std::chrono::system_clock::time_point get_timestamp(std::string filename);
 
 	//! Check the time stamp
+	
+	//! \param type The source of the data.
+	//! \param days Age in days the filename is considered valid. A warning is raised if the file is older.
 	void check_timestamp(cty_type_t type, int days);
 	
 	//! The result of a parse request.
