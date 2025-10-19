@@ -28,8 +28,7 @@ public:
 		ADIF = 0,          //!< Data from ADIF Specification.
 		CLUBLOG,           //!< Data from Clublog.org.
 		COUNTRY_FILES,     //!< Data from country-files.com.
-		DXATLAS,           //!< Data from dxatlas.com.
-		CTY_LIMIT
+		DXATLAS            //!< Data from dxatlas.com.
 	};
 
 
