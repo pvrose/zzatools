@@ -191,6 +191,9 @@ utils.h - various utility methods
 	//! Convert ISO date-time format to time_t
 	std::time_t convert_iso_datetime(std::string value);
 
+	//! Convert ISO date-time format from time_t
+	std::string convert_iso_datetime(std::time_t t);
+
 	//! Returns the widget of class WIDGET that encloses \p w.
 	template <class WIDGET>
 	WIDGET* ancestor_view(Fl_Widget* w) {

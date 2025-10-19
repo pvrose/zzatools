@@ -139,7 +139,10 @@ protected:
 	void mutate_call(std::string& call, char suffix);
 	//! Store json
 	void store_json();
-
+	//! Load JSON
+	bool load_json();
+	//! Load source data
+	void load_sources();
 	//! Find element that matches the call.
 	
 	//! \param call Callsign to match.
@@ -218,5 +221,7 @@ protected:
 	std::map<cty_type_t, std::string> versions_;
 
 };
-
+//! Json Serilaisation from cty_data::all_data
 void to_json(json& j, const cty_data::all_data& d);
+//! JSON Serialisation to cty_data::all_data
+void from_json(const json& j, cty_data::all_data& d);

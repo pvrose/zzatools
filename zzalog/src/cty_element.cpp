@@ -190,45 +190,93 @@ std::ostream& operator<<(std::ostream& os, const cty_geography& rhs) {
 
 // JSON Serialisation from cty_element
 void to_json(json& j, const cty_element& e) {
-	j = json{
-		{ "DXCC", e.dxcc_id_ },
-		{ "Name", e.name_ },
-		{ "Start", e.time_validity_.start },
-		{ "Finish", e.time_validity_.finish },
-		{ "CQ Zone", e.cq_zone_ },
-		{ "ITU Zone", e.itu_zone_ },
-		{ "Continent", e.continent_ },
-		{ "Latitude", e.coordinates_.latitude },
-		{ "Longitude", e.coordinates_.longitude },
-		{ "Deleted", e.deleted_}
-	};
-	json jf;
-	for (auto f : e.filters_) {
-		switch (f->filter_type_) {
-		case cty_filter::FT_GEOGRAPHY:
-			jf.push_back(*(cty_geography*)f);
-			break;
-		case cty_filter::FT_USAGE:
-			jf.push_back(*f);
-			break;
-		default:
-			break;
+	j["DXCC"] = e.dxcc_id_;
+	if (e.name_.length()) j["Name"] = e.name_;
+	if (e.time_validity_.start != "*") j["Start"] = e.time_validity_.start;
+	if (e.time_validity_.finish != "*") j["Finish"] = e.time_validity_.finish;
+	if (e.cq_zone_ != -1) j["CQ Zone"] = e.cq_zone_;
+	if (e.itu_zone_ != -1) j["ITU Zone"] = e.itu_zone_;
+	if (e.continent_.length()) j["Continent"] = e.continent_;
+	if (!isnan(e.coordinates_.latitude)) j["Latitude"] = e.coordinates_.latitude;
+	if (!isnan(e.coordinates_.longitude)) j["Latitude"] = e.coordinates_.longitude;
+	if (e.deleted_) j["Deleted"] = e.deleted_;
+	if (e.filters_.size()) {
+		json jf;
+		for (auto f : e.filters_) {
+			switch (f->filter_type_) {
+			case cty_filter::FT_GEOGRAPHY:
+				jf.push_back(*(cty_geography*)f);
+				break;
+			case cty_filter::FT_USAGE:
+				jf.push_back(*f);
+				break;
+			default:
+				break;
+			}
+		}
+		j["Filters"] = jf;
+	}
+}
+// JSON Serialisation from cty_element
+void from_json(const json& j, cty_element& e) {
+	if (j.find("DXCC") != j.end()) j.at("DXCC").get_to(e.dxcc_id_);
+	else e.dxcc_id_ = -1;
+	if (j.find("Name") != j.end()) j.at("Name").get_to(e.name_);
+	else e.name_ = "";
+	if (j.find("Start") != j.end()) j.at("Start").get_to(e.time_validity_.start);
+	else e.time_validity_.start = "*";
+	if (j.find("Finish") != j.end()) j.at("Finish").get_to(e.time_validity_.finish);
+	else e.time_validity_.finish = "*";
+	if (j.find("CQ Zone") != j.end()) j.at("CQ Zone").get_to(e.cq_zone_);
+	else e.cq_zone_ = -1;
+	if (j.find("ITU_Zone") != j.end()) j.at("ITU_Zone").get_to(e.itu_zone_);
+	else e.itu_zone_ = -1;
+	if (j.find("Continent") != j.end()) j.at("Continent").get_to(e.continent_);
+	else e.continent_ = "";
+	if (j.find("Latitude") != j.end()) j.at("Latitude").get_to(e.coordinates_.latitude);
+	else e.coordinates_.latitude = nan("");
+	if (j.find("Longitude") != j.end()) j.at("Longitude").get_to(e.coordinates_.longitude);
+	else e.coordinates_.longitude = nan("");
+	if (j.find("Deleted") != j.end()) j.at("Deleted").get_to(e.deleted_);
+	else e.deleted_ = false;
+	if (j.find("Filters") != j.end()) {
+		for (auto f : j.at("Filters")) {
+			cty_filter::filter_t t = cty_filter::FT_NOT_USED;
+			if (f.find("Filter Type") != f.end()) {
+				f.at("Filter Type").get_to(t);
+			}
+			if (t == cty_filter::FT_GEOGRAPHY) {
+				cty_geography* filter = new cty_geography;
+				f.get_to(*filter);
+				e.filters_.push_back(filter);
+			}
+			else {
+				cty_filter* filter = new cty_filter;
+				f.get_to(*filter);
+				e.filters_.push_back(filter);
+			}
 		}
 	}
-	j["Filters"] = jf;
 }
-
 // JSON Serialisation of cty_entity
 void to_json(json& j, const cty_entity& e) {
 	j = json((cty_element&)e);
-	j["Nickname"] = e.nickname_;
+	if (e.nickname_.length()) j["Nickname"] = e.nickname_;
 }
-
+// JSON Serialisation to cty_entity
+void from_json(const json& j, cty_entity& e) {
+	from_json(j, (cty_element&)e);
+	if (j.find("Nickname") != j.end()) j.at("Nickname").get_to(e.nickname_);
+	else e.nickname_ = "";
+}
 // JSON Serialisation of cty_prefix
 void to_json(json& j, const cty_prefix& e) {
 	j = json((cty_element&)e);
 }
-
+// JSON Serialisation to cty_prefix
+void from_json(const json& j, cty_prefix& e) {
+	from_json(j, (cty_element&)e);
+}
 // JSON Serialisation of cty_exception::exc_type_t
 NLOHMANN_JSON_SERIALIZE_ENUM(cty_exception::exc_type_t, {
 	{ cty_exception::EXC_INVALID, "Invalid Operation"},
@@ -241,7 +289,12 @@ void to_json(json& j, const cty_exception& e) {
 	j = json((cty_element&)e);
 	j["Exception Type"] = e.exc_type_;
 }
-
+// JSON Serialiser to cty_exception
+void from_json(const json& j, cty_exception& e) {
+	from_json(j, (cty_element&)e);
+	if (j.find("Exception Type") != j.end()) j.at("Exception Type").get_to(e.exc_type_);
+	else e.exc_type_ = cty_exception::EXC_INVALID;
+}
 // JSON Serialisation of cty_filter::filter_t 
 NLOHMANN_JSON_SERIALIZE_ENUM(cty_filter::filter_t, {
 	{ cty_filter::FT_NOT_USED, "No filter"},
@@ -254,14 +307,31 @@ NLOHMANN_JSON_SERIALIZE_ENUM(cty_filter::filter_t, {
 void to_json(json& j, const cty_filter& e) {
 	j = json((cty_element&)e);
 	j["Filter Type"] = e.filter_type_;
-	j["Pattern"] = e.pattern_;
-	j["Nickname"] = e.nickname_;
-	j["Reason"] = e.reason_;
+	if (e.pattern_.length()) j["Pattern"] = e.pattern_;
+	if (e.nickname_.length()) j["Nickname"] = e.nickname_;
+	if (e.reason_.length()) j["Reason"] = e.reason_;
 }
-
+// JSON Serialisation to cty_filter
+void from_json(const json& j, cty_filter& e) {
+	from_json(j, (cty_element&)e);
+	if (j.find("Filter Type") != j.end()) j.at("Filter Type").get_to(e.filter_type_);
+	else e.filter_type_ = cty_filter::FT_NOT_USED;
+	if (j.find("Pattern") != j.end()) j.at("Pattern").get_to(e.pattern_);
+	else e.pattern_ = "";
+	if (j.find("Nickname") != j.end()) j.at("Nickname").get_to(e.nickname_);
+	else e.nickname_ = "";
+	if (j.find("Reason") != j.end()) j.at("FReason").get_to(e.reason_);
+	else e.reason_ = "";
+}
 // JSON Serialisation from cty_geography
 void to_json(json& j, const cty_geography& e) {
 	j = json((cty_filter&)e);
 	j["Primary Subdivision"] = e.province_;
+}
+// JSON Serialisation to cty_geography
+void from_json(const json& j, cty_geography& e) {
+	from_json(j, (cty_filter&)e);
+	if (j.find("Primary Subdivision") != j.end()) j.at("Primary Subdivision").get_to(e.province_);
+	else e.province_ = "";
 }
 

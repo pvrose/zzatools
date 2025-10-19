@@ -93,8 +93,10 @@ public:
 
 //! Output streaming operator "<<" for a cty_element.
 std::ostream& operator<<(std::ostream& os, const cty_element& elem);
-
+//! JSON Serialisation from cty_element
 void to_json(json& j, const cty_element& e);
+//! JSON Serialisation to cty_element
+void from_json(const json& j, cty_element& e);
 
 //! Version of cty_element to be used for entities.
 class cty_entity : public cty_element {
@@ -117,8 +119,10 @@ public:
 
 //! Output streaming operator "<<" for a cty_entity.
 std::ostream& operator<<(std::ostream& os, const cty_entity& rhs);
-
+//! JSON Serialisation from cty_entity
 void to_json(json& j, const cty_entity& e);
+//! JSON Serialisation to cty_entity
+void from_json(const json& j, cty_entity& e);
 
 //! Vesrion of cty_element to be used for prefixes
 class cty_prefix : public cty_element {
@@ -134,8 +138,10 @@ public:
 
 //! Output streaming operator "<<" for a cty_prefix.
 std::ostream& operator<<(std::ostream& os, const cty_prefix& elem);
-
+//! JSON Serialisation from cty_prefix
 void to_json(json& j, const cty_prefix& e);
+//! JSON Serialisation to cty_prefix
+void from_json(const json& j, cty_prefix& e);
 
 //! Version of cty_exception to be used for exceptions
 class cty_exception : public cty_element {
@@ -159,8 +165,10 @@ public:
 
 //! Output streaming operator "<<" for a cty_exception.
 std::ostream& operator<<(std::ostream& os, const cty_exception& rhs);
-
+//! JSON Serialisation from cty_exception
 void to_json(json& j, const cty_exception& e);
+//! JSON Serialisation to cty_exception
+void from_json(const json& j, cty_exception& e);
 
 //! Version of cty_element to be used in geographic or usage filter
 class cty_filter : public cty_element {
@@ -189,8 +197,10 @@ public:
 
 //! Output streaming operator "<<" for a cty_filter.
 std::ostream& operator <<(std::ostream& os, const cty_filter& rhs);
-
+//! JSON Serialisation from cty_filter
 void to_json(json& j, const cty_filter& e);
+//! JSON Serialisation to cty_filter
+void from_json(const json& j, cty_filter& e);
 
 //! Version of cty_element used for geographic filters.
 class cty_geography : public cty_filter {
@@ -207,5 +217,7 @@ public:
 
 //! Output streaming operator "<<" for a cty_geography.
 std::ostream& operator <<(std::ostream& os, const cty_geography& rhs);
-
+//! JSON Serialisation from cty_geography
 void to_json(json& j, const cty_geography& e);
+//! JSON Serialisation to cty_geography
+void from_json(json& j, cty_geography& e);

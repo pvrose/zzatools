@@ -9,6 +9,8 @@
 #include "spec_data.h"
 #include "status.h"
 
+#include "utils.h"
+
 #include <nlohmann/json.hpp>
 
 #include <cctype>
@@ -35,6 +37,13 @@ extern bool DEBUG_PARSE;
 
 cty_data::cty_data() {
 	data_ = new all_data;
+	if (load_json()) {
+		return;
+	}
+	load_sources();
+}
+
+void cty_data::load_sources() {
 	import_ = new all_data;
 	now_ = std::chrono::system_clock::now();
 	bool loaded;
@@ -76,9 +85,7 @@ cty_data::cty_data() {
 	else timestamps_[type_] = std::chrono::system_clock::from_time_t(-1);
 	os_.close();
 
-	// TODO temporary while testing
 	store_json();
-
 }
 
 cty_data::~cty_data() {
@@ -948,12 +955,123 @@ std::string cty_data::version(cty_type_t type) {
 // Store JSON
 void cty_data::store_json() {
 	std::string filename = default_data_directory_ + "cty.json";
+	char msg[128];
+	status_->misc_status(ST_NOTE, "CTY_DATA: Storing country data");
 	ofstream os(filename);
-	// TODO Add timestamps
+	json jall;
+	json jsources;
+	for(auto ts : timestamps_) {
+		time_t tst = std::chrono::system_clock::to_time_t(ts.second);
+		switch (ts.first) {
+		case ADIF:
+			jsources["ADIF"]["Timestamp"] = convert_iso_datetime(tst);
+			break;
+		case CLUBLOG:
+			jsources["Clublog.org"]["Timestamp"] = convert_iso_datetime(tst);
+			break;
+		case COUNTRY_FILES:
+			jsources["Countryfiles.com"]["Timestamp"] = convert_iso_datetime(tst);
+			break;
+		case DXATLAS:
+			jsources["DxAtlas"]["Timestamp"] = convert_iso_datetime(tst);
+			break;
+		}
+	}
+	for (auto vs : versions_) {
+		switch (vs.first) {
+		case ADIF:
+			jsources["ADIF"]["Version"] = vs.second;
+			break;
+		case CLUBLOG:
+			jsources["Clublog.org"]["Version"] = vs.second;
+			break;
+		case COUNTRY_FILES:
+			jsources["Countryfiles.com"]["Version"] = vs.second;
+			break;
+		case DXATLAS:
+			jsources["DxAtlas"]["Version"] = vs.second;
+			break;
+		}
+
+	}
+	time_t now = time(nullptr);
+	jsources["ZZALOG Collated"] = convert_iso_datetime(now);
+	jall["Data"] = *data_;
+	jall["Sources"] = jsources;
 	json j;
-	j["Cty"] = *data_;
+	j["Country Data"] = jall;
 	os << std::setw(2) << j;
 	os.close();
+	snprintf(msg, sizeof(msg), "CTY DATA: Finished storing %s", filename.c_str());
+}
+
+// Load JSON data
+bool cty_data::load_json() {
+	std::string filename = default_data_directory_ + "cty.json";
+	char msg[128];
+	status_->misc_status(ST_NOTE, "CTY DATA: Loading country data");
+	ifstream is(filename);
+	json jall;
+	if (is.good()) {
+		try {
+			is >> jall;
+			is.close();
+		}
+		catch (const json::exception& e) {
+			snprintf(msg, sizeof(msg), "CTY DATA: Failed to load %s: %d (%s)",
+				filename.c_str(), e.id, e.what());
+			status_->misc_status(ST_ERROR, msg);
+			is.close();
+			return false;
+		}
+		if (jall.find("Country Data") == jall.end()) {
+			snprintf(msg, sizeof(msg), "CTY DATA: File %s is not country data",
+				filename.c_str());
+			status_->misc_status(ST_ERROR, msg);
+			return false;
+		}
+		json j = jall.at("Country Data");
+		if (j.find("Sources") != j.end()) {
+			std::string sts;
+			json js = j.at("Sources");
+			if (js.find("ADIF") != js.end()) {
+				json jd = js.at("ADIF");
+				jd.at("Timestamp").get_to(sts);
+				timestamps_[ADIF] = std::chrono::system_clock::from_time_t(convert_iso_datetime(sts));
+				jd.at("Version").get_to(versions_[ADIF]);
+			}
+			if (js.find("Clublog.org") != js.end()) {
+				json jd = js.at("Clublog.org");
+				jd.at("Timestamp").get_to(sts);
+				timestamps_[CLUBLOG] = std::chrono::system_clock::from_time_t(convert_iso_datetime(sts));
+				jd.at("Version").get_to(versions_[CLUBLOG]);
+			}
+			if (js.find("Countryfiles.com") != js.end()) {
+				json jd = js.at("Countryfiles.com");
+				jd.at("Timestamp").get_to(sts);
+				timestamps_[COUNTRY_FILES] = std::chrono::system_clock::from_time_t(convert_iso_datetime(sts));
+				jd.at("Version").get_to(versions_[COUNTRY_FILES]);
+			}
+			if (js.find("DxAtlas") != js.end()) {
+				json jd = js.at("DxAtlas");
+				jd.at("Timestamp").get_to(sts);
+				timestamps_[DXATLAS] = std::chrono::system_clock::from_time_t(convert_iso_datetime(sts));
+				jd.at("Version").get_to(versions_[DXATLAS]);
+			}
+		}
+		if (j.find("Data") != j.end()) {
+			data_ = new all_data;
+			j.at("Data").get_to(*data_);
+		}
+	}
+	else {
+		snprintf(msg, sizeof(msg), "CTY DATA: FAiled to open %s", filename.c_str());
+		status_->misc_status(ST_ERROR, msg);
+		return false;
+	}
+	snprintf(msg, sizeof(msg), "CTY DATA: File %s loaded OK", filename.c_str());
+	status_->misc_status(ST_OK, msg);
+	return true;
 }
 
 // JSON serialisation of cty_data::all_data
@@ -981,4 +1099,35 @@ void to_json(json& j, const cty_data::all_data& d) {
 		jex[e.first] = je;
 	}
 	j["Exceptions"] = jex;
+}
+
+// JSON Serialisation to cty_data::all_data
+void from_json(const json& j, cty_data::all_data& d) {
+	if (j.find("Entities") != j.end()) {
+		for (auto e : j.at("Entities")) {
+			cty_entity* ent = new cty_entity;
+			e.get_to(*ent);
+			d.entities[ent->dxcc_id_] = ent;
+		}
+	}
+	if (j.find("Prefixes") != j.end()) {
+		auto jpfxs = j.at("Prefixes").get<std::map<std::string, json>>();
+		for (auto p : jpfxs) {
+			for (auto jpx : p.second) {
+				cty_prefix* pfx = new cty_prefix;
+				jpx.get_to(*pfx);
+				d.prefixes[p.first].push_back(pfx);
+			}
+		}
+	}
+	if (j.find("Exceptions") != j.end()) {
+		auto jpfxs = j.at("Exceptions").get<std::map<std::string, json>>();
+		for (auto p : jpfxs) {
+			for (auto jpx : p.second) {
+				cty_exception* pfx = new cty_exception;
+				jpx.get_to(*pfx);
+				d.exceptions[p.first].push_back(pfx);
+			}
+		}
+	}
 }

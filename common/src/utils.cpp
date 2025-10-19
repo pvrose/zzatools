@@ -1142,3 +1142,15 @@ std::time_t convert_iso_datetime(std::string value) {
 	}
 	return result;
 }
+
+std::string convert_iso_datetime(std::time_t t) {
+	tm tm_struct;
+#ifdef _WIN32
+	gmtime_s(&tm_struct, &t);
+#else
+	gmtime_r(&t, &tm_struct);
+#endif
+	char temp[32];
+	strftime(temp, sizeof(temp), "%Y-%m-%dT%H:%M:%SZ", &tm_struct);
+	return std::string(temp);
+}
