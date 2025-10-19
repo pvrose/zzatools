@@ -60,7 +60,7 @@ public:
 	};
 
 	//! Constructor.
-	cty_data();
+	cty_data(bool reload = false);
 	//! Destructor.
 	virtual ~cty_data();
 
@@ -179,8 +179,11 @@ protected:
 	//! \param filename Filename.
 	//! \param old_age Age in days the filename is considered valid. A warning is raised if the file is older.
 	//! \return the system timestamp of the file.
-	std::chrono::system_clock::time_point get_timestamp(std::string filename, int old_age);
+	std::chrono::system_clock::time_point get_timestamp(std::string filename);
 
+	//! Check the time stamp
+	void check_timestamp(cty_type_t type, int days);
+	
 	//! The result of a parse request.
 	struct {
 		//! The entity definition

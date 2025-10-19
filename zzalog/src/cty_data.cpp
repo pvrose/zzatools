@@ -35,9 +35,16 @@ extern std::string default_ref_directory_;
 extern std::string default_data_directory_;
 extern bool DEBUG_PARSE;
 
-cty_data::cty_data() {
+std::map < cty_data::cty_type_t, std::string> TYPE_MAP = {
+	{ cty_data::ADIF, "ADIF" },
+	{ cty_data::CLUBLOG, "Clublog.org" },
+	{ cty_data::COUNTRY_FILES, "Countryfiles.com" },
+	{ cty_data::DXATLAS, "DxAtlas" }
+};
+
+cty_data::cty_data(bool reload) {
 	data_ = new all_data;
-	if (load_json()) {
+	if (!reload && load_json()) {
 		return;
 	}
 	load_sources();
@@ -52,10 +59,11 @@ void cty_data::load_sources() {
 	os_ << "Loading from ADIF\n";
 	// Load all the daat
 	type_ = ADIF;
-	load_data("");
+	load_data("ADIF");
 	merge_data();
 	dump_database();
 	delete_data(import_);
+	timestamps_[type_] = spec_data_->adif_timestamp();
 	os_ << "Loading from Clublog.org\n";
 	type_ = CLUBLOG;
 	std::string filename = get_filename();
@@ -63,8 +71,9 @@ void cty_data::load_sources() {
 	merge_data();
 	dump_database();
 	delete_data(import_);
-	if (loaded) timestamps_[type_] = get_timestamp(filename, 7);
+	if (loaded) timestamps_[type_] = get_timestamp(filename);
 	else timestamps_[type_] = std::chrono::system_clock::from_time_t(-1);
+	check_timestamp(type_, 7);
 	os_ << "Loading from Country-files.com\n";
 	type_ = COUNTRY_FILES;
 	filename = get_filename();
@@ -72,8 +81,9 @@ void cty_data::load_sources() {
 	merge_data();
 	dump_database();
 	delete_data(import_);
-	if (loaded) timestamps_[type_] = get_timestamp(filename, 7);
+	if (loaded) timestamps_[type_] = get_timestamp(filename);
 	else timestamps_[type_] = std::chrono::system_clock::from_time_t(-1);
+	check_timestamp(type_, 7);
 	os_ << "Loading from DxAtlas\n";
 	type_ = DXATLAS;
 	filename = get_filename();
@@ -81,8 +91,9 @@ void cty_data::load_sources() {
 	merge_data();
 	dump_database();
 	delete_data(import_);
-	if (loaded) timestamps_[type_] = get_timestamp(filename, 365);
+	if (loaded) timestamps_[type_] = get_timestamp(filename);
 	else timestamps_[type_] = std::chrono::system_clock::from_time_t(-1);
+	check_timestamp(type_, 365);
 	os_.close();
 
 	store_json();
@@ -335,17 +346,19 @@ std::string cty_data::nickname(int adif_id) {
 
 // Load the data 
 bool cty_data::load_data(std::string filename) {
-	if (type_ == ADIF) {
-		load_adif_data();
-		return true;
-	}
+	std::string version;
 	// else
 	char msg[128];
-	ifstream in(filename.c_str(), std::ios_base::in);
-	std::string version;
 	bool ok;
 	switch (type_) {
+	case ADIF: {
+		load_adif_data();
+		version = spec_data_->adif_version();
+		ok = true;
+		break;
+	}
 	case CLUBLOG: {
+		ifstream in(filename.c_str(), std::ios_base::in);
 		cty1_reader* reader = new cty1_reader;
 		import_ = new all_data;
 		status_->misc_status(ST_NOTE, "CTY DATA: Loading data supplied by clublog.org");
@@ -353,6 +366,7 @@ bool cty_data::load_data(std::string filename) {
 		break;
 	}
 	case COUNTRY_FILES: {
+		ifstream in(filename.c_str(), std::ios_base::in);
 		cty2_reader* reader = new cty2_reader;
 		import_ = new all_data;
 		status_->misc_status(ST_NOTE, "CTY DATA: Loading data supplied by www.country-files.com");
@@ -364,6 +378,7 @@ bool cty_data::load_data(std::string filename) {
 		break;
 	}
 	case DXATLAS: {
+		ifstream in(filename.c_str(), std::ios_base::in);
 		cty3_reader* reader = new cty3_reader;
 		import_ = new all_data;
 		status_->misc_status(ST_NOTE, "CTY DATA: Loading data supplied by dxatlas.com");
@@ -890,7 +905,7 @@ void cty_data::merge_data() {
 	}
 }
 
-std::chrono::system_clock::time_point cty_data::get_timestamp(std::string filename, int old_age) {
+std::chrono::system_clock::time_point cty_data::get_timestamp(std::string filename) {
 #ifdef _WIN32
 	int fd = _sopen(filename.c_str(), _O_RDONLY, _SH_DENYNO);
 #else
@@ -911,12 +926,16 @@ std::chrono::system_clock::time_point cty_data::get_timestamp(std::string filena
 	close(fd);
 #endif
 	std::chrono::system_clock::time_point ts = std::chrono::system_clock::from_time_t(status.st_mtime);
-	if ((now_ - ts) > std::chrono::hours(old_age * 24)) {
+	return ts;
+}
+
+void cty_data::check_timestamp(cty_type_t t, int days) {
+	if ((now_ - timestamps_[t]) > std::chrono::hours(days * 24)) {
 		char msg[128];
-		snprintf(msg, sizeof(msg), "CTY DATA: Data file %s is > %d days old", filename.c_str(), old_age);
+		snprintf(msg, sizeof(msg), "CTY DATA: Data from  %s is > %d days old", TYPE_MAP[t].c_str(), days);
 		status_->misc_status(ST_WARNING, msg);
 	}
-	return ts;
+
 }
 
 // Return the recorded timestamp
@@ -957,6 +976,7 @@ void cty_data::store_json() {
 	std::string filename = default_data_directory_ + "cty.json";
 	char msg[128];
 	status_->misc_status(ST_NOTE, "CTY_DATA: Storing country data");
+	status_->progress(2, OT_PREFIX, "Storing country data", "Steps");
 	ofstream os(filename);
 	json jall;
 	json jsources;
@@ -1000,8 +1020,10 @@ void cty_data::store_json() {
 	jall["Sources"] = jsources;
 	json j;
 	j["Country Data"] = jall;
+	status_->progress(1, OT_PREFIX);
 	os << std::setw(2) << j;
 	os.close();
+	status_->progress(2, OT_PREFIX);
 	snprintf(msg, sizeof(msg), "CTY DATA: Finished storing %s", filename.c_str());
 }
 
@@ -1010,20 +1032,24 @@ bool cty_data::load_json() {
 	std::string filename = default_data_directory_ + "cty.json";
 	char msg[128];
 	status_->misc_status(ST_NOTE, "CTY DATA: Loading country data");
+	status_->progress(2, OT_PREFIX, "Loading country data", "Steps");
 	ifstream is(filename);
 	json jall;
 	if (is.good()) {
 		try {
 			is >> jall;
 			is.close();
+			status_->progress(2, OT_PREFIX);
 		}
 		catch (const json::exception& e) {
 			snprintf(msg, sizeof(msg), "CTY DATA: Failed to load %s: %d (%s)",
 				filename.c_str(), e.id, e.what());
 			status_->misc_status(ST_ERROR, msg);
+			status_->progress("Read failed", OT_PREFIX);
 			is.close();
 			return false;
 		}
+		status_->progress(2, OT_PREFIX);
 		if (jall.find("Country Data") == jall.end()) {
 			snprintf(msg, sizeof(msg), "CTY DATA: File %s is not country data",
 				filename.c_str());
@@ -1065,12 +1091,19 @@ bool cty_data::load_json() {
 		}
 	}
 	else {
-		snprintf(msg, sizeof(msg), "CTY DATA: FAiled to open %s", filename.c_str());
+		snprintf(msg, sizeof(msg), "CTY DATA: Failed to open %s", filename.c_str());
 		status_->misc_status(ST_ERROR, msg);
+		status_->progress("Read failed", OT_PREFIX);
 		return false;
 	}
 	snprintf(msg, sizeof(msg), "CTY DATA: File %s loaded OK", filename.c_str());
 	status_->misc_status(ST_OK, msg);
+	now_ = std::chrono::system_clock::now();
+	check_timestamp(ADIF, 365);
+	check_timestamp(CLUBLOG, 7);
+	check_timestamp(COUNTRY_FILES, 7);
+	check_timestamp(DXATLAS, 365);
+	status_->progress(2, OT_PREFIX);
 	return true;
 }
 

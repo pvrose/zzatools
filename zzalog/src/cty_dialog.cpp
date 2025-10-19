@@ -188,7 +188,7 @@ void cty_dialog::cb_update(Fl_Widget* w, void* v) {
 // Reload cty_data
 void cty_dialog::cb_reload(Fl_Widget* w, void* v) {
 	delete cty_data_;
-	cty_data_ = new cty_data;
+	cty_data_ = new cty_data(true);
 }
 
 // Close the dialog

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <vector>
 #include <string>
 #include <map>
@@ -82,6 +83,8 @@ typedef size_t qso_num_t;
 		spec_dataset* dataset(std::string name);
 		//! Returns the ADIF version coded in the file.
 		std::string adif_version();
+		//! Returns ADIF timestamp
+		std::chrono::system_clock::time_point adif_timestamp();
 		//! Returns sorted std::list of field names
 		std::set<std::string>* sorted_fieldnames();
 		//! Add user defined fields 
@@ -198,6 +201,8 @@ typedef size_t qso_num_t;
 	protected:
 		//! ADIF Version
 		std::string adif_version_;
+		//! Timestamp in ADIF File
+		std::chrono::system_clock::time_point adif_timestamp_;
 		//! List of Fieldnames
 		std::set<std::string> field_names_;
 		//! Array of user defs

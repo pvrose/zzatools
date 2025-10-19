@@ -7,6 +7,8 @@
 - Move qso_apps configuration data to separate JSON file.
 - Cosmetic changes.
 - Performance improvements.
+  - Reduce look-ups while loading ADIF file.
+  - Save country data as single file between updates.
 - Bug fixes:
   - Wrong include file.
 

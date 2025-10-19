@@ -17,7 +17,7 @@
 #include "nlohmann/json.hpp"
 
 #include <fstream>
-#include<ostream>
+#include <ostream>
 #include <sstream>
 #include <regex>
 #include <chrono>
@@ -143,6 +143,9 @@ bool spec_data::load_json() {
 			is >> jall;
 			json j = jall.at("Adif");
 			j.at("Version").get_to(adif_version_);
+			std::string temp;
+			j.at("Date").get_to(temp);
+			adif_timestamp_ = std::chrono::system_clock::from_time_t(convert_iso_datetime(temp));
 			// Ignore Status, Date, Created
 			spec_dataset* ds;
 			auto enums = j.at("Enumerations").get<std::map<std::string, json>>();
@@ -375,6 +378,11 @@ spec_dataset* spec_data::dataset(std::string name) {
 // Get Adif version
 std::string spec_data::adif_version() {
 	return adif_version_;
+}
+
+// Get ADIF Timestamp
+std::chrono::system_clock::time_point spec_data::adif_timestamp() {
+	return adif_timestamp_;
 }
 
 // Get sorted std::list of field names
