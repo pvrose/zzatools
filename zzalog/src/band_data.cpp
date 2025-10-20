@@ -109,13 +109,13 @@ bool band_data::load_json() {
 				band_entry_t* e = new band_entry_t(jt.template get<band_entry_t>());
 				entries_.insert(e);
 			}
-			std::snprintf(msg, sizeof(msg), "BAND: File %s loaded OK", filename.c_str());
+			snprintf(msg, sizeof(msg), "BAND: File %s loaded OK", filename.c_str());
 			status_->misc_status(ST_OK, msg);
 			return true;
 		}
 		catch (const json::exception& e) {
 			char msg[128];
-			std::snprintf(msg, sizeof(msg), "BAND: Failed to load %s: %d (%s)\n",
+			snprintf(msg, sizeof(msg), "BAND: Failed to load %s: %d (%s)\n",
 				filename.c_str(), e.id, e.what());
 			status_->misc_status(ST_ERROR, msg);
 			return false;

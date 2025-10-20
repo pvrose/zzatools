@@ -183,7 +183,7 @@ bool spec_data::load_json() {
 			return true;
 		}
 		catch (const json::exception& e) {
-			std::snprintf(msg, sizeof(msg), "ADIF SPEC: Reading JSON failed %d (%s)\n",
+			snprintf(msg, sizeof(msg), "ADIF SPEC: Reading JSON failed %d (%s)\n",
 				e.id, e.what());
 			status_->misc_status(ST_ERROR, msg);
 			is.close();
@@ -191,7 +191,7 @@ bool spec_data::load_json() {
 		}
 	}
 	else {
-		std::snprintf(msg, sizeof(msg), "ADIF SPEC: Failed to open %s", filename.c_str());
+		snprintf(msg, sizeof(msg), "ADIF SPEC: Failed to open %s", filename.c_str());
 		status_->misc_status(ST_FATAL, msg);
 		return false;
 	}

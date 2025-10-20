@@ -438,12 +438,12 @@ bool qsl_dataset::load_json() {
 					server_data_[it.first] = sd;
 				}
 			}
-			std::snprintf(msg, sizeof(msg), "QSL: File %s loaded OK", filename.c_str());
+			snprintf(msg, sizeof(msg), "QSL: File %s loaded OK", filename.c_str());
 			status_->misc_status(ST_OK, msg);
 			return true;
 		}
 		catch (const json::exception& e) {
-			std::snprintf(msg, sizeof(msg), "QSL: Reading JSON failed %d (%s)\n",
+			snprintf(msg, sizeof(msg), "QSL: Reading JSON failed %d (%s)\n",
 				e.id, e.what());
 			status_->misc_status(ST_ERROR, msg);
 			is.close();
@@ -495,7 +495,7 @@ void qsl_dataset::save_json() {
 			status_->misc_status(ST_ERROR, "QSL: Failed to save data");
 		}
 		else {
-			std::snprintf(msg, sizeof(msg), "QSL: File %s saved OK", filename.c_str());
+			snprintf(msg, sizeof(msg), "QSL: File %s saved OK", filename.c_str());
 			status_->misc_status(ST_OK, msg);
 		}
 		os.close();

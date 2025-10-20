@@ -152,7 +152,7 @@ bool qrz_handler::decode_response(std::istream& response) {
 			decode_callsign(n_child);
 		}
 		else {
-			std::snprintf(msg, sizeof(msg), "QRZ: Response item %s ignored",
+			snprintf(msg, sizeof(msg), "QRZ: Response item %s ignored",
 				n_child.name());
 			status_->misc_status(ST_NOTE, msg);
 		}
@@ -230,13 +230,13 @@ bool qrz_handler::decode_session(pugi::xml_node node) {
 		}
 		// Error detected - stop decoding
 		if (strcmp(datum.name(), "Error") == 0) {
-			std::snprintf(msg, sizeof(msg), "QRZ: Error: %s", datum.text().as_string());
+			snprintf(msg, sizeof(msg), "QRZ: Error: %s", datum.text().as_string());
 			status_->misc_status(ST_ERROR, msg);
 			return false;
 		}
 		// Warning message received
 		else if (strcmp(datum.name(), "Message") ==0) {
-			std::snprintf(msg, sizeof(msg), "QRZ: Warning: %s", datum.text().as_string());
+			snprintf(msg, sizeof(msg), "QRZ: Warning: %s", datum.text().as_string());
 			status_->misc_status(ST_WARNING, msg);
 		}
 		// Check subscription status
@@ -246,7 +246,7 @@ bool qrz_handler::decode_session(pugi::xml_node node) {
 				non_subscriber_ = true;
 			}
 			else {
-				std::snprintf(msg, sizeof(msg), "QRZ: QRZ Subscription expires %s",
+				snprintf(msg, sizeof(msg), "QRZ: QRZ Subscription expires %s",
 					datum.text().as_string());
 				status_->misc_status(ST_NOTE, msg);
 				non_subscriber_ = false;

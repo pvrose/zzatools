@@ -143,12 +143,12 @@ std::istream& adi_reader::load_record(record* in_record, std::istream& in, load_
 					if (count > 0 && in.good()) {
 						// Start assuming it's a valid field
 						enum valid_code {
-							NO_ERROR,
-							IGNORED_APP,
-							INVALID_USERDEF,
-							INVALID_TYPE,
-							DUPLICATE
-						} validity = NO_ERROR;
+							VC_NO_ERROR,
+							VC_IGNORED_APP,
+							VC_INVALID_USERDEF,
+							VC_INVALID_TYPE,
+							VC_DUPLICATE
+						} validity = VC_NO_ERROR;
 						// Add User defined fields to the reference data base if found in a header
 						// <USERDEFn:sz:ty>name[,{std::list or range}]
 						if (in_record->is_header() && field.length() > 7 && field.substr(0, 7) == "USERDEF") {
@@ -160,7 +160,7 @@ std::istream& adi_reader::load_record(record* in_record, std::istream& in, load_
 							}
 							int id_userdef = std::stoi(field.substr(7));
 							if (!spec_data_->add_userdef(id_userdef, value, type_indicator, list_range)) {
-								validity = INVALID_USERDEF;
+								validity = VC_INVALID_USERDEF;
 							}
 						}
 						// Add application defined field to the reference data base 
@@ -178,22 +178,22 @@ std::istream& adi_reader::load_record(record* in_record, std::istream& in, load_
 									// Also don't ignore APP_QRZLOG_LOGID as we need these to progress
 									// QRZ.com downloads - ignore them in import_data::convert_update
 								} else if (field.substr(0,11) != "APP_QRZLOG_") {
-									validity = IGNORED_APP;
+									validity = VC_IGNORED_APP;
 								}
 							}
 						}
 						// If the data type is not valid then the field isn't
-						if (validity == NO_ERROR && spec_data_->datatype(field).length() == 0) {
-							validity = INVALID_TYPE;
+						if (validity == VC_NO_ERROR && spec_data_->datatype(field).length() == 0) {
+							validity = VC_INVALID_TYPE;
 						}
 						// Multiple instances of field
-						if (validity == NO_ERROR && in_record->item(field) != "" &&
+						if (validity == VC_NO_ERROR && in_record->item(field) != "" &&
 							in_record->item(field) != value) {
-							validity = DUPLICATE;
+							validity = VC_DUPLICATE;
 							old_value = in_record->item(field);
 						}
 						// If the user or app. defined field is valid or it's an ADIF defined field
-						if (validity == NO_ERROR || validity == DUPLICATE) {
+						if (validity == VC_NO_ERROR || validity == VC_DUPLICATE) {
 							// Get the expected datatype
 							char data_type_indicator = spec_data_->datatype_indicator(field);
 							// All enumerated values are treated as upper-case (except band)
@@ -212,7 +212,7 @@ std::istream& adi_reader::load_record(record* in_record, std::istream& in, load_
 						// Report if an error case has been seen
 						char message[200];
 						switch (validity) {
-						case IGNORED_APP:
+						case VC_IGNORED_APP:
 							if (known_app_fields.find(bad_field) == known_app_fields.end()) {
 								sprintf(message, "LOG: %s %s %s - field ignored %s",
 									in_record->item("QSO_DATE").c_str(),
@@ -223,8 +223,8 @@ std::istream& adi_reader::load_record(record* in_record, std::istream& in, load_
 								known_app_fields.insert(bad_field);
 							}
 							break;
-						case INVALID_TYPE:
-						case INVALID_USERDEF:
+						case VC_INVALID_TYPE:
+						case VC_INVALID_USERDEF:
 							sprintf(message, "LOG: %s %s %s - invalid field %s",
 								in_record->item("QSO_DATE").c_str(),
 								in_record->item("TIME_ON").c_str(),
@@ -232,8 +232,8 @@ std::istream& adi_reader::load_record(record* in_record, std::istream& in, load_
 								bad_field.c_str());
 							status_->misc_status(ST_ERROR, message);
 							break;
-						case DUPLICATE:
-							sprintf(message, "LOG: %s %s %s - duplicate field %s: was %s is %s",
+						case VC_DUPLICATE:
+							sprintf(message, "LOG: %s %s %s - VC_DUPLICATE field %s: was %s is %s",
 								in_record->item("QSO_DATE").c_str(),
 								in_record->item("TIME_ON").c_str(),
 								in_record->item("CALL").c_str(),

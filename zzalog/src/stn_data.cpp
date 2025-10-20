@@ -193,13 +193,13 @@ bool stn_data::load_json() {
 		}
 	}
 	catch (const json::exception& e) {
-		std::snprintf(msg, sizeof(msg), "STN DATA: Failed to load %s: %d (%s)\n",
+		snprintf(msg, sizeof(msg), "STN DATA: Failed to load %s: %d (%s)\n",
 			filename.c_str(), e.id, e.what());
 		status_->misc_status(ST_ERROR, msg);
 		is.close();
 		return false;
 	}
-	std::snprintf(msg, sizeof(msg), "STN DATA: File %s Loaded OK", filename.c_str());
+	snprintf(msg, sizeof(msg), "STN DATA: File %s Loaded OK", filename.c_str());
 	status_->misc_status(ST_OK, msg);
 	return true;
 }

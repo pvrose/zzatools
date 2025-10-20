@@ -246,7 +246,7 @@ bool rig_data::load_json() {
         }
     }
     catch (const json::exception& e) {
-        std::snprintf(msg, sizeof(msg), "RIG DATA: Failed to load %s: %d (%s)\n",
+        snprintf(msg, sizeof(msg), "RIG DATA: Failed to load %s: %d (%s)\n",
             filename.c_str(), e.id, e.what());
         status_->misc_status(ST_ERROR, msg);
         is.close();

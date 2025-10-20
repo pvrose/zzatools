@@ -153,7 +153,7 @@ bool contest_data::load_json(std::ifstream& is) {
 	}
 	catch (const json::exception& e) {
 		char msg[128];
-		std::snprintf(msg, sizeof(msg), "CONTEST: Reading JSON failed %d (%s)\n",
+		snprintf(msg, sizeof(msg), "CONTEST: Reading JSON failed %d (%s)\n",
 			e.id, e.what());
 		status_->misc_status(ST_ERROR, msg);
 		return false;

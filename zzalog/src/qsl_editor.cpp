@@ -121,7 +121,7 @@ void qsl_editor::create_form(int X, int Y) {
 	
     int curr_x = X + GAP;
     int curr_y = Y + GAP;
-    int max_x;
+    int max_x = 0;
 
 	// Group 1: Template file
     g_1_ = new Fl_Group(curr_x, curr_y, 100, 100, "Template File");

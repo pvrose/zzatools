@@ -148,12 +148,12 @@ bool fields::load_collections() {
                 coll_map_[ita.first] = coll;
             }
         }
-        std::snprintf(msg, sizeof(msg), "FIELDS: File %s loaded OK", filename_.c_str());
+        snprintf(msg, sizeof(msg), "FIELDS: File %s loaded OK", filename_.c_str());
         status_->misc_status(ST_OK, msg);
     }
     catch (const json::exception& e) {
         char msg[128];
-        std::snprintf(msg, sizeof(msg), "FIELDS: Failed to load %s: %d (%s)\n",
+        snprintf(msg, sizeof(msg), "FIELDS: Failed to load %s: %d (%s)\n",
             filename_.c_str(), e.id, e.what());
         status_->misc_status(ST_ERROR, msg);
         ip.close();

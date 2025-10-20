@@ -565,7 +565,7 @@ void qso_apps::load_values() {
             }
         }
         catch (const json::exception& e) {
-            std::snprintf(msg, sizeof(msg), "APPS: Reading JSON failed %d (%s)\n",
+            snprintf(msg, sizeof(msg), "APPS: Reading JSON failed %d (%s)\n",
                 e.id, e.what());
             status_->misc_status(ST_ERROR, msg);
             i.close();

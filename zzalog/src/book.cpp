@@ -154,7 +154,7 @@ bool book::load_data(std::string filename)
 					}
 					else {
 						char msg[128];
-						std::snprintf(msg, sizeof(msg), "LOG: File %s loaded OK", filename.c_str());
+						snprintf(msg, sizeof(msg), "LOG: File %s loaded OK", filename.c_str());
 						status_->misc_status(ST_OK, msg);
 						if (book_type_ == OT_MAIN) {
 							main_loading_ = false;

@@ -32,7 +32,7 @@ bool adx_handler::load_book(book* my_book, std::istream& in) {
 	pugi::xml_parse_result result = doc.load(in, pugi::parse_default | pugi::parse_declaration);
 	if (result.status != pugi::status_ok) {
 		// Parsing the XML failed for some reason
-		std::snprintf(msg, sizeof(msg), "LOG: Loading ADX failed: %s", 
+		snprintf(msg, sizeof(msg), "LOG: Loading ADX failed: %s", 
 			result.description());
 		status_->misc_status(ST_ERROR, msg);
 		loading_ = false;
@@ -120,7 +120,7 @@ bool adx_handler::store_book(book* my_book, std::ostream& os, bool clean) {
 	for (auto qso : *my_book) {
 		xml_node n_qso = n_records.append_child("RECORD");
 		if (!store_record(qso, n_qso)) {
-			std::snprintf(msg, sizeof(msg),
+			snprintf(msg, sizeof(msg),
 				"LOG: Storing ADX failed: Error in record %s %s %s",
 				qso->item("QSO_DATE").c_str(),
 				qso->item("TIME_ON").c_str(),
@@ -152,7 +152,7 @@ bool adx_handler::load_record(record* rec, xml_node& node) {
 		std::string value = n_field.text().as_string();
 		if (name == "USERDEF") {
 			// Ignore USERDEF: both header and record
-			std::snprintf(msg, sizeof(msg), "LOG: USERDEF %s ignored",
+			snprintf(msg, sizeof(msg), "LOG: USERDEF %s ignored",
 				name.c_str());
 			status_->misc_status(ST_WARNING, msg);
 		}
