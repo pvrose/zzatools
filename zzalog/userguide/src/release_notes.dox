@@ -5,12 +5,14 @@
 - Redesigned station dialog and initialisation of station data.
 - Add ability to edit band plan data.
 - Move qso_apps configuration data to separate JSON file.
+- Reinstate club operator log-in.
 - Cosmetic changes.
 - Performance improvements.
   - Reduce look-ups while loading ADIF file.
   - Save country data as single file between updates.
 - Bug fixes:
   - Wrong include file.
+  - Reflect changes in station dialog to station fields in dashboard.
 
 \section rev_368A Revision 3.6.8A
 
