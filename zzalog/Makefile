@@ -168,7 +168,7 @@ $(DOCUMENTS_DIR)/userguide/html/index.html : $(UG_DIR)/html/index.html ./Doxyfil
 	@cp $(UG_DIR)/images/* $(DOCUMENTS_DIR)/userguide/images/
 
 # Copy Code documenation
-$(DOCUMENTS_DIR)/docs/html/index.html : $(UG_DIR)/html/index.html ./Doxyfile
+$(DOCUMENTS_DIR)/docs/html/index.html : $(CDX_DIR)/html/index.html ./Doxyfile
 	@echo Copying Code Documentation HTML files
 	@mkdir -p $(DOCUMENTS_DIR)/docs/html
 	@cp -r $(CDX_DIR)/html/* $(DOCUMENTS_DIR)/docs/html/
