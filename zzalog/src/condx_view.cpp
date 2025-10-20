@@ -1,5 +1,6 @@
 #include "condx_view.h"
 
+#include "main.h"
 #include "qso_manager.h"
 #include "qso_wx.h"
 #include "settings.h"
@@ -22,20 +23,11 @@
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Tabs.H>
 
-extern bool DARK;
-extern qso_manager* qso_manager_;
-extern status* status_;
-extern std::string default_data_directory_;
-extern ticker* ticker_;
-extern url_handler* url_handler_;
-extern void open_html(const char*);
-
 Fl_Color COLOUR_BAD = FL_RED;         //!< Use for bad stuff
 Fl_Color COLOUR_FAIR = FL_FOREGROUND_COLOR;
 //!< Use for fair stuff
 Fl_Color COLOUR_GOOD = FL_DARK_GREEN;      //!< Use for good stuff
 Fl_Color COLOYR_NOTE = FL_BLUE;       //!< Use for extra annotation
-
 
 //! Constructor
 

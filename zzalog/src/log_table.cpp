@@ -8,6 +8,7 @@
 #include "fields.h"
 #include "intl_dialog.h"
 #include "intl_widgets.h"
+#include "main.h"
 #include "main_window.h"
 #include "menu.h"
 #include "qso_manager.h"
@@ -24,23 +25,6 @@
 #include <FL/Enumerations.H>
 #include <FL/Fl_Help_Dialog.H>
 #include <FL/fl_ask.H>
-
-extern book* book_;
-extern cty_data* cty_data_;
-extern fields* fields_;
-extern intl_dialog* intl_dialog_;
-extern main_window* main_window_;
-extern menu* menu_;
-extern qso_manager* qso_manager_;
-extern spec_data* spec_data_;
-extern status* status_;
-extern time_t session_start_;
-extern toolbar* toolbar_;
-
-extern bool in_current_session(record*);
-extern bool DARK;
-extern void open_html(const char*);
-
 
 Fl_Font log_table::font_;
 Fl_Fontsize log_table::fontsize_;

@@ -5,6 +5,7 @@
 #include "cty1_reader.h"
 #include "cty2_reader.h"
 #include "cty3_reader.h"
+#include "main.h"
 #include "record.h"
 #include "spec_data.h"
 #include "status.h"
@@ -27,13 +28,6 @@
 #include <fcntl.h>
 
 using json = nlohmann::json;
-
-extern club_handler* club_handler_;
-extern spec_data* spec_data_;
-extern status* status_;
-extern std::string default_ref_directory_;
-extern std::string default_data_directory_;
-extern bool DEBUG_PARSE;
 
 std::map < cty_data::cty_type_t, std::string> TYPE_MAP = {
 	{ cty_data::ADIF, "ADIF" },

@@ -1,13 +1,11 @@
 #include "dxcc_table.h"
 
 #include "book.h"
+#include "main.h"
 #include "record.h"
 #include "spec_data.h"
 
 #include "drawing.h"
-
-extern book* book_;
-extern spec_data* spec_data_;
 
 dxcc_table::dxcc_table(int X, int Y, int W, int H, const char* L) :
     Fl_Table(X, Y, W, H, L)

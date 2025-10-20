@@ -1,25 +1,22 @@
 #include "printer.h"
-#include "log_table.h"
-#include "tabbed_forms.h"
-#include "status.h"
-#include "qsl_display.h"
-#include "qsl_dataset.h"
-#include "drawing.h"
-#include "qso_manager.h"
+
 #include "book.h"
+#include "log_table.h"
+#include "main.h"
+#include "qsl_dataset.h"
+#include "qsl_display.h"
+#include "qso_manager.h"
 #include "record.h"
+#include "status.h"
+#include "tabbed_forms.h"
+
+#include "drawing.h"
 
 #include <climits>
 
 #include <FL/fl_ask.H>
 #include <FL/fl_draw.H>
 #include <FL/Fl_Button.H>
-
-extern tabbed_forms* tabbed_forms_;
-extern status* status_;
-extern book* navigation_book_;
-extern qso_manager* qso_manager_;
-extern qsl_dataset* qsl_dataset_;
 
 const int LINE_MARGIN = 1;
 const int LINE_WIDTH = 1;

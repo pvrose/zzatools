@@ -1,9 +1,7 @@
-#include "intl_dialog.h"
 #include "intl_widgets.h"
 
-
-
-extern intl_dialog* intl_dialog_;
+#include "intl_dialog.h"
+#include "main.h"
 
 // Constructor
 intl_editor::intl_editor(int X, int Y, int W, int H, const char* label) :

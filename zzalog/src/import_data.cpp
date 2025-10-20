@@ -1,17 +1,20 @@
 #include "import_data.h"
+
+#include "adi_reader.h"
+#include "club_handler.h"
 #include "cty_data.h"
-#include "spec_data.h"
-#include "tabbed_forms.h"
-#include "status.h"
 #include "eqsl_handler.h"
 #include "lotw_handler.h"
-#include "club_handler.h"
-#include "qrz_handler.h"
-#include "utils.h"
+#include "main.h"
 #include "menu.h"
+#include "qrz_handler.h"
 #include "qso_manager.h"
-#include "adi_reader.h"
 #include "record.h"
+#include "spec_data.h"
+#include "status.h"
+#include "tabbed_forms.h"
+
+#include "utils.h"
 
 #include <sstream>
 #include <ctime>
@@ -28,18 +31,6 @@
 
 #include <FL/Fl.H>
 #include <FL/fl_ask.H>
-
-extern status* status_;
-extern book* book_;
-extern cty_data* cty_data_;
-extern spec_data* spec_data_;
-extern tabbed_forms* tabbed_forms_;
-extern eqsl_handler* eqsl_handler_;
-extern lotw_handler* lotw_handler_;
-extern club_handler* club_handler_;
-extern qrz_handler* qrz_handler_;
-extern menu* menu_;
-extern qso_manager* qso_manager_;
 
 // Constructor - this book is used to contain data being imported. It adds functionality to support this
 import_data::import_data() :

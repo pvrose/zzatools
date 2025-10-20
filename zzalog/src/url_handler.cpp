@@ -1,12 +1,10 @@
 #include "url_handler.h"
 
+#include "main.h"
+
 #include "utils.h"
 
 #include <FL/fl_ask.H>
-
-extern bool DEBUG_CURL;
-extern std::string PROGRAM_ID;
-extern std::string PROGRAM_VERSION;
 
 std::string USER_AGENT = PROGRAM_ID + '/' + PROGRAM_VERSION;
 

@@ -5,6 +5,7 @@
 #include "contest_data.h"
 #include "cty_data.h"
 #include "extract_data.h"
+#include "main.h"
 #include "qso_data.h"
 #include "qso_manager.h"
 #include "record.h"
@@ -21,13 +22,6 @@
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Int_Input.H>
 #include <FL/Fl_Output.H>
-
-extern book* book_;
-extern contest_data* contest_data_;
-extern cty_data* cty_data_;
-extern stn_data* stn_data_;
-extern std::map<std::string, contest_algorithm*>* algorithms_;
-extern void open_html(const char*);
 
 contest_scorer::contest_scorer(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)

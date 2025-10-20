@@ -1,6 +1,7 @@
 #include "adx_handler.h"
 
 #include "book.h"
+#include "main.h"
 #include "record.h"
 #include "status.h"
 
@@ -10,8 +11,6 @@
 using xml_document = pugi::xml_document;
 using xml_node = pugi::xml_node;
 using xml_attribute = pugi::xml_attribute;
-
-extern status* status_;
 
 	//! Constructor
 adx_handler::adx_handler() {

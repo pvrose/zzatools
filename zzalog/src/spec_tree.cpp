@@ -2,6 +2,7 @@
 
 #include "band.h"
 #include "book.h"
+#include "main.h"
 #include "settings.h"
 #include "spec_data.h"
 #include "status.h"
@@ -16,16 +17,6 @@
 
 #include <FL/fl_draw.H>
 #include <FL/Fl_Help_Dialog.H>
-
-
-extern spec_data* spec_data_;
-extern tabbed_forms* tabbed_forms_;
-extern status* status_;
-extern bool DARK;
-extern void open_html(const char*);
-
-
-
 
 // Constructor
 spec_tree::spec_tree(int X, int Y, int W, int H, const char* label, field_app_t app) :

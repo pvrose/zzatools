@@ -1,30 +1,22 @@
 #include "club_handler.h"
-#include "url_handler.h"
-#include "adi_writer.h"
-#include "status.h"
-#include "callback.h"
-#include "cty_data.h"
+
 #include "book.h"
-#include "qso_manager.h"
+#include "adi_writer.h"
+#include "cty_data.h"
 #include "fields.h"
-#include "record.h"
+#include "main.h"
 #include "qsl_dataset.h"
+#include "qso_manager.h"
+#include "record.h"
+#include "status.h"
+#include "url_handler.h"
+
+#include "callback.h"
 
 #include <sstream>
 
 #include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_Native_File_Chooser.H>
-
-extern url_handler* url_handler_;
-extern status* status_;
-extern book* book_;
-extern qso_manager* qso_manager_;
-extern bool DEBUG_THREADS;
-extern fields* fields_;
-extern qsl_dataset* qsl_dataset_;
-// extern uint32_t seed_;
-extern std::string default_ref_directory_;
-extern void open_html(const char*);
 
 // Constructor 
 club_handler::club_handler() {

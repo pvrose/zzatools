@@ -4,6 +4,7 @@
 #include "cty_data.h"
 #include "extract_data.h"
 #include "field_choice.h"
+#include "main.h"
 #include "menu.h"
 #include "qso_data.h"
 #include "qso_manager.h"
@@ -17,18 +18,6 @@
 #include "utils.h"
 
 #include <FL/fl_draw.H>
-
-extern book* book_;
-extern cty_data* cty_data_;
-extern extract_data* extract_records_;
-extern menu* menu_;
-extern qso_manager* qso_manager_;
-extern spec_data* spec_data_;
-extern status* status_;
-extern tabbed_forms* tabbed_forms_;
-
-extern bool DARK;
-extern void open_html(const char*);
 
 // Constructor
 report_tree::report_tree(int X, int Y, int W, int H, const char* label, field_app_t app) :

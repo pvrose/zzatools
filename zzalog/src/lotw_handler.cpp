@@ -1,14 +1,17 @@
 #include "lotw_handler.h"
+
 #include "adi_writer.h"
-#include "status.h"
-#include "utils.h"
 #include "book.h"
-#include "url_handler.h"
-#include "callback.h"
 #include "extract_data.h"
 #include "fields.h"
-#include "record.h"
+#include "main.h"
 #include "qsl_dataset.h"
+#include "record.h"
+#include "status.h"
+#include "url_handler.h"
+
+#include "callback.h"
+#include "utils.h"
 
 #include <cstdlib>
 
@@ -17,13 +20,6 @@
 #include <FL/Fl_Window.H>
 #include <FL/fl_draw.H>
 #include <FL/Fl_Help_Dialog.H>
-
-extern status* status_;
-extern book* book_;
-extern url_handler* url_handler_;
-extern bool DEBUG_THREADS;
-extern fields* fields_;
-extern qsl_dataset* qsl_dataset_;
 
 // Constructor
 lotw_handler::lotw_handler()

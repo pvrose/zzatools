@@ -1,11 +1,14 @@
 #include "wx_handler.h"
-#include "status.h"
-#include "utils.h"
-#include "url_handler.h"
+
 #include "qso_manager.h"
 #include "record.h"
+#include "main.h"   
+#include "status.h"
 #include "stn_data.h"
 #include "ticker.h"
+#include "url_handler.h"
+
+#include "utils.h"
 
 #include "nlohmann/json.hpp"
 
@@ -13,14 +16,6 @@
 
 #include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_PNG_Image.H>
-
-extern status* status_;
-extern url_handler* url_handler_;
-extern qso_manager* qso_manager_;
-extern ticker* ticker_;
-extern stn_data* stn_data_;
-extern bool DEBUG_THREADS;
-extern bool DEBUG_QUICK;
 
 using json = nlohmann::json;
 

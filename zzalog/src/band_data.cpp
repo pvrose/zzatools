@@ -1,4 +1,5 @@
 #include "band_data.h"
+#include "main.h"
 #include "status.h"
 #include "spec_data.h"
 
@@ -11,10 +12,6 @@
 #include <FL/Fl_Native_File_Chooser.H>
 
 using json = nlohmann::json;
-
-extern status* status_;
-extern spec_data* spec_data_;
-extern std::string default_ref_directory_;
 
 // MAp band_data::entry_t
 NLOHMANN_JSON_SERIALIZE_ENUM(band_data::entry_t, {

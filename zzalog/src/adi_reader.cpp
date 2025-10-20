@@ -1,6 +1,7 @@
 #include "adi_reader.h"
 
 #include "book.h"
+#include "main.h"
 #include "record.h"
 #include "status.h"
 #include "spec_data.h"
@@ -15,16 +16,6 @@
 #include <FL/Fl.H>
 #include <FL/fl_ask.H>
 #include <FL/fl_draw.H>
-
-
-
-
-
-extern status* status_;
-extern spec_data* spec_data_;
-extern bool closing_;
-extern bool new_file_;
-
 
 // Helper class that reads and decodes an ADIF .adi format file and stores it a book container
 adi_reader::adi_reader()

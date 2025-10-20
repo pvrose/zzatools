@@ -2,6 +2,7 @@
 
 #include "book.h"
 #include "cty_data.h"
+#include "main.h"
 #include "qso_manager.h"
 #include "record.h"
 #include "status.h"
@@ -14,12 +15,6 @@
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Input_Choice.H>
 #include <FL/Fl_Output.H>
-
-extern book* navigation_book_;
-extern cty_data* cty_data_;
-extern qso_manager* qso_manager_;
-extern status* status_;
-extern stn_data* stn_data_;
 
 const std::string LABELS[] = {"Strret", "City", "Postcode", "Locator", "Country", "DXCC",
 	"Prim'y Sub", "Sec'y Sub", "CQ Zone", "ITU Zone", "Continent", "IOTA", "WAB" };

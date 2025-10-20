@@ -1,20 +1,19 @@
 #include "fields_dialog.h"
-#include "drawing.h"
-#include "field_choice.h"
-#include "intl_widgets.h"
-#include "utils.h"
-#include "callback.h"
+
 #include "book.h"
+#include "field_choice.h"
 #include "fields.h"
+#include "intl_widgets.h"
+#include "main.h"
+
+#include "callback.h"
+#include "drawing.h"
+#include "utils.h"
 
 #include <FL/Fl_Int_Input.H>
 #include <FL/Fl_Input_Choice.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Choice.H>
-
-extern book* book_;
-extern fields* fields_;
-extern void open_html(const char*);
 
 // Constructor
 fields_table::fields_table(int X, int Y, int W, int H, const char* L) :

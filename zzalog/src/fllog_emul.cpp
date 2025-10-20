@@ -4,6 +4,7 @@
 #include "adi_writer.h"
 #include "book.h"
 #include "extract_data.h"
+#include "main.h"
 #include "qso_apps.h"
 #include "qso_data.h"
 #include "qso_manager.h"
@@ -13,14 +14,6 @@
 #include "status.h"
 
 #include <sstream>
-
-extern rpc_handler* rpc_handler_;
-extern status* status_;
-extern fllog_emul* fllog_emul_;
-extern extract_data* extract_records_;
-extern book* book_;
-extern spec_data* spec_data_;
-extern qso_manager* qso_manager_;
 
 // Static - only one instance of this class supported
 fllog_emul* fllog_emul::that_ = nullptr;

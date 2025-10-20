@@ -1,45 +1,34 @@
 #include "qso_qsl.h"
-#include "qso_manager.h"
-#include "qso_data.h"
-#include "drawing.h"
+
+#include "book.h"
+#include "club_handler.h"
+#include "eqsl_handler.h"
 #include "extract_data.h"
 #include "import_data.h"
-#include "tabbed_forms.h"
-#include "printer.h"
-#include "status.h"
-#include "book.h"
-#include "ticker.h"
-#include "record.h"
-#include "png_writer.h"
-#include "callback.h"
-#include "eqsl_handler.h"
-#include "club_handler.h"
 #include "lotw_handler.h"
+#include "main.h"
+#include "menu.h"
+#include "png_writer.h"
+#include "printer.h"
+#include "record.h"
 #include "qrz_handler.h"
 #include "qsl_data.h"
-#include "qsl_image.h"
-#include "qsl_emailer.h"
 #include "qsl_dataset.h"
-#include "menu.h"
+#include "qsl_emailer.h"
+#include "qsl_image.h"
+#include "qso_data.h"
+#include "qso_manager.h"
+#include "status.h"
+#include "tabbed_forms.h"
+#include "ticker.h"
+
+#include "callback.h"
+#include "drawing.h"
 
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Fill_Dial.H>
-
-extern import_data* import_data_;
-extern extract_data* extract_records_;
-extern tabbed_forms* tabbed_forms_;
-extern status* status_;
-extern book* book_;
-extern book* navigation_book_;
-extern ticker* ticker_;
-extern eqsl_handler* eqsl_handler_;
-extern club_handler* club_handler_;
-extern lotw_handler* lotw_handler_;
-extern qrz_handler* qrz_handler_;
-extern qsl_dataset* qsl_dataset_;
-extern void open_html(const char*);
 
 // Constructor
 qso_qsl::qso_qsl(int X, int Y, int W, int H, const char* L) :

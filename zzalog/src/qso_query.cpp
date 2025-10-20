@@ -1,15 +1,13 @@
 #include "qso_query.h"
-#include "drawing.h"
-#include "record_table.h"
-#include "qso_data.h"
+
 #include "book.h"
 #include "fields.h"
-#include "utils.h"
+#include "qso_data.h"
 #include "record.h"
+#include "record_table.h"
 
-extern book* book_;
-extern fields* fields_;
-extern void open_html(const char*);
+#include "drawing.h"
+#include "utils.h"
 
 // Constrctor
 qso_query::qso_query(int X, int Y, int W, int H, const char* L) :

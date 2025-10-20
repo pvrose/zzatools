@@ -1,4 +1,5 @@
 #include "file_viewer.h"
+#include "main.h"
 #include "status.h"
 
 #include "utils.h"
@@ -8,8 +9,6 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Text_Editor.H>
-
-extern status* status_;
 
 // Constructor
 file_viewer::file_viewer(int W, int H, const char* L) :

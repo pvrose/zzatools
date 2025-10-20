@@ -1,21 +1,18 @@
 #include "qso_log_info.h"
-#include "drawing.h"
+
 #include "book.h"
 #include "import_data.h"
-#include "ticker.h"
-#include "utils.h"
+#include "main.h"
 #include "record.h"
+#include "ticker.h"
+
+#include "drawing.h"
+#include "utils.h"
 
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Light_Button.H>
-
-extern book* book_;
-extern import_data* import_data_;
-extern ticker* ticker_;
-extern bool AUTO_SAVE;
-extern void open_html(const char*);
 
 // Constructor
 qso_log_info::qso_log_info(int X, int Y, int W, int H, const char* l) :

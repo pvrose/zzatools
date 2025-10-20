@@ -5,6 +5,7 @@
 #include "cty_data.h"
 #include "extract_data.h"
 #include "import_data.h"
+#include "main.h"
 #include "menu.h"
 #include "qrz_handler.h"
 #include "qso_buttons.h"
@@ -26,22 +27,6 @@
 #include "utils.h"
 
 #include <FL/Fl_Tooltip.H>
-
-extern book* book_;
-extern extract_data* extract_records_;
-extern status* status_;
-extern cty_data* cty_data_;
-extern spec_data* spec_data_;
-extern tabbed_forms* tabbed_forms_;
-extern import_data* import_data_;
-extern book* navigation_book_;
-extern qrz_handler* qrz_handler_;
-extern wsjtx_handler* wsjtx_handler_;
-extern menu* menu_;
-extern double prev_freq_;
-extern bool DARK;
-extern fields* fields_;
-extern config* config_;
 
 // qso_group_
 qso_data::qso_data(int X, int Y, int W, int H, const char* l) :

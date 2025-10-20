@@ -3,6 +3,7 @@
 #include "contest_scorer.h"
 #include "dxcc_table.h"
 #include "log_table.h"
+#include "main.h"
 #include "qso_wx.h"
 #include "report_tree.h"
 #include "search.h"
@@ -15,9 +16,6 @@
 #include <string>
 
 using json = nlohmann::json;
-
-extern std::string default_data_directory_;
-extern std::string PROGRAM_ID;
 
 //! Basic constructor
 settings::settings() {

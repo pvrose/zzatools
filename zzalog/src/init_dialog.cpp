@@ -1,5 +1,6 @@
 #include "init_dialog.h"
 
+#include "main.h"
 #include "stn_data.h"
 #include "stn_dialog.h"
 
@@ -9,9 +10,6 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Radio_Round_Button.H>
-
-extern stn_data* stn_data_;
-extern stn_dialog* stn_dialog_;
 
 //! Constructor - sizes and labels itself
 init_dialog::init_dialog(int X, int Y, int W, int H, const char* L) :

@@ -4,22 +4,13 @@
 #include "log_table.h"
 #include "extract_data.h"
 #include "import_data.h"
+#include "main.h"
 #include "spec_tree.h"
 #include "report_tree.h"
 #include "toolbar.h"
 #include "config.h"
 #include "qso_manager.h"
 #include "dxcc_view.h"
-
-extern book* book_;
-extern book* navigation_book_;
-extern extract_data* extract_records_;
-extern import_data* import_data_;
-extern extract_data* dxatlas_records_;
-extern toolbar* toolbar_;
-extern config* config_;
-extern bool closing_;
-extern qso_manager* qso_manager_;
 
 // Constructor
 tabbed_forms::tabbed_forms(int X, int Y, int W, int H, const char* label) :

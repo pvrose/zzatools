@@ -1,23 +1,19 @@
 #include "qso_buttons.h"
-#include "qso_data.h"
-#include "extract_data.h"
+
 #include "book.h"
 #include "cty_data.h"
+#include "extract_data.h"
+#include "main.h"
+#include "qso_data.h"
 #include "qso_manager.h"
 #include "spec_data.h"
-#include "drawing.h"
-#include "callback.h"
 #include "record.h"
+
+#include "callback.h"
+#include "drawing.h"
 
 #include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_Tooltip.H>
-
-extern extract_data* extract_records_;
-extern book* book_;
-extern cty_data* cty_data_;
-extern spec_data* spec_data_;
-extern void open_html(const char*);
-
 
 // Map showing the buttons available in each qso_data logging_state
 std::map<qso_data::logging_state_t, std::list<qso_buttons::button_type> > button_map_ =

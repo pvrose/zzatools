@@ -1,76 +1,4 @@
 #pragma once
-
-
-#include "callback.h"
-#include "drawing.h"
-#include "utils.h"
-
-#include "about_dialog.h"
-#include "band_data.h"
-#include "band_window.h"
-#include "banner.h"
-#include "book.h"
-#include "club_handler.h"
-#include "config.h"
-#include "contest_data.h"
-#include "cty_data.h"
-#include "eqsl_handler.h"
-#include "extract_data.h"
-#include "fields.h"
-#include "fllog_emul.h"
-#include "import_data.h"
-#include "init_dialog.h"
-#include "intl_dialog.h"
-#include "logo.h"
-#include "lotw_handler.h"
-#include "main_window.h"
-#include "menu.h"
-#include "qrz_handler.h"
-#include "qsl_dataset.h"
-#include "qso_manager.h"
-#include "record.h"
-#include "report_tree.h"
-#include "rig_data.h"
-#include "spec_data.h"
-#include "spec_tree.h"
-#include "status.h"
-#include "stn_data.h"
-#include "stn_dialog.h"
-#include "symbols.h"
-#include "tabbed_forms.h"
-#include "ticker.h"
-#include "timestamp.h"
-#include "toolbar.h"
-#include "url_handler.h"
-#include "wsjtx_handler.h"
-#include "wx_handler.h"
-
-#include "hamlib/rig.h"
-
-// C/C++ header files
-#include <ctime>
-#include <string>
-#include <list>
-#include <cstdio>
-
-// FLTK header files
-#include <FL/Fl.H>
-#include <FL/Fl_Box.H>
-#include <FL/Fl_Menu_Item.H>
-#include <FL/Fl_Native_File_Chooser.H>
-#include <FL/Fl_PNG_Image.H>
-#include <FL/Fl_Single_Window.H>
-#include <FL/Fl_Tabs.H>
-#include <FL/Fl_Tooltip.H>
-#include <FL/Fl_Widget.H>
-#include <FL/fl_ask.H>
-#include <FL/fl_draw.H>
-// included to allow windows specifics to be called
-#include <FL/platform.H>
-
-
-
-
 //! \mainpage ZZALOG Code Documentation
 //! 
 //! This document describes the code interfaces between the constituent parts
@@ -86,111 +14,148 @@
 //!
 //! ZZALOG is based in part on the work of the FLTK project <A HREF=https://www.fltk.org>https://www.fltk.org</A>.
 
+#include <list>
+#include <string>
+
+class band_data;
+class band_window;
+class banner;
+class book;
+class club_handler;
+class config;
+class contest_data;
+class cty_data;
+class eqsl_handler;
+class extract_data;
+class fields;
+class fllog_emul;
+class import_data;
+class intl_dialog;
+class lotw_handler;
+class main_window;
+class menu;
+class qrz_handler;
+class qsl_dataset;
+class qso_manager;
+class record;
+class rig_data;
+class spec_data;
+class status;
+class stn_data;
+class stn_window;
+class tabbed_forms;
+class ticker;
+class toolbar;
+class url_handler;
+class wsjtx_handler;
+class wx_handler;
+class Fl_PNG_Image;
+class Fl_Widget;
+enum rig_debug_level_e;
 
 //! Program copyright - displayed in all windows.
-std::string COPYRIGHT = "\302\251 Philip Rose GM3ZZA 2018-2025. All rights reserved.";
+extern std::string COPYRIGHT;
 //! Third-party acknowledgments.
-std::string PARTY3RD_COPYRIGHT = "Prefix data courtesy of clublog.org, country-files.com and dxatlas.com\n"
-"ZZALOG is based in part on the work of the FLTK project https://www.fltk.org.";
+extern std::string PARTY3RD_COPYRIGHT;
 //! Contact address for use in FLTK widget labels.
-std::string CONTACT = "gm3zza@@btinternet.com";
+extern std::string CONTACT;
 //! Contact address for use in general texts.
-std::string CONTACT2 = "gm3zza@btinternet.com";
+extern std::string CONTACT2;
 //! Copyright placed in exported data items.
-std::string DATA_COPYRIGHT = "\302\251 Philip Rose %s. This data may be copied for the purpose of correlation and analysis";
+extern std::string DATA_COPYRIGHT;
 //! Program identifier: used in ADIF PROGRAM_ID field and filestore
-std::string PROGRAM_ID = "ZZALOG";
+extern std::string PROGRAM_ID;
 //! Short-form program identifier.
-std::string PROG_ID = "ZLG";
+extern std::string PROG_ID;
 //! Program version. 
-std::string PROGRAM_VERSION = "3.6.8+";
+extern std::string PROGRAM_VERSION;
 //! Program vendor.
-std::string VENDOR = "GM3ZZA";
+extern std::string VENDOR;
 
 // Debug switches
 //! Print errors -  by "-d e"
-bool DEBUG_ERRORS = true;
+extern bool DEBUG_ERRORS;
 //! Print std::thread debugging messages -  by "-d t"
-bool DEBUG_THREADS = false;
+extern bool DEBUG_THREADS;
 //! Print libcurl debugging messages -  by "-d c"
-bool DEBUG_CURL = false;
+extern bool DEBUG_CURL;
 //! Reduce long duration tiemouts and waits -  by "-d q"
-bool DEBUG_QUICK = false;
+extern bool DEBUG_QUICK;
 //! Print rig access debugging messages -  by "-d r"
-bool DEBUG_RIGS = false;
+extern bool DEBUG_RIGS;
 //! Print callsign parsing messages -  by "-d d"
-bool DEBUG_PARSE = false;
+extern bool DEBUG_PARSE;
 //! Set hamlib debugging verbosity level -  by "-d h=<level>"
-rig_debug_level_e HAMLIB_DEBUG_LEVEL = RIG_DEBUG_ERR;
+extern rig_debug_level_e HAMLIB_DEBUG_LEVEL;
 
 // Operation switches - _S versions used to override sticky switch
 //! Automatically upload QSOs to QSL sites -  by "-n"
-bool AUTO_UPLOAD = true;
+extern bool AUTO_UPLOAD;
 //! Version of \p AUTO_UPLOAD read from settings
-bool AUTO_UPLOAD_S = false;
+extern bool AUTO_UPLOAD_S;
 //! Automatically save QSO record after each change -  by "-a"
-bool AUTO_SAVE = true;
+extern bool AUTO_SAVE;
 //! Version of \p AUTO_SAVE read from settings.
-bool AUTO_SAVE_S = false;
+extern bool AUTO_SAVE_S;
 //! Dark mode: Dark background, light forreground -  by "-k"
-bool DARK = false;
+extern bool DARK;
 //! Version of \p DARK read from settings.
-bool DARK_S = false;
+extern bool DARK_S;
 //! Print version details instead of running ZZALOG -  by "-v"
-bool DISPLAY_VERSION = false;
+extern bool DISPLAY_VERSION;
 //! Print command-line interface instead of running ZZALOG -  by "-h"
-bool HELP = false;
+extern bool HELP;
 //! Start with an empty logbook -  by "-e"
-bool NEW_BOOK = false;
+extern bool NEW_BOOK;
 //! Do not add file to recent file std::list -  by "-p"
-bool PRIVATE = false;
+extern bool PRIVATE;
 //! Open file in read-only mode -  by "-r"
-bool READ_ONLY = false;
+extern bool READ_ONLY;
 //! Resum logging including previous session -  by "-m"
-bool RESUME_SESSION = false;
+extern bool RESUME_SESSION;
 //! Development flag: used to enable/disable features only in development mode ("-g")
-bool DEVELOPMENT_MODE = false;
+extern bool DEVELOPMENT_MODE;
 
 //! Access to FLTK global attribute to  default text size throughout ZZALOG.
 extern int FL_NORMAL_SIZE;
 
 //! \cond
 // Top level data items - these are declared as externals in each .cpp that uses them
-band_data* band_data_ = nullptr;
-band_window* band_window_ = nullptr;
-banner* banner_ = nullptr;
-book* book_ = nullptr;
-book* navigation_book_ = nullptr;
-club_handler* club_handler_ = nullptr;
-config* config_ = nullptr;
-contest_data* contest_data_ = nullptr;
-cty_data* cty_data_ = nullptr;
-eqsl_handler* eqsl_handler_ = nullptr;
-extract_data* extract_records_ = nullptr;
-fields* fields_ = nullptr;
-fllog_emul* fllog_emul_ = nullptr;
-import_data* import_data_ = nullptr;
-intl_dialog* intl_dialog_ = nullptr;
-lotw_handler* lotw_handler_ = nullptr;
-main_window* main_window_ = nullptr;
-menu* menu_ = nullptr;
-qrz_handler* qrz_handler_ = nullptr;
-qsl_dataset* qsl_dataset_ = nullptr;
-qso_manager* qso_manager_ = nullptr;
-rig_data* rig_data_ = nullptr;
-spec_data* spec_data_ = nullptr;
-status* status_ = nullptr;
-stn_data* stn_data_ = nullptr;
-stn_window* stn_window_ = nullptr;
-tabbed_forms* tabbed_forms_ = nullptr;
-ticker* ticker_ = nullptr;
-toolbar* toolbar_ = nullptr;
-url_handler* url_handler_ = nullptr;
-wsjtx_handler* wsjtx_handler_ = nullptr;
-wx_handler* wx_handler_ = nullptr;
+extern band_data* band_data_;
+extern band_window* band_window_;
+extern banner* banner_;
+extern book* book_;
+extern book* navigation_book_;
+extern club_handler* club_handler_;
+extern config* config_;
+extern contest_data* contest_data_;
+extern cty_data* cty_data_;
+extern eqsl_handler* eqsl_handler_;
+extern extract_data* extract_records_;
+extern fields* fields_;
+extern fllog_emul* fllog_emul_;
+extern import_data* import_data_;
+extern intl_dialog* intl_dialog_;
+extern lotw_handler* lotw_handler_;
+extern main_window* main_window_;
+extern menu* menu_;
+extern qrz_handler* qrz_handler_;
+extern qsl_dataset* qsl_dataset_;
+extern qso_manager* qso_manager_;
+extern rig_data* rig_data_;
+extern spec_data* spec_data_;
+extern status* status_;
+extern stn_data* stn_data_;
+extern stn_window* stn_window_;
+extern tabbed_forms* tabbed_forms_;
+extern ticker* ticker_;
+extern toolbar* toolbar_;
+extern url_handler* url_handler_;
+extern wsjtx_handler* wsjtx_handler_;
+extern wx_handler* wx_handler_;
 
 //! List of files most recently opened. Maximum: 4 files. 
-std::list<std::string> recent_files_;
+extern std::list<std::string> recent_files_;
 //! \endcond
 
 // Forward declarations
@@ -340,49 +305,49 @@ void open_pdf();
 std::string recent_file(int n);
 
 //! Flag to prevent more than one closure process at the same time.
-bool closing_ = false;
+extern bool closing_;
 
 //! Flag to mark everything loaded.
-bool initialised_ = false;
+extern bool initialised_;
 
 //! Time loaded.
-time_t session_start_ = (time_t)0;
+extern time_t session_start_;
 
 //! Previous frequency.
-double prev_freq_ = 0.0;
+extern double prev_freq_;
 
 //! Filename in arguments.
-char* filename_ = nullptr;
+extern char* filename_;
 
 //! File is new (neither in argument or settings.
-bool new_file_ = false;
+extern bool new_file_;
 
 //! Main logo.
-Fl_PNG_Image main_icon_("ZZALOG_ICON", ___rose_png, ___rose_png_len);
+extern Fl_PNG_Image main_icon_;
 
 //! Using backp.
-bool using_backup_ = false;
+extern bool using_backup_;
 
 //! Sticky switches mesasge.
-std::string sticky_message_ = "";
+extern std::string sticky_message_;
 
 //! Common seed to use in password encryption - maintaned with sessions.
-uint32_t seed_ = 0;
+extern uint32_t seed_;
 
 //! Default location for configuration files.
-std::string default_data_directory_ = "";
+extern std::string default_data_directory_;
 
 //! Default location for documentatiom files.
-std::string default_html_directory_ = "";
+extern std::string default_html_directory_;
 
 //! Default location for reference data
-std::string default_ref_directory_ = "";
+extern std::string default_ref_directory_;
 
 //! Default location for auto-generated compile fodder
-std::string default_code_directory_ = "";
+extern std::string default_code_directory_;
 
 //! Do not close banner. Kept \p false unless banner is not deleted at ZZALOG closure in error cases.
-bool keep_banner_ = false;
+extern bool keep_banner_;
 
 //! This run is a new installation
-bool new_installation_ = false;
+extern bool new_installation_;

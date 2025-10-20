@@ -1,6 +1,7 @@
 #include "band_editor.h"
 
 #include "band_data.h"
+#include "main.h"
 #include "status.h"
 
 #include "drawing.h"
@@ -15,10 +16,6 @@
 
 #include <map>
 #include <string>
-
-extern band_data* band_data_;
-extern status* status_;
-extern bool DEVELOPMENT_MODE;
 
 using band_entry_t = band_data::band_entry_t;
 

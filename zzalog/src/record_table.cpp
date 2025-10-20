@@ -1,14 +1,14 @@
 
 #include "record_table.h"
-#include "spec_data.h"
-#include "drawing.h"
+
 #include "fields.h"
+#include "main.h"
 #include "record.h"
+#include "spec_data.h"
+
+#include "drawing.h"
 
 #include <FL/fl_draw.H>
-
-extern spec_data* spec_data_;
-extern fields* fields_;
 
 // Constructor
 record_table::record_table(int X, int Y, int W, int H, const char* label) :

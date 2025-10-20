@@ -5,11 +5,12 @@ All Rights Reserved
 
 record.cpp - Individual record data item: implementation file
 */
+#include "record.h"
 
 #include "adif.h"
 #include "book.h"
 #include "cty_data.h"
-#include "record.h"
+#include "main.h"
 #include "spec_data.h"
 #include "status.h"
 #include "view.h"
@@ -23,11 +24,6 @@ record.cpp - Individual record data item: implementation file
 
 #include <FL/fl_ask.H>
 #include <FL/fl_utf8.h>
-
-extern cty_data* cty_data_;
-extern spec_data* spec_data_;
-extern status* status_;
-extern book* book_;
 
 // initialise the static variables
 bool record::expecting_header_ = true;

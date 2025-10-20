@@ -1,14 +1,17 @@
 #include "web_dialog.h"
-#include "utils.h"
+
 #include "calendar_input.h"
-#include "intl_widgets.h"
-#include "icons.h"
-#include "wsjtx_handler.h"
 #include "fllog_emul.h"
+#include "icons.h"
+#include "intl_widgets.h"
+#include "main.h"
 #include "password_input.h"
-#include "spec_data.h"
 #include "qrz_handler.h"
 #include "qsl_dataset.h"
+#include "spec_data.h"
+#include "wsjtx_handler.h"
+
+#include "utils.h"
 
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Button.H>
@@ -17,13 +20,6 @@
 #include <FL/Fl_Output.H>
 #include <FL/Fl_RGB_Image.H>
 #include <FL/Fl_Tabs.H>
-
-extern wsjtx_handler* wsjtx_handler_;
-extern fllog_emul* fllog_emul_;
-extern spec_data* spec_data_;
-extern uint32_t seed_;
-extern qsl_dataset* qsl_dataset_;
-extern void open_html(const char*);
 
 // Constructor
 web_dialog::web_dialog(int X, int Y, int W, int H, const char* label) :

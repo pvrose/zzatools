@@ -1,5 +1,6 @@
 #include "field_choice.h"
 #include "fields.h"
+#include "main.h"
 #include "spec_data.h"
 #include "intl_dialog.h"
 #include "utils.h"
@@ -7,10 +8,6 @@
 #include "qso_entry.h"
 
 #include <cstring>
-
-extern spec_data* spec_data_;
-extern cty_data* cty_data_;
-extern intl_dialog* intl_dialog_;
 
 // Lists greater than this will be hierarchic - e.g. "A/ADDRESS" else not so "ADDRESS"
 const int HIERARCHIC_LIMIT = 12;

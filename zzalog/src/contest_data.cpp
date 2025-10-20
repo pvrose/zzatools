@@ -1,12 +1,10 @@
 #include "contest_data.h"
 
+#include "main.h"
 #include "status.h"
 
 #include <fstream>
 #include <ctime>
-
-extern std::string default_data_directory_;
-extern status* status_;
 
 //! Conversion of ct_data_ to JSON
 void to_json(json& j, const ct_data_t& s) {

@@ -5,6 +5,7 @@
 #include "contest_algorithm.h"
 #include "contest_data.h"
 #include "field_choice.h"
+#include "main.h"
 #include "settings.h"
 
 #include "drawing.h"
@@ -18,10 +19,6 @@
 #include <FL/Fl_Multiline_Output.H>
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Text_Display.H>
-
-extern std::map<std::string, contest_algorithm*>* algorithms_;
-extern contest_data* contest_data_;
-extern void open_html(const char*);
 
 contest_dialog::contest_dialog(int X, int Y, int W, int H, const char* L) :
 	page_dialog(X, Y, W, H, L)

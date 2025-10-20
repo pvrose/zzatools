@@ -1,8 +1,9 @@
 #include "png_writer.h"
 #include "book.h"
-#include "record.h"
+#include "main.h"
 #include "qsl_image.h"
 #include "qsl_data.h"
+#include "record.h"
 #include "settings.h"
 #include "status.h"
 
@@ -11,8 +12,6 @@
 #include "png.h"
 #include "zlib.h"
 #include <FL/fl_utf8.h>
-
-extern status* status_;
 
 png_writer::png_writer() {
 	// TODO: Any initialisation of the libpng

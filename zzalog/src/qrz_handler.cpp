@@ -1,16 +1,17 @@
 #include "qrz_handler.h"
 
-#include "status.h"
-#include "tabbed_forms.h"
-#include "book.h"
-#include "url_handler.h"
-#include "menu.h"
-#include "record.h"
-#include "import_data.h"
-#include "qso_manager.h"
 #include "adi_reader.h"
 #include "adi_writer.h"
+#include "book.h"
+#include "import_data.h"
+#include "main.h"
+#include "menu.h"
 #include "qsl_dataset.h"
+#include "qso_manager.h"
+#include "record.h"
+#include "status.h"
+#include "tabbed_forms.h"
+#include "url_handler.h"
 
 #include "pugixml.hpp"
 
@@ -20,19 +21,6 @@
 #include <FL/Fl.H>
 #include <FL/fl_ask.H>
 #include <FL/filename.H>
-
-extern status* status_;
-extern tabbed_forms* tabbed_forms_;
-extern url_handler* url_handler_;
-extern book* navigation_book_;
-extern std::string PROG_ID;
-extern std::string PROGRAM_VERSION;
-extern uint32_t seed_;
-extern import_data* import_data_;
-extern qso_manager* qso_manager_;
-extern book* book_;
-extern bool DEBUG_THREADS;
-extern qsl_dataset* qsl_dataset_;
 
 // Constructor
 qrz_handler::qrz_handler() :

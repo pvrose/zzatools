@@ -2,6 +2,7 @@
 
 #include "cty_data.h"
 #include "init_dialog.h"
+#include "main.h"
 #include "qso_data.h"
 #include "qso_manager.h"
 #include "record.h"
@@ -23,12 +24,6 @@
 #include <FL/Fl_Multiline_Input.H>
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Tabs.H>
-
-extern cty_data* cty_data_;
-extern qso_manager* qso_manager_;
-extern spec_data* spec_data_;
-extern stn_data* stn_data_;
-extern void open_html(const char*);
 
 stn_dialog::stn_dialog(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L),

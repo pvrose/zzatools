@@ -1,5 +1,6 @@
 #pragma once
 
+#include "main.h"
 #include "spec_data.h"
 
 #include <string>
@@ -7,9 +8,6 @@
 #include <map> 
 #include <cmath>
 
-
-
-extern spec_data* spec_data_;
 
 //! \brief Structure to provide a special means of sorting bands known by their
 //! wavelength to be sorted on their frequency.

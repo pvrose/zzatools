@@ -1,9 +1,8 @@
 #include "cty3_reader.h"
 
 #include "cty_data.h"
+#include "main.h"
 #include "status.h"
-
-extern status* status_;
 
 cty3_reader::cty3_reader() {}
 cty3_reader::~cty3_reader() {}

@@ -1,6 +1,7 @@
 #include "stn_call_dlg.h"
 
 #include "cty_data.h"
+#include "main.h"
 #include "qso_manager.h"
 #include "record.h"
 #include "stn_data.h"
@@ -12,9 +13,6 @@
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Input_Choice.H>
 #include <FL/Fl_Output.H>
-
-extern qso_manager* qso_manager_;
-extern stn_data* stn_data_;
 
 //! Constructor 
 

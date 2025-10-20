@@ -1,13 +1,12 @@
 #include "dxcc_view.h"
 
 #include "dxcc_table.h"
+#include "main.h"
 #include "settings.h"
 #include "utils.h"
 
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Help_Dialog.H>
-
-extern void open_html(const char*);
 
 dxcc_view::dxcc_view(int X, int Y, int W, int H, const char* L, field_app_t fo) :
 	view(),

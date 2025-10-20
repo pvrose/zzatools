@@ -6,6 +6,7 @@
 #include "field_choice.h"
 #include "import_data.h"
 #include "intl_widgets.h"
+#include "main.h"
 #include "main_window.h"
 #include "menu.h"
 #include "qrz_handler.h"
@@ -42,28 +43,6 @@
 #include <FL/Fl_Output.H>
 #include <FL/fl_ask.H>
 #include <FL/Fl_Tooltip.H>
-
-
-
-
-// External declarations
-extern status* status_;
-extern tabbed_forms* tabbed_forms_;
-extern spec_data* spec_data_;
-extern book* book_;
-extern extract_data* extract_records_;
-extern import_data* import_data_;
-extern book* navigation_book_;
-extern menu* menu_;
-extern tabbed_forms* tabbed_forms_;
-extern import_data* import_data_;
-extern qrz_handler* qrz_handler_;
-extern main_window* main_window_;
-extern stn_data* stn_data_;
-extern bool closing_;
-extern std::string COPYRIGHT;
-extern std::string CONTACT;
-
 
 // The main dialog constructor
 qso_manager::qso_manager(int W, int H, const char* label) :

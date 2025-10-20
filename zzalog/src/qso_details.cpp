@@ -1,25 +1,20 @@
 #include "qso_details.h"
-#include "qso_entry.h"
-#include "qso_data.h"
-#include "drawing.h"
+
 #include "book.h"
-#include "status.h"
-#include "spec_data.h"
+#include "main.h"
+#include "qso_data.h"
+#include "qso_entry.h"
 #include "record.h"
 #include "regices.h"
+#include "spec_data.h"
+#include "status.h"
+
+#include "drawing.h"
 
 #include <regex>
 #include <string>
 
 #include <FL/Fl_Output.H>
-
-
-
-extern book* book_;
-extern status* status_;
-extern spec_data* spec_data_;
-extern bool DARK;
-extern void open_html(const char*);
 
 // Constructor
 qso_details::qso_details(int X, int Y, int W, int H, const char* L) :

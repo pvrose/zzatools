@@ -2,6 +2,7 @@
 #include "callback.h"
 #include "field_choice.h"
 #include "intl_widgets.h"
+#include "main.h"
 #include "spec_data.h"
 
 #include <set>
@@ -11,9 +12,6 @@
 #include <FL/Fl_Radio_Round_Button.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Box.H>
-
-extern spec_data* spec_data_;
-extern void open_html(const char*);
 
 // Constructor - calls the dialog constructor with placeholders for size
 change_dialog::change_dialog(const char* label) :

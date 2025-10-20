@@ -1,15 +1,12 @@
 #include "cty1_reader.h"
-#include "status.h"
+
 #include "cty_data.h"
+#include "main.h"
+#include "status.h"
 
 #include "pugixml.hpp"
 
 #include <list>
-
-
-
-extern status* status_;
-extern bool closing_;
 
 // Constructor
 cty1_reader::cty1_reader() {

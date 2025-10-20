@@ -1,5 +1,7 @@
 #include "qsl_dataset.h"
+
 #include "extract_data.h"
+#include "main.h"
 #include "qrz_handler.h"
 #include "settings.h"
 #include "status.h"
@@ -12,9 +14,6 @@
 #include <fstream>
 
 #include <FL/Fl_Native_File_Chooser.H>
-
-extern status* status_;
-extern uint32_t seed_;
 
 using json = nlohmann::json;
 

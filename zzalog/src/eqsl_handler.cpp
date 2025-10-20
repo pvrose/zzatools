@@ -3,6 +3,7 @@
 #include "adi_writer.h"
 #include "book.h"
 #include "fields.h"
+#include "main.h"
 #include "qsl_dataset.h"
 #include "qso_manager.h"
 #include "qso_qsl.h"
@@ -29,17 +30,6 @@
 #include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Help_View.H>
-
-extern book* book_;
-extern status* status_;
-extern stn_data* stn_data_;
-extern qso_manager* qso_manager_;
-extern ticker* ticker_;
-extern url_handler* url_handler_;
-extern bool DEBUG_THREADS;
-extern fields* fields_;
-// extern uint32_t seed_;
-extern qsl_dataset* qsl_dataset_;
 
 // Constructor
 eqsl_handler::eqsl_handler()

@@ -1,9 +1,12 @@
 #include "rpc_handler.h"
-#include "url_handler.h"
-#include "socket_server.h"
-#include "utils.h"
-#include "status.h"
+
+#include "main.h"
 #include "regices.h"
+#include "socket_server.h"
+#include "status.h"
+#include "url_handler.h"
+
+#include "utils.h"
 
 #include "pugixml.hpp"
 
@@ -12,17 +15,9 @@
 #include <map>
 #include <string>
 
-
 #include <FL/fl_ask.H>
 
-
-
-
-extern url_handler* url_handler_;
-extern status* status_;
-rpc_handler* rpc_handler::that_ = nullptr;
-extern std::string PROGRAM_VERSION;
-extern std::string PROGRAM_ID;
+rpc_handler* rpc_handler::that_;
 
 // Constructor
 rpc_handler::rpc_handler(std::string address, int port_number, std::string resource_name)

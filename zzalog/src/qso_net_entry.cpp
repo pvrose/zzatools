@@ -1,15 +1,12 @@
 #include "qso_net_entry.h"
-#include "qso_entry.h"
-#include "status.h"
 
 #include "book.h"
+#include "main.h"
+#include "qso_entry.h"
 #include "record.h"
+#include "status.h"
 
 #include <FL/Fl_Tabs.H>
-
-extern status* status_;
-extern book* book_;
-extern void open_html(const char*);
 
 // Constructor
 qso_net_entry::qso_net_entry(int X, int Y, int W, int H, const char* L) :

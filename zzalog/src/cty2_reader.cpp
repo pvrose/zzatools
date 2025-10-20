@@ -1,16 +1,13 @@
 #include "cty2_reader.h"
 
 #include "cty_data.h"
+#include "main.h"
 #include "status.h"
 
 #include "drawing.h"
 
 #include <string>
 #include <vector>
-
-
-
-extern status* status_;
 
 cty2_reader::cty2_reader() {
 	data_ = nullptr;

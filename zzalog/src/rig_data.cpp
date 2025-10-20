@@ -1,4 +1,6 @@
 #include "rig_data.h"
+
+#include "main.h"
 #include "rig_if.h"
 #include "status.h"
 
@@ -8,11 +10,7 @@
 #include <vector>
 #include <set>
 
-
 using json = nlohmann::json;
-
-extern status* status_;
-extern std::string default_data_directory_;
 
 // power_mode_t serialisation
 NLOHMANN_JSON_SERIALIZE_ENUM(power_mode_t, {

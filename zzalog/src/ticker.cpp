@@ -1,8 +1,8 @@
 #include "ticker.h"
 
-#include <FL/Fl.H>
+#include "main.h"
 
-extern bool DEBUG_QUICK;
+#include <FL/Fl.H>
 
 const double TICK = 0.1;
 

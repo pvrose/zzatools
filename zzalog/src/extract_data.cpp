@@ -5,6 +5,7 @@
 #include "club_handler.h"
 #include "eqsl_handler.h"
 #include "lotw_handler.h"
+#include "main.h"
 #include "qrz_handler.h"
 #include "qso_manager.h"
 #include "record.h"
@@ -17,17 +18,6 @@
 #include <sstream>
 
 #include <FL/fl_ask.H>
-
-extern book* book_;
-extern book* navigation_book_;
-extern club_handler* club_handler_;
-extern eqsl_handler* eqsl_handler_;
-extern lotw_handler* lotw_handler_;
-extern qrz_handler* qrz_handler_;
-extern qso_manager* qso_manager_;
-extern spec_data* spec_data_;
-extern status* status_;
-extern tabbed_forms* tabbed_forms_;
 
 // Constructor
 extract_data::extract_data() :

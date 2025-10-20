@@ -4,6 +4,7 @@
 #include "cty_data.h"
 #include "cty_dialog.h"
 #include "extract_data.h"
+#include "main.h"
 #include "menu.h"
 #include "qso_entry.h"
 #include "qso_data.h"
@@ -24,16 +25,6 @@
 #include <FL/Fl_Toggle_Button.H>
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Scroll.H>
-
-extern cty_data* cty_data_;
-extern book* book_;
-extern extract_data* extract_records_;
-extern book* navigation_book_;
-extern status* status_;
-extern tabbed_forms* tabbed_forms_;
-extern spec_data* spec_data_;
-extern bool DARK;
-extern void open_html(const char*);
 
 std::map <std::string, std::string> CONTINENTS = {
 	{ "AF", "Africa" },

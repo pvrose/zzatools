@@ -1,15 +1,16 @@
 #include "qso_qsl_vwr.h"
 
+#include "book.h"
+#include "main.h"
+#include "qsl_dataset.h"
+#include "qsl_display.h"
+#include "qsl_widget.h"
 #include "qso_data.h"
 #include "qso_manager.h"
 #include "eqsl_handler.h"
-#include "status.h"
-#include "book.h"
-#include "qsl_display.h"
-#include "qsl_widget.h"
-#include "qsl_dataset.h"
 #include "record.h"
 #include "settings.h"
+#include "status.h"
 #include "stn_data.h"
 #include "tabbed_forms.h"
 
@@ -24,16 +25,6 @@
 #include <FL/Fl_Radio_Light_Button.H>
 #include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Fl_Box.H>
-
-
-
-extern eqsl_handler* eqsl_handler_;
-extern status* status_;
-extern book* book_;
-extern tabbed_forms* tabbed_forms_;
-extern qsl_dataset* qsl_dataset_;
-extern stn_data* stn_data_;
-extern void open_html(const char*);
 
 // Constructor
 qso_qsl_vwr::qso_qsl_vwr(int X, int Y, int W, int H, const char* L) :

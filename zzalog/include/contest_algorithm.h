@@ -5,8 +5,6 @@
 #include <string>
 #include <vector>
 
-
-
 class contest_algorithm;
 class contest_scorer;
 class record;
@@ -14,6 +12,8 @@ class record;
 struct qth_info_t;
 // List of fields
 typedef std::vector <std::string> field_list;
+
+extern std::map<std::string, contest_algorithm*>* algorithms_;
 
 //! Basic contest scoring element
 struct score_result {

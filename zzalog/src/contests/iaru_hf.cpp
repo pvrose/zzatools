@@ -8,7 +8,6 @@
 #include "utils.h"
 
 extern stn_data* stn_data_;
-extern std::map<std::string, contest_algorithm*>* algorithms_;
 
 contest_algorithm* iaru_hf_ = new contests::iaru_hf;
 

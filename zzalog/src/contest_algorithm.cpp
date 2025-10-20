@@ -1,6 +1,7 @@
 #include "contest_algorithm.h"
 
 #include "contest_scorer.h"
+#include "main.h"
 #include "qso_manager.h"
 #include "record.h"
 #include "spec_data.h"
@@ -12,10 +13,6 @@
 #include <FL/Fl_Output.H>
 
 typedef std::vector<std::string> field_list;
-
-extern qso_manager* qso_manager_;
-extern spec_data* spec_data_;
-extern stn_data* stn_data_;
 
 std::map< std::string, contest_algorithm* >* algorithms_ = nullptr;
 

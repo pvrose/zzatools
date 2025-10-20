@@ -6,6 +6,7 @@
 #include "book.h"
 #include "corr_dialog.h"
 #include "cty_data.h"
+#include "main.h"
 #include "record.h"
 #include "regices.h"
 #include "status.h"
@@ -26,13 +27,6 @@
 
 #include <FL/fl_ask.H>
 #include <FL/Fl_Native_File_Chooser.H>
-
-extern book* book_;
-extern cty_data* cty_data_;
-extern status* status_;
-extern std::string default_code_directory_;
-extern std::string default_ref_directory_;
-extern url_handler* url_handler_;
 
 using json = nlohmann::json;
 

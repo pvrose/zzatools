@@ -1,5 +1,6 @@
 ﻿#include "rig_if.h"
 
+#include "main.h"
 #include "status.h"
 
 #include "utils.h"
@@ -12,10 +13,6 @@
 #include <FL/fl_ask.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Tooltip.H>
-
-extern status* status_;
-extern bool DEBUG_THREADS;
-extern bool DEBUG_RIGS;
 
 // Returns if the rig opened OK
 bool rig_if::is_open() {

@@ -2,6 +2,7 @@
 
 #include "band_editor.h"
 #include "band_widget.h"
+#include "main.h"
 #include "qso_manager.h"
 #include "rig_if.h"
 #include "status.h"
@@ -10,11 +11,6 @@
 
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Tabs.H>
-
-extern std::string CONTACT;
-extern std::string COPYRIGHT;
-extern qso_manager* qso_manager_;
-extern status* status_;
 
 band_window::band_window(int X, int Y, int W, int H, const char* L) :
 	Fl_Double_Window(X, Y, W, H, L)

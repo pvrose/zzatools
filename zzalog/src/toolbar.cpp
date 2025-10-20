@@ -8,6 +8,7 @@
 #include "import_data.h"
 #include "intl_dialog.h"
 #include "intl_widgets.h"
+#include "main.h"
 #include "main_window.h"
 #include "menu.h"
 #include "qso_manager.h"
@@ -26,24 +27,6 @@
 #include <FL/Fl_Single_Window.H>
 #include <FL/Fl_Tooltip.H>
 #include <FL/fl_ask.H>
-
-extern book* navigation_book_;
-extern book* book_;
-extern cty_data* cty_data_;
-extern extract_data* extract_records_;
-extern import_data* import_data_;
-extern intl_dialog* intl_dialog_;
-extern main_window* main_window_;
-extern menu* menu_;
-extern qso_manager* qso_manager_;
-extern status* status_;
-extern tabbed_forms* tabbed_forms_;
-extern Fl_PNG_Image main_icon_;
-extern std::string default_ref_directory_;
-
-extern bool DARK;
-extern void open_html(const char*);
-
 
 // Constructor - most buttons invoke a menu item
 toolbar::toolbar(int X, int Y, int W, int H, const char* label) :

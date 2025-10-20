@@ -7,8 +7,6 @@
 
 #include "utils.h"
 
-extern std::map<std::string, contest_algorithm*>* algorithms_;
-
 contest_algorithm* basic_ = new contests::basic;
 
 // Constructor - add algorithmic specific data here

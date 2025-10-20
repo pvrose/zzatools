@@ -2,6 +2,7 @@
 
 #include "adi_reader.h"
 #include "book.h"
+#include "main.h"
 #include "menu.h"
 #include "qso_apps.h"
 #include "qso_data.h"
@@ -30,15 +31,6 @@
 
 #include <FL/Fl.H>
 #include <FL/fl_ask.H>
-
-extern status* status_;
-extern menu* menu_;
-extern toolbar* toolbar_;
-extern qso_manager* qso_manager_;
-extern spec_data* spec_data_;
-extern std::string PROGRAM_ID;
-extern std::string PROGRAM_VERSION;
-extern ticker* ticker_;
 
 wsjtx_handler* wsjtx_handler::that_ = nullptr;
 

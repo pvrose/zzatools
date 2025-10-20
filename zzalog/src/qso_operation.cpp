@@ -1,6 +1,7 @@
 #include "qso_operation.h"
 
 #include "config.h"
+#include "main.h"
 #include "qso_data.h"
 #include "record.h"
 #include "status.h"
@@ -13,14 +14,6 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_Input_Choice.H>
-
-extern config *config_;
-extern status *status_;
-extern stn_data *stn_data_;
-extern stn_window* stn_window_;
-
-extern std::string VENDOR;
-extern void open_html(const char*);
 
 qso_operation::qso_operation(int X, int Y, int W, int H, const char *L) : Fl_Group(X, Y, W, H, L),
 																		  current_qth_(""),

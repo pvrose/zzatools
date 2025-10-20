@@ -1,15 +1,17 @@
 #include "qso_rig.h"
+
+#include "band_data.h"
+#include "field_choice.h"
+#include "file_viewer.h"
+#include "filename_input.h"
+#include "main.H"
+#include "qso_manager.h"
+#include "rig_data.h"
 #include "rig_if.h"
 #include "serial.h"
-#include "status.h"
-#include "qso_manager.h"
-#include "band_data.h"
 #include "spec_data.h"
+#include "status.h"
 #include "ticker.h"
-#include "field_choice.h"
-#include "filename_input.h"
-#include "file_viewer.h"
-#include "rig_data.h"
 
 #include <set>
 #include <string>
@@ -25,17 +27,6 @@
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Tabs.H>
 #include <FL/Fl_Value_Slider.H>
-
-
-
-extern status* status_;
-extern band_data* band_data_;
-extern spec_data* spec_data_;
-extern rig_data* rig_data_;
-extern bool DARK;
-extern ticker* ticker_;
-extern void open_html(const char*);
-
 
 // Constructor
 qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :

@@ -2,6 +2,7 @@
 
 #include "banner.h"
 #include "intl_widgets.h"
+#include "main.h"
 #include "main_window.h"
 #include "menu.h"
 #include "qso_manager.h"
@@ -15,20 +16,6 @@
 #include <FL/Fl.H>
 #include <FL/Fl_Native_File_Chooser.H>
 #include <FL/fl_ask.H>
-
-
-
-extern menu* menu_;
-extern main_window* main_window_;
-extern status* status_;
-extern qso_manager* qso_manager_;
-extern bool READ_ONLY;
-extern std::string PROGRAM_VERSION;
-extern bool DEBUG_PRETTY;
-extern ticker* ticker_;
-extern banner* banner_;
-extern std::string default_data_directory_;
-extern bool keep_banner_;
 
 // Constructor
 status::status() :

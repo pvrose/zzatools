@@ -1,5 +1,6 @@
 #include "qso_clock.h"
 
+#include "main.h"
 #include "qso_manager.h"
 #include "ticker.h"
 
@@ -10,8 +11,6 @@
 
 #include <FL/Fl_Image.H>
 #include <FL/Fl_Button.H>
-
-extern ticker* ticker_;
 
 // Clock group - constructor
 qso_clock::qso_clock

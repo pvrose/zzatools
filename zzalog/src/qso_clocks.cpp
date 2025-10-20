@@ -1,6 +1,7 @@
 #include "qso_clocks.h"
 
 #include "condx_view.h"
+#include "main.h"
 #include "qso_clock.h"
 #include "qso_manager.h"
 #include "qso_wx.h"
@@ -14,12 +15,6 @@
 
 #include <FL/Fl_Radio_Round_Button.H>
 #include <FL/Fl_Tabs.H>
-
-// basic tick is 200 ms 
-extern status* status_;
-extern wsjtx_handler* wsjtx_handler_;
-extern bool closing_;
-extern void open_html(const char*);
 
 // Constructor
 qso_clocks::qso_clocks(int X, int Y, int W, int H, const char* L) :

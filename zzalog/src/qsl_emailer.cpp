@@ -1,18 +1,16 @@
 #include "qsl_emailer.h"
-#include "record.h"
+
+#include "main.h"
 #include "png_writer.h"
+#include "qsl_dataset.h"
+#include "record.h"
 #include "status.h"
 #include "url_handler.h"
-#include "qsl_dataset.h"
 
 #include <string>
 #include <cstdio>
 
 #include <FL/fl_ask.H>
-
-extern status* status_;
-extern url_handler* url_handler_;
-extern qsl_dataset* qsl_dataset_;
 
 const std::string SUBJECT = "QSL for <CALL> <QSO_DATE> <BAND> <MODE> from <STATION_CALLSIGN>";
 const std::string BODY = 

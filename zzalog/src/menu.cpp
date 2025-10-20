@@ -14,6 +14,7 @@
 #include "extract_data.h"
 #include "import_data.h"
 #include "intl_dialog.h"
+#include "main.h"
 #include "main_window.h"
 #include "page_dialog.h"
 #include "printer.h"
@@ -50,35 +51,6 @@
 #include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Fl_Single_Window.H>
 #include <FL/Fl_Tooltip.H>
-
-extern banner* banner_;
-extern book* book_;
-extern book* navigation_book_;
-extern config* config_;
-extern cty_data* cty_data_;
-extern eqsl_handler* eqsl_handler_;
-extern extract_data* extract_records_;
-extern import_data* import_data_;
-extern intl_dialog* intl_dialog_;
-extern main_window* main_window_;
-extern qrz_handler* qrz_handler_;
-extern qso_manager* qso_manager_;
-extern spec_data* spec_data_;
-extern status* status_;
-extern tabbed_forms* tabbed_forms_;
-extern ticker* ticker_;
-extern toolbar* toolbar_;
-extern url_handler* url_handler_;
-extern wsjtx_handler* wsjtx_handler_;
-
-extern bool READ_ONLY;
-extern std::list<std::string> recent_files_;
-extern std::string PROGRAM_ID;
-extern time_t session_start_;
-extern void open_html(const char*);
-extern void open_pdf();
-extern std::string recent_file(int n);
-
 
 	// The default menu - std::set of menu items
 	Fl_Menu_Item menu_items[] = {
@@ -244,13 +216,6 @@ extern std::string recent_file(int n);
 		{ 0 },
 	{ 0 }
 	};
-
-extern void add_data();
-extern void main_window_label(std::string text);
-extern void backup_file();
-extern void restore_backup();
-extern void set_recent_file(std::string filename);
-
 
 // Constructor
 menu::menu(int X, int Y, int W, int H, const char* label) :

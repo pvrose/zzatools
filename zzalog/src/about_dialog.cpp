@@ -1,5 +1,6 @@
 #include "about_dialog.h"
 
+#include "main.h"
 #include "spec_data.h"
 #include "utils.h"
 
@@ -13,15 +14,7 @@
 #include <FL/Fl_Multiline_Output.H>
 #include <FL/Fl_PNG_Image.H>
 
-extern spec_data* spec_data_;
-extern std::string PROGRAM_ID;
-extern std::string PROGRAM_VERSION;
-extern std::string CONTACT;
-extern std::string COPYRIGHT;
-extern std::string PARTY3RD_COPYRIGHT;
 extern std::string TIMESTAMP;
-extern bool DEVELOPMENT_MODE;
-extern Fl_PNG_Image main_icon_;
 
 // Creates the about box dialog and displays it.
 about_dialog::about_dialog() :

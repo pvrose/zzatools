@@ -2,6 +2,7 @@
 
 #include "book.h"
 #include "fields.h"
+#include "main.h"
 #include "record.h"
 #include "spec_data.h"
 #include "status.h"
@@ -15,13 +16,6 @@
 #include <FL/Fl.H>
 #include <FL/fl_draw.H>
 
-
-
-
-extern status* status_;
-extern spec_data* spec_data_;
-extern std::string DATA_COPYRIGHT;
-extern std::string PROGRAM_ID;
 
 // Default constructor
 adi_writer::adi_writer()

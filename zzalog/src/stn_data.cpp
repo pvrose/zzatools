@@ -2,6 +2,7 @@
 
 #include "config.h"
 #include "init_dialog.h"
+#include "main.h"
 #include "record.h"
 #include "status.h"
 #include "stn_dialog.h"
@@ -9,11 +10,6 @@
 #include "nlohmann/json.hpp"
 
 #include <vector>
-
-extern config* config_;
-extern status* status_;
-extern stn_window* stn_window_;
-extern std::string default_data_directory_;
 
 using json = nlohmann::json;
 

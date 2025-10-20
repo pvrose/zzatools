@@ -1,15 +1,12 @@
 #include "qso_tabbed_rigs.h"
+
+#include "main.h"
 #include "qso_rig.h"
 #include "qso_manager.h"
 #include "rig_data.h"
 #include "settings.h"
 #include "spec_data.h"
 #include "status.h"
-
-extern rig_data* rig_data_;
-extern spec_data* spec_data_;
-extern status* status_;
-extern bool closing_;
 
 // Constructor for the rigs std::set of tabs
 qso_tabbed_rigs::qso_tabbed_rigs(int X, int Y, int W, int H, const char* L) :

@@ -1,4 +1,5 @@
 #include "fields.h"
+#include "main.h"
 #include "utils.h"
 #include "status.h"
 
@@ -6,9 +7,6 @@
 #include <iostream>
 
 #include <FL/fl_utf8.h>
-
-extern status* status_;
-extern std::string default_data_directory_;
 
 //! Convert field_info_t to JSON object
 static void to_json(json& j, const field_info_t& s) {

@@ -1,8 +1,11 @@
 #include "qsl_display.h"
+
+#include "main.h"
 #include "qsl_dataset.h"
 #include "qso_manager.h"
-#include "status.h"
 #include "record.h"
+#include "status.h"
+
 #include "utils.h"
 
 #include <set>
@@ -14,11 +17,6 @@
 #include <FL/Fl_PNG_Image.H>
 #include <FL/Fl_Image_Surface.H>
 
-
-
-extern qso_manager* qso_manager_;
-extern status* status_;
-extern qsl_dataset* qsl_dataset_;
 // Dynamically drawn QSL card label
 
 // Constructor - just initialises the data
