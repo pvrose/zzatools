@@ -294,7 +294,7 @@ void restore_backup() {
 
 // This callback intercepts the close command and performs checks and tidies up
 // Updates recent files settings
-static void cb_bn_close(Fl_Widget* w, void*v) {
+void cb_bn_close(Fl_Widget* w, void*v) {
 	// The close button can only be clicked at certain times in the closure process
 	// when Fl::wait() is called.
 	if (closing_) {

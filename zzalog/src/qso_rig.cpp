@@ -4,7 +4,7 @@
 #include "field_choice.h"
 #include "file_viewer.h"
 #include "filename_input.h"
-#include "main.H"
+#include "main.h"
 #include "qso_manager.h"
 #include "rig_data.h"
 #include "rig_if.h"

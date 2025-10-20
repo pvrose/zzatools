@@ -14,6 +14,8 @@
 //!
 //! ZZALOG is based in part on the work of the FLTK project <A HREF=https://www.fltk.org>https://www.fltk.org</A>.
 
+#include "hamlib/rig.h"
+
 #include <list>
 #include <string>
 
@@ -169,7 +171,7 @@ void restore_backup();
 
 //! \param w calling widget.
 //! \param v not used.
-static void cb_bn_close(Fl_Widget* w, void* v);
+void cb_bn_close(Fl_Widget* w, void* v);
 
 //! Callback used by FLTK when parsing command-line arguments.
 
