@@ -122,7 +122,7 @@ void stn_call_cntnr::redraw_widgets() {
 	int cy = ry;
 	for (auto it : *data) {
 		// Create widget
-		stn_call_widget* w = new stn_call_widget(rx, cy, rw, ROW_HEIGHT * 2);
+		stn_call_widget* w = new stn_call_widget(rx, cy, rw, ROW_HEIGHT * 4/3);
 		w->copy_label(it.first.c_str());
 		if (it.first == selected_) w->labelfont(FL_BOLD);
 		else w->labelfont(FL_ITALIC);
@@ -308,4 +308,9 @@ void stn_call_dlg::set_callsign(std::string s) {
 		selected_new_ = false;
 		enable_widgets();
 	}
+}
+
+//! Get selected c all
+std::string stn_call_dlg::get_callsign() {
+	return callsign_;
 }

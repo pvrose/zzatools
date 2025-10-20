@@ -66,7 +66,7 @@ static void from_json(const json& j, oper_info_t& s) {
 NLOHMANN_JSON_SERIALIZE_ENUM(stn_type, {
 	{ NOT_USED, "Not used" },
 	{ CLUB, "Club" },
-	{ INDIVIDUAL, "Individual "}
+	{ INDIVIDUAL, "Individual"}
 })
 
 // Convert stn_default to JSON object
@@ -101,6 +101,11 @@ void stn_data::load_data() {
 	char msg[128];
 	status_->misc_status(ST_NOTE, "STN DATA: Loading operation data");
 	bool loaded = load_json();
+	// Set current values
+	current_ = defaults_;
+	if (defaults_.type == CLUB) {
+		current_.name = previous_oper_;
+	}
 	// If no data loaded or default callsign is not set
 	if (!loaded || defaults_.callsign.length() == 0) {
 		// Create a set of initial values from input defaults.
@@ -116,6 +121,11 @@ void stn_data::load_data() {
 		opers_.find(defaults_.name) == opers_.end()) {
 		// Create a set of initial values from input defaults.
 		stn_window_->set_tab(stn_dialog::OPERATOR, defaults_.name, "Operator not known, please enter details.");
+		while (stn_window_->visible()) Fl::check();
+	}
+	else if (defaults_.type == CLUB) {
+		// Create a set of initial values from input defaults.
+		stn_window_->set_tab(stn_dialog::OPERATOR, previous_oper_, "Club station, please specify operator");
 		while (stn_window_->visible()) Fl::check();
 	}
 	else if (calls_.find(defaults_.callsign) == calls_.end()) {
@@ -179,6 +189,12 @@ bool stn_data::load_json() {
 		if (j.find("Defaults") != j.end()) {
 			j.at("Defaults").get_to(defaults_);
 		}
+		if (j.find("Previous Operator") != j.end()) {
+			j.at("Previous Operator").get_to(previous_oper_);
+		}
+		else {
+			previous_oper_ = "";
+		}
 	}
 	catch (const json::exception& e) {
 		std::snprintf(msg, sizeof(msg), "STN DATA: Failed to load %s: %d (%s)\n",
@@ -223,6 +239,9 @@ bool stn_data::store_json() {
 		}
 		jall["Station callsigns"] = jc;
 		jall["Defaults"] = defaults_;
+		if (defaults_.type == CLUB) {
+			jall["Previous Operator"] = current_.name;
+		}
 		json j;
 
 		j["Station"] = jall;
@@ -765,4 +784,15 @@ void stn_data::set_defaults(const stn_default def) {
 // Set station type
 void stn_data::set_type(const stn_type t) {
 	defaults_.type = t;
+}
+
+// Get current
+stn_default stn_data::current() {
+	return current_;
+}
+
+// Set current
+void stn_data::set_current(stn_default values) {
+	current_ = values;
+	current_.type = defaults_.type;
 }

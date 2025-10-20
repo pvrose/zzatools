@@ -188,8 +188,14 @@ public:
 	//! Return station defaults
 	stn_default defaults();
 
+	//! Return current values
+	stn_default current();
+
 	//! Set defaults to \p def
 	void set_defaults(const stn_default def);
+
+	//! Set current values to \p values
+	void set_current(const stn_default values);
 
 	//! Set station type
 	void set_type(const stn_type t);
@@ -216,9 +222,13 @@ protected:
 	std::map<std::string, std::string> calls_;
 	//! Loaded station defaults
 	stn_default defaults_;
+	//! Current values
+	stn_default current_;
 	//! Current unknown QTH identifier
 	int unknown_qth_index_;
 	//! Current unknown operator identifier
 	int unknown_oper_index_{ 0 };
+	//! Previous operator
+	std::string previous_oper_;
 };
 

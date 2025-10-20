@@ -93,6 +93,14 @@ void stn_dialog::create_form(int X, int Y) {
 	message_->labelsize(FL_NORMAL_SIZE + 2);
 
 	cy += message_->h();
+	cx += (cw / 2) - (WBUTTON / 2);
+	Fl_Button* bn_done = new Fl_Button(cx, cy, WBUTTON, HBUTTON, "Done!");
+	bn_done->callback(cb_done);
+	bn_done->tooltip("Close the window to accept the changes");
+
+	cy += HBUTTON;
+	cx = x() + GAP;
+
 	int ch = y() + h() - cy;
 
 	// Create an Fl_Tabs
@@ -124,8 +132,15 @@ void stn_dialog::create_form(int X, int Y) {
 
 // Used to write settings back
 void stn_dialog::save_values() {
+	stn_default current;
+	current.type = NOT_USED;
+	current.callsign = g_call_->get_callsign();
+	current.location = g_qth_->get_location();
+	current.name = g_oper_->get_operator();
+	stn_data_->set_current(current);
+
 	// Make the changes availble in qso_data
-	qso_manager_->data()->update_station_choices();
+	if (qso_manager_) qso_manager_->data()->update_station_choices();
 }
 
 // Used to enable/disable specific widget - any widgets enabled musr be attributes
@@ -156,6 +171,14 @@ void stn_dialog::enable_widgets() {
 void stn_dialog::cb_tab(Fl_Widget* w, void* v) {
 	stn_dialog* that = ancestor_view<stn_dialog>(w);
 	that->enable_widgets();
+}
+
+// Done
+void stn_dialog::cb_done(Fl_Widget* w, void* v) {
+	stn_dialog* that = ancestor_view<stn_dialog>(w);
+	stn_window* win = ancestor_view<stn_window>(that);
+	that->save_values();
+	win->hide();
 }
 
 // Set tab

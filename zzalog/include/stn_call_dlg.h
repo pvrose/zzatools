@@ -113,6 +113,9 @@ public:
     //! Set selected
     void set_callsign(std::string s);
 
+    //! Get selected
+    std::string get_callsign();
+
     //! Callback from "Add" button
     static void cb_add(Fl_Widget* w, void* v);
 

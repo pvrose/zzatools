@@ -113,6 +113,9 @@ public:
 
     //! Set selected
     void set_location(std::string s);
+
+    //! Get location
+    std::string get_location();
     
     //! Callback from "Add" button
     static void cb_add(Fl_Widget* w, void* v);

@@ -57,6 +57,8 @@ public:
 
 	//! Callback from changing tabs.
 	static void cb_tab(Fl_Widget* w, void* v);
+	//! Callback to close window from Done button
+	static void cb_done(Fl_Widget* w, void* v);
 
 	//! type for the single_tab 
 	enum tab_type : char {

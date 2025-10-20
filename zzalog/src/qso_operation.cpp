@@ -122,7 +122,7 @@ void qso_operation::enable_widgets()
 
 // Load data
 void qso_operation::load_data() {
-	stn_default defaults = stn_data_->defaults();
+	stn_default defaults = stn_data_->current();
 	current_oper_ = defaults.name;
 	current_call_ = defaults.callsign;
 	current_qth_ = defaults.location;

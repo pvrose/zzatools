@@ -113,6 +113,9 @@ public:
     //! Set selected
     void set_operator(std::string s);
 
+    //! Return current operator
+    std::string get_operator();
+
     //! Callback from "Add" button
     static void cb_add(Fl_Widget* w, void* v);
 

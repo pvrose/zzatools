@@ -474,3 +474,8 @@ void stn_qth_dlg::set_location(std::string s) {
 	selected_new_ = false;
 	enable_widgets();
 }
+
+//! Get location
+std::string stn_qth_dlg::get_location() {
+	return location_;
+}

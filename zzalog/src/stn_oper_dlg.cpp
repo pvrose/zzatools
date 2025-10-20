@@ -153,7 +153,7 @@ void stn_oper_cntnr::redraw_widgets() {
 	int cy = ry;
 	for (auto it : *data) {
 		// Create widget
-		stn_oper_widget* w = new stn_oper_widget(rx, cy, rw, ROW_HEIGHT * 2);
+		stn_oper_widget* w = new stn_oper_widget(rx, cy, rw, ROW_HEIGHT * 4/3);
 		w->copy_label(it.first.c_str());
 		if (it.first == selected_) w->labelfont(FL_BOLD);
 		else w->labelfont(FL_ITALIC);
@@ -374,7 +374,7 @@ void stn_oper_dlg::populate_operators() {
 
 //! Set selected oper
 void stn_oper_dlg::set_operator(std::string s) {
-	if (stn_data_->known_oper(s)) {
+	if (stn_data_->known_oper(s) || s.length() == 0) {
 		table_->set_selected(s);
 		ip_new_->value(s.c_str());
 		ip_new_->update_menubutton();
@@ -386,4 +386,9 @@ void stn_oper_dlg::set_operator(std::string s) {
 		selected_new_ = false;
 		enable_widgets();
 	}
+}
+
+//! Get operator
+std::string stn_oper_dlg::get_operator() {
+	return operator_;
 }
