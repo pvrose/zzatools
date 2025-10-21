@@ -1197,7 +1197,6 @@ void set_directories() {
 	// Working directory
 	default_data_directory_ =
 		std::string(getenv("HOME")) + "/.config/" + VENDOR + "/" + PROGRAM_ID + "/";
-	}
 #endif
 }
 
