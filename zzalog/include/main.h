@@ -87,19 +87,6 @@ extern bool DEBUG_QUICK;
 extern bool DEBUG_RIGS;
 //! Print callsign parsing messages -  by "-d d"
 extern bool DEBUG_PARSE;
-//! Reset configuration files (for cold/warm start testing)
-extern uint16_t DEBUG_RESET_CONFIG;
-const uint16_t DEBUG_RESET_ADIF = 1;        //!< Reset all.json (ADIF)
-const uint16_t DEBUG_RESET_BAND = 1 << 1;   //!< Reset band_plan.json
-const uint16_t DEBUG_RESET_CTY = 1 << 2;    //!< Reset country files
-const uint16_t DEBUG_RESET_INTL = 1 << 3;   //!< Reset intl_chars.txt
-const uint16_t DEBUG_RESET_APPS = 1 << 4;   //!< Reset apps.json
-const uint16_t DEBUG_RESET_SETT = 1 << 5;   //!< Reset settings.json
-const uint16_t DEBUG_RESET_RIGS = 1 << 6;   //!< Reset rigs.json
-const uint16_t DEBUG_RESET_FLDS = 1 << 7;   //!< Reset fields.json
-const uint16_t DEBUG_RESET_TEST = 1 << 8;   //!< Reset contests.json
-const uint16_t DEBUG_RESET_IMGS = 1 << 9;   //!< Reset images
-const uint16_t DEBUG_RESET_ALL = 0xffff;    //!< Reset all
 //! Set hamlib debugging verbosity level -  by "-d h=<level>"
 extern rig_debug_level_e HAMLIB_DEBUG_LEVEL;
 
@@ -343,15 +330,6 @@ extern std::string sticky_message_;
 
 //! Common seed to use in password encryption - maintaned with sessions.
 extern uint32_t seed_;
-
-//! Default location for configuration files, and HTML files
-extern std::string default_data_directory_;
-
-//! Default location for reference source data
-extern std::string default_source_directory_;
-
-//! Default location for auto-generated compile fodder
-extern std::string default_code_directory_;
 
 //! Do not close banner. Kept \p false unless banner is not deleted at ZZALOG closure in error cases.
 extern bool keep_banner_;

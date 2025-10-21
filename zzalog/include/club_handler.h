@@ -88,8 +88,6 @@ typedef size_t qso_num_t;
 		void generate_oqrs(std::ostream& req);
 		//! Unzip the downloaded  exceptions file.
 		bool unzip_exception(std::string filename);
-		//! Get reference directory name.
-		void get_reference(std::string& dir_name);
 		//! Copy QSO to ADIF std::string.
 		
 		//! \param this_record the QSO record to convert.

@@ -47,7 +47,6 @@ std::list<std::string> cty3_reader::expand_mask(std::string patterns) {
 			}
 		}
 		if (num_multis > 1) {
-			data_->out() << "Pattern " << ptn << " ignored - too many individual prefixes\n";
 			continue;
 		}
 		// Preprocess removing #,@,? and -
@@ -248,7 +247,6 @@ bool cty3_reader::load_data(cty_data* data, std::istream& in, std::string& versi
 		current_elements_.resize(depth + 1);
 		switch (type) {
 		case CTY_UNDEFINED:
-			data_->out() << "Undefined record " << line << "\n";
 			break;
 		case CTY_ENTITY:
 			// Add the element and remove the filters
@@ -266,7 +264,6 @@ bool cty3_reader::load_data(cty_data* data, std::istream& in, std::string& versi
 			current_elements_[depth] = load_entity(line, true);
 			break;
 		case CTY_OLD_PREFIX:
-			data_->out() << "Old prefix " << line << "\n";
 			break;
 		case CTY_UNRECOGNISED:
 			current_elements_[depth] = load_entity(line, false);

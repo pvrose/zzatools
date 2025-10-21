@@ -4,6 +4,7 @@
 #include "callback.h"
 #include "cty_data.h"
 #include "extract_data.h"
+#include "file_holder.h"
 #include "icons.h"
 #include "import_data.h"
 #include "intl_dialog.h"
@@ -238,7 +239,7 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	bn = new Fl_Button(curr_x, Y, H, H, 0);
 	bn->callback(cb_bn_menu, (void*)"&Information/Google &Maps");
 	bn->when(FL_WHEN_RELEASE);
-	std::string gmap_filename = default_data_directory_ + "google-maps.png";
+	std::string gmap_filename = file_holder_->get_filename(FILE_ICON_GMAPS);;
 	Fl_PNG_Image* pi = new Fl_PNG_Image(gmap_filename.c_str());
 	if (pi && !pi->fail())
 		bn->image(pi->copy(H, H));
@@ -251,7 +252,7 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	bn = new Fl_Button(curr_x, Y, H, H, 0);
 	bn->callback(menu::cb_mi_info_qrz, &search_text_);
 	bn->when(FL_WHEN_RELEASE);
-	std::string qrz_filename = default_data_directory_ + "qrz_1.jpg";
+	std::string qrz_filename = file_holder_->get_filename(FILE_ICON_QRZ);
 	Fl_JPEG_Image* qi = new Fl_JPEG_Image(qrz_filename.c_str());
 	if (qi && !qi->fail())
 		bn->image(qi->copy(H, H));
@@ -280,7 +281,7 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	bn = new Fl_Button(curr_x, Y, H, H, 0);
 	bn->callback(cb_bn_menu, (void*)"&Help/User Guide (&PDF)");
 	bn->when(FL_WHEN_RELEASE);
-	std::string pdf_filename = default_data_directory_ + "pdf.png";
+	std::string pdf_filename = file_holder_->get_filename(FILE_ICON_PDF);
 	pi = new Fl_PNG_Image(pdf_filename.c_str());
 	if (pi && !pi->fail())
 		bn->image(pi->copy(H, H));

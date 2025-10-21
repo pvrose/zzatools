@@ -1,6 +1,7 @@
 #include "cty_dialog.h"
 
 #include "cty_data.h"
+#include "file_holder.h"
 #include "main.h"
 
 #include "drawing.h"
@@ -198,7 +199,7 @@ void cty_dialog::cb_close(Fl_Widget* w, void* v) {
 void cty_dialog::cb_browser(Fl_Widget* w, void* v) {
 	Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
 	chooser->title("ZZALOG Application Data");
-	chooser->directory(default_data_directory_.c_str());
+	chooser->directory(file_holder_->get_directory().c_str());
 	chooser->show();
 	delete chooser;
 }

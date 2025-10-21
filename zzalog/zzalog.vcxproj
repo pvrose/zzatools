@@ -201,6 +201,7 @@
     <ClCompile Include="src\fields.cpp" />
     <ClCompile Include="src\fields_dialog.cpp" />
     <ClCompile Include="src\field_choice.cpp" />
+    <ClCompile Include="src\file_holder.cpp" />
     <ClCompile Include="src\file_viewer.cpp" />
     <ClCompile Include="src\fllog_emul.cpp" />
     <ClCompile Include="src\font_dialog.cpp" />
@@ -319,6 +320,7 @@
     <ClInclude Include="include\fields.h" />
     <ClInclude Include="include\fields_dialog.h" />
     <ClInclude Include="include\field_choice.h" />
+    <ClInclude Include="include\file_holder.h" />
     <ClInclude Include="include\file_viewer.h" />
     <ClInclude Include="include\fllog_emul.h" />
     <ClInclude Include="include\font_dialog.h" />

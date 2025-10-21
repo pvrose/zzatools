@@ -157,8 +157,6 @@ typedef size_t qso_num_t;
 	protected:
 		//! Load data from JSON 
 		bool load_json();
-		//! Returns path to all.xml
-		std::string get_path();
 		//! Sort field names
 		void process_fieldnames();
 		//! Combine mode and submode into single dataset

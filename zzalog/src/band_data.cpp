@@ -1,4 +1,5 @@
 #include "band_data.h"
+#include "file_holder.h"
 #include "main.h"
 #include "status.h"
 #include "spec_data.h"
@@ -98,10 +99,10 @@ bool band_data::load_json() {
 	json j;
 	char msg[128];
 	// Wrte JSON out to band_plan.json
-	std::string filename = get_path() + "band_plan.json";
 	status_->misc_status(ST_NOTE, ("BAND: Loading band-plan data"));
-	ifstream i(filename);
-	if (i.good()) {
+	ifstream i;
+	std::string filename;
+	if (file_holder_->get_file(FILE_BANDPLAN, i, filename)) {
 		try {
 			i >> j;
 			i.close();
@@ -139,15 +140,11 @@ void band_data::save_json() {
 	json jout;
 	jout["Band plan"] = j;
 	// Wrte JSON out to band_plan.json
-	std::string filename = get_path() + "band_plan.json";
-	std::ofstream o(filename);
+	std::string filename;
+	std::ofstream o;
+	file_holder_->get_file(FILE_BANDPLAN, o, filename);
 	o << std::setw(4) << jout << '\n';
 	o.close();
-}
-
-// Get the directory of the reference files
-std::string band_data::get_path() {
-	return default_data_directory_;
 }
 
 // Get the band plan data entry for the specified frequency
@@ -231,60 +228,6 @@ void band_data::create_bands() {
 			}
 			entries_.insert(entry);
 		}
-	}
-}
-
-// Locate the all.xml file and copy to default data directory
-bool band_data::find_and_copy_data() {
-	std::string source;
-	Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
-	chooser->title("Select Band plan file band_plan.tsv");
-	chooser->filter("TSV File\t*.tsv");
-	if (chooser->show() == 0) {
-		source = chooser->filename();
-	}
-	delete chooser;
-	std::string target = get_path() + "band_plan.tsv";
-	char msg[128];
-	snprintf(msg, sizeof(msg), "BAND: Copying %s", source.c_str());
-	status_->misc_status(ST_NOTE, msg);
-	// In and out streams
-	ifstream in(source);
-	in.seekg(0, in.end);
-	int length = (int)in.tellg();
-	const int increment = 8000;
-	in.seekg(0, in.beg);
-	status_->progress(length, OT_BAND, "Copying data to backup", "bytes");
-	std::ofstream out(target);
-	bool ok = in.good() && out.good();
-	char buffer[increment];
-	int count = 0;
-	// Copy file in 7999 byte chunks
-	while (!in.eof() && ok) {
-		in.read(buffer, increment);
-		out.write(buffer, in.gcount());
-		count += (int)in.gcount();
-		ok = out.good() && (in.good() || in.eof());
-		status_->progress(count, OT_BAND);
-	}
-	if (!ok) {
-		status_->progress("Failed before completion", OT_BAND);
-	}
-	else {
-		if (count != length) {
-			status_->progress(length, OT_BAND);
-		}
-	}
-	in.close();
-	out.close();
-	if (!ok) {
-		// Report error
-		status_->misc_status(ST_FATAL, "BAND: failed");
-		return false;
-	}
-	else {
-		status_->misc_status(ST_OK, "BAND: Copied");
-		return true;
 	}
 }
 

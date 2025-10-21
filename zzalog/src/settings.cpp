@@ -2,6 +2,7 @@
 
 #include "contest_scorer.h"
 #include "dxcc_table.h"
+#include "file_holder.h"
 #include "log_table.h"
 #include "main.h"
 #include "qso_wx.h"
@@ -20,8 +21,9 @@ using json = nlohmann::json;
 //! Basic constructor
 settings::settings() {
 	// Ddfault filename ZZALOG.json
-	std::string filename = default_data_directory_ + PROGRAM_ID + ".json";
-	std::ifstream i(filename);
+	std::string filename;
+	std::ifstream i;
+	file_holder_->get_file(FILE_SETTINGS, i, filename);
 	parent_ = nullptr;
 	if (i.good()) {
 		// Load in file
@@ -41,6 +43,7 @@ settings::settings() {
 			printf("SETTINGS: Reading JSON failed %d (%s)\n",
 				e.id, e.what());
 			i.close();
+			data_ = new json;
 		}
 	}
 	else {
@@ -61,8 +64,9 @@ settings::settings(settings* parent, const std::string name) {
 //! DEstructor - copy data back to file
 settings::~settings() {
 	if (parent_ == nullptr) {
-		std::string filename = default_data_directory_ + PROGRAM_ID + ".json";
-		std::ofstream o(filename);
+		std::string filename;
+		std::ofstream o;
+		file_holder_->get_file(FILE_SETTINGS, o, filename);
 		parent_ = nullptr;
 		json j;
 		j[PROGRAM_ID] = *data_;

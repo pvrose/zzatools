@@ -1,5 +1,6 @@
 #include "rig_data.h"
 
+#include "file_holder.h"
 #include "main.h"
 #include "rig_if.h"
 #include "status.h"
@@ -226,9 +227,9 @@ void rig_data::load_data() {
 // Loading datafrom JSON
 bool rig_data::load_json() {
     char msg[128];
-    std::string filename = default_data_directory_ + "rigs.json";
+    std::string filename;
     ifstream is;
-    is.open(filename, std::ios_base::in);
+    file_holder_->get_file(FILE_RIGS, is, filename);
     if (!is.good()) {
         snprintf(msg, sizeof(msg), "RIGS: Failed to open %s", filename.c_str());
         status_->misc_status(ST_WARNING, msg);
@@ -260,9 +261,9 @@ bool rig_data::load_json() {
 
 // Store data as JSON
 bool rig_data::store_json() {
-    std::string filename = default_data_directory_ + "rigs.json";
+    std::string filename;
     std::ofstream os;
-    os.open(filename, std::ios_base::out);
+    file_holder_->get_file(FILE_RIGS, os, filename);
     if (os.good()) {
         json j;
         for (auto& it : data_) {

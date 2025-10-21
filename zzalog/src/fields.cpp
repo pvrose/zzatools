@@ -1,4 +1,6 @@
 #include "fields.h"
+
+#include "file_holder.h"
 #include "main.h"
 #include "utils.h"
 #include "status.h"
@@ -123,11 +125,9 @@ void fields::load_data() {
 
 // Read - <Prefs path>.fields.tsv
 bool fields::load_collections() {
-    filename_ = default_data_directory_ + "fields.json";
-    fl_make_path_for_file(filename_.c_str());
     ifstream ip;
+    file_holder_->get_file(FILE_FIELDS, ip, filename_);
     char msg[128];
-    ip.open(filename_.c_str(), std::ios_base::in);
     if (!ip.good()) {
         char msg[128];
         snprintf(msg, sizeof(msg), 
@@ -166,12 +166,8 @@ bool fields::load_collections() {
 // Store settings
 void fields::store_data() {
 	// Delete current settings
-    if (filename_.length() == 0) {
-         filename_ = default_data_directory_ + "fields.json";
-        fl_make_path_for_file(filename_.c_str());
-    }
     std::ofstream op;
-    op.open(filename_.c_str(), std::ios_base::out);
+    file_holder_->get_file(FILE_FIELDS, op, filename_);
     if (op.good()) {
         json j;
         for (auto it : coll_map_) {

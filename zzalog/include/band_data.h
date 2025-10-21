@@ -115,16 +115,6 @@ protected:
 	bool load_json();
 	//! Process the data to bands
 	void create_bands();
-	//! Get the file name
-	
-	//! \return directory containing the bandplan data.
-	std::string get_path();
-	//! Find the band_plan.json file
-	
-	//! If the bandplan data is not available, a file browser is opened to 
-	//! and the selected file will be copied to the correct location
-	//! \return true if successful, false if not.
-	bool find_and_copy_data();
 	//! The database of band_entry_t items.
 	std::set<band_entry_t*, ptr_lt> entries_;
 	//! A map referencing band names to frequency ranges.

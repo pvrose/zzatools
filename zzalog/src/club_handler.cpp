@@ -4,6 +4,7 @@
 #include "adi_writer.h"
 #include "cty_data.h"
 #include "fields.h"
+#include "file_holder.h"
 #include "main.h"
 #include "qsl_dataset.h"
 #include "qso_manager.h"
@@ -134,8 +135,7 @@ bool club_handler::download_exception(std::string filename) {
 // Unzip the downloaded  exceptions file
 bool club_handler::unzip_exception(std::string filename) {
 	// Read the settings that define user's access 
-	std::string ref_dir;
-	get_reference(ref_dir);
+	std::string ref_dir = file_holder_->get_directory();
 	char cmd[256];
 #ifdef _WIN32
 	snprintf(cmd, sizeof(cmd), "\"%s\" e %s -o%s -y", "C:/Program Files/7-Zip/7z", filename.c_str(), ref_dir.c_str());
@@ -183,11 +183,6 @@ bool club_handler::unzip_exception(std::string filename) {
 		return true;
 	}
 #endif
-}
-
-// Get reference directory
-void club_handler::get_reference(std::string& dir_name) {
-	dir_name = default_data_directory_;
 }
 
 // Upload the single specified QSO in real time

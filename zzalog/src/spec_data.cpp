@@ -6,6 +6,7 @@
 #include "book.h"
 #include "corr_dialog.h"
 #include "cty_data.h"
+#include "file_holder.h"
 #include "main.h"
 #include "record.h"
 #include "regices.h"
@@ -94,11 +95,6 @@ spec_data::~spec_data()
 	datatype_indicators_.clear();
 }
 
-// Get the data path to the files - returns directory name
-std::string spec_data::get_path() {
-	return default_data_directory_;
-}
-
 // load the data
 bool spec_data::load_data() {
 	// Clear all containers
@@ -125,12 +121,11 @@ bool spec_data::load_data() {
 // Load data from JSON
 bool spec_data::load_json() {
 	// Get the directory
-	std::string directory = get_path();
-	std::string filename = directory + "all.json";
+	std::string filename;
 	char msg[128];
 	status_->misc_status(ST_NOTE, "ADIF SPEC: Loading ADIF Specification");
 	ifstream is;
-	is.open(filename, std::ios_base::in);
+	file_holder_->get_file(FILE_ADIF, is, filename);
 	if (is.good()) {
 		try {
 			json jall;
@@ -2449,11 +2444,11 @@ std::string spec_data::summarise_enumaration(std::string name, std::string value
 bool spec_data::valid() { return data_loaded_; }
 
 bool spec_data::generate_adif_hfile() {
-	if (default_code_directory_.length() == 0) {
+	if (!DEVELOPMENT_MODE) {
 		status_->misc_status(ST_ERROR, "Cannot regenerate adif.h - not in development mode");
 		return false;
 	}
-	std::string filename = default_code_directory_ + "include/adif.h";
+	std::string filename = file_holder_->get_directory(true) + "include/adif.h";
 	// Add my application defined fields
 	add_my_appdefs();
 	ofstream os(filename);

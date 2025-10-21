@@ -1,5 +1,6 @@
 #include "qso_apps.h"
 
+#include "file_holder.h"
 #include "file_viewer.h"
 #include "filename_input.h"
 #include "fllog_emul.h"
@@ -547,8 +548,9 @@ int qso_apps::handle(int event) {
 
 // Load settings
 void qso_apps::load_values() {
-    std::string filename = default_data_directory_ + "apps.json";
-    std::ifstream i(filename);
+    std::string filename;
+    std::ifstream i;
+    file_holder_->get_file(FILE_APPS, i, filename);
     char msg[128];
     if (i.good()) {
         try {
@@ -683,8 +685,9 @@ void qso_apps::save_values() {
     json jout;
     jout["Apps"] = j;
 
-    std::string filename = default_data_directory_ + "apps.json";
-    std::ofstream o(filename);
+    std::string filename;
+    std::ofstream o;
+    file_holder_->get_file(FILE_APPS, o, filename);
     o << std::setw(4) << jout << '\n';
     o.close();
     settings top_settings;

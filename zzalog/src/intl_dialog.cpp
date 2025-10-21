@@ -1,5 +1,6 @@
 ﻿#include "intl_dialog.h"
 
+#include "file_holder.h"
 #include "main.h"
 #include "menu.h"
 #include "status.h"
@@ -20,9 +21,6 @@ intl_dialog::intl_dialog() :
 	win_dialog(640, 480, "International character std::set")
 {
 	editor_ = nullptr;
-	// Get the file name
-	std::string directory = get_path();
-	filename_ = directory + "intl_chars.txt";
 	// Load the data
 	if (load_data()) {
 		// create the dialog
@@ -203,11 +201,6 @@ void intl_dialog::cb_bn_use(Fl_Widget* w, void* v) {
 	}
 }
 
-// Get the data path to the files - returns directory name
-std::string intl_dialog::get_path() {
-	return default_data_directory_;
-}
-
 // Set the widget to receive the pasted character
 void intl_dialog::editor(Fl_Widget* w) {
 	editor_ = w;
@@ -243,7 +236,9 @@ void intl_dialog::add_symbols(std::string text) {
 // Load the initial character data
 bool intl_dialog::load_data() {
 	symbols_.clear();
-	ifstream is(filename_.c_str());
+	std::string filename;
+	ifstream is;
+	file_holder_->get_file(FILE_INTLCHARS, is, filename);
 	std::string line;
 	if (!is.good()) {
 		add_symbols(DEFAULT_INTL);
@@ -267,7 +262,9 @@ bool intl_dialog::load_data() {
 
 // Store the current character data
 bool intl_dialog::save_data() {
-	std::ofstream os(filename_.c_str());
+	std::ofstream os;
+	std::string filename;
+	file_holder_->get_file(FILE_INTLCHARS, os, filename);
 	int col = 0;
 	for (auto it = symbols_.begin(); it != symbols_.end() && os.good(); it++) {
 		// Convert the UCS code to the appropriate UTF-8 bytes

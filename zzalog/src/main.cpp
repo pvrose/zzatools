@@ -26,6 +26,7 @@ main.cpp - application entry point
 #include "eqsl_handler.h"
 #include "extract_data.h"
 #include "fields.h"
+#include "file_holder.h"
 #include "fllog_emul.h"
 #include "import_data.h"
 #include "init_dialog.h"
@@ -217,12 +218,6 @@ std::string sticky_message_ = "";
 
 //! Common seed to use in password encryption - maintaned with sessions.
 uint32_t seed_ = 0;
-
-//! Default location for configuration files.
-std::string default_data_directory_ = "";
-
-//! Default location for reference source data
-std::string default_source_directory_ = "";
 
 //! Development directory
 std::string development_directory_;
@@ -587,7 +582,7 @@ int cb_args(int argc, char** argv, int& i) {
 	// Reset configuration
 	else if (strcmp("-x", argv[i]) == 0 || strcmp("--reset", argv[i]) == 0) {
 		i += 1;
-		while (argv[i][0] != '-') {
+		while (argv[i] && argv[i][0] != '-') {
 			if (strcmp("adif", argv[i]) == 0) {
 				DEBUG_RESET_CONFIG |= DEBUG_RESET_ADIF;
 			}
@@ -1166,40 +1161,6 @@ void save_switches() {
 	behav_settings.set("Save per QSO", AUTO_SAVE);
 }
 
-// Open preferences and save them - it is possible to corrupt the settings
-// file if an exception occurs while they are being saved.
-void set_directories() {
-#ifdef _WIN32
-	// Source directory - for resetting reference data
-	if (DEVELOPMENT_MODE) {
-		// $ProjectDir/../reference
-		default_source_directory_ = 
-			development_directory_ + "..\\reference\\";
-	}
-	else {
-		default_source_directory_ = 
-			std::string(getenv("ALLUSERSPROFILE")) + "\\" + VENDOR + "\\" + PROGRAM_ID + "\\";
-	}
-	// Working directory
-	default_data_directory_ = 
-		std::string(getenv("APPDATA")) + "\\" + VENDOR + "\\" + PROGRAM_ID + "\\";
-#else 
-	// Source directory - for resetting reference data
-	if (DEVELOPMENT_MODE) {
-		// $PWD/../reference
-		default_source_directory_ =
-			development_directory_ + "../reference/";
-	}
-	else {
-		default_source_directory_ =
-			"/etc/" + VENDOR + "/" + PROGRAM_ID + "/";
-	}
-	// Working directory
-	default_data_directory_ =
-		std::string(getenv("HOME")) + "/.config/" + VENDOR + "/" + PROGRAM_ID + "/";
-#endif
-}
-
 // Load all the hamlib data, and then the rig connection details
 void load_rig_data() {
 	rig_set_debug(HAMLIB_DEBUG_LEVEL);
@@ -1220,7 +1181,7 @@ int main(int argc, char** argv)
 	int i = 1;
 	Fl::args(argc, argv, i, cb_args);
 	// Set the default data directories
-	set_directories();
+	file_holder_ = new file_holder(DEVELOPMENT_MODE, development_directory_);
 	// Read any switches that stick between calls
 	read_saved_switches();
 	customise_fltk();
@@ -1400,13 +1361,13 @@ void set_recent_file(std::string filename) {
 
 void open_html(const char* file) {
 	// OS dependent code to open a document
-	std::string full_filename = default_data_directory_ +
+	std::string full_filename = file_holder_->get_directory() +
 		"userguide/html/" + std::string(file);
 	open_doc(full_filename);
 }
 
 void open_pdf() {
-	std::string full_filename = default_data_directory_ +
+	std::string full_filename = file_holder_->get_directory() +
 		"userguide/ZZALOG.pdf";
 	open_doc(full_filename);
 }

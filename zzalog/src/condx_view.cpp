@@ -1,5 +1,6 @@
 #include "condx_view.h"
 
+#include "file_holder.h"
 #include "main.h"
 #include "qso_manager.h"
 #include "qso_wx.h"
@@ -84,7 +85,7 @@ int condx_view::handle(int event) {
 bool condx_view::load_data() {
 	char msg[128];
 	pugi::xml_document doc;
-	std::string filename = default_data_directory_ + "solar.xml";
+	std::string filename = file_holder_->get_filename(FILE_SOLAR);
 
 	// Check if saved file is > 1 hour old
 	settings top_settings;

@@ -1,6 +1,7 @@
 #include "stn_data.h"
 
 #include "config.h"
+#include "file_holder.h"
 #include "init_dialog.h"
 #include "main.h"
 #include "record.h"
@@ -138,10 +139,10 @@ void stn_data::load_data() {
 
 // Load data from station.json
 bool stn_data::load_json() {
-	std::string filename = default_data_directory_ + "station.json";
+	std::string filename;
 	ifstream is;
+	file_holder_->get_file(FILE_STATION, is, filename);
 	char msg[128];
-	is.open(filename, std::ios_base::in);
 	if (!is.good()) {
 		char msg[128];
 		snprintf(msg, sizeof(msg), "STN DATA: Failed to open %s", filename.c_str());
@@ -206,9 +207,9 @@ bool stn_data::load_json() {
 
 // Store data to station.json
 bool stn_data::store_json() {
-	std::string filename = default_data_directory_ + "station.json";
+	std::string filename;
 	std::ofstream os;
-	os.open(filename, std::ios_base::out);
+	file_holder_->get_file(FILE_STATION, os, filename);
 	if (os.good()) {
 		json jall;
 		for (auto& it : qths_) {

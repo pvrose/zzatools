@@ -1,6 +1,7 @@
 #include "status.h"
 
 #include "banner.h"
+#include "file_holder.h"
 #include "intl_widgets.h"
 #include "main.h"
 #include "main_window.h"
@@ -24,7 +25,7 @@ status::status() :
 	, file_unusable_(false)
 {
 	// Get report filename from the settings
-	report_filename_ = default_data_directory_ + "status.txt";
+	report_filename_ = file_holder_->get_filename(FILE_STATUS);
 
 }
 

@@ -109,8 +109,6 @@ public:
 	//! Add the filter \p entry to the specified \p element in the database. 
 	void add_filter(cty_element* element, cty_filter* entry);
 
-	//! Returns the current output stream
-	std::ostream& out() { return os_; };
 	//! Returns the recorded timestamp for the data source by \p type.
 	std::chrono::system_clock::time_point timestamp(cty_type_t type);
 	//! Download the latest data from data source by \p type.
@@ -123,11 +121,9 @@ public:
 protected:
 
 	//! Load the data from the \p filename specified. 
-	bool load_data(std::string filename);
+	bool load_data(std::string* filename = nullptr);
 	//! Delete data
 	void delete_data(all_data* data);
-	//! Returns the filename for the current data type.
-	std::string get_filename();
 	//! Merge imported data from latest source.
 	void merge_data();
 	//! Prepopulate from ADIF Specification.
@@ -166,8 +162,6 @@ protected:
 
 	//! Split \p call into call \p body and \p alt (alternate).
 	void split_call(std::string call, std::string& alt, std::string& body);
-	//! Dump database into a file - for checking data loaded cotrrectly.
-	void dump_database();
 
 	//! Returns Exception record for current parse result, nullptr if not an exception
 	cty_exception* exception();
@@ -208,9 +202,6 @@ protected:
 
 	//! The data being imported
 	all_data* import_ = nullptr;
-
-	//! Output stream for the merge report.
-	std::ofstream os_;
 
 	//! Warnings have been reported during data merge.
 	bool report_warnings_ = false;

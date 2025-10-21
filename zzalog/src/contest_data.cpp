@@ -1,5 +1,6 @@
 #include "contest_data.h"
 
+#include "file_holder.h"
 #include "main.h"
 #include "status.h"
 
@@ -104,10 +105,9 @@ ct_entry_t* contest_data::get_contest_info(int number) {
 // Load data
 bool contest_data::load_data() {
 	status_->misc_status(ST_NOTE, "CONTEST: loading contest data");
-	std::string filename = default_data_directory_ + "contests.json";
+	std::string filename;
 	ifstream is;
-	is.open(filename, std::ios_base::in);
-	if (is.good()) {
+	if (file_holder_->get_file(FILE_CONTEST, is, filename)) {
 		if (load_json(is)) {
 			status_->misc_status(ST_OK, "CONTEST: Contest data loaded OK");
 			return true;
@@ -120,10 +120,9 @@ bool contest_data::load_data() {
 
 // Save data
 bool contest_data::save_data() {
-	std::string filename = default_data_directory_ + "contests.json";
+	std::string filename;
 	std::ofstream os;
-	os.open(filename, std::ios_base::out);
-	if (os.good()) {
+	if (file_holder_->get_file(FILE_CONTEST, os, filename)) {
 		if (save_json(os)) {
 			status_->misc_status(ST_OK, "CONTEST: Saved data OK");
 			os.close();

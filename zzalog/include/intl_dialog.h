@@ -48,8 +48,6 @@ class Fl_Group;
 
 	protected:
 
-		//! Get the pathname to the file: intl_chars.txt.
-		std::string get_path();
 		//! Load data from \p filename_.
 		bool load_data();
 		//! Save data to \p filename_.
@@ -60,8 +58,6 @@ class Fl_Group;
 		void add_buttons(int width);
 		//! Transfer UTF-8 characters from text input to std::list of Unicode symbols.
 		void add_symbols(std::string text);
-		//! File name.
-		std::string filename_;
 		//! The std::set of Unicode symbols to draw buttons for.
 		std::set<unsigned int> symbols_;
 		//! New character.

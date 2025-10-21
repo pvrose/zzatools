@@ -5,6 +5,7 @@
 #include "cty1_reader.h"
 #include "cty2_reader.h"
 #include "cty3_reader.h"
+#include "file_holder.h"
 #include "main.h"
 #include "record.h"
 #include "spec_data.h"
@@ -48,47 +49,34 @@ void cty_data::load_sources() {
 	import_ = new all_data;
 	now_ = std::chrono::system_clock::now();
 	bool loaded;
-	std::string rep_fn = default_data_directory_ + "cty_load.rpt";
-	os_.open(rep_fn);
-	os_ << "Loading from ADIF\n";
 	// Load all the daat
 	type_ = ADIF;
-	load_data("ADIF");
+	load_data();
 	merge_data();
-	dump_database();
 	delete_data(import_);
 	timestamps_[type_] = spec_data_->adif_timestamp();
-	os_ << "Loading from Clublog.org\n";
 	type_ = CLUBLOG;
-	std::string filename = get_filename();
-	loaded = load_data(filename);
+	std::string filename;
+	loaded = load_data(&filename);
 	merge_data();
-	dump_database();
 	delete_data(import_);
 	if (loaded) timestamps_[type_] = get_timestamp(filename);
 	else timestamps_[type_] = std::chrono::system_clock::from_time_t(-1);
 	check_timestamp(type_, 7);
-	os_ << "Loading from Country-files.com\n";
 	type_ = COUNTRY_FILES;
-	filename = get_filename();
-	loaded = load_data(filename);
+	loaded = load_data(&filename);
 	merge_data();
-	dump_database();
 	delete_data(import_);
 	if (loaded) timestamps_[type_] = get_timestamp(filename);
 	else timestamps_[type_] = std::chrono::system_clock::from_time_t(-1);
 	check_timestamp(type_, 7);
-	os_ << "Loading from DxAtlas\n";
 	type_ = DXATLAS;
-	filename = get_filename();
-	loaded = load_data(filename);
+	loaded = load_data(&filename);
 	merge_data();
-	dump_database();
 	delete_data(import_);
 	if (loaded) timestamps_[type_] = get_timestamp(filename);
 	else timestamps_[type_] = std::chrono::system_clock::from_time_t(-1);
 	check_timestamp(type_, 365);
-	os_.close();
 
 	store_json();
 }
@@ -339,7 +327,7 @@ std::string cty_data::nickname(int adif_id) {
 }
 
 // Load the data 
-bool cty_data::load_data(std::string filename) {
+bool cty_data::load_data(std::string* filename) {
 	std::string version;
 	// else
 	char msg[128];
@@ -352,7 +340,8 @@ bool cty_data::load_data(std::string filename) {
 		break;
 	}
 	case CLUBLOG: {
-		ifstream in(filename.c_str(), std::ios_base::in);
+		ifstream in;
+		file_holder_->get_file(FILE_COUNTRY_CLUB, in, *filename);
 		cty1_reader* reader = new cty1_reader;
 		import_ = new all_data;
 		status_->misc_status(ST_NOTE, "CTY DATA: Loading data supplied by clublog.org");
@@ -360,7 +349,8 @@ bool cty_data::load_data(std::string filename) {
 		break;
 	}
 	case COUNTRY_FILES: {
-		ifstream in(filename.c_str(), std::ios_base::in);
+		ifstream in;
+		file_holder_->get_file(FILE_COUNTRY_CFILES, in, *filename);
 		cty2_reader* reader = new cty2_reader;
 		import_ = new all_data;
 		status_->misc_status(ST_NOTE, "CTY DATA: Loading data supplied by www.country-files.com");
@@ -372,7 +362,8 @@ bool cty_data::load_data(std::string filename) {
 		break;
 	}
 	case DXATLAS: {
-		ifstream in(filename.c_str(), std::ios_base::in);
+		ifstream in;
+		file_holder_->get_file(FILE_COUNTRY_DXATLAS, in, *filename);
 		cty3_reader* reader = new cty3_reader;
 		import_ = new all_data;
 		status_->misc_status(ST_NOTE, "CTY DATA: Loading data supplied by dxatlas.com");
@@ -386,29 +377,20 @@ bool cty_data::load_data(std::string filename) {
 	versions_[type_] = version;
 
 	if (ok) {
-		snprintf(msg, sizeof(msg), "CTY DATA: File %s loaded OK - version: %s", filename.c_str(), version.c_str());
+		if (type_ == ADIF) {
+			snprintf(msg, sizeof(msg), "CTY DATA: ADIF loaded OK - version %s", version.c_str());
+		}
+		else {
+			snprintf(msg, sizeof(msg), "CTY DATA: File %s loaded OK - version: %s", filename->c_str(), version.c_str());
+		}
 		status_->misc_status(ST_OK, msg);
 
 		return true;
 	}
 	else {
-		snprintf(msg, sizeof(msg), "CTY DATA: Failed to load %s", filename.c_str());
+		snprintf(msg, sizeof(msg), "CTY DATA: Failed to load %s", filename->c_str());
 		status_->misc_status(ST_ERROR, msg);
 		return false;
-	}
-}
-
-// Get the filename
-std::string cty_data::get_filename() {
-	switch (type_) {
-	case COUNTRY_FILES:
-		return default_data_directory_ + "cty.csv";
-	case CLUBLOG:
-		return default_data_directory_ + "cty.xml";
-	case DXATLAS:
-		return default_data_directory_ + "Prefix.lst";
-	default:
-		return "";
 	}
 }
 
@@ -692,9 +674,6 @@ void cty_data::add_entity(cty_entity* entry) {
 		import_->entities[dxcc] = entry;
 	}
 	else {
-		os_ << "Multiple entity entry for DXCC " << dxcc << "\n";
-		os_ << "Original: " << *(import_->entities.at(dxcc)) << "\n";
-		os_ << "Duplicat: " << *entry << "\n";
 		report_errors_ = true;
 	}
 }
@@ -708,9 +687,6 @@ void cty_data::add_prefix(std::string pattern, cty_prefix* entry) {
 		bool exists = false;
 		for (auto ita : import_->prefixes.at(pattern)) {
 			if (ita->time_overlap(entry)) {
-				os_ << "Overlapping prefix entry for " << pattern << "\n";
-				os_ << "Original: " << *ita << "\n";
-				os_ << "Overlap : " << *entry << "\n";
 				report_warnings_ = true;
 				exists = true;
 
@@ -731,9 +707,6 @@ void cty_data::add_exception(std::string pattern, cty_exception* entry) {
 		bool exists = false;
 		for (auto ita : import_->exceptions.at(pattern)) {
 			if (ita->time_overlap(entry)) {
-				os_ << "Overlapping exception entry for " << pattern << "\n";
-				os_ << "Original: " << *ita << "\n";
-				os_ << "Overlap : " << *entry << "\n";
 				report_warnings_ = true;
 				exists = true;
 			}
@@ -763,60 +736,24 @@ void cty_data::load_adif_data() {
 	}
 }
 
-// Dump database
-void cty_data::dump_database() {
-	os_ << "Contents of data - entities\n";
-	for (auto it : data_->entities) {
-		os_ << "DXCC " << it.first << ":" << *it.second << "\n";
-		for (auto ita : it.second->filters_) {
-			os_ << "  FILT " << ita << "\n";
-		}
-	}
-	os_ << "Contents of data - prefixes\n";
-	for (auto ita : data_->prefixes) {
-		for (auto itb : ita.second) {
-			os_ << "PFX " << ita.first << ":" << *itb << "\n";
-		}
-	}
-	os_ << "Contents of data - exceptions\n";
-	for (auto ita : data_->exceptions) {
-		for (auto itb : ita.second) {
-			os_ << "EXCN " << ita.first << ":" << *itb << "\n";
-		}
-	}
-}
-
 // Merge import into data
 void cty_data::merge_data() {
 	// Merge entities
 	for (auto it : import_->entities) {
 		if (data_->entities.find(it.first) == data_->entities.end()) {
-			os_ << "DXCC " << it.first << " not in data: adding it\n";
-			os_ << *it.second << "\n";
 			// Need to copy contents rather than pointer
 			data_->entities[it.first] = new cty_entity;
 			*(data_->entities[it.first]) = *it.second;
 		} else {
 			cty_element::error_t error = data_->entities.at(it.first)->merge(it.second);
 			if (error != cty_element::CE_OK) {
-				os_ << "DXCC " << it.first << "clashes ";
-				if (error & cty_element::CE_NAME_CLASH) os_ << "Name; ";
-				if (error & cty_element::CE_CQ_CLASH) os_ << "CQZ; ";
-				if (error & cty_element::CE_ITU_CLASH) os_ << "ITUZ: ";
-				if (error & cty_element::CE_CONT_CLASH) os_ << "Cont; ";
-				if (error & cty_element::CE_COORD_CLASH) os_ << "Coords: ";
-				os_ << "\n";
-				os_ << "Original: " << *data_->entities.at(it.first) << "\n";
-				os_ << "Merging : " << *it.second << "\n";
 			}
 		}
 	}
 	// Merge prefixes
 	for (auto it : import_->prefixes) {
 		if (data_->prefixes.find(it.first) == data_->prefixes.end()) {
-			os_ << "PFX " << it.first << " not in data: adding it\n";
 			for (auto ita : it.second) {
-				os_ << ita << "\n";
 				// Copy the data not the pointer
 				cty_prefix* new_pfx = new cty_prefix;
 				*new_pfx = *ita;
@@ -832,22 +769,11 @@ void cty_data::merge_data() {
 					if (itb->time_overlap(ita)) {
 						cty_element::error_t error = itb->merge(ita);
 						if (error != cty_element::CE_OK) {
-							os_ << "Prefix " << it.first << "clashes ";
-							if (error & cty_element::CE_NAME_CLASH) os_ << "Name; ";
-							if (error & cty_element::CE_CQ_CLASH) os_ << "CQZ; ";
-							if (error & cty_element::CE_ITU_CLASH) os_ << "ITUZ: ";
-							if (error & cty_element::CE_CONT_CLASH) os_ << "Cont; ";
-							if (error & cty_element::CE_COORD_CLASH) os_ << "Coords: ";
-							os_ << "\n";
-							os_ << "Original: " << *itb << "\n";
-							os_ << "Merging : " << *ita << "\n";
 						}
 						matches = true;
 					}
 				}
 				if (!matches) {
-					os_ << "PFX " << ita << " not in data: adding it\n";
-					os_ << ita << "\n";
 					cty_prefix* new_pfx = new cty_prefix(*ita);
 					data_->prefixes[it.first].push_back(new_pfx);
 				}
@@ -857,9 +783,7 @@ void cty_data::merge_data() {
 	// Merge exceptions
 	for (auto it : import_->exceptions) {
 		if (data_->exceptions.find(it.first) == data_->exceptions.end()) {
-			os_ << "EXCN " << it.first << " not in data: adding it\n";
 			for (auto ita : it.second) {
-				os_ << ita << "\n";
 				// Copy the data not the pointer
 				cty_exception* new_excn = new cty_exception;
 				*new_excn = *ita;
@@ -875,22 +799,11 @@ void cty_data::merge_data() {
 					if (itb->time_overlap(ita)) {
 						cty_element::error_t error = itb->merge(ita);
 						if (error != cty_element::CE_OK) {
-							os_ << "Prefix " << it.first << "clashes ";
-							if (error & cty_element::CE_NAME_CLASH) os_ << "Name; ";
-							if (error & cty_element::CE_CQ_CLASH) os_ << "CQZ; ";
-							if (error & cty_element::CE_ITU_CLASH) os_ << "ITUZ: ";
-							if (error & cty_element::CE_CONT_CLASH) os_ << "Cont; ";
-							if (error & cty_element::CE_COORD_CLASH) os_ << "Coords: ";
-							os_ << "\n";
-							os_ << "Original: " << *itb << "\n";
-							os_ << "Merging : " << *ita << "\n";
 						}
 						matches = true;
 					}
 				}
 				if (!matches) {
-					os_ << "PFX " << ita << " not in data: adding it\n";
-					os_ << ita << "\n";
 					cty_exception* new_excn = new cty_exception(*ita);
 					data_->exceptions[it.first].push_back(new_excn);
 				}
@@ -945,9 +858,10 @@ std::chrono::system_clock::time_point cty_data::timestamp(cty_type_t type) {
 // Fetch the appropriate data
 bool cty_data::fetch_data(cty_type_t type) {
 	type_ = type;
-	std::string filename = get_filename();
+	std::string filename;
 	switch (type) {
 	case CLUBLOG:
+		filename = file_holder_->get_filename(FILE_COUNTRY_CLUB);
 		return club_handler_->download_exception(filename);
 	case COUNTRY_FILES:
 		status_->misc_status(ST_WARNING, "CTY DATA: Downloading country-files.com not yet implemented");
@@ -967,11 +881,15 @@ std::string cty_data::version(cty_type_t type) {
 
 // Store JSON
 void cty_data::store_json() {
-	std::string filename = default_data_directory_ + "cty.json";
 	char msg[128];
+	std::string filename;
 	status_->misc_status(ST_NOTE, "CTY_DATA: Storing country data");
 	status_->progress(2, OT_PREFIX, "Storing country data", "Steps");
-	ofstream os(filename);
+	ofstream os;
+	if (!file_holder_->get_file(FILE_COUNTRY, os, filename)) {
+		status_->misc_status(ST_ERROR, "CTY_DATA: Storing failed");
+		return;
+	}
 	json jall;
 	json jsources;
 	for(auto ts : timestamps_) {
@@ -1023,11 +941,12 @@ void cty_data::store_json() {
 
 // Load JSON data
 bool cty_data::load_json() {
-	std::string filename = default_data_directory_ + "cty.json";
 	char msg[128];
+	std::string filename;
 	status_->misc_status(ST_NOTE, "CTY DATA: Loading country data");
 	status_->progress(2, OT_PREFIX, "Loading country data", "Steps");
-	ifstream is(filename);
+	ifstream is;
+	file_holder_->get_file(FILE_COUNTRY, is, filename);
 	json jall;
 	if (is.good()) {
 		try {
