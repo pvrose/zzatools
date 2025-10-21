@@ -87,7 +87,7 @@ extern bool DEBUG_QUICK;
 extern bool DEBUG_RIGS;
 //! Print callsign parsing messages -  by "-d d"
 extern bool DEBUG_PARSE;
-//! Reset configuration files
+//! Reset configuration files (for cold/warm start testing)
 extern uint16_t DEBUG_RESET_CONFIG;
 const uint16_t DEBUG_RESET_ADIF = 1;        //!< Reset all.json (ADIF)
 const uint16_t DEBUG_RESET_BAND = 1 << 1;   //!< Reset band_plan.json
@@ -98,6 +98,7 @@ const uint16_t DEBUG_RESET_SETT = 1 << 5;   //!< Reset settings.json
 const uint16_t DEBUG_RESET_RIGS = 1 << 6;   //!< Reset rigs.json
 const uint16_t DEBUG_RESET_FLDS = 1 << 7;   //!< Reset fields.json
 const uint16_t DEBUG_RESET_TEST = 1 << 8;   //!< Reset contests.json
+const uint16_t DEBUG_RESET_IMGS = 1 << 9;   //!< Reset images
 const uint16_t DEBUG_RESET_ALL = 0xffff;    //!< Reset all
 //! Set hamlib debugging verbosity level -  by "-d h=<level>"
 extern rig_debug_level_e HAMLIB_DEBUG_LEVEL;

@@ -11,6 +11,7 @@ EXEC_DIR = $(BUILD_DIR)/$(BUILD_TYPE)
 INSTALL_DIR := /usr/local/bin
 LIBRARY_DIR := /usr/local/lib
 APPDATA_DIR := ${HOME}/.config/GM3ZZA/ZZALOG
+APPREF_DIR := /etc/GM3ZZA/ZZALOG
 DOCUMENTS_DIR :=$(APPDATA_DIR)
 
 # Standard compilers and debuggers
@@ -43,7 +44,7 @@ TARFILE = $(TARGET_EXEC:.exe=.tgz)
 # Refenerce files
 REFS := $(shell ls $(REF_DIR))
 # Target references
-TREFS := $(REFS:%=$(APPDATA_DIR)/%)
+TREFS := $(REFS:%=$(APPREF_DIR)/%)
 
 # Every folder in ./src will need to be passed to GCC so that it can find header files
 INC_DIRS := ./include ../widgets/include ../common/include
@@ -154,10 +155,10 @@ clean_ug:
 	sudo rm -r $(DOCUMENTS_DIR)
 
 # Copy references
-$(APPDATA_DIR)/%: $(REF_DIR)/%
+$(APPREF_DIR)/%: $(REF_DIR)/%
 	@echo $@
-	@mkdir -p $(APPDATA_DIR)
-	@cp $< $@
+	@sudo mkdir -p $(APPREF_DIR)
+	@sudo cp $< $@
 
 # Copy User guide
 $(DOCUMENTS_DIR)/userguide/html/index.html : $(UG_DIR)/html/index.html ./Doxyfile
