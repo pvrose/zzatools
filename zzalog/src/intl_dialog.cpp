@@ -205,7 +205,7 @@ void intl_dialog::cb_bn_use(Fl_Widget* w, void* v) {
 
 // Get the data path to the files - returns directory name
 std::string intl_dialog::get_path() {
-	return default_ref_directory_;
+	return default_data_directory_;
 }
 
 // Set the widget to receive the pasted character

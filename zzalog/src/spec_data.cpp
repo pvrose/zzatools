@@ -96,7 +96,7 @@ spec_data::~spec_data()
 
 // Get the data path to the files - returns directory name
 std::string spec_data::get_path() {
-	return default_ref_directory_;
+	return default_data_directory_;
 }
 
 // load the data

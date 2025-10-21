@@ -62,6 +62,7 @@ main.cpp - application entry point
 #include <string>
 #include <list>
 #include <cstdio>
+#include <cstdlib>
 
 // FLTK header files
 #include <FL/Fl.H>
@@ -113,6 +114,8 @@ bool DEBUG_QUICK = false;
 bool DEBUG_RIGS = false;
 //! Print callsign parsing messages -  by "-d d"
 bool DEBUG_PARSE = false;
+//! Reset configuration files
+uint16_t DEBUG_RESET_CONFIG = 0;
 //! Set hamlib debugging verbosity level -  by "-d h=<level>"
 rig_debug_level_e HAMLIB_DEBUG_LEVEL = RIG_DEBUG_ERR;
 
@@ -218,11 +221,11 @@ uint32_t seed_ = 0;
 //! Default location for configuration files.
 std::string default_data_directory_ = "";
 
-//! Default location for documentatiom files.
-std::string default_html_directory_ = "";
+//! Default location for reference source data
+std::string default_source_directory_ = "";
 
-//! Default location for reference data
-std::string default_ref_directory_ = "";
+//! Development directory
+std::string development_directory_;
 
 //! Default location for auto-generated compile fodder
 std::string default_code_directory_ = "";
@@ -505,11 +508,10 @@ int cb_args(int argc, char** argv, int& i) {
 		DEVELOPMENT_MODE = true;
 		i += 1;
 		if (i < argc) {
-			default_html_directory_ = argv[i];
-			default_ref_directory_ = argv[i];
+			development_directory_ = argv[i];
 			default_code_directory_ = argv[i];
 			i += 1;
-		}
+	}
 	}
 	// Help
 	else if (strcmp("-h", argv[i]) == 0 || strcmp("--help", argv[i]) == 0) {
@@ -549,7 +551,7 @@ int cb_args(int argc, char** argv, int& i) {
 		AUTO_UPLOAD = false;
 		AUTO_UPLOAD_S = true;
 		i += 1;
-	} 
+	}
 	// Look for read_only (-r or --read_only)
 	else if (strcmp("-r", argv[i]) == 0 || strcmp("--read_only", argv[i]) == 0) {
 		READ_ONLY = true;
@@ -574,13 +576,50 @@ int cb_args(int argc, char** argv, int& i) {
 	// Version
 	else if (strcmp("-v", argv[i]) == 0 || strcmp("--version", argv[i]) == 0) {
 		DISPLAY_VERSION = true;
-		i+= 1;
+		i += 1;
 	}
 	// No auto save
 	else if (strcmp("-w", argv[i]) == 0 || strcmp("--wait_save", argv[i]) == 0) {
 		AUTO_SAVE = false;
 		AUTO_SAVE_S = true;
 		i += 1;
+	}
+	// Reset configuration
+	else if (strcmp("-x", argv[i]) == 0 || strcmp("--reset", argv[i]) == 0) {
+		i += 1;
+		while (argv[i][0] != '-') {
+			if (strcmp("adif", argv[i]) == 0) {
+				DEBUG_RESET_CONFIG |= DEBUG_RESET_ADIF;
+			}
+			if (strcmp("apps", argv[i]) == 0) {
+				DEBUG_RESET_CONFIG |= DEBUG_RESET_APPS;
+			}
+			if (strcmp("bandplan", argv[i]) == 0) {
+				DEBUG_RESET_CONFIG |= DEBUG_RESET_BAND;
+			}
+			if (strcmp("contest", argv[i]) == 0) {
+				DEBUG_RESET_CONFIG |= DEBUG_RESET_TEST;
+			}
+			if (strcmp("country", argv[i]) == 0) {
+				DEBUG_RESET_CONFIG |= DEBUG_RESET_CTY;
+			}
+			if (strcmp("fields", argv[i]) == 0) {
+				DEBUG_RESET_CONFIG |= DEBUG_RESET_FLDS;
+			}
+			if (strcmp("intl", argv[i]) == 0) {
+				DEBUG_RESET_CONFIG |= DEBUG_RESET_INTL;
+			}
+			if (strcmp("rigs", argv[i]) == 0) {
+				DEBUG_RESET_CONFIG |= DEBUG_RESET_RIGS;
+			}
+			if (strcmp("settings", argv[i]) == 0) {
+				DEBUG_RESET_CONFIG |= DEBUG_RESET_SETT;
+			}
+			if (strcmp("all", argv[i]) == 0) {
+				DEBUG_RESET_CONFIG = DEBUG_RESET_ALL;
+			}
+			i += 1;
+		}
 	}
 	if (i == i_orig ) {
 		// Not processed any argumant
@@ -634,6 +673,17 @@ void show_help() {
 	"\t-t|--test\tTest mode: infers -q -w\n"
 	"\t-u|--usual\tNormal mode: infers -a -n\n"
 	"\t-w|--wait_save\tDo not automatically save each change (sticky)\n"
+	"\t-x|--reset [data]...\tReset configuration data (more than 1 allowed"
+	"\t\tadif\tADIF specification file (all.json)"
+	"\t\tapps\tApps configuration file (apps.json)"
+	"\t\tbandplan\tBand-plan data (band_plan.json)"
+	"\t\tcontest\tContest data (contests.json)"
+	"\t\tcountry\tCountry data (cty.xml, cty.csv, prefix.lst)"
+	"\t\tfields\tFields data (fields.json)"
+	"\t\tintl\tInternational character set (intl_chars.txt)"
+	"\t\trigs\tRig configuration data (rigs.json)"
+	"\t\tsettings\tZZALOG configuration (ZZALOG.json)"
+	"\t\tall\tAll files"
 	"\n";
 	printf(text);
 }
@@ -1118,62 +1168,37 @@ void save_switches() {
 
 // Open preferences and save them - it is possible to corrupt the settings
 // file if an exception occurs while they are being saved.
-bool open_settings() {
-	// Now std::set the default app data directory
-	char buffer[128];
-	Fl_Preferences::filename(buffer, sizeof(buffer),
-		Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	const char* period = strrchr(buffer, '.');
-
-	default_data_directory_ = std::string(buffer, period - buffer) + '/';
-	if (default_ref_directory_.length()) {
-		default_ref_directory_ += "../reference/";
+void set_directories() {
+#ifdef _WIN32
+	// Source directory - for resetting reference data
+	if (DEVELOPMENT_MODE) {
+		// $ProjectDir/../reference
+		default_source_directory_ = 
+			development_directory_ + "..\\reference\\";
 	}
 	else {
-		default_ref_directory_ = default_data_directory_;
+		default_source_directory_ = 
+			std::string(getenv("ALLUSERSPROFILE")) + "\\" + VENDOR + "\\" + PROGRAM_ID + "\\";
 	}
-	if (!default_html_directory_.length()) {
-		default_html_directory_ = default_data_directory_;
+	// Working directory
+	default_data_directory_ = 
+		std::string(getenv("APPDATA")) + "\\" + VENDOR + "\\" + PROGRAM_ID + "\\";
+#else 
+	// Source directory - for resetting reference data
+	if (DEVELOPMENT_MODE) {
+		// $PWD/../reference
+		default_source_directory_ =
+			development_directory_ + "../reference/";
 	}
-
-	// Rename all the saved preferences file 8->9, 7->8 down to ''->1
-	for (char c = '8'; c > '0'; c--) {
-		// Rename will fail if file does not exist, so no need to test file exists
-		std::string oldfile = std::string(buffer) + c;
-		char c2 = c + 1;
-		std::string newfile = std::string(buffer) + c2;
-		fl_rename(oldfile.c_str(), newfile.c_str());
+	else {
+		default_source_directory_ =
+			"/etc/" + VENDOR + "/" + PROGRAM_ID + "/";
 	}
-	char backup[256];
-	strcpy(backup, buffer);
-	strcat(backup, "1");
-	// In and out streams
-	ifstream in(buffer);
-	in.seekg(0, in.end);
-	int length = (int)in.tellg();
-	bool ok = false;
-	if (in.good() && length) {
-		// We do have a (probably) valid settings file
-		const int increment = 8000;
-		in.seekg(0, in.beg);
-		std::ofstream out(backup);
-		ok = in.good() && out.good();
-		char buffer[increment];
-		int count = 0;
-		// Copy file in 7999 byte chunks
-		while (!in.eof() && ok) {
-			in.read(buffer, increment);
-			out.write(buffer, in.gcount());
-			count += (int)in.gcount();
-			ok = out.good() && (in.good() || in.eof());
-		}
-		in.close();
-		out.close();
-
+	// Working directory
+	default_data_directory_ =
+		std::string(getenv("HOME")) + "/.config/" + VENDOR + "/" + PROGRAM_ID + "/";
 	}
-
-
-	return true;
+#endif
 }
 
 // Load all the hamlib data, and then the rig connection details
@@ -1195,10 +1220,8 @@ int main(int argc, char** argv)
 	// Parse command-line arguments - accept FLTK standard arguments and custom ones (in cb_args)
 	int i = 1;
 	Fl::args(argc, argv, i, cb_args);
-	// Create the settings before anything else 
-	if (!open_settings()) {
-		return 255;
-	}
+	// Set the default data directories
+	set_directories();
 	// Read any switches that stick between calls
 	read_saved_switches();
 	customise_fltk();
@@ -1378,13 +1401,13 @@ void set_recent_file(std::string filename) {
 
 void open_html(const char* file) {
 	// OS dependent code to open a document
-	std::string full_filename = default_html_directory_ +
+	std::string full_filename = default_data_directory_ +
 		"userguide/html/" + std::string(file);
 	open_doc(full_filename);
 }
 
 void open_pdf() {
-	std::string full_filename = default_html_directory_ +
+	std::string full_filename = default_data_directory_ +
 		"userguide/ZZALOG.pdf";
 	open_doc(full_filename);
 }

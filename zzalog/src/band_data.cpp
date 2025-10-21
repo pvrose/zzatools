@@ -147,7 +147,7 @@ void band_data::save_json() {
 
 // Get the directory of the reference files
 std::string band_data::get_path() {
-	return default_ref_directory_;
+	return default_data_directory_;
 }
 
 // Get the band plan data entry for the specified frequency

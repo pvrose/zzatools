@@ -87,6 +87,18 @@ extern bool DEBUG_QUICK;
 extern bool DEBUG_RIGS;
 //! Print callsign parsing messages -  by "-d d"
 extern bool DEBUG_PARSE;
+//! Reset configuration files
+extern uint16_t DEBUG_RESET_CONFIG;
+const uint16_t DEBUG_RESET_ADIF = 1;        //!< Reset all.json (ADIF)
+const uint16_t DEBUG_RESET_BAND = 1 << 1;   //!< Reset band_plan.json
+const uint16_t DEBUG_RESET_CTY = 1 << 2;    //!< Reset country files
+const uint16_t DEBUG_RESET_INTL = 1 << 3;   //!< Reset intl_chars.txt
+const uint16_t DEBUG_RESET_APPS = 1 << 4;   //!< Reset apps.json
+const uint16_t DEBUG_RESET_SETT = 1 << 5;   //!< Reset settings.json
+const uint16_t DEBUG_RESET_RIGS = 1 << 6;   //!< Reset rigs.json
+const uint16_t DEBUG_RESET_FLDS = 1 << 7;   //!< Reset fields.json
+const uint16_t DEBUG_RESET_TEST = 1 << 8;   //!< Reset contests.json
+const uint16_t DEBUG_RESET_ALL = 0xffff;    //!< Reset all
 //! Set hamlib debugging verbosity level -  by "-d h=<level>"
 extern rig_debug_level_e HAMLIB_DEBUG_LEVEL;
 
@@ -274,11 +286,6 @@ void read_saved_switches();
 //! Save the sticky switches to the settings file.
 void save_switches();
 
-//! Open the settings file for saved configuration.
-
-//! \return true if file was opened successfully, otherwise false.
-bool open_settings();
-
 //! Initialise hamlib
 void load_rig_data();
 
@@ -336,14 +343,11 @@ extern std::string sticky_message_;
 //! Common seed to use in password encryption - maintaned with sessions.
 extern uint32_t seed_;
 
-//! Default location for configuration files.
+//! Default location for configuration files, and HTML files
 extern std::string default_data_directory_;
 
-//! Default location for documentatiom files.
-extern std::string default_html_directory_;
-
-//! Default location for reference data
-extern std::string default_ref_directory_;
+//! Default location for reference source data
+extern std::string default_source_directory_;
 
 //! Default location for auto-generated compile fodder
 extern std::string default_code_directory_;

@@ -402,11 +402,11 @@ bool cty_data::load_data(std::string filename) {
 std::string cty_data::get_filename() {
 	switch (type_) {
 	case COUNTRY_FILES:
-		return default_ref_directory_ + "cty.csv";
+		return default_data_directory_ + "cty.csv";
 	case CLUBLOG:
-		return default_ref_directory_ + "cty.xml";
+		return default_data_directory_ + "cty.xml";
 	case DXATLAS:
-		return default_ref_directory_ + "Prefix.lst";
+		return default_data_directory_ + "Prefix.lst";
 	default:
 		return "";
 	}

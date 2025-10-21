@@ -198,7 +198,7 @@ void cty_dialog::cb_close(Fl_Widget* w, void* v) {
 void cty_dialog::cb_browser(Fl_Widget* w, void* v) {
 	Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
 	chooser->title("ZZALOG Application Data");
-	chooser->directory(default_ref_directory_.c_str());
+	chooser->directory(default_data_directory_.c_str());
 	chooser->show();
 	delete chooser;
 }

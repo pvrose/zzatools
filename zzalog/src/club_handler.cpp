@@ -187,7 +187,7 @@ bool club_handler::unzip_exception(std::string filename) {
 
 // Get reference directory
 void club_handler::get_reference(std::string& dir_name) {
-	dir_name = default_ref_directory_;
+	dir_name = default_data_directory_;
 }
 
 // Upload the single specified QSO in real time
