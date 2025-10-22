@@ -550,9 +550,8 @@ int qso_apps::handle(int event) {
 void qso_apps::load_values() {
     std::string filename;
     std::ifstream i;
-    file_holder_->get_file(FILE_APPS, i, filename);
     char msg[128];
-    if (i.good()) {
+    if (file_holder_->get_file(FILE_APPS, i, filename)) {
         try {
             json j;
             i >> j;

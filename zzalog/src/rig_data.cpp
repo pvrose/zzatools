@@ -229,8 +229,7 @@ bool rig_data::load_json() {
     char msg[128];
     std::string filename;
     ifstream is;
-    file_holder_->get_file(FILE_RIGS, is, filename);
-    if (!is.good()) {
+    if (!file_holder_->get_file(FILE_RIGS, is, filename)) {
         snprintf(msg, sizeof(msg), "RIGS: Failed to open %s", filename.c_str());
         status_->misc_status(ST_WARNING, msg);
         return false;

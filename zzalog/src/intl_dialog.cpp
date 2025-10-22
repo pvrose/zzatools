@@ -238,9 +238,9 @@ bool intl_dialog::load_data() {
 	symbols_.clear();
 	std::string filename;
 	ifstream is;
-	file_holder_->get_file(FILE_INTLCHARS, is, filename);
+	;
 	std::string line;
-	if (!is.good()) {
+	if (!file_holder_->get_file(FILE_INTLCHARS, is, filename)) {
 		add_symbols(DEFAULT_INTL);
 		return true;
 	}

@@ -341,20 +341,20 @@ bool cty_data::load_data(std::string* filename) {
 	}
 	case CLUBLOG: {
 		ifstream in;
-		file_holder_->get_file(FILE_COUNTRY_CLUB, in, *filename);
+		ok = file_holder_->get_file(FILE_COUNTRY_CLUB, in, *filename);
 		cty1_reader* reader = new cty1_reader;
 		import_ = new all_data;
 		status_->misc_status(ST_NOTE, "CTY DATA: Loading data supplied by clublog.org");
-		ok = reader->load_data(this, in, version);
+		if (ok) ok = reader->load_data(this, in, version);
 		break;
 	}
 	case COUNTRY_FILES: {
 		ifstream in;
-		file_holder_->get_file(FILE_COUNTRY_CFILES, in, *filename);
+		ok = file_holder_->get_file(FILE_COUNTRY_CFILES, in, *filename);
 		cty2_reader* reader = new cty2_reader;
 		import_ = new all_data;
 		status_->misc_status(ST_NOTE, "CTY DATA: Loading data supplied by www.country-files.com");
-		ok = reader->load_data(this, in, version);
+		if (ok) ok = reader->load_data(this, in, version);
 		// Get version from database
 		int vdxcc = import_->exceptions.at("VERSION").front()->dxcc_id_;
 		version = import_->entities.at(vdxcc)->name_ + ", " +
@@ -363,11 +363,11 @@ bool cty_data::load_data(std::string* filename) {
 	}
 	case DXATLAS: {
 		ifstream in;
-		file_holder_->get_file(FILE_COUNTRY_DXATLAS, in, *filename);
+		ok = file_holder_->get_file(FILE_COUNTRY_DXATLAS, in, *filename);
 		cty3_reader* reader = new cty3_reader;
 		import_ = new all_data;
 		status_->misc_status(ST_NOTE, "CTY DATA: Loading data supplied by dxatlas.com");
-		ok = reader->load_data(this, in, version);
+		if (ok) ok = reader->load_data(this, in, version);
 		break;
 	}
 	default:
@@ -946,9 +946,8 @@ bool cty_data::load_json() {
 	status_->misc_status(ST_NOTE, "CTY DATA: Loading country data");
 	status_->progress(2, OT_PREFIX, "Loading country data", "Steps");
 	ifstream is;
-	file_holder_->get_file(FILE_COUNTRY, is, filename);
 	json jall;
-	if (is.good()) {
+	if (file_holder_->get_file(FILE_COUNTRY, is, filename)) {
 		try {
 			is >> jall;
 			is.close();

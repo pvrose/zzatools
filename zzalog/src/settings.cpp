@@ -23,9 +23,8 @@ settings::settings() {
 	// Ddfault filename ZZALOG.json
 	std::string filename;
 	std::ifstream i;
-	file_holder_->get_file(FILE_SETTINGS, i, filename);
 	parent_ = nullptr;
-	if (i.good()) {
+	if (file_holder_->get_file(FILE_SETTINGS, i, filename)) {
 		// Load in file
 		try {
 			json j;

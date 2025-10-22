@@ -141,9 +141,8 @@ void stn_data::load_data() {
 bool stn_data::load_json() {
 	std::string filename;
 	ifstream is;
-	file_holder_->get_file(FILE_STATION, is, filename);
 	char msg[128];
-	if (!is.good()) {
+	if (!file_holder_->get_file(FILE_STATION, is, filename)) {
 		char msg[128];
 		snprintf(msg, sizeof(msg), "STN DATA: Failed to open %s", filename.c_str());
 		status_->misc_status(ST_WARNING, msg);

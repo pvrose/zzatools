@@ -4,6 +4,7 @@
 #include "status.h"
 
 file_holder* file_holder_ = nullptr;
+uint16_t DEBUG_RESET_CONFIG = 0;
 
 file_holder::file_holder(bool development, std::string directory) {
 #ifdef _WIN32
@@ -12,24 +13,35 @@ file_holder::file_holder(bool development, std::string directory) {
 		// $ProjectDir/../reference
 		default_source_directory_ =
 			directory + "..\\reference\\";
+		default_code_directory_ = directory;
+		default_html_directory_ = directory;
 	}
 	else {
 		default_source_directory_ =
 			std::string(getenv("ALLUSERSPROFILE")) + "\\" + VENDOR + "\\" + PROGRAM_ID + "\\";
+		default_code_directory_ = "";
+		default_html_directory_ = 
+			std::string(getenv("APPDATA")) + "\\" + VENDOR + "\\" + PROGRAM_ID + "\\";
 	}
 	// Working directory
 	default_data_directory_ =
 		std::string(getenv("APPDATA")) + "\\" + VENDOR + "\\" + PROGRAM_ID + "\\";
+	// Code directory
 #else 
 	// Source directory - for resetting reference data
 	if (development) {
 		// $PWD/../reference
 		default_source_directory_ =
 			directory + "../reference/";
+		default_code_directory_ = directory;
+		default_html_directory_ = directory;
 	}
 	else {
 		default_source_directory_ =
 			"/etc/" + VENDOR + "/" + PROGRAM_ID + "/";
+		default_code_directory_ = "";
+		default_html_directory_ =
+			std::string(getenv("HOME")) + "/.config/" + VENDOR + "/" + PROGRAM_ID + "/";
 	}
 	// Working directory
 	default_data_directory_ =
@@ -48,7 +60,11 @@ bool file_holder::get_file(file_contents_t type, std::ifstream& is, std::string&
 			is.open(filename);
 			if (is.fail()) {
 				snprintf(msg, sizeof(msg), "FILE: Cannot open %s", filename.c_str());
-				if (status_) status_->misc_status(ST_FATAL, msg);
+				if (status_) status_->misc_status(ctrl.fatal ? ST_FATAL : ST_ERROR, msg);
+				else {
+					printf(msg);
+					printf("\n");
+				}
 				return false;
 			}
 			else {
@@ -62,7 +78,11 @@ bool file_holder::get_file(file_contents_t type, std::ifstream& is, std::string&
 				is.open(filename);
 				if (is.fail()) {
 					snprintf(msg, sizeof(msg), "FILE: Cannot open %s", filename.c_str());
-					if (status_) status_->misc_status(ST_FATAL, msg);
+					if (status_) status_->misc_status(ctrl.fatal ? ST_FATAL : ST_ERROR, msg);
+					else {
+						printf(msg);
+						printf("\n");
+					}
 					return false;
 				}
 				return true;
@@ -77,12 +97,20 @@ bool file_holder::get_file(file_contents_t type, std::ifstream& is, std::string&
 			if (is.fail()) {
 				snprintf(msg, sizeof(msg), "FILE: Cannot open %s", filename.c_str());
 				if (status_) status_->misc_status(ST_WARNING, msg);
+				else {
+					printf(msg);
+					printf("\n");
+				}
 				// Copy source to working
 				if (copy_source_to_working(ctrl)) {
 					is.open(filename);
 					if (is.fail()) {
 						snprintf(msg, sizeof(msg), "FILE: Cannot open %s", filename.c_str());
-						if (status_) status_->misc_status(ST_FATAL, msg);
+						if (status_) status_->misc_status(ctrl.fatal ? ST_FATAL : ST_ERROR, msg);
+						else {
+							printf(msg);
+							printf("\n");
+						}
 						return false;
 					}
 					return true;
@@ -97,15 +125,23 @@ bool file_holder::get_file(file_contents_t type, std::ifstream& is, std::string&
 	else {
 		filename = default_data_directory_ + ctrl.filename;
 		if (DEBUG_RESET_CONFIG & ctrl.reset_mask) {
-			DEBUG_RESET_CONFIG &= !(ctrl.reset_mask);
+			DEBUG_RESET_CONFIG &= ~(ctrl.reset_mask);
 			snprintf(msg, sizeof(msg), "FILE: Ignoring %s", filename.c_str());
 			if (status_) status_->misc_status(ST_WARNING, msg);
+			else {
+				printf(msg);
+				printf("\n");
+			}
 			return false;
 		}
 		is.open(filename);
 		if (is.fail()) {
 			snprintf(msg, sizeof(msg), "FILE: Cannot open %s", filename.c_str());
-			if (status_) status_->misc_status(ST_FATAL, msg);
+			if (status_) status_->misc_status(ctrl.fatal ? ST_FATAL : ST_ERROR, msg);
+			else {
+				printf(msg);
+				printf("\n");
+			}
 			return false;
 		}
 		return true;
@@ -120,13 +156,13 @@ bool file_holder::copy_source_to_working(file_control_t ctrl) {
 	ifstream ss(source);
 	if (ss.fail()) {
 		snprintf(msg, sizeof(msg), "FILE: Cannot open %s", source.c_str());
-		if (status_) status_->misc_status(ST_FATAL, msg);
+		if (status_) status_->misc_status(ctrl.fatal ? ST_FATAL : ST_ERROR, msg);
 		return false;
 	}
 	ofstream ds(filename);
 	if (ds.fail()) {
 		snprintf(msg, sizeof(msg), "FILE: Cannot open %s", filename.c_str());
-		if (status_) status_->misc_status(ST_FATAL, msg);
+		if (status_) status_->misc_status(ctrl.fatal ? ST_FATAL : ST_ERROR, msg);
 		return false;
 	}
 	// Copy file in 16K byte chunks
@@ -146,12 +182,13 @@ bool file_holder::copy_source_to_working(file_control_t ctrl) {
 	ss.close();
 	ds.close();
 	if (!ok) {
-		if (status_) status_->misc_status(ST_FATAL, "FILE: Copy failed");
+		if (status_) status_->misc_status(ctrl.fatal ? ST_FATAL : ST_ERROR, "FILE: Copy failed");
 		return false;
 	}
-	DEBUG_RESET_CONFIG &= !(ctrl.reset_mask);
+	DEBUG_RESET_CONFIG &= ~(ctrl.reset_mask);
 	return true;
 }
+
 bool file_holder::get_file(file_contents_t type, std::ofstream& os, std::string& filename) {
 	const file_control_t ctrl = FILE_CONTROL.at(type);
 	char msg[128];

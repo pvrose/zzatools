@@ -199,7 +199,7 @@ void cty_dialog::cb_close(Fl_Widget* w, void* v) {
 void cty_dialog::cb_browser(Fl_Widget* w, void* v) {
 	Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
 	chooser->title("ZZALOG Application Data");
-	chooser->directory(file_holder_->get_directory().c_str());
+	chooser->directory(file_holder_->get_directory(DATA_WORKING).c_str());
 	chooser->show();
 	delete chooser;
 }

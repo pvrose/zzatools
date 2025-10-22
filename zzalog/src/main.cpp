@@ -115,8 +115,6 @@ bool DEBUG_QUICK = false;
 bool DEBUG_RIGS = false;
 //! Print callsign parsing messages -  by "-d d"
 bool DEBUG_PARSE = false;
-//! Reset configuration files
-uint16_t DEBUG_RESET_CONFIG = 0;
 //! Set hamlib debugging verbosity level -  by "-d h=<level>"
 rig_debug_level_e HAMLIB_DEBUG_LEVEL = RIG_DEBUG_ERR;
 
@@ -596,10 +594,13 @@ int cb_args(int argc, char** argv, int& i) {
 				DEBUG_RESET_CONFIG |= DEBUG_RESET_TEST;
 			}
 			if (strcmp("country", argv[i]) == 0) {
-				DEBUG_RESET_CONFIG |= DEBUG_RESET_CTY;
+				DEBUG_RESET_CONFIG |= DEBUG_RESET_CALL;
 			}
 			if (strcmp("fields", argv[i]) == 0) {
 				DEBUG_RESET_CONFIG |= DEBUG_RESET_FLDS;
+			}
+			if (strcmp("icons", argv[i]) == 0) {
+				DEBUG_RESET_CONFIG |= DEBUG_RESET_ICON;
 			}
 			if (strcmp("intl", argv[i]) == 0) {
 				DEBUG_RESET_CONFIG |= DEBUG_RESET_INTL;
@@ -609,6 +610,9 @@ int cb_args(int argc, char** argv, int& i) {
 			}
 			if (strcmp("settings", argv[i]) == 0) {
 				DEBUG_RESET_CONFIG |= DEBUG_RESET_SETT;
+			}
+			if (strcmp("station", argv[i]) == 0) {
+				DEBUG_RESET_CONFIG |= DEBUG_RESET_STN;
 			}
 			if (strcmp("all", argv[i]) == 0) {
 				DEBUG_RESET_CONFIG = DEBUG_RESET_ALL;
@@ -675,9 +679,11 @@ void show_help() {
 	"\t\tcontest\tContest data (contests.json)"
 	"\t\tcountry\tCountry data (cty.xml, cty.csv, prefix.lst)"
 	"\t\tfields\tFields data (fields.json)"
+	"\t\ticons\tToolbar icons (various)"
 	"\t\tintl\tInternational character set (intl_chars.txt)"
 	"\t\trigs\tRig configuration data (rigs.json)"
 	"\t\tsettings\tZZALOG configuration (ZZALOG.json)"
+	"\t\tstation\tOperator/QTH/Callsign configuration (station.json)"
 	"\t\tall\tAll files"
 	"\n";
 	printf(text);
@@ -1063,6 +1069,9 @@ void print_args(int argc, char** argv) {
 	if (PRIVATE) status_->misc_status(ST_WARNING, "ZZALOG: -p - This file not being noted on recent files std::list");
 	if (DARK) status_->misc_status(ST_NOTE, "ZZALOG: -k - Opening in dark mode");
 	else status_->misc_status(ST_NOTE, "ZZALOG: -l - Opening in normal FLTK colours");
+	snprintf(message, sizeof(message), "ZZALOG: -x (value = %x) - Reset file (bit signficant)",
+		DEBUG_RESET_CONFIG);
+	if (DEBUG_RESET_CONFIG) status_->misc_status(ST_WARNING, message);
 }
 
 // Returns true if record is within current session.
@@ -1361,13 +1370,13 @@ void set_recent_file(std::string filename) {
 
 void open_html(const char* file) {
 	// OS dependent code to open a document
-	std::string full_filename = file_holder_->get_directory() +
+	std::string full_filename = file_holder_->get_directory(DATA_HTML) +
 		"userguide/html/" + std::string(file);
 	open_doc(full_filename);
 }
 
 void open_pdf() {
-	std::string full_filename = file_holder_->get_directory() +
+	std::string full_filename = file_holder_->get_directory(DATA_HTML) +
 		"userguide/ZZALOG.pdf";
 	open_doc(full_filename);
 }

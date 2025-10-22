@@ -126,9 +126,8 @@ void fields::load_data() {
 // Read - <Prefs path>.fields.tsv
 bool fields::load_collections() {
     ifstream ip;
-    file_holder_->get_file(FILE_FIELDS, ip, filename_);
     char msg[128];
-    if (!ip.good()) {
+    if (!file_holder_->get_file(FILE_FIELDS, ip, filename_)) {
         char msg[128];
         snprintf(msg, sizeof(msg), 
             "FIELDS: Failed to open %s", 

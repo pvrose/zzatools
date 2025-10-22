@@ -125,8 +125,7 @@ bool spec_data::load_json() {
 	char msg[128];
 	status_->misc_status(ST_NOTE, "ADIF SPEC: Loading ADIF Specification");
 	ifstream is;
-	file_holder_->get_file(FILE_ADIF, is, filename);
-	if (is.good()) {
+	if (file_holder_->get_file(FILE_ADIF, is, filename)) {
 		try {
 			json jall;
 			is >> jall;
@@ -2448,7 +2447,7 @@ bool spec_data::generate_adif_hfile() {
 		status_->misc_status(ST_ERROR, "Cannot regenerate adif.h - not in development mode");
 		return false;
 	}
-	std::string filename = file_holder_->get_directory(true) + "include/adif.h";
+	std::string filename = file_holder_->get_directory(DATA_CODEGEN) + "include/adif.h";
 	// Add my application defined fields
 	add_my_appdefs();
 	ofstream os(filename);
