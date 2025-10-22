@@ -137,7 +137,7 @@ bool file_holder::get_file(file_contents_t type, std::ifstream& is, std::string&
 		is.open(filename);
 		if (is.fail()) {
 			snprintf(msg, sizeof(msg), "FILE: Cannot open %s", filename.c_str());
-			if (status_) status_->misc_status(ctrl.fatal ? ST_FATAL : ST_ERROR, msg);
+			if (status_) status_->misc_status(ST_ERROR, msg);
 			else {
 				printf(msg);
 				printf("\n");

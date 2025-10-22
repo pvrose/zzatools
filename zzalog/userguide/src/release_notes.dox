@@ -6,6 +6,8 @@
 - Add ability to edit band plan data.
 - Move qso_apps configuration data to separate JSON file.
 - Reinstate club operator log-in.
+- Better handling of configuration data between development and release versions. 
+Features to assist cold- and warm-start testing.
 - Cosmetic changes.
 - Performance improvements.
   - Reduce look-ups while loading ADIF file.

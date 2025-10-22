@@ -67,7 +67,7 @@ const std::map < file_contents_t, file_control_t > FILE_CONTROL = {
 	{ FILE_BANDPLAN, { "band_plan.json", true, false, DEBUG_RESET_BAND } },
 	{ FILE_COUNTRY_CLUB, { "cty.xml", true, false, DEBUG_RESET_CTY } },
 	{ FILE_COUNTRY_CFILES, { "cty.csv", true, false, DEBUG_RESET_CTY1 }},
-	{ FILE_COUNTRY_DXATLAS, { "prefix.lst", true, false, DEBUG_RESET_CTY2 }},
+	{ FILE_COUNTRY_DXATLAS, { "Prefix.lst", true, false, DEBUG_RESET_CTY2 }},
 	{ FILE_COUNTRY, { "cty.json", true, false, DEBUG_RESET_CTY3, false } },
 	{ FILE_INTLCHARS, { "intl_chars.txt", true, false, DEBUG_RESET_INTL }},
 	{ FILE_ICON_GMAPS, { "google_maps.png", true, true, DEBUG_RESET_ICON }},
