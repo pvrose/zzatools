@@ -269,7 +269,6 @@ __pycache__/
 
 # GIT files as repository = development fielstore
 .git/
-/reference/cty.xml
 /reference/cty.xml.gz
 /zzalog/userguide/html/
 /zzalog/userguide/html/dir_ee3233fb07bdb6ef237d9cb1f6dac54c.html
