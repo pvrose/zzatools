@@ -41,7 +41,7 @@ discreancy found.
 \section add_clip Adding data from the clipboard
 
 It is possible to select one or more ADIF records from a text editor and import into the current logbook.
-Simply copy the records from the text editor using its copy procedure.Then in the logbook view in the Main Window
+Simply copy the records from the text editor using its copy procedure. Then in the logbook view in the Main Window
 click the book and enter CTRL and V from the keyboard. Alternately, there is a menu item "Import->Clipboard".
 
 

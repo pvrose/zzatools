@@ -93,7 +93,7 @@ protected:
     Fl_Image* solar_image_;
 
     // Components
-    Fl_Tabs* w_tabs_;         //!< 5 tabs: Solar data, Geomag data, HF f/c, VHF f/c, Solar image.
+    Fl_Tabs* w_tabs_;         //!< 5 tabs: Solar data, Geomag data, HF f/c, VHF f/c.
     // Solar data
     Fl_Group* g_solar_;       //!< Solar data tab
     Fl_Output* w_sfi_;        //!< Solar flux index.

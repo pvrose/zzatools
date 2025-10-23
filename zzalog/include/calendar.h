@@ -49,7 +49,7 @@ class calendar_table;
 			BN_TODAY      //!< Go to today's date.
 		};
 		//! Callback when an action button is clicked.
-		//! 
+		
 		//! \param w clicked button.
 		//! \param v as button_t indicates the action to do.
 		static void cb_bn_cal(Fl_Widget* w, void* v);

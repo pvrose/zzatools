@@ -128,7 +128,9 @@ the images as:
 .../GM3ZZA/scans/20161202/dg5mla++20150615.png\n
 </code>
 
-<B>NB</B> Replace forward slash characters '/' with and underscore '_' to avoid the slash being interpreted as a level of file hierarchy.
+<B>NB</B> Replace forward slash characters '/' in callsigns
+with and underscore '_' to avoid the slash being 
+interpreted as a level of file hierarchy.
 
 \section qsl_sending Sending QSLs
 
@@ -145,7 +147,7 @@ has been received and not replied to. Alternatively an individual e-mail can be 
 To send the e-mail or e-mails follow the steps using the buttons 
 from left to right:
 - <B>file icon</B> this generates a PNG image files with the completed e-mails.
-- <B>letter icon</B> this sends the e-mails.
+- <B>envelope icon</B> this sends the e-mails.
 - <B>Done</B> Once the e-mails have been sent this updates the QSO records. Only do this when you are 
 sure the e-mail has been sent.
 

@@ -27,4 +27,7 @@ of the on-line directories as shown in \ref page_6.
 \image html qso_dxcc_3.png "Example of a callsign exception"
 \image latex qso_dxcc_3.png "Example of a callsign exception" width=5cm
 
+The data used to decode the callsigns can be managed by clicking the "Check Data" 
+button. See \ref cty_dialog.
+
 */

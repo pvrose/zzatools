@@ -13,6 +13,7 @@
 //! wavelength to be sorted on their frequency.
 struct band_lt {
     //! Special &lt; operator.
+    
     //! \param l LHS of operation. A std::string containing wavelength as eg. 10M (28~29.7 MHz).
     //! \param r RHS of operation. A std::string containing wavelength.
     //! \return frequency of LHS is less than frequency of RHS.

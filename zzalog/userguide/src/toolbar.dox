@@ -37,12 +37,12 @@ The majority of buttons contain links to the Menu bar.
 
 \image html toolbar_set4.png "Extract and import controls"
 \image latex toolbar_set4.png "Extract and import controls"
--  <B>Cyan downward arrow over "eQSL"</B> - Import->Download eQSL.
--  <B>Cyan downward arrow over "LotW"</B> - Import->Download LotW.
--  <B>Blue "?" over "eQSL"</B> - Extract->eQSL.
--  <B>Blue "?" over "LotW"</B> - Extract->LotW.
--  <B>Blue "?" over "CL"</B> - Extract->ClubLog.
--  <B>Upward arrow</B> - Extract->Upload.
+-  <B>"eQSL" with downward arrows</B> - Import->Download eQSL.
+-  <B>"LotW" with downward arrows</B> - Import->Download LotW.
+-  <B>"Eqsl ??"</B> - Extract->eQSL.
+-  <B>"LotW ??"</B> - Extract->LotW.
+-  <B>"Clog ??"</B> - Extract->ClubLog.
+-  <B>Upward arrows</B> - Extract->Upload.
 
 \image html toolbar_set5.png "Miscellaneous controls"
 \image latex toolbar_set5.png "Miscellaneous controls"
@@ -50,10 +50,11 @@ The majority of buttons contain links to the Menu bar.
 -  <B>Blue "?"</B> - Extract->Criteria.
 -  <B>Blue "?" with red cross</B> - Extract->Clear.
 -  <B>Blue "?" superimposed with horizontal lines</B> - Extract->Display.
--  <B>Image of world</B> - Information->Google Maps.
--  <B>"QRZ.com"</B> - Information->QRZ.com.
+-  <B>Icon: Google maps</B> - Information->Google Maps.
+-  <B>Icon: QRZ.com</B> - Information->QRZ.com.
 -  <B>&quot;&AElig;&quot;</B> - Windows->International Chars.
--  <B>Rose icon</B> - Help->User Guide.
+-  <B>Icon: Rose</B> - Help->User Guide.
+-  <B>Icon: PDF</B> - Help->User Guide (PDF). 
 
 \image html toolbar_set6.png "Search controls"
 \image latex toolbar_set6.png "Search controls"

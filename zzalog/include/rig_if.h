@@ -58,7 +58,7 @@
 		BOTH = AMPLIFIER | TRANSVERTER  //!< Both amplifier and transverter attached.
 	};
 
-	//! Interface configuration data:
+	//! Rig interface configuration data (including hamlib configuration):
 	struct hamlib_data_t {
 		//! Manufacturer as known by hamlib.
 		std::string mfr = "";

@@ -179,12 +179,12 @@ protected:
     Fl_Output* w_start_time_;    //!< Displays contest start time
     Fl_Output* w_finish_time_;   //!< Displays contest finish time.
     Fl_Button* w_status_;        //!< Displays contest status and allows some chnage in status.
-    Fl_Group* g_exch_;           
+    Fl_Group* g_exch_;           //!< Group of widgets for exchange data.  
     Fl_Input* w_rx_exchange_;    //!< Input for received exchange.
     Fl_Output* w_tx_exchange_;   //!< Displays required transmit exchange.
     Fl_Counter* w_next_serno_;   //!< Display for current seral number: allows modification.
     Fl_Button* w_parse_;         //!< Button to parse received exchange.
-    Fl_Group* g_scores_;    
+    Fl_Group* g_scores_;         //!< Group of widgets for scoring data.
     Fl_Output* w_number_qsos_;   //!< Displays number of QSOs so far in contest.
     Fl_Output* w_qso_points_;    //!< Displays total QSO points so far.
     Fl_Output* w_multiplier_;    //!< Displays total Multiplier so far.

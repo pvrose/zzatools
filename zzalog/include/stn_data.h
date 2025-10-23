@@ -42,6 +42,7 @@ enum qth_value_t : char {
 
 //! Station location data
 struct qth_info_t {
+	//! Map QTH paramter to its value.
 	std::map<qth_value_t, std::string> data;
 };
 
@@ -106,6 +107,7 @@ enum oper_value_t : char {
 
 //! Station operator database.
 struct oper_info_t {
+	//! Maps operator parameter to its value.
 	std::map< oper_value_t, std::string> data;
 };
 

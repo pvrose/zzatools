@@ -49,6 +49,7 @@ protected:
     int top_;        //!< Y coordinate
     int width_;      //!< Width
     int height_;     //!< Height
+    
     //! Flag, if true opens the larger view on start-up.
     bool open_window_; 
 

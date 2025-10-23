@@ -493,7 +493,9 @@
 		ifstream input_;
 		//! File format.
 		adif_format_t format_;
-		//! inhibit views being updated when selection changes. This is std::set to prevent
+		//! Inhibit views being updated when selection changes. 
+		
+		//! This is std::set to prevent
 		//! unnecessary redrawing during an std::atomic sequence of updates.
 		bool inhibit_view_update_;
 		//! New record being created.
@@ -556,10 +558,12 @@
 		// Readers and writer
 		adi_reader* adi_reader_;  //!< Component used to read a .adi format file.
 		adi_writer* adi_writer_;  //!< Component used to write a .adi format file.
-		adx_handler* adx_handler_; //!< Component useed to read and write an ADX format file
+		adx_handler* adx_handler_; //!< Component useed to read and write an ADX format file.
 		//! Flag std::set when uploads to QSL sites is allowed.
 		bool upload_allowed_;
-		//! The std::set of QSO records that have been declared "dirty". Their contents
+		//! The std::set of QSO records that have been declared "dirty". 
+		
+		//! Their contents
 		//! differ from the equivalent records in filestore.
 		std::set<record*> dirty_qsos_;
 		//! Flag std::set to indicate that the book is dirty after a record has been deleted.

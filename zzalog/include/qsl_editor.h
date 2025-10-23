@@ -148,15 +148,15 @@ protected:
     //Widgets to reference:-
 
     // Filename input and browse button
-    Fl_Group* g_1_;
+    Fl_Group* g_1_;                       //!< Group for image owner.
     field_input* ip_callsign_;            //!< Station callsign.
 
     // Inputs to define size and formats
-    Fl_Group* g_dim_;        
+    Fl_Group* g_dim_;                     //!< Radio button group - dimensions.
     Fl_Radio_Round_Button* bn_inch_;      //!< Radio button: Dimensions in inches.
     Fl_Radio_Round_Button* bn_mm_;        //!< Radio button: Dimensions in millimetres.
     Fl_Radio_Round_Button* bn_point_;     //!< Radio button: Dimensions in (print) points.
-    Fl_Group* g_2_;
+    Fl_Group* g_2_;                       //!< Group dimension values.
     Fl_Value_Input* ip_cols_;             //!< Input: Number of columns in  label sheet.
     Fl_Value_Input* ip_width_;            //!< Input: Width of label.
     Fl_Value_Input* ip_cpos_;             //!< Input: Position of first columns.
@@ -169,7 +169,7 @@ protected:
     Fl_Choice* ch_data_;                  //!< Choice: Date format.
     Fl_Choice* ch_time_;                  //!< Choice: Time format.
     // Contains the item editing buttons
-    Fl_Group* g_4_;
+    Fl_Group* g_4_;                       //!< Contains item editing buttons.
     // Window in which to show the display
     Fl_Window* w_display_;                //!< Window to show full-size image.
     // Display widget 

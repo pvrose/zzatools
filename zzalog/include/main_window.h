@@ -24,7 +24,7 @@
 		~main_window();
 
 		//! Override Fl_Double_Window::handle.
-		//! 
+	 
 		//! On HIDE and SHOW let menu know visibility.
 		//! Accept paste events to import QSO records from the clipboard.
 		virtual int handle(int event);

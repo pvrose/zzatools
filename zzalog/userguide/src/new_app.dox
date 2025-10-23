@@ -43,7 +43,7 @@ information on this refer to the application's manual.
 \section app_ex2 Example 2 - GridTracker
 
 The second example shows the configuration for GridTracker2. This application has no interaction with the rigs. It
-listens for data packets sent out by WSJT-X.
+only listens for data packets sent out by WSJT-X.
 
 \image html new_apps_3.png "Configuring for GridTracker2"
 \image latex new_apps_3.png "Configuring for GridTracker2" width=5cm

@@ -54,7 +54,9 @@ public:
     //! \param value the current progress value. The display is only updated if the 
     //! change in progress in greater than one hundredth of the maximum value.
     void add_progress(uint64_t value);
-    //! End a progress report normally. However if add_progress indicates 100% complete then
+    //! \brief End a progress report normally. 
+   
+    //! However if add_progress indicates 100% complete then
     //! the progress report will indicate complete.
     void end_progress();
     //! Cancel a progress report if an abnormal condition occurred.
@@ -76,7 +78,7 @@ public:
     static void cb_close(Fl_Widget* w, void* v);
 
     //! Override Fl_Double_Window::draw().
-    //! 
+    
     //! When ZZALOG is closing, the word "CLOSING" is displayed across the banner.
     //! This provides an indication to the user that ZZALOG is, in fact, closing as
     //! this can in some cases take a noticeable time.
@@ -101,7 +103,9 @@ protected:
     uint64_t max_value_;
     //! Delta value to trigger update of progress. Set to a fixed fraction of the maximum value.
     uint64_t delta_;
-    //! Previous progress value. The progress clock is updated if the new value is greater than
+    //! Previous progress value.
+    
+    //! The progress clock is updated if the new value is greater than
     //! prev_value_ + delta_.
     uint64_t prev_value_;
     //! Progress unit. Eg bytes or records.

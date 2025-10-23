@@ -17,9 +17,10 @@ using json = nlohmann::json;
 
 //! Field data element. 
 struct field_info_t {
-	std::string field;			//!< Field name
+	std::string field;			//!< Field name.
 	std::string header;			//!< Text used for column headers in log table views
-	unsigned int width;		//!< Column width in log table views
+	unsigned int width;		    //!< Column width in log table views.
+	
 	//! Default constructor.
 	field_info_t() :
 		field(""),

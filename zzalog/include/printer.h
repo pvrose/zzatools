@@ -76,6 +76,7 @@ class qsl_data;
 		int cwin_y_;  //!< Top edge of printable area.
 		int cwin_w_;  //!< Width of printable area.
 		int cwin_h_;  //!< Height of printable area.
+
 		//! Individual card image parameters.
 		qsl_data* card_data_;
 	};

@@ -32,7 +32,7 @@ const int HCONFIG = 500;
 			DLG_USER,       //!< User formatting configuration dialog.
 			DLG_QSLE,       //!< QSL Editor.
 			DLG_CONTEST,    //!< Contest setup dialog.
-			DLG_X
+			DLG_X           //!< Marks end of enumeration.
 		};
 
 	public:
@@ -46,7 +46,7 @@ const int HCONFIG = 500;
 		~config();
 
 		//! Callback for OK, CANCEL or SAVE buttons
-		//! 
+		
 		//! - SAVE: Action the changes and remain open
 		//! - OK: Action the changes and close the dialog.
 		//! - CANCEL: Do not action the changes.

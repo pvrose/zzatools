@@ -120,7 +120,7 @@ protected:
 	//! Card image and info
 	qsl_widget* qsl_thumb_;
 	//! Card controls
-	Fl_Group* grp_card_type_;
+	Fl_Group* grp_card_type_;                 //!< Radio button group.
 	Fl_Radio_Light_Button* radio_eqsl_;       //!< Light: view eQSL image
 	Fl_Radio_Light_Button* radio_card_front_; //!< Light: view Card front
 	Fl_Radio_Light_Button* radio_card_back_;  //!< Light: view Card back
@@ -128,7 +128,7 @@ protected:
 	Fl_Radio_Light_Button* radio_label_;      //!< Light: view label to be printed
 	Fl_Radio_Light_Button* radio_emails_;     //!< Light: view e-Mail to be sent.
 	// "Status" tab.
-	Fl_Group* grp_status_;
+	Fl_Group* grp_status_;                    //!< QSL status pane.
 	Fl_Check_Button* bn_eqsl_rstatus_;        //!< Check: eQSL received.
 	Fl_Check_Button* bn_lotw_rstatus_;        //!< Check: LotW received
 	Fl_Check_Button* bn_qrz_rstatus_;         //!< Check: QRZ.com received
@@ -144,7 +144,7 @@ protected:
 	Fl_Check_Button* bn_club_decline_;        //!< Check: Decline Clublog
 	Fl_Check_Button* bn_card_decline_;        //!< Check: Decline card
 	// "Edit" tab
-	Fl_Group* grp_editor_;
+	Fl_Group* grp_editor_;                    //!< Pane to allow status to be edited.
 	Fl_Button* bn_fetch_;                     //!< Button: Fetch image from eQSL.cc
 	Fl_Button* bn_log_bureau_;                //!< Button: Log card received from bureau.
 	Fl_Button* bn_log_email_;                 //!< Button: Log image received by e-Mail.

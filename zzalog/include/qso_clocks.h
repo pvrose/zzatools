@@ -46,7 +46,7 @@ public:
 protected:
     // The two instances
     qso_clock* clock_;         //!< Clock display.
-    Fl_Tabs* tabs_;
+    Fl_Tabs* tabs_;            //!< Contains weather and solar data tabs.
     qso_wx* qso_weather_;      //!< Weather display.
     condx_view* condx_;        //!< Solar conditions.
 

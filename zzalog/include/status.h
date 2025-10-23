@@ -17,8 +17,8 @@ class banner;
 
 	//! The colours used for a particular status_t value.
 	struct colours_t {
-		Fl_Color fg;
-		Fl_Color bg;
+		Fl_Color fg;          //!< Foreground colour
+		Fl_Color bg;          //!< BAncground colour
 	};
 
 	//! The status of the various messages

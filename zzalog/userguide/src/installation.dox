@@ -2,11 +2,11 @@
 
 \section win_install Windows Installation
 
-A file zzalog-3.6.8.msi is available from https://sourceforge.net/projects/zzalog/. Please follow
+A file zzalog-<version>.msi is available from https://sourceforge.net/projects/zzalog/. Please follow
 instructions to install this. ZZALOG will be installed in
-"C:\Program Files\GM3ZZA\ZZALOG\". 
+"C:\Program Files\GM3ZZA\ZZALOG". 
 Data used by ZZALOG will be installed in 
-"C:\ProgramData\GM3ZZA\ZZALOG\".
+"C:\ProgramData\GM3ZZA\ZZALOG".
 
 \subsection win_source Compiling from source
 
@@ -51,7 +51,7 @@ make clean\n
 make install
 </code>
 
-\section initial_run First-time Run
+\section initial_run First-time Run (Cold-start)
 
 The first time ZZALOG is run, a dialog opens asking for station details. 
 The selection can be either for a club station or an individual station.
@@ -91,7 +91,7 @@ Dialogs then open to select:
 - a file to store the logbook. The name of the file will default to the 
 staion callsign.
 
-\subsection warm_start "Warm start"
+\subsection warm_start Warm-start
 
 A warm start is where a logbook file already exists. ZZALOG will use information in that 
 logbook to provide more information about locations, operators and station callsigns

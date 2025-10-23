@@ -70,7 +70,7 @@ const std::map < file_contents_t, file_control_t > FILE_CONTROL = {
 	{ FILE_COUNTRY_DXATLAS, { "Prefix.lst", true, false, DEBUG_RESET_CTY2 }},
 	{ FILE_COUNTRY, { "cty.json", true, false, DEBUG_RESET_CTY3, false } },
 	{ FILE_INTLCHARS, { "intl_chars.txt", true, false, DEBUG_RESET_INTL }},
-	{ FILE_ICON_GMAPS, { "google_maps.png", true, true, DEBUG_RESET_ICON }},
+	{ FILE_ICON_GMAPS, { "google-maps.png", true, true, DEBUG_RESET_ICON }},
 	{ FILE_ICON_PDF, { "pdf.png", true, true, DEBUG_RESET_ICON}},
 	{ FILE_ICON_QRZ, { "qrz_1.jpg", true, true, DEBUG_RESET_ICON}},
 	{ FILE_APPS, { "apps.json", false, false, DEBUG_RESET_APPS}},

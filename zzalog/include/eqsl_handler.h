@@ -116,9 +116,9 @@ typedef size_t qso_num_t;
 			}
 		};
 	public:
-		// Constructor.
+		//! Constructor.
 		eqsl_handler();
-		// Destructor.
+		//! Destructor.
 		~eqsl_handler();
 
 		//! enqueue a request to fetch a qsl card.

@@ -41,6 +41,7 @@ public:
 		end();
 
 	};
+	//! Destructor
 	~button_input() {};
 
 	//! Inherited from Fl_Group - to be overridden by inheritee.
@@ -75,7 +76,7 @@ public:
 
 	//! Returns the internal Fl_Input widget
 	Fl_Input* input() { return ip_; };
-	//! Returns the internal Fl_Button widget
+	//! Returns the internal Fl_Button widget.
 	Fl_Button* button() { return bn_; };
 
 

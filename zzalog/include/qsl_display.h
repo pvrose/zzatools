@@ -109,13 +109,16 @@ protected:
     // Width and height in points
     int w_;              //!< Width in pixels.
     int h_;              //!< Height in pixels.
+    
     // Scaling factor
     float scaling_;      //!< Scaling factor to draw image in widget.
+    
     //! Use scaling factor
     bool do_scale_;      
     // Scaled origin
     int draw_x_;         //!< X coordinate of origin once scaled.
     int draw_y_;         //!< Y coordinate of origin once scaled.
+    
     // Sacled width and height
     int draw_w_;         //!< Scaled width. 
     int draw_h_;         //!< Scaled height.

@@ -16,9 +16,9 @@ that provides the following functionality:
 	electronic and paper QSL cards and displaying images of received
 	cards.
 - Includes: a shack clock;
-	weather report and band plan view.
+	weather report; propagation forecast and band plan view.
 - Interfaces with a number of
-	modem applications:WSJT-X and FlDigi.
+	modem applications: WSJT-X and FlDigi.
 
 This document can be opened at
 any time from the menu or the toolbar:

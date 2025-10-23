@@ -63,7 +63,7 @@ class record;
 		book * my_book_;
 		//! Neither a header nor the first record has been read yet.
 		bool expecting_header_;
-		//! Total number of records in file (read from header field APP_ZZA_NUM_RECORDS). 10000 assumed
+		//! \brief Total number of records in file (read from header field APP_ZZA_NUM_RECORDS). 10000 assumed
 		//! if not specified.
 		int number_records_;
 		//! Number of records so far loaded.

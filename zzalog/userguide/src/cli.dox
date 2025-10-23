@@ -44,10 +44,10 @@ Provides debug tracing on thread use.
 Removes debug tracing on threads.
 - <B>-e|--new</B>
 Creates a new file
+- <B>-g|--userguide</B>
+Displays the User Guide
 - <B>-h|--help</B>
 Displays the help message.
-- <B>-i|--individual</B>
-Starts the app in Individual mode (sticky).
 - <B>-k|--dark</B>
 Runs the app in dark mode with daek background and light text and icons (sticky).
 - <B>-l|--light</B>
@@ -62,14 +62,25 @@ Does not update the recent files list.
 Does not update QSO records to the on-line QSO servers (sticky).
 - <B>-r|--read_only</B>
 Opens the file in read only mode.
-- <B>-s|--new-settings</B>
-Opens the application with empty configuration file.
 - <B>-t|--test</B>
 Opens the application in test mode: infers -q -w.
 - <B>-u|--usual</B>
 Opens the application in normal mode (ie not test mode): infers -a -n.
 - <B>-w|--wait_save</B>
 Does not automatically save each change (sticky).
+- <B>-x|--reset [data]...</B>Reset configuration data (more than 1 allowed).
+  - <B>adif</B> ADIF specification file (all.json)
+  - <B>apps</B> Apps configuration file (apps.json)
+  - <B>andplan</B> Band-plan data (band_plan.json)
+  - <B>contest</B> Contest data (contests.json)
+  - <B>country</B> Country data (cty.xml, cty.csv, prefix.lst)
+  - <B>fields</B> Fields data (fields.json)
+  - <B>icons</B> Toolbar icons (various)
+  - <B>intl</B> International character set (intl_chars.txt)
+  - <B>rigs</B> Rig configuration data (rigs.json)
+  - <B>settings</B>ZZALOG configuration (ZZALOG.json)
+  - <B>station</B> Operator/QTH/Callsign configuration (station.json)
+  - <B>all</B> All files
 
 
 */

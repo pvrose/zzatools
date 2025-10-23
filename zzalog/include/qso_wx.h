@@ -67,7 +67,7 @@ public:
 		IN_MERCURY,        //!< inches of mercury
 		MILLIBARS          //!< mullibars
 	};
-	//! Clous coverage
+	//! Cloud coverage
 	enum cloud_t : uchar {
 		PERCENT,           //!< percentage 
 		OKTA,              //!< okta

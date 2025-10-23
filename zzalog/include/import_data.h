@@ -37,9 +37,9 @@ class book;
 		};
 
 	public:
-		// Contsructor.
+		//! Contsructor.
 		import_data();
-		// Destructor.
+		//! Destructor.
 		~import_data();
 
 		// public methods
@@ -58,7 +58,7 @@ class book;
 		void update_book();
 
 		//! Stop importing.
-		//! 
+		
 		//! \param immediate true causes the import to be abandoned immediately.
 		//! false causes the update to be wound down gradually.
 		void stop_update(bool immediate);
@@ -69,7 +69,7 @@ class book;
 		//! Merge the data according to the update \p mode.
 		void merge_data(update_mode_t mode = EXISTING);
 		//! Load data for import
-		//! 
+		
 		//! \param filename file to read the data for importing.
 		//! \param mode controls how the import is handled.
 		//! \return true if the load is successful.
@@ -110,8 +110,8 @@ class book;
 		int number_added_;
 		//! The number of rejected
 		int number_rejected_;
-		//! The number of records with clublog data modified
-		//! as a result of LotW QSL information update
+		//! \brief The number of records with clublog data modified
+		//! as a result of LotW QSL information update.
 		int number_clublog_;
 		//! The number of SWL records added
 		int number_swl_;

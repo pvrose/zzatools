@@ -35,7 +35,7 @@ struct app_data_t {
     std::map<std::string, std::string> commands; //!< The commands for each rig.
     bool admin{ false };                         //!< The command needs to be run in administrator mode.
     bool can_disable{ false };                   //!< The app can be disconnected (Rig = NONE).
-    bool (*has_server)() { nullptr };            //!< Function to call to see if serever is active.
+    bool (*has_server)() { nullptr };            //!< Function to call to see if server is active.
     bool (*has_data)() { nullptr };              //!< Function to call to see if server has request.
     std::string address{ "" };                   //!< Network address.
     int port_num{ 0 };                           //!< Network port number.

@@ -1,6 +1,6 @@
 /** \page basic2 Basic operating - digital modes
 
-Operatimg dgital modes require the ues of modem applications. A modem application will
+Operating dgital modes require the ues of modem applications. A modem application will
 encode the message into audio tones for transmission and decode received audio tones on
 reception. As such, the application needs to be configured to access the audio ports on the 
 radio as well as having access to the CAT control port. It will have to share the CAT
@@ -49,7 +49,7 @@ the QSO entry form. On completion of the QSO, WSJT-X sends a command to log the 
 \section b2_other Other Applications
 
 It is possible to configure ZZALOG to launch other applications. For example, in the author's 
-setup, we have: Gridtracker2 for displaying QSOs made with WSJT-X on a map; Mumble for 
+station use, we have: Gridtracker2 for displaying QSOs made with WSJT-X on a map; Mumble for 
 transferring audio between the radio and a remote PC connection; and QSSTV an SSTV modem
 application for Linux. See \ref new_app.
 

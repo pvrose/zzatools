@@ -34,6 +34,7 @@ public:
 	//! Desctructor.
 	virtual ~contest_dialog();
 
+	//! Allow F1 to open user guide.
 	virtual int handle(int event);
 
 	// inherited methods

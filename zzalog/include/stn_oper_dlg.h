@@ -131,7 +131,7 @@ public:
     //! Callback from "Check log" button
     static void cb_check(Fl_Widget* w, void* v);
 
-    //! CAllback from "Set Default" button
+    //! Callback from "Set Default" button
     static void cb_default(Fl_Widget* w, void* v);
 
 protected:

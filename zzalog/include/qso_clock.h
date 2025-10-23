@@ -10,7 +10,7 @@ class qso_clock :
     public Fl_Group
 {
 public:
-	// Constructor
+	//! Constructor
 
 	//! \param X horizontal position within host window
 	//! \param Y vertical position with hosr window

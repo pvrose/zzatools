@@ -27,7 +27,7 @@ public:
 
 protected:
 	//! Load an entity item.
-	//! 
+	
 	//! \param entity Entity item to load.
 	//! \param in Input stream.
 	//! \param dxcc DXCC entity identifier: will be updated.
@@ -35,7 +35,7 @@ protected:
 	bool load_entity(cty_entity* entity, std::istream& in, int& dxcc);
 
 	//! Takes each pattern from the record and generates an element from it.
-	//! 
+	
 	//! \param value individual pattern.
 	//! \param match updated with calsign if it is an exception.
 	//! \param exception returns true if an exception pattern, otherwise false.
