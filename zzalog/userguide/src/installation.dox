@@ -2,7 +2,7 @@
 
 \section win_install Windows Installation
 
-A file zzalog-<version>.msi is available from https://sourceforge.net/projects/zzalog/. Please follow
+A file zzalog-[version].msi is available from https://sourceforge.net/projects/zzalog/. Please follow
 instructions to install this. ZZALOG will be installed in
 "C:\Program Files\GM3ZZA\ZZALOG". 
 Data used by ZZALOG will be installed in 

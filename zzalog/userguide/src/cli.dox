@@ -71,7 +71,7 @@ Does not automatically save each change (sticky).
 - <B>-x|--reset [data]...</B>Reset configuration data (more than 1 allowed).
   - <B>adif</B> ADIF specification file (all.json)
   - <B>apps</B> Apps configuration file (apps.json)
-  - <B>andplan</B> Band-plan data (band_plan.json)
+  - <B>bandplan</B> Band-plan data (band_plan.json)
   - <B>contest</B> Contest data (contests.json)
   - <B>country</B> Country data (cty.xml, cty.csv, prefix.lst)
   - <B>fields</B> Fields data (fields.json)
