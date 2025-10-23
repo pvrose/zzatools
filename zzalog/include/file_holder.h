@@ -133,6 +133,9 @@ public:
 		}
 	}
 
+	//! Release working copy to source
+	bool copy_working_to_source(file_contents_t type);
+
 protected:
 
 	//! Copy source to working

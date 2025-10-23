@@ -41,6 +41,8 @@ public:
     static void cb_close(Fl_Widget* w, void* v);
     //! Open directory browser at directory containing all the country data files.
     static void cb_browser(Fl_Widget* w, void* v);
+    //! Copy working back to source
+    static void cb_release(Fl_Widget* w, void* v);
 
 protected:
 

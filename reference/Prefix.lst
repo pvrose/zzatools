@@ -525,12 +525,12 @@ M0201|-16023|2431|San Vicente;Cabanas;La Paz|YS4|||||||||??4[/?]|3
 M0201|-16188|2451|Santa Ana;Ahuachapan;Sonsonate|YS2|||||||||??2[/?]|7
 -0301|||Unused prefix|YS5|||||||||??[5-9]|7
 01|-280|9500|England|G|14|27|EU|Europe/London|223||||[GM]#,[GM2][ABEFGKLOQRVXY],Z[EHIJNO],VP[01347],VQ[0-4678],VS#,ZD[0-6],VP2#,VP2[A-DF-LN-UW-Z],G/|1,7
--0301|||Intermediate license|2E|||||||||2E|7
+-0301|||Intermediate license|2E|||||||||2E,M[89]|7
 -0301|||Beacon or repeater|GB3|||||||||GB[37]|
 -0301|||Club station|GX|||||||||[GM]X|7
 -0301|||Emergency service|M2|||||||||M2|7
--0301|||Foundation license|M3|||||||||M[37]@@@.|7
--0301|||Full license||||||||||G[0-46-8]@@@.,G[2-68]@@.,M[015]@@@.|7
+-0301|||Foundation license|M3|||||||||M[37]@@@.,ME[37]@@@|7
+-0301|||Full license||||||||||G[0-46-8]@@@.,G[2-68]@@.,M[015]@@@.,ME[015]@@@|7
 -0301|||HF Contest station|M0@|||||||||M#@.|7
 -0301|||Reserved prefix block|G0|||||||||G[0179]@@.,G[59]@@@.,M[246-9],G[1-4678]Q@@.,2E[2-9],M[135]@@.|7
 -0301|||Special station|GB|||||||||GB[0-24-689]|7
@@ -650,7 +650,7 @@ M0201|-16450|2762|Huehuetenango;Quiche;Totonicapan|TG5|||||||||??5[/?]|5
 M0201|-16571|2661|Quezaltenango;Retalhuleu;San Marcos|TG8|||||||||??8[/?]|5
 -0301|||Special station|TG0|||||||||??0|5
 01|-461|8905|Guernsey|GU|14|27|EU|Europe/London|106||||[GM2][UP],GB,[GM]U/|1,7
--0301|||Intermediate license|2U|||||||||2U|7
+-0301|||Intermediate license|2U|||||||||2U,MU[89]|7
 -0301|||Beacon or repeater|GB3|||||||||GB[37]|7
 -0501|||Channel Is.|GC|||||||||GC|3,54
 -0301|||Club station|GP|||||||||[GM]P|7
@@ -843,7 +843,7 @@ M0201|24660|6300|Tokai|JA2|||||||||J@2,7J2,JA2/|9
 -0301|||Very old timer|JA#@@|||||||||JA#@@.,JR6@@.|9
 -04|20096|-1336|Java|PK1|28|54|OC|Asia/Jakarta|119|||19630430|PK[1-3],VK9|2,3
 01|-380|8856|Jersey|GJ|14|27|EU|Europe/London|122||||[GM2][JH],GB,[GM]J/|1,7
--0301|||Intermediate license|2J|||||||||2J|7
+-0301|||Intermediate license|2J|||||||||2J,MJ[89]|7
 -0301|||Beacon or repeater|GB3|||||||||GB[37]|7
 -0501|||Channel Is.|GC|||||||||GC|3,54
 -0301|||Club station|GH|||||||||[GM]H|7
@@ -1132,7 +1132,7 @@ M0201|630|1345|Ogun;Oyo;Osun|5N1|||||||||??1[/?]|5
 -0301|||Special call, foreigner|Z38|||||||||Z38|7
 -06|6120|6372|Northern Cyprus|1B[C]|20|39|AS|Asia/Nicosia|||||1B[/?],1B1/|3
 01|-1208|9838|Northern Ireland|GI|14|27|EU|Europe/London|265||||[GM2][IN],GB,[GM]I/|1,7
--0301|||Intermediate license|2I|||||||||2I|7
+-0301|||Intermediate license|2I|||||||||2I,MI[89]|7
 -0301|||Beacon or repeater|GB3|||||||||GB[37]|7
 -0301|||Club station|GN|||||||||[GM]N|7
 -0301|||Foundation license|MI3|||||||||MI[37]@@@.|7
@@ -1422,7 +1422,7 @@ M0201|1487|7045|Small islands|IM0|||||||||IM0[/?]|5
 -04|7946|5293|Saudi Arabia/Iraq Neut. Zone|8Z4|21|39|AS|Asia/Riyadh|226|||19811225|8Z4|2
 01|21194|2720|Scarborough Reef|BS7|27|50|AS|+08:00|506||19950101||BS[/#],BS7/|2
 01|-766|10204|Scotland|GM|14|27|EU|Europe/London|279||||[GM2][MSZ],GB,[GM]M/|1,7
--0301|||Intermediate license|2M|||||||||2M|7
+-0301|||Intermediate license|2M|||||||||2M,MM[89]|7
 -0301|||Beacon or repeater|GB3|||||||||GB[37]|7
 -0301|||Club station|GS|||||||||[GM]S|7
 -0301|||Foundation license|MM3|||||||||MM[37]@@@.|7
@@ -1873,7 +1873,7 @@ M0901|19204|1940|Southeastern, Ho Chi Minh City, Vung Tau City|3W2|||||||||??2[/
 01|29996|3474|Wake I.|KH9|31|65|OC|Pacific/Tarawa|297|UM|||[AKNW]H9[/?]|2,4
 -0501|||Wake I.|KW6|||||||||K[CW]6|3
 01|-670|9380|Wales|GW|14|27|EU|Europe/London|294||||[GM2][WC],GB,[GM]W/|1,7
--0301|||Intermediate license|2W|||||||||2W|7
+-0301|||Intermediate license|2W|||||||||2W,MW[89]|7
 -0301|||Beacon or repeater|GB3|||||||||GB[37]|7
 -0301|||Club station|GC|||||||||[GM]C|7
 -0301|||Foundation license|MW3|||||||||MW[37]@@@.|7

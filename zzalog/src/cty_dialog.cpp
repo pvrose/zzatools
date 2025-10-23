@@ -124,6 +124,14 @@ void cty_dialog::create_form() {
 	curr_y += HBUTTON + GAP;
 	curr_x = bn_update->x() - WBUTTON - WBUTTON;
 
+	if (DEVELOPMENT_MODE) {
+		curr_x -= WBUTTON;
+		Fl_Button* bn_release = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Release");
+		bn_release->callback(cb_release);
+		bn_release->tooltip("Copy working copies back to source directory");
+		curr_x += WBUTTON;
+	}
+
 	Fl_Button* bn_browser = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Folder");
 	bn_browser->callback(cb_browser);
 	bn_browser->tooltip("Open data directory for cty_data files");
@@ -185,8 +193,10 @@ void cty_dialog::cb_update(Fl_Widget* w, void* v) {
 
 // Reload cty_data
 void cty_dialog::cb_reload(Fl_Widget* w, void* v) {
+	cty_dialog* that = ancestor_view<cty_dialog>(w);
 	delete cty_data_;
 	cty_data_ = new cty_data(true);
+	that->update_widgets();
 }
 
 // Close the dialog
@@ -202,4 +212,19 @@ void cty_dialog::cb_browser(Fl_Widget* w, void* v) {
 	chooser->directory(file_holder_->get_directory(DATA_WORKING).c_str());
 	chooser->show();
 	delete chooser;
+}
+
+// Release and reload
+void cty_dialog::cb_release(Fl_Widget* w, void* v) {
+	cty_dialog* that = ancestor_view<cty_dialog>(w);
+	// Copy working copies back to source - will fail if not DEVELOPMENT_MODE
+	file_holder_->copy_working_to_source(FILE_COUNTRY_CLUB);
+	file_holder_->copy_working_to_source(FILE_COUNTRY_CFILES);
+	file_holder_->copy_working_to_source(FILE_COUNTRY_DXATLAS);
+	// Force reload from source files
+	DEBUG_RESET_CONFIG |= DEBUG_RESET_CALL;
+	delete cty_data_;
+	cty_data_ = new cty_data(true);
+	// Redraw dialog
+	that->update_widgets();
 }
