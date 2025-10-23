@@ -1,6 +1,6 @@
-/** \page web_dialog On-line services and functions
+/** \page web_dialog On-line QSL services and functions
 
-This dialog allows the user to configure all necessary on-line services and functions.
+This dialog allows the user to configure all necessary on-line QSL services and functions.
 
 \section web_eqsl eQSL.cc
 
@@ -90,5 +90,17 @@ they use. An additional e-mail address can be specified to receive the e-mail as
 \image html web_dialog_6.png "Tab to enter e-Mail credentials"
 \image latex web_dialog_6.png "Tab to enter e-Mail credentials"
 
+\section web_noqsl No QSL List
+
+ZZALOG can maintain a list of callsigns, for which not to upload QSO data. 
+
+To add a callsign to the list type the callsign into the "New Callsign" input and click the 
+"Add call" button.
+
+Te remove a callsign from the list, select the callsign in the "No QSL List" box and click
+the "Remove call" button.
+
+\image html web_dialog_9.png "Tab to manage 'No QSL' list"
+\image latex web_dialog_9.png "Tab to manage 'No QSL' list"
 
 */

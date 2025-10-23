@@ -178,4 +178,11 @@ that allows other operators to request a physical QSL card. Clicking the "OQRS" 
 fetch a list of these requests. The records corresponding to this list will then
 be updated with QSL_SENT to "R" (for requested).
 
+\subsection qsl_noqsl Managing a "Do not QSL" list
+
+ZZALOG offers the opportunity to manage a list of callsigns not to upload QSL cards for. This is handled in
+the \ref web_dialog pane.
+
+
+
 */
