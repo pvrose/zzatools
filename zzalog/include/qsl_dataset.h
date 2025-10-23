@@ -2,9 +2,10 @@
 
 #include "qsl_data.h"
 
+#include <map>
+#include <set>
 #include <string>
 #include <vector>
-#include <map>
 
 #include <FL/Fl.H>
 
@@ -56,6 +57,8 @@ public:
 	server_data_t* get_server_data(std::string server);
 	//! Returns QRZ logbook credentials
 	qsl_call_data* get_qrz_api(std::string callsign);
+	//! Returns set of callsign not wanting electronic QSLs
+	std::set<std::string>* get_no_qsl_list();
 
 	//! Mark data dirty
 	void dirty(qsl_data* card);
@@ -67,6 +70,9 @@ public:
 	bool new_server(std::string server);
 	//! Current server name during save
 	static std::string server_name();
+	//! \p callsign does not want QSLs
+	bool no_qsl(std::string callsign);
+
 
 protected:
 	//! Read card designs
@@ -80,6 +86,8 @@ protected:
 	std::map<qsl_data::qsl_type, std::map<std::string, qsl_data*>* > data_;
 	//! QSL server data
 	std::map<std::string, server_data_t*> server_data_; 
+	//! Do not QSL list
+	std::set<std::string>  no_qsl_list_;
 	//! Path to QSL data
 	std::string qsl_path_;
 	//! Load failed

@@ -1545,13 +1545,13 @@ bool book::upload_qso(qso_num_t record_num) {
 		record* qso = get_record(item_number(record_num), false);
 		enable_save(false, "Uploading to QSL sites");
 		bool ok = true;
-		if (qso->item("EQSL_QSL_SENT") != "Y") 
+		if (qso->item("EQSL_QSL_SENT") != "Y" && qso->item("EQSL_QSL_SENT") != "N")
 			if (!eqsl_handler_->upload_single_qso(record_num)) ok = false;
-		if (qso->item("LOTW_QSL_SENT") != "Y") 
+		if (qso->item("LOTW_QSL_SENT") != "Y" && qso->item("LOTW_QSL_SENT") != "N")
 			if (!lotw_handler_->upload_single_qso(record_num)) ok = false;
-		if (qso->item("CLUBLOG_UPLOAD_QSL_STATUS") != "Y") 
+		if (qso->item("CLUBLOG_QSO_UPLOAD_STATUS") != "Y" && qso->item("CLUBLOG_QSO_UPLOAD_STATUS") != "N")
 			if (!club_handler_->upload_single_qso(record_num)) ok = false;
-		if (qso->item("QRZCOM_QSO_UPLOAD_STATUS") != "Y") {
+		if (qso->item("QRZCOM_QSO_UPLOAD_STATUS") != "Y" && qso->item("QRZCOM_QSO_UPLOAD_STATUS") != "N") {
 			if (!qrz_handler_->upload_single_qso(record_num)) ok = false;
 		}
 		// Clear flag as already handled new record features

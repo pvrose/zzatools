@@ -72,7 +72,7 @@
 
 	// Settings operations
 	{ "&Settings", 0, 0, 0, FL_SUBMENU },
-		{ "&Web sites", 0, menu::cb_mi_settings, (void*)config::DLG_WEB },
+		{ "QSL &Servers", 0, menu::cb_mi_settings, (void*)config::DLG_QSLS },
 		{ "&Fields", 0, menu::cb_mi_settings, (void*)config::DLG_COLUMN },
 		{ "&User config", 0, menu::cb_mi_settings, (void*)config::DLG_USER },
 		{ "&QSL design", 0, menu::cb_mi_settings, (void*)config::DLG_QSLE },

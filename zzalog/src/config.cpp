@@ -44,11 +44,11 @@ config::config(int W, int H, const char* label) :
 	// get client area 
 	tabs_->client_area(rx, ry, rw, rh, 0);
 	// Web URLs, user-names and passwords
-	web_dialog* aweb = new web_dialog(rx, ry, rw, rh, "Web sites");
+	web_dialog* aweb = new web_dialog(rx, ry, rw, rh, "QSL Servers");
 	aweb->labelfont(FL_BOLD);
 	aweb->labelsize(FL_NORMAL_SIZE + 2);
-	aweb->tooltip("Allows the setting of user details for the various on-line services");
-	children_ids_.push_back(DLG_WEB);
+	aweb->tooltip("Allows the setting of user details for the various on-line QSL services");
+	children_ids_.push_back(DLG_QSLS);
 	// Fields config - fields to display as columns in log views, first few rows in record view
 	// and fields to export to TSV files
 	fields_dialog* fields = new fields_dialog(rx, ry, rw, rh, "Fields");
@@ -198,7 +198,7 @@ Fl_Widget* config::get_tab(cfg_dialog_t active) {
 void config::set_label(config::cfg_dialog_t active) {
 
 	switch (active) {
-	case DLG_WEB:
+	case DLG_QSLS:
 		label("Configuration: Define web locations of QSL and other services");
 		break;
 	case DLG_COLUMN:

@@ -438,6 +438,14 @@ bool qsl_dataset::load_json() {
 					server_data_[it.first] = sd;
 				}
 			}
+			if (jall.find("No QSLs") != jall.end()) {
+				auto noqs = jall.at("No QSLs").get < std::set<json> >();
+				for (auto it : noqs) {
+					std::string call;
+					it.get_to(call);
+					no_qsl_list_.insert(call);
+				}
+			}
 			snprintf(msg, sizeof(msg), "QSL: File %s loaded OK", filename.c_str());
 			status_->misc_status(ST_OK, msg);
 			return true;
@@ -490,6 +498,11 @@ void qsl_dataset::save_json() {
 		}
 		jsvrs["Seed"] = seed_;
 		jall["Servers"] = jsvrs;
+		json jnoqs;
+		for (auto& it_noq : no_qsl_list_) {
+			jnoqs.push_back(it_noq);
+		}
+		jall["No QSLs"] = jnoqs;
 		os << std::setw(2) << jall;
 		if (os.fail()) {
 			status_->misc_status(ST_ERROR, "QSL: Failed to save data");
@@ -524,5 +537,15 @@ bool qsl_dataset::new_server(std::string server) {
 	server_data_t* data = new server_data_t;
 	server_data_[server] = data;
 	return true;
+}
+
+// Return true if callsign within no_qsl_list_
+bool qsl_dataset::no_qsl(std::string callsign) {
+	return no_qsl_list_.find(callsign) != no_qsl_list_.end();
+}
+
+// Get No QSL list
+std::set<std::string>* qsl_dataset::get_no_qsl_list() {
+	return &no_qsl_list_;
 }
 

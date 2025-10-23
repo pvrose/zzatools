@@ -2,14 +2,15 @@
 
 #include "book.h"
 #include "config.h"
+#include "contest_scorer.h"
 #include "cty_data.h"
 #include "extract_data.h"
 #include "import_data.h"
 #include "main.h"
 #include "menu.h"
 #include "qrz_handler.h"
+#include "qsl_dataset.h"
 #include "qso_buttons.h"
-#include "contest_scorer.h"
 #include "qso_entry.h"
 #include "qso_manager.h"
 #include "qso_misc.h"
@@ -917,6 +918,7 @@ bool qso_data::action_save(bool continuing) {
 		// check whether record has changed - when validated
 		if (spec_data_->validate(qso, item_number)) {
 		}
+		set_decline_qsl(qso);
 
 		book_->add_use_data(qso);
 		extract_records_->check_add_record(qso_number);
@@ -1405,7 +1407,6 @@ void qso_data::action_create_net() {
 	qso_entry* w = g_net_entry_->entry();
 	switch (logging_state_) {
 	case QSO_STARTED:
-		set_decline_qsl(qso);
 		w->copy_cat_to_qso();
 		logging_state_ = NET_STARTED;
 		break;
@@ -1456,7 +1457,6 @@ void qso_data::action_add_net_qso() {
 	case NET_STARTED:
 		logging_state_ = NET_ADDING;
 		action_new_qso(qso, QSO_ON_AIR);
-		set_decline_qsl(qso);
 		logging_state_ = NET_STARTED;
 		break;
 	case NET_EDIT:
@@ -2134,9 +2134,12 @@ bool qso_data::has_dirty_records() {
 
 // Sets the various do not send QSL
 void qso_data::set_decline_qsl(record* qso) {
-	qso->item("QSL_SENT", std::string("N"));
-	qso->item("EQSL_QSL_SENT", std::string("N"));
-	qso->item("LOTW_QSL_SENT", std::string("N"));
-	qso->item("CLUBLOG_QSO_UPLOAD_STATUS", std::string("N"));
-	qso->item("QRZCOM_QSO_UPLOAD_STATUS", std::string("N"));
+	std::string callsign = qso->item("CALL");
+	if (qsl_dataset_->no_qsl(callsign)) {
+		qso->item("QSL_SENT", std::string("N"));
+		qso->item("EQSL_QSL_SENT", std::string("N"));
+		qso->item("LOTW_QSL_SENT", std::string("N"));
+		qso->item("CLUBLOG_QSO_UPLOAD_STATUS", std::string("N"));
+		qso->item("QRZCOM_QSO_UPLOAD_STATUS", std::string("N"));
+	}
 }

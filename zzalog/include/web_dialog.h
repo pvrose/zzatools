@@ -11,8 +11,9 @@
 
 
 
-class Fl_Widget;
 class Fl_Group;
+class Fl_Select_Browser;
+class Fl_Widget;
 struct qsl_call_data;
 struct server_data_t;
 
@@ -50,6 +51,14 @@ struct server_data_t;
 		// Callbacks
 		//! Callback when switching tabs: reformats labels.
 		static void cb_tab(Fl_Widget* w, void* v);
+		//! Callback adding data to No QSL list.
+		
+		//! \p v points to input choice
+		static void cb_add_noqsl(Fl_Widget* w, void* v);
+		//! Callback deleting data from No QSL list
+
+		//! \p v points to input choice
+		static void cb_del_noqsl(Fl_Widget* w, void* v);
 
 		//! Instantiate the widgets to configure eQSL interface.
 		void create_eqsl(int rx, int ry, int rw, int rh);
@@ -61,9 +70,14 @@ struct server_data_t;
 		void create_club(int rx, int ry, int rw, int rh);
 		//! Instantiate the widgets to configure the e-Mail interface. 
 		void create_email(int rx, int ry, int rw, int rh);
+		//! Instantiate the widgets to define No QSL list
+		void create_noqsl(int rx, int ry, int rw, int rh);
 
 		//! Returns the server data
 		server_data_t* get_server(std::string name);
+
+		//! Populate No QSL list
+		void populate_noqsl(Fl_Select_Browser* b);
 		
 
 		// Widgets for eQSL
@@ -81,6 +95,8 @@ struct server_data_t;
 		Fl_Group* grp_server_;
 		// Widgets for e-mail
 		Fl_Group* grp_email_;           //!< e-Mail widget group/#
+		// Widgets for NoQSL
+		Fl_Group* grp_noqsl_;           //!< No QSL widget group
 
 		//! Mapping of callsign to widget groups per QRZ.com logbook
 		std::map<std::string, Fl_Group*> grp_api_books_;
@@ -92,6 +108,9 @@ struct server_data_t;
 		server_data_t* club_data_;       //! Clublog.org configuration data
 		server_data_t* qrz_data_;        //! QRZ.com configuration data
 		server_data_t* email_data_;      //! e-Mail configuration data
+		std::set<std::string>* noqsl_data_;   //!< No QSL list data
+
+		std::string add_call_;           //!< Callsign to add
 
 	};
 #endif

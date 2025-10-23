@@ -27,7 +27,7 @@ const int HCONFIG = 500;
 
 		//! Identifiers for each configuration tab - order is speific!
 		enum cfg_dialog_t {
-			DLG_WEB,        //!< Web location dialog.
+			DLG_QSLS,       //!< QSL Server dialog.
 			DLG_COLUMN,     //!< Columns (aka fields) format dialog.
 			DLG_USER,       //!< User formatting configuration dialog.
 			DLG_QSLE,       //!< QSL Editor.

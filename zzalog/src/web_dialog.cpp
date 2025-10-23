@@ -13,12 +13,15 @@
 
 #include "utils.h"
 
-#include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Group.H>
+#include <FL/Fl_Input.H>
+#include <FL/Fl_Input_Choice.H>
 #include <FL/Fl_Int_Input.H>
 #include <FL/Fl_Output.H>
 #include <FL/Fl_RGB_Image.H>
+#include <FL/Fl_Select_Browser.H>
 #include <FL/Fl_Tabs.H>
 
 // Constructor
@@ -29,6 +32,7 @@ web_dialog::web_dialog(int X, int Y, int W, int H, const char* label) :
 	, grp_qrz_(nullptr)
 	, grp_email_(nullptr)
 	, grp_server_(nullptr)
+	, grp_noqsl_(nullptr)
 	, grp_club_(nullptr)
 	, eqsl_data_(nullptr)
 	, lotw_data_(nullptr)
@@ -77,6 +81,7 @@ void web_dialog::load_values() {
 	club_data_ = get_server("Club");
 	qrz_data_ = get_server("QRZ");
 	email_data_ = get_server("eMail");
+	noqsl_data_ = qsl_dataset_->get_no_qsl_list();
 	// Add any STATION_CALLSIGNs not yet in the data read from file
 	spec_dataset* call_set = spec_data_->dataset("Dynamic STATION_CALLSIGN");
 	if (call_set) {
@@ -131,6 +136,7 @@ void web_dialog::create_form(int X, int Y) {
 	create_qrz(rx, ry, rw, rh);
 	create_club(rx, ry, rw, rh);
 	create_email(rx, ry, rw, rh);
+	create_noqsl(rx, ry, rw, rh);
 
 	tabs->end();
 
@@ -649,6 +655,51 @@ void web_dialog::create_email(int rx, int ry, int rw, int rh) {
 	gp06->end();
 }
 
+// Create the No QSL list
+void web_dialog::create_noqsl(int rx, int ry, int rw, int rh) {
+	Fl_Group* gp07 = new Fl_Group(rx, ry, rw, rh, "No QSL list");
+
+	Fl_Group* gp7 = new Fl_Group(rx, ry, rw, rh);
+	gp7->labelsize(FL_NORMAL_SIZE + 2);
+	gp7->labelfont(FL_BOLD);
+	gp7->box(FL_FLAT_BOX);
+	gp7->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+
+	int curr_x = rx + GAP + WLABEL;
+	int curr_y = ry + GAP;
+
+	Fl_Input* ip71 = new Fl_Input(curr_x, curr_y, WSMEDIT, HBUTTON, "New Callsign");
+	ip71->align(FL_ALIGN_LEFT);
+	ip71->callback(cb_value<Fl_Input, std::string>, &add_call_);
+	ip71->value("");
+	ip71->tooltip("Enter Callsign to add to the No QSL List");
+
+	curr_y += HBUTTON;
+	curr_x = rx + GAP + WLABEL;
+
+	Fl_Select_Browser* br72 = new Fl_Select_Browser(curr_x, curr_y, WSMEDIT, HBUTTON * 10, "No QSL List");
+	br72->align(FL_ALIGN_LEFT);
+	br72->tooltip("List of callsigns on the No QSL List");
+
+	curr_y = ry + GAP;
+	curr_x += WSMEDIT + GAP;
+
+	Fl_Button* bn71 = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Add call");
+	bn71->callback(cb_add_noqsl, br72);
+	bn71->tooltip("add the typed in call to the No QSL list");
+
+	curr_y += HBUTTON;
+	Fl_Button* bn72 = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Remove call");
+	bn72->callback(cb_del_noqsl, br72);
+	bn72->tooltip("Remove the selected call from the No QSL list");
+
+	gp7->end();
+	gp07->end();
+
+	populate_noqsl(br72);
+
+}
+
 // Save values to settings
 void web_dialog::save_values() {
 	qsl_dataset_->save_data();
@@ -730,4 +781,31 @@ void web_dialog::cb_tab(Fl_Widget* w, void* v) {
 	that->enable_widgets();
 }
 
+// Callback: add call to NoQSL list
+// v points to input choice
+void web_dialog::cb_add_noqsl(Fl_Widget* w, void* v) {
+	web_dialog* that = ancestor_view<web_dialog>(w);
+	Fl_Select_Browser* br = (Fl_Select_Browser*)v;
+	that->noqsl_data_->insert(to_upper(that->add_call_));
+	that->populate_noqsl(br);
+}
+
+// Callback: remove call from NoQSL list
+// v points to input choice
+void web_dialog::cb_del_noqsl(Fl_Widget* w, void* v) {
+	web_dialog* that = ancestor_view<web_dialog>(w);
+	Fl_Select_Browser* br = (Fl_Select_Browser*)v;
+	std::string call = br->text(br->value());
+	that->noqsl_data_->erase(call);
+	that->populate_noqsl(br);
+}
+
+// Populate No QSL l ist
+void web_dialog::populate_noqsl(Fl_Select_Browser* br) {
+	while (br->size()) br->remove(1);
+	for (auto it : *noqsl_data_) {
+		br->add(it.c_str());
+	}
+	redraw();
+}
 
