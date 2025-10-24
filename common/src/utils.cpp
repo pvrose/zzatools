@@ -617,6 +617,7 @@ std::string degrees_to_dms(float value, bool is_latitude) {
 	num_minutes = num_minutes % 60;
 	// Now format the text 
 	char temp[20]; // I count 11 but add a bit
+	memset(temp, 0, 20);
 	snprintf(temp, 20, "%d\302\260%d'%d\"%c", num_degrees, num_minutes, num_seconds, value < 0 ? (is_latitude ? 'S' : 'W') : (is_latitude ? 'N' : 'E'));
 	text = temp;
 	return text;

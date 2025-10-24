@@ -1244,7 +1244,8 @@ void menu::cb_mi_info_map(Fl_Widget* w, void* v) {
 			// @%f,%f,25000m display 10 km around long/lat
 			snprintf(uri, sizeof(uri), "http://google.com/maps/@%f,%f,10000m", location.latitude, location.longitude);
 			snprintf(message, 128, "INFO: Launching Google maps for %s %s",
-				degrees_to_dms(location.latitude, true), degrees_to_dms(location.longitude, false));
+				degrees_to_dms(location.latitude, true).c_str(),
+				degrees_to_dms(location.longitude, false).c_str());
 			break;
 		}
 		status_->misc_status(ST_NOTE, message);
