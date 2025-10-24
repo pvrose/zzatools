@@ -17,13 +17,15 @@ Features to assist cold- and warm-start testing.
   - Wrong include file.
   - Reflect changes in station dialog to station fields in dashboard.
   - Revise Google Maps location algorithm.
-  - Country longitude and latitude not saved correctly in cty.json file.
 
-\section rev_368A Revision 3.6.8A
+
+\section older Older revisions
+
+\subsection rev_368A Revision 3.6.8A
 
 - Further issues with "luke-warm" start.
 
-\section rev_368 Revision 3.6.8
+\subsection rev_368 Revision 3.6.8
 
 - Testing proposal to ignore unpaired '<' in reading ADI format.
 - Removed special behaviour for club stations.
@@ -38,8 +40,6 @@ Features to assist cold- and warm-start testing.
   - JSON ADIF Band enumeration is lower-case.
   - Errors with cold-start.
   - Focus management in QSO entry broken when added userguide.
-
-\section older Older revisions
 
 \subsection rev_367 Revision 3.6.7
 

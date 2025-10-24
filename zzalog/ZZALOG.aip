@@ -2274,12 +2274,13 @@
     <ROW File="pdf.png_2" Component_="all.json" FileName="pdf.png" Attributes="0" SourcePath="..\reference\pdf.png" SelfReg="false"/>
     <ROW File="Prefix.lst_2" Component_="all.json" FileName="Prefix.lst" Attributes="0" SourcePath="..\reference\Prefix.lst" SelfReg="false"/>
     <ROW File="qrz_1.jpg_2" Component_="all.json" FileName="qrz_1.jpg" Attributes="0" SourcePath="..\reference\qrz_1.jpg" SelfReg="false"/>
+    <ROW File="web_dialog_9.png" Component_="adding.html" FileName="WEB_DI~9.PNG|web_dialog_9.png" Attributes="0" SourcePath="userguide\images\web_dialog_9.png" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.custcomp.MsiShortcutPropertyComponent">
     <ROW MsiShortcutProperty="ZZALOG.pdf0" Shortcut_="ZZALOG.pdf" PropertyKey="System.AppUserModel.PreventPinning" PropVariantValue="1"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
-    <ROW BuildKey="x64_Release" BuildName="x64_Release" BuildOrder="1" BuildType="0" PackageFileName="ZZALOG-3.6.8A" Languages="en_GB" InstallationType="4" SummInfoMetadata="Page Count:450" UseLargeSchema="true" MsiPackageType="x64"/>
+    <ROW BuildKey="x64_Release" BuildName="x64_Release" BuildOrder="1" BuildType="0" PackageFileName="ZZALOG-3.6.9-rc1" Languages="en_GB" InstallationType="4" SummInfoMetadata="Page Count:450" UseLargeSchema="true" MsiPackageType="x64"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
     <ROW Path="&lt;AI_DICTS&gt;ui.ail"/>
