@@ -138,6 +138,7 @@ run_all: all
 # Create a target to run the compiled code
 .PHONY: run
 run: $(EXEC_DIR)/$(TARGET_EXEC)
+	@mkdir -p $(APPDATA_DIR)
 	@$(EXEC_DIR)/$(TARGET_EXEC) $(ARGS) -g ./
 
 # Create a target to run debugger
