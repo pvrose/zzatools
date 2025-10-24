@@ -17,7 +17,7 @@ Features to assist cold- and warm-start testing.
   - Wrong include file.
   - Reflect changes in station dialog to station fields in dashboard.
   - Revise Google Maps location algorithm.
-  - Country longitude and latitude not save correctly in cty.json file.
+  - Country longitude and latitude not saved correctly in cty.json file.
 
 \section rev_368A Revision 3.6.8A
 
