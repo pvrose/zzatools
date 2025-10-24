@@ -200,7 +200,7 @@ void to_json(json& j, const cty_element& e) {
 	if (e.itu_zone_ != -1) j["ITU Zone"] = e.itu_zone_;
 	if (e.continent_.length()) j["Continent"] = e.continent_;
 	if (!std::isnan(e.coordinates_.latitude)) j["Latitude"] = e.coordinates_.latitude;
-	if (!std::isnan(e.coordinates_.longitude)) j["Latitude"] = e.coordinates_.longitude;
+	if (!std::isnan(e.coordinates_.longitude)) j["Longitude"] = e.coordinates_.longitude;
 	if (e.deleted_) j["Deleted"] = e.deleted_;
 	if (e.filters_.size()) {
 		json jf;

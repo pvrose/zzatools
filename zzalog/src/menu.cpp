@@ -1171,26 +1171,81 @@ void menu::cb_mi_info_map(Fl_Widget* w, void* v) {
 		std::string locator = record->item("GRIDSQUARE");
 		std::string city = record->item("QTH");
 		std::string label = record->item("CALL");
+		std::string country = record->item("COUNTRY");
 		// These are DOS specific, will need the Linux version
 		std::string format_coords = "http://google.com/maps/@%f,%f,25000m";
 		char message[128];
 		char uri[256];
-		if ((source == LOC_NONE || source == LOC_GRID2 || source == LOC_GRID4) && city != "") {
-			// Location got from wide stuff, therefore use city location
-			// ?q=City&z=10 - centre on city zoom level 10
-			snprintf(uri, sizeof(uri), "http://google.com/maps/?q=%s&z=10", city.c_str());
-			snprintf(message, 128, "INFO: Launching Google maps for %s", city.c_str());
-		}
-		else if (source == LOC_GRID6 || source == LOC_GRID8 || source == LOC_LATLONG) {
+		switch (source) {
+		case LOC_NONE:
+			if (city != "") {
+				// Location got from wide stuff, therefore use city location
+				// ?q=City&z=10 - centre on city zoom level 10
+				snprintf(uri, sizeof(uri), "http://google.com/maps/?q=%s&z=10", city.c_str());
+				snprintf(message, 128, "INFO: Launching Google maps for %s", city.c_str());
+			}
+			else {
+				// Any thing else could be a random location somewhere up to 1 degree away.
+				status_->misc_status(ST_WARNING, "INFO: Insufficient QTH information in record for to launch Google Maps");
+				return;
+			}
+			break;
+		case LOC_GRID2:
+			if (city != "") {
+				// Location got from wide stuff, therefore use city location
+				// ?q=City&z=10 - centre on city zoom level 10
+				snprintf(uri, sizeof(uri), "http://google.com/maps/?q=%s&z=10", city.c_str());
+				snprintf(message, 128, "INFO: Launching Google maps for %s", city.c_str());
+			}
+			else {
+				// grid square is 2 characters 
+				// @%f,%f,25000m display 150 km around long/lat
+				snprintf(uri, sizeof(uri), "http://google.com/maps/@%f,%f,150000m", location.latitude, location.longitude);
+				snprintf(message, 128, "INFO: Launching Google maps for %s", locator.c_str());
+			}
+			break;
+		case LOC_GRID4:
+			if (city != "") {
+				// Location got from wide stuff, therefore use city location
+				// ?q=City&z=10 - centre on city zoom level 10
+				snprintf(uri, sizeof(uri), "http://google.com/maps/?q=%s&z=10", city.c_str());
+				snprintf(message, 128, "INFO: Launching Google maps for %s", city.c_str());
+			}
+			else {
+				// grid square is 4 characters 
+				// @%f,%f,25000m display 15 km around long/lat
+				snprintf(uri, sizeof(uri), "http://google.com/maps/@%f,%f,15000m", location.latitude, location.longitude);
+				snprintf(message, 128, "INFO: Launching Google maps for %s", locator.c_str());
+			}
+			break;
+		case LOC_PREFIX:
+			if (city != "") {
+				// Location got from wide stuff, therefore use city location
+				// ?q=City&z=10 - centre on city zoom level 10
+				snprintf(uri, sizeof(uri), "http://google.com/maps/?q=%s&z=10", city.c_str());
+				snprintf(message, 128, "INFO: Launching Google maps for %s", city.c_str());
+			}
+			else {
+				// grid square is 6 or more characters 
+				// @%f,%f,25000m display 300 km around long/lat
+				snprintf(uri, sizeof(uri), "http://google.com/maps/@%f,%f,300000m", location.latitude, location.longitude);
+				snprintf(message, 128, "INFO: Launching Google maps for %s", country.c_str());
+			}
+			break;
+		case LOC_GRID6:
+		case LOC_GRID8:
 			// grid square is 6 or more characters 
-			// @%f,%f,25000m display 25 km around long/lat
-			snprintf(uri, sizeof(uri), "http://google.com/maps/@%f,%f,25000m", location.latitude, location.longitude);
+			// @%f,%f,25000m display 10 km around long/lat
+			snprintf(uri, sizeof(uri), "http://google.com/maps/@%f,%f,10000m", location.latitude, location.longitude);
 			snprintf(message, 128, "INFO: Lunching Google maps for %s", locator.c_str());
-		}
-		else {
-			// Any thing else could be a random location somewhere up to 1 degree away.
-			status_->misc_status(ST_WARNING, "INFO: Insufficient QTH information in record to launch Google Maps");
-			return;
+			break;
+		case LOC_LATLONG:
+			// grid square is 6 or more characters 
+			// @%f,%f,25000m display 10 km around long/lat
+			snprintf(uri, sizeof(uri), "http://google.com/maps/@%f,%f,10000m", location.latitude, location.longitude);
+			snprintf(message, 128, "INFO: Launching Google maps for %s %s",
+				degrees_to_dms(location.latitude, true), degrees_to_dms(location.longitude, false));
+			break;
 		}
 		status_->misc_status(ST_NOTE, message);
 		fl_open_uri(uri);

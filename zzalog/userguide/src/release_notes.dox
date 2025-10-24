@@ -8,6 +8,7 @@
 - Reinstate club operator log-in.
 - Better handling of configuration data between development and release versions. 
 Features to assist cold- and warm-start testing.
+- Add feature to allow a list of "Don't QSL" callsigns.
 - Cosmetic changes.
 - Performance improvements.
   - Reduce look-ups while loading ADIF file.
@@ -15,6 +16,8 @@ Features to assist cold- and warm-start testing.
 - Bug fixes:
   - Wrong include file.
   - Reflect changes in station dialog to station fields in dashboard.
+  - Revise Google Maps location algorithm.
+  - Country longitude and latitude not save correctly in cty.json file.
 
 \section rev_368A Revision 3.6.8A
 
