@@ -49,7 +49,6 @@ file_holder::file_holder(bool development, std::string directory) {
 	default_data_directory_ =
 		std::string(getenv("HOME")) + "/.config/" + VENDOR + "/" + PROGRAM_ID + "/";
 #endif
-	fl_mkdir(default_data_directory_.c_str(), -1);
 	default_code_directory_ = directory;
 }
 

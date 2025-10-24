@@ -45,7 +45,7 @@ Removes debug tracing on threads.
 - <B>-e|--new</B>
 Creates a new file
 - <B>-g|--userguide</B>
-Displays the User Guide
+Sets development mode and is ued to define the development reference data.
 - <B>-h|--help</B>
 Displays the help message.
 - <B>-k|--dark</B>

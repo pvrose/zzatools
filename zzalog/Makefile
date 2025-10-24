@@ -193,7 +193,10 @@ $(CDX_DIR)/html/index.html: ./Doxyfile_code $(INCS)
 	@doxygen ./Doxyfile_code
 
 .PHONY: documents
-documents: $(UG_DIR)/html/index.html $(CDX_DIR)/html/index.html $(UG_DIR)/ZZALOG.pdf
+documents: $(UG_DIR)/html/index.html $(CDX_DIR)/html/index.html
+
+.PHONY: pdf
+pdf: $(UG_DIR)/ZZALOG.pdf
 
 $(UG_DIR)/ZZALOG.pdf: $(UG_DIR)/latex/refman.pdf
 	cp $(UG_DIR)/latex/refman.pdf $(UG_DIR)/ZZALOG.pdf
@@ -204,7 +207,10 @@ $(UG_DIR)/latex/refman.pdf: $(UG_DIR)/latex/refman.tex
 	@make -C $(UG_DIR)/latex
 
 .PHONY: install_docs
-install_docs: $(DOCUMENTS_DIR)/userguide/html/index.html $(DOCUMENTS_DIR)/docs/html/index.html $(DOCUMENTS_DIR)/userguide/ZZALOG.pdf
+install_docs: $(DOCUMENTS_DIR)/userguide/html/index.html $(DOCUMENTS_DIR)/docs/html/index.html 
+
+.PHONY: install_pdf
+install_pdf: $(DOCUMENTS_DIR)/userguide/ZZALOG.pdf
 
 # # force recompile
 # .PHONY: touch_main
