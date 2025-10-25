@@ -699,7 +699,7 @@ std::string get_file(char * arg_filename) {
 			status_->misc_status(ST_WARNING, "ZZALOG: No log file - assuming a new installation.");
 			stn_default defaults = stn_data_->defaults();
 			string def_filename = to_lower(defaults.callsign) + ".adi";
-			Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
+			Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
 			chooser->title("Select log file name");
 			chooser->preset_file(def_filename.c_str());
 			chooser->filter("ADI Files\t*.adi\nADX Files\t*.adx");
@@ -831,9 +831,11 @@ void add_book(char* arg) {
 					}
 				} else {
 					char msg[100];
-					snprintf(msg, sizeof(msg), "ZZALOG: Load %s failed, no backup loaded", log_file.c_str());
-					status_->misc_status(closing_ ? ST_WARNING : ST_ERROR, msg);
-					book_->set_filename(log_file);
+					snprintf(msg, sizeof(msg), "ZZALOG: Load %s failed, no backup loaded - assume a new logbook", log_file.c_str());
+					status_->misc_status(ST_WARNING, msg);
+					set_recent_file(log_file);
+					book_->set_filename(log_file, true);
+
 				}
 			} else {
 				// Move this file to the top of the recent file std::list

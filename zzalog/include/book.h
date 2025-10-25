@@ -441,8 +441,9 @@
 		//! Set the filename.
 		
 		//! \param filename if the logbook is empty std::set this as the new filename and
+		//! \param new_file new file is being created that needs saving.
 		//! propagate to other components of ZZALOG.
-		void set_filename(std::string filename);
+		void set_filename(std::string filename, bool new_file);
 
 		//! Get filename
 		std::string get_filename();
@@ -570,6 +571,7 @@
 		bool deleted_record_;
 		//! Flag to indicate that the book has been modified and so needs backing up.
 		bool been_modified_;
+
 	};
 
 #endif

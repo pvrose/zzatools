@@ -276,7 +276,11 @@ void banner::add_progress(uint64_t value) {
 	if ((value == max_value_) || (value - prev_value_) > delta_) {
 		snprintf(text, sizeof(text), "%lld out of %lld %s", value, max_value_, prg_unit_);
 		bx_prog_value_->copy_label(text);
-		fd_progress_->value((double)value / double(max_value_));
+		if (max_value_ == 0) {
+			fd_progress_->value(1.0);
+		} else {
+			fd_progress_->value((double)value / double(max_value_));
+		}
 		prev_value_ = value;
 		if (value == max_value_) {
 			end_progress();

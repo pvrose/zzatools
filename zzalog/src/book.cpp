@@ -1631,7 +1631,7 @@ void book::allow_upload(bool enable) {
 }
 
 // Set the filename
-void book::set_filename(std::string filename) {
+void book::set_filename(std::string filename, bool new_file) {
 	if (size()) {
 		char msg[128];
 		snprintf(msg, sizeof(msg), "LOG: %s Not empty - use \"Save as\" to save as %s",
@@ -1640,6 +1640,12 @@ void book::set_filename(std::string filename) {
 		filename_ = filename;
 		spec_data_->loaded_filename(filename_);
 		main_window_label(filename_);
+		if (new_file)  {
+			been_modified_ = true;
+			record* hdr = new record();
+			header(hdr);
+			header_->header(default_header_);
+		}
 	}
 }
 

@@ -119,7 +119,8 @@ public:
 	//! Get filename for data \p type
 	std::string get_filename(file_contents_t type) {
 		const file_control_t ctrl = FILE_CONTROL.at(type);
-		return default_data_directory_ + ctrl.filename;
+		if (ctrl.read_only) return default_source_directory_ + ctrl.filename;
+		else return default_data_directory_ + ctrl.filename;
 	}
 
 	//! Get directory for data \p type
