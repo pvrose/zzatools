@@ -133,6 +133,7 @@ all: $(EXEC_DIR)/$(TARGET_EXEC) documents
 # Create a target to run the compiled code
 .PHONY: run_all
 run_all: all
+	@mkdir -p $(APPDATA_DIR)
 	@$(EXEC_DIR)/$(TARGET_EXEC) $(ARGS) -g ./
 
 # Create a target to run the compiled code
