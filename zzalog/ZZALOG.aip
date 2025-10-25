@@ -55,7 +55,7 @@
     <ROW Component="NewFolder" ComponentId="{B7CF7830-8BD2-4284-A08E-2E200D458212}" Directory_="NewFolder_Dir" Attributes="0"/>
     <ROW Component="ProductInformation" ComponentId="{E180E30E-16B6-4506-97ED-6FEB327E79BE}" Directory_="APPDIR" Attributes="260" KeyPath="Version"/>
     <ROW Component="SHORTCUTDIR" ComponentId="{04DB559B-3E2C-4C23-BE71-B8D21A9EC47B}" Directory_="SHORTCUTDIR" Attributes="0"/>
-    <ROW Component="ZZALOG.pdf" ComponentId="{AB90C026-9C54-4F72-B67B-1A9A47E8D69C}" Directory_="userguide_Dir" Attributes="0" KeyPath="refman.pdf" Type="0"/>
+    <ROW Component="ZZALOG.pdf" ComponentId="{A518DBE8-5EFE-43E5-A057-542E1B524F41}" Directory_="userguide_Dir" Attributes="0" KeyPath="ZZALOG.pdf" Type="0"/>
     <ROW Component="about__dialog_8h.html" ComponentId="{62C9209B-2263-4C2D-95C3-85EDDCD0A238}" Directory_="html_1_Dir" Attributes="0" KeyPath="about__dialog_8h.html" Type="0"/>
     <ROW Component="adding.html" ComponentId="{1D53FE55-ABE2-4C95-8506-D33663FE35AC}" Directory_="html_Dir" Attributes="0" KeyPath="adding.html" Type="0"/>
     <ROW Component="all.json" ComponentId="{081EC22A-9865-459F-A4A9-CB88C2B99D78}" Directory_="ZZALOG_1_Dir" Attributes="0" KeyPath="all.json_2" Type="0"/>
@@ -1996,7 +1996,6 @@
     <ROW File="web_dialog_6.png" Component_="adding.html" FileName="WEB_DI~6.PNG|web_dialog_6.png" Attributes="0" SourcePath="userguide\html\web_dialog_6.png" SelfReg="false"/>
     <ROW File="web_dialog_7.png" Component_="adding.html" FileName="WEB_DI~7.PNG|web_dialog_7.png" Attributes="0" SourcePath="userguide\html\web_dialog_7.png" SelfReg="false"/>
     <ROW File="web_dialog_8.png" Component_="adding.html" FileName="WEB_DI~8.PNG|web_dialog_8.png" Attributes="0" SourcePath="userguide\html\web_dialog_8.png" SelfReg="false"/>
-    <ROW File="refman.pdf" Component_="ZZALOG.pdf" FileName="ZZALOG.pdf" Attributes="0" SourcePath="userguide\latex\refman.pdf" SelfReg="false"/>
     <ROW File="adx__handler_8h.html" Component_="about__dialog_8h.html" FileName="ADX__H~1.HTM|adx__handler_8h.html" Attributes="0" SourcePath="docs\html\adx__handler_8h.html" SelfReg="false"/>
     <ROW File="adx__handler_8h.js" Component_="about__dialog_8h.html" FileName="ADX__H~1.JS|adx__handler_8h.js" Attributes="0" SourcePath="docs\html\adx__handler_8h.js" SelfReg="false"/>
     <ROW File="adx__handler_8h_source.html" Component_="about__dialog_8h.html" FileName="ADX__H~2.HTM|adx__handler_8h_source.html" Attributes="0" SourcePath="docs\html\adx__handler_8h_source.html" SelfReg="false"/>
@@ -2275,12 +2274,10 @@
     <ROW File="Prefix.lst_2" Component_="all.json" FileName="Prefix.lst" Attributes="0" SourcePath="..\reference\Prefix.lst" SelfReg="false"/>
     <ROW File="qrz_1.jpg_2" Component_="all.json" FileName="qrz_1.jpg" Attributes="0" SourcePath="..\reference\qrz_1.jpg" SelfReg="false"/>
     <ROW File="web_dialog_9.png" Component_="adding.html" FileName="WEB_DI~9.PNG|web_dialog_9.png" Attributes="0" SourcePath="userguide\images\web_dialog_9.png" SelfReg="false"/>
-  </COMPONENT>
-  <COMPONENT cid="caphyon.advinst.custcomp.MsiShortcutPropertyComponent">
-    <ROW MsiShortcutProperty="ZZALOG.pdf0" Shortcut_="ZZALOG.pdf" PropertyKey="System.AppUserModel.PreventPinning" PropVariantValue="1"/>
+    <ROW File="ZZALOG.pdf" Component_="ZZALOG.pdf" FileName="ZZALOG.pdf" Attributes="0" SourcePath="userguide\ZZALOG.pdf" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
-    <ROW BuildKey="x64_Release" BuildName="x64_Release" BuildOrder="1" BuildType="0" PackageFileName="ZZALOG-3.6.9-rc2" Languages="en_GB" InstallationType="4" SummInfoMetadata="Page Count:450" UseLargeSchema="true" MsiPackageType="x64"/>
+    <ROW BuildKey="x64_Release" BuildName="x64_Release" BuildOrder="1" BuildType="0" PackageFileName="ZZALOG-3.6.9" Languages="en_GB" InstallationType="4" SummInfoMetadata="Page Count:450" UseLargeSchema="true" MsiPackageType="x64"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
     <ROW Path="&lt;AI_DICTS&gt;ui.ail"/>
@@ -2368,9 +2365,9 @@
     <ROW Feature_="MainFeature" Component_="all_0.js_1"/>
     <ROW Feature_="MainFeature" Component_="adding.html"/>
     <ROW Feature_="MainFeature" Component_="all_0.js"/>
-    <ROW Feature_="MainFeature" Component_="ZZALOG.pdf"/>
     <ROW Feature_="MainFeature" Component_="NewFolder"/>
     <ROW Feature_="MainFeature" Component_="all.json"/>
+    <ROW Feature_="MainFeature" Component_="ZZALOG.pdf"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
     <ROW Action="AI_DOWNGRADE" Condition="AI_NEWERPRODUCTFOUND AND (UILevel &lt;&gt; 5)" Sequence="210"/>
@@ -2402,7 +2399,6 @@
     <ROW Registry="Version" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="Version" Value="[ProductVersion]" Component_="ProductInformation"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiShortsComponent">
-    <ROW Shortcut="ZZALOG.pdf" Directory_="DesktopFolder" Name="ZZALOG.pdf" Component_="ZZALOG.pdf" Target="[#refman.pdf]" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="userguide_Dir"/>
     <ROW Shortcut="zzalog.exe" Directory_="SHORTCUTDIR" Name="zzalog.exe" Component_="zzalog.exe" Target="[#zzalog.exe]" Description="zzalog.exe" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
     <ROW Shortcut="zzalog.exe_1" Directory_="DesktopFolder" Name="ZZALOG" Component_="zzalog.exe" Target="[#zzalog.exe]" Description="ZZALOG" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
   </COMPONENT>
