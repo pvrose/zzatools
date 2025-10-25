@@ -128,7 +128,7 @@ endif
 
 # Build all without running
 .PHONY: all
-all: $(EXEC_DIR)/$(TARGET_EXEC) $(TREFS) documents
+all: $(EXEC_DIR)/$(TARGET_EXEC) documents
 
 # Create a target to run the compiled code
 .PHONY: run_all
