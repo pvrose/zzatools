@@ -707,6 +707,7 @@ std::string get_file(char * arg_filename) {
 				result = chooser->filename();
 			}
 			delete chooser;
+			NEW_BOOK = true;
 		}
 		else {
 			result = filename;
@@ -813,21 +814,30 @@ void add_book(char* arg) {
 
 
 			if (!book_->load_data(log_file)) {
-				settings top_settings;
-				settings behav_settings(&top_settings, "Behaviour");
-				settings backup_settings(&behav_settings, "Backup");
-				std::string backup;
-				backup_settings.get<std::string>("Last Backup", backup, "");
-				// Cannot access book - try backup
-				if (!closing_ && fl_choice("Load %s failed - load from backup %s", "Yes", "No", nullptr, log_file.c_str(), backup.c_str()) == 0) {
-					char msg[100];
-					snprintf(msg, sizeof(msg), "ZZALOG: Load %s failed, trying backup %s", log_file.c_str(), backup.c_str());
-					status_->misc_status(ST_WARNING, msg);
-					if (book_->load_data(backup)) {
-						using_backup_ = true;
-						status_->misc_status(ST_OK, "ZZALOG: Load backup successful");
+				if (!NEW_BOOK) {
+					settings top_settings;
+					settings behav_settings(&top_settings, "Behaviour");
+					settings backup_settings(&behav_settings, "Backup");
+					std::string backup;
+					backup_settings.get<std::string>("Last Backup", backup, "");
+					// Cannot access book - try backup
+					if (!closing_ && fl_choice("Load %s failed - load from backup %s", "Yes", "No", nullptr, log_file.c_str(), backup.c_str()) == 0) {
+						char msg[100];
+						snprintf(msg, sizeof(msg), "ZZALOG: Load %s failed, trying backup %s", log_file.c_str(), backup.c_str());
+						status_->misc_status(ST_WARNING, msg);
+						if (book_->load_data(backup)) {
+							using_backup_ = true;
+							status_->misc_status(ST_OK, "ZZALOG: Load backup successful");
+						} else {
+							status_->misc_status(ST_ERROR, "ZZALOG: Load backup failed");
+						}
 					} else {
-						status_->misc_status(ST_ERROR, "ZZALOG: Load backup failed");
+						char msg[100];
+						snprintf(msg, sizeof(msg), "ZZALOG: Load %s failed, no backup loaded - assume a new logbook", log_file.c_str());
+						status_->misc_status(ST_WARNING, msg);
+						set_recent_file(log_file);
+						book_->set_filename(log_file, true);
+
 					}
 				} else {
 					char msg[100];
