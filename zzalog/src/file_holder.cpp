@@ -5,6 +5,8 @@
 
 #include <cstdlib>
 
+#include <FL/fl_utf8.h>
+
 file_holder* file_holder_ = nullptr;
 uint16_t DEBUG_RESET_CONFIG = 0;
 
@@ -28,6 +30,12 @@ file_holder::file_holder(bool development, std::string directory) {
 	// Working directory
 	default_data_directory_ =
 		std::string(getenv("APPDATA")) + "\\" + VENDOR + "\\" + PROGRAM_ID + "\\";
+	// Create the working directory
+	std::string unixified = default_data_directory_;
+	for (size_t pos = 0; pos < unixified.length(); pos++) {
+		if (unixified[pos] == '\\') unixified[pos] = '/';
+	}
+	fl_make_path(unixified.c_str());
 	// Code directory
 #else 
 	// Source directory - for resetting reference data
@@ -48,8 +56,9 @@ file_holder::file_holder(bool development, std::string directory) {
 	// Working directory
 	default_data_directory_ =
 		std::string(getenv("HOME")) + "/.config/" + VENDOR + "/" + PROGRAM_ID + "/";
+	// Create the working directory
+	fl_make_path(default_data_directory_.c_str());
 #endif
-	default_code_directory_ = directory;
 }
 
 bool file_holder::get_file(file_contents_t type, std::ifstream& is, std::string& filename) {
