@@ -98,7 +98,7 @@ std::string PROGRAM_ID = "ZZALOG";
 //! Short-form program identifier.
 std::string PROG_ID = "ZLG";
 //! Program version. 
-std::string PROGRAM_VERSION = "3.6.9-rc1";
+std::string PROGRAM_VERSION = "3.6.9";
 //! Program vendor.
 std::string VENDOR = "GM3ZZA";
 
