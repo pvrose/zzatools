@@ -122,8 +122,8 @@ endif
 	@echo Creating $@
 	@xxd -i $< > $@
 	
-# Touch main if any other source has changed
-./include/timestamp.h: $(SRCS)
+# Touch main if any other source has changed (or if FLTK has changed)
+./include/timestamp.h: $(SRCS) 
 	touch ./include/timestamp.h
 
 # Build all without running

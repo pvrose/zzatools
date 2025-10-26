@@ -7,6 +7,7 @@
 #include "hamlib/rig.h"
 #include <curl/curl.h>
 
+#include <FL/Enumerations.H>
 #include <FL/fl_draw.H>
 #include <FL/Fl.H>
 #include <FL/Fl_Box.H>

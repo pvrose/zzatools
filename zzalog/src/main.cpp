@@ -66,6 +66,7 @@ main.cpp - application entry point
 #include <cstdlib>
 
 // FLTK header files
+#include <FL/Enumerations.H>
 #include <FL/Fl.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Menu_Item.H>
