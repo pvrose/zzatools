@@ -222,18 +222,18 @@ void band_widget::draw_markers() {
 			}
 			break;
 		case CURRENT:
-			fl_color(Fl_Widget::color());
+			fl_color(FL_RED);
 			draw_line(m.y_scale, m.y_text, 0);
 			fl_font(0, FL_NORMAL_SIZE);
 			fl_draw(m.text, x_text_, m.y_text + h_offset_);
 			break;
 		case CURRENT_LOCUM:
-			fl_color(Fl_Widget::selection_color());
+			fl_color(fl_lighter(FL_RED));
 			fl_font(0, FL_NORMAL_SIZE);
 			fl_draw(m.text, x_text_, m.y_text + h_offset_);
 			break;
 		case CURRENT_RX:
-			fl_color(Fl_Widget::selection_color());
+			fl_color(COLOUR_ORANGE);
 			draw_line(m.y_scale, m.y_text, 0);
 			fl_font(0, FL_NORMAL_SIZE);
 			fl_draw(m.text, x_text_, m.y_text + h_offset_);
