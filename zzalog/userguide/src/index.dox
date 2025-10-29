@@ -42,24 +42,24 @@ For help on any specific window or panel, click on it and press F1.
 
 \page ack Acknowledgments.
 
-ZZALOG uses the following third-party libraries:
-- FLTK (https://www.fltk.org/doc-1.4/index.html) Graphical user interface library.
-- Hamlib (https://github.com/Hamlib/Hamlib/wiki/Hamlib) CAT Interface library.
-- Libcurl (https://curl.se/libcurl/c/libcurl.html) HTTP support library.
-- JSON (https://json.nlohmann.me/nlohmann/json) JSON support library.
-- pugixml (https://pugixml.org) XML support library.
-
-ZZALOG uses reference data from the following third-parties:
-- Clublog.org (https://clublog.org) Country data.
-- Country-files.com (https://www.country-files.com) Country data.
-- DxAtlas (http://dxatlas.com) Prefix data.
-- ADIF (http://adif.org) ADIF Specification (JSON).
-- OpenWeatherMap (https://openweathermap.org) Weather data.
-- HAMQSL (https://www.hamqsl.com) Solar and Terrestrial data.
-
-ZZALOG uses images from the following third-parties:
-- <a href="https://www.flaticon.com/free-icons/google-maps" title="google maps icons">Google maps icons created by justicon - Flaticon</a>
-- <a href="https://www.flaticon.com/free-icons/pdf" title="pdf icons">Pdf icons created by Smashicons - Flaticon</a>
+ZZALOG uses the following items from third parties:
+- Libraries:
+  - FLTK (https://www.fltk.org/doc-1.4/index.html) Graphical user interface library.
+  - Hamlib (https://github.com/Hamlib/Hamlib/wiki/Hamlib) CAT Interface library.
+  - Libcurl (https://curl.se/libcurl/c/libcurl.html) HTTP support library.
+  - JSON (https://json.nlohmann.me/nlohmann/json) JSON support library.
+  - pugixml (https://pugixml.org) XML support library.
+- Reference data:
+  - Clublog.org (https://clublog.org) Country data.
+  - Country-files.com (https://www.country-files.com) Country data.
+  - DxAtlas (http://dxatlas.com) Prefix data.
+  - ADIF (http://adif.org) ADIF Specification.
+  - OpenWeatherMap (https://openweathermap.org) Weather data.
+  - HAMQSL (https://www.hamqsl.com) Solar and Terrestrial data.
+- Images:
+  - FlatIcon (https://www.flaticon.com)
+    - Google maps icons created by justicon.
+    - Pdf icons created by Smashicons.
 
 
 */

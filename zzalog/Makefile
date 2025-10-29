@@ -73,9 +73,8 @@ CPPFLAGS := $(INC_FLAGS) -MMD -MP
 
 LINTFLAG := -Wunused -Wswitch 
 # Set ccompile flags
-# include debug data
-CFLAGS += -g $(LINTFLAG) -std=c++20
-CXXFLAGS += -g $(LINTFLAG) -std=c++20
+CFLAGS += $(LINTFLAG) -std=c++20
+CXXFLAGS += $(LINTFLAG) -std=c++20
 
 ifeq ($(BUILD_TYPE), Anal)
 CXXFLAGS += -fsanitize=address
@@ -90,6 +89,9 @@ endif
 ifeq ($(BUILD_TYPE), Release)
 CXXFLAGS += -O2
 CFLAGS += -O2
+else
+CXXFLAGS += -g
+CFLAGS += -g
 endif
 
 DEBUG_FLAG := -Og

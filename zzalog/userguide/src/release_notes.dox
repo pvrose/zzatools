@@ -1,5 +1,12 @@
 /** \page release_notes Revision History
 
+\section rev_3-6-10 Revision 3.6.9+
+
+- Cosmetic changes.
+  - Current QSO frequency does not show up properly in LIGHT mode.
+- Bug fixes:
+  - "Don't QSL" list ignored when saving a net.
+
 \section rev_369 Revision 3.6.9
 
 - Redesigned station dialog and initialisation of station data.
