@@ -1484,8 +1484,10 @@ void qso_data::action_save_net_all() {
 	while (g_net_entry_->entries() && ok) {
 		switch (logging_state_) {
 		case NET_STARTED:
-			// SAving record number for later upload
-			upload_qsos->add_record(g_net_entry_->qso_number());
+			// SAving record number for later upload (only if not on the "no qSL" list
+			if (!qsl_dataset_->no_qsl(g_net_entry_->qso()->item("CALL"))) {
+				upload_qsos->add_record(g_net_entry_->qso_number());
+			}
 			ok = action_save(false);
 			break;
 		case NET_EDIT:
