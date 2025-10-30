@@ -87,9 +87,16 @@ bool settings::get(std::string name, T& value, const T def) {
 		(*data_)[name.c_str()] = def;
 		exists = false;
 	}
-	value = data_->at(name.c_str()).get<T>();
+	try {
+		value = data_->at(name.c_str()).get<T>();
+	}
+	catch (const json::exception& e) {
+		(*data_)[name.c_str()] = def;
+		exists = false;
+	}
 	return exists;
 }
+
 // Need to have explicit instantiations for the compiler
 template bool settings::get<bool>(std::string, bool&, const bool);
 template bool settings::get<double>(std::string, double&, const double);

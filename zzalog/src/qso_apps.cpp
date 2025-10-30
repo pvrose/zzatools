@@ -694,7 +694,9 @@ void qso_apps::save_values() {
     settings view_settings(&top_settings, "Views");
     settings dash_settings(&view_settings, "Dashboard");
     // Find the current selected tab and save its index
-    dash_settings.set("Default App", string(tabs_->value()->label()));
+    if (tabs_->value()) {
+        dash_settings.set("Default App", string(tabs_->value()->label()));
+    }
 }
 
 // Configure widgets
