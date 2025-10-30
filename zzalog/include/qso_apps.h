@@ -196,7 +196,7 @@ protected:
 
     //! Name of new app.
     std::string new_name_;
-    //! Read from settings, the index of the default tab to display.
-    int default_tab_;
+    //! Read from settings, the name of the default tab to display.
+    std::string default_tab_;
   
 };

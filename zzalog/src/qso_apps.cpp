@@ -578,8 +578,9 @@ void qso_apps::load_values() {
     settings top_settings;
     settings view_settings(&top_settings, "Views");
     settings dash_settings(&view_settings, "Dashboard");
-    dash_settings.get("Default App", default_tab_, 0);
+    dash_settings.get("Default App", default_tab_, string(""));
 }
+
 
 // Create the tabs
 void qso_apps::create_tabs(std::string name) {
@@ -612,16 +613,16 @@ void qso_apps::create_tabs(std::string name) {
         rw = max(rw, g->w());
     }
 
+    if (name.length()) default_tab_ = name;
     for (auto ix = 0; ix < tabs_->children(); ix++) {
         tabs_->child(ix)->size(rw, rh);
-        if (std::string(tabs_->child(ix)->label()) == name) {
+        if (std::string(tabs_->child(ix)->label()) == default_tab_) {
             tabs_->value(tabs_->child(ix));
         }
     }
-
+ 
     tabs_->resizable(nullptr);
     tabs_->size(tabs_->w() + rw - saved_rw, tabs_->h() + rh - saved_rh);
-    if (tabs_->children() > 0) tabs_->value(child(default_tab_));
 
     resizable(nullptr);
     size(w(), tabs_->y() + tabs_->h() - y() + GAP);
@@ -693,12 +694,7 @@ void qso_apps::save_values() {
     settings view_settings(&top_settings, "Views");
     settings dash_settings(&view_settings, "Dashboard");
     // Find the current selected tab and save its index
-    Fl_Widget* w = tabs_->value();
-    for (int ix = 0; ix != children(); ix++) {
-        if (child(ix) == w) {
-            dash_settings.set("Default App", ix);
-        }
-    }
+    dash_settings.set("Default App", string(tabs_->value()->label()));
 }
 
 // Configure widgets
