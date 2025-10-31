@@ -1411,6 +1411,8 @@ void qso_rig::cb_bn_connect(Fl_Widget* w, void* v) {
 	} else {
 		that->rig_->open();
 		if (that->rig_->is_good()) {
+			// Cancel timer
+			Fl::remove_timeout(cb_start_timer);
 			that->rig_ok_ = true;
 			that->modify_hamlib_data();
 		}
