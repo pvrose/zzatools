@@ -277,6 +277,7 @@
     <ClCompile Include="src\wsjtx_handler.cpp" />
     <ClCompile Include="src\wx_handler.cpp" />
     <ClCompile Include="..\widgets\src\filename_input.cpp" />
+    <ClCompile Include="src\zl4_entry.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\include\pugixml.hpp" />
@@ -401,6 +402,7 @@
     <ClInclude Include="include\win_dialog.h" />
     <ClInclude Include="include\wsjtx_handler.h" />
     <ClInclude Include="include\wx_handler.h" />
+    <ClInclude Include="include\zl4_entry.h" />
     <ClInclude Include="packages\pthreads.2.9.1.4\build\native\include\pthread.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="..\widgets\include\button_input.h" />
