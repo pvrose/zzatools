@@ -17,19 +17,16 @@
 
 #include <FL/fl_ask.H>
 
-rpc_handler* rpc_handler::that_;
-
 // Constructor
 rpc_handler::rpc_handler(std::string address, int port_number, std::string resource_name)
 {
 	host_name_ = address;
 	server_port_ = port_number;
 	resource_ = resource_name;
-	that_ = this;
 	server_ = nullptr;
 	method_list_.clear();
-	add_method({ "system.listMethods", "s:s", "List of methods available" }, list_methods);
-	add_method({ "system.methodHelp", "s:s", "Help text for method" }, method_help);
+	add_method(this, { "system.listMethods", "s:s", "List of methods available" }, list_methods);
+	add_method(this, { "system.methodHelp", "s:s", "Help text for method" }, method_help);
 }
 
 // Destructor
@@ -305,14 +302,14 @@ void rpc_handler::run_server() {
 	}
 	else {
 		server_ = new socket_server(socket_server::HTTP, host_name_, server_port_);
-		server_->callback(rcv_request);
+		server_->callback(this, rcv_request);
 		server_->run_server();
 	}
 }
 
 // Static callback - calls the one in this class
-int rpc_handler::rcv_request(std::stringstream& ss) { 
-	return that_->handle_request(ss);
+int rpc_handler::rcv_request(void* instance, std::stringstream& ss) { 
+	return ((rpc_handler*)instance)->handle_request(ss);
 }
 
 // Handle request - decode it, action it and send response
@@ -331,7 +328,8 @@ int rpc_handler::handle_request(std::stringstream& ss) {
 		}
 		else {
 			// It does, so do it
-			error = method_list_.at(method_name).callback(params, response);
+			auto meth = method_list_.at(method_name);
+			error = meth.callback(meth.v, params, response);
 		}
 		// Convert to XML
 		std::stringstream xml;
@@ -414,14 +412,15 @@ bool rpc_handler::add_header(http_code code, std::stringstream& payload, std::st
 }
 
 // Add server method
-void rpc_handler::add_method(method_entry method, int(*callback)(rpc_data_item::rpc_list& params, rpc_data_item& response)) {
-	method_list_[method.name] = { method.signature, method.help_text, callback };
+void rpc_handler::add_method(void* v, method_entry method, int(*callback)(void* v, rpc_data_item::rpc_list& params, rpc_data_item& response)) {
+	method_list_[method.name] = { method.signature, method.help_text, v, callback };
 }
 
 // system.listMethods
-int rpc_handler::list_methods(rpc_data_item::rpc_list& params, rpc_data_item& response) {
+int rpc_handler::list_methods(void* v, rpc_data_item::rpc_list& params, rpc_data_item& response) {
+	rpc_handler* that = (rpc_handler*)v;
 	rpc_data_item::rpc_array* array = new rpc_data_item::rpc_array;
-	for (auto it = that_->method_list_.begin(); it != that_->method_list_.end(); it++) {
+	for (auto it = that->method_list_.begin(); it != that->method_list_.end(); it++) {
 		rpc_data_item* name = new rpc_data_item;
 		name->set(it->first, XRT_STRING);
 		array->push_back(name);
@@ -431,19 +430,20 @@ int rpc_handler::list_methods(rpc_data_item::rpc_list& params, rpc_data_item& re
 }
 
 // system.MethodHelp
-int rpc_handler::method_help(rpc_data_item::rpc_list& params, rpc_data_item& response) {
+int rpc_handler::method_help(void* v, rpc_data_item::rpc_list& params, rpc_data_item& response) {
+	rpc_handler* that = (rpc_handler*)v;
 	if (params.size() == 1) {
 		rpc_data_item* item_0 = params.front();
 		std::string method_name = item_0->get_string();
-		if (that_->method_list_.find(method_name) != that_->method_list_.end()) {
-			std::string help_text = that_->method_list_.at(method_name).help_text;
+		if (that->method_list_.find(method_name) != that->method_list_.end()) {
+			std::string help_text = that->method_list_.at(method_name).help_text;
 			response.set(help_text, XRT_STRING);
 			return 0;
 		}
-		that_->generate_error(-1, "Unknown method name", response);
+		that->generate_error(-1, "Unknown method name", response);
 		return 1;
 	}
-	that_->generate_error(-2, "Invalid number of paarmeters", response);
+	that->generate_error(-2, "Invalid number of paarmeters", response);
 	return 1;
 }
 

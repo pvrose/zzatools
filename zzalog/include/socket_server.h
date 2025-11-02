@@ -51,7 +51,7 @@
 		//! Returns true if this server is listening
 		bool has_server();
 		//! Set callback to handle requests. 
-		void callback(int(*do_request)(std::stringstream&));
+		void callback(void* instance, int(*do_request)(void*, std::stringstream&));
 		//! Send response
 		int send_response(std::istream& response);
 
@@ -71,7 +71,7 @@
 		//! Error handler - \p phase indicates the peocess that errored.
 		void handle_error(const char* phase);
 		//! Send request - std::set by call-back
-		int (*do_request)(std::stringstream& request);
+		int (*do_request)(void* instance, std::stringstream& request);
 
 		//! Open socket and create server
 		int create_server();
@@ -110,6 +110,8 @@
 		std::queue<std::string> q_packet_;
 		//! Lock to avoid pushing into the packet std::queue and pulling from it at the same time.
 		std::mutex mu_packet_;
+		//! Client request handler
+		void* instance_;
 
 	};
 

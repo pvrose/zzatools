@@ -468,8 +468,9 @@ void socket_server::handle_error(const char *phase)
 }
 
 // Set handlers
-void socket_server::callback(int (*request)(std::stringstream &))
+void socket_server::callback(void* instance, int (*request)(void*, std::stringstream &))
 {
+	instance_ = instance;
 	do_request = request;
 }
 
@@ -532,7 +533,7 @@ void socket_server::cb_th_packet(void *v)
 		that->q_packet_.pop();
 		that->mu_packet_.unlock();
 		// Process packet having unlocked std::queue to allow another packet in
-		that->do_request(ss);
+		that->do_request(that->instance_, ss);
 		that->mu_packet_.lock();
 	}
 	that->mu_packet_.unlock();

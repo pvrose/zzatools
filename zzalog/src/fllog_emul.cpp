@@ -15,15 +15,12 @@
 
 #include <sstream>
 
-// Static - only one instance of this class supported
-fllog_emul* fllog_emul::that_ = nullptr;
 
 // Constructor
 fllog_emul::fllog_emul() {
 	rpc_handler_ = nullptr;
 	current_qso_ = nullptr;
 	putative_qso_ = nullptr;
-	that_ = this;
 	connected_ = false;
 }
 
@@ -48,15 +45,15 @@ void fllog_emul::run_server() {
 	}
 	// Set up callbacks to handle these
 	method_list_.push_back({ "log.add_record", "s:s", "adds new ADIF-RECORD" });
-	rpc_handler_->add_method(method_list_.back(), add_record);
+	rpc_handler_->add_method(this, method_list_.back(), add_record);
 	method_list_.push_back({ "log.get_record",    "s:s", "returns ADIF-RECORD for CALL" });
-	rpc_handler_->add_method(method_list_.back(), get_record);
+	rpc_handler_->add_method(this, method_list_.back(), get_record);
 	method_list_.push_back({ "log.update_record", "s:s", "updates current record with specified ADIF-RECORD" });
-	rpc_handler_->add_method(method_list_.back(), update_record);
+	rpc_handler_->add_method(this, method_list_.back(), update_record);
 	method_list_.push_back({ "log.check_dup",     "s:s", "return true/false/possible for ADIF record" });
-	rpc_handler_->add_method(method_list_.back(), check_dup);
+	rpc_handler_->add_method(this, method_list_.back(), check_dup);
 	method_list_.push_back({ "log.list_methods",  "s:s", "return this std::list" });
-	rpc_handler_->add_method(method_list_.back(), list_methods);
+	rpc_handler_->add_method(this, method_list_.back(), list_methods);
 
 	rpc_handler_->run_server();
 }
@@ -82,22 +79,23 @@ void fllog_emul::generate_error(int code, std::string message, rpc_data_item& re
 }
 
 // Get ADIF std::string for first record with callsign - also displays all matching records in extract window
-int fllog_emul::get_record(rpc_data_item::rpc_list& params, rpc_data_item& response) {
-	that_->check_connected();
+int fllog_emul::get_record(void* v, rpc_data_item::rpc_list& params, rpc_data_item& response) {
+	fllog_emul* that = (fllog_emul*)v;
+	that->check_connected();
 	if (params.size() == 1) {
 		rpc_data_item* item_0 = params.front();
 		std::string callsign = item_0->get_string();
 		record* qso = nullptr;
-		if (that_->current_qso_ && that_->current_qso_->item("CALL") == callsign) {
+		if (that->current_qso_ && that->current_qso_->item("CALL") == callsign) {
 			// Use this 
-			qso = that_->current_qso_;
+			qso = that->current_qso_;
 		} else {
 			if (extract_records_->size() == 0 || extract_records_->get_record(0, true)->item("CALL") != callsign) 
 				extract_records_->extract_call(callsign);
 			if (extract_records_->size()) {
 				qso = extract_records_->get_record(0, true);
 				extract_records_->selection(0, HT_SELECTED);
-				that_->current_qso_ = qso;
+				that->current_qso_ = qso;
 			}
 		}
 		if (qso) {
@@ -113,18 +111,19 @@ int fllog_emul::get_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 		qso = qso_manager_->start_modem_qso(callsign, qso_data::QSO_COPY_FLDIGI);
 		qso->item("CALL", callsign);
 		qso_manager_->update_modem_qso(false);
-		that_->putative_qso_ = qso;
+		that->putative_qso_ = qso;
 		return 0;
 	}
 	else {
-		that_->generate_error(-2, "Wrong number of parameters in call", response);
+		that->generate_error(-2, "Wrong number of parameters in call", response);
 		return 1;
 	}
 }
 
 // Check duplicate - replies true (exact match), possible (callsign matches), false (not a match
-int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& response) {
-	that_->check_connected();
+int fllog_emul::check_dup(void* v, rpc_data_item::rpc_list& params, rpc_data_item& response) {
+	fllog_emul* that = (fllog_emul*)v;
+	that->check_connected();
 	if (params.size() == 6) {
 		// Get parametrs
 		rpc_data_item* i_call = params.front();
@@ -150,7 +149,7 @@ int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& respon
 		if (extract_records_->size() == 0 || extract_records_->get_record(0, true)->item("CALL") != callsign) 
 			extract_records_->extract_call(callsign);
 		time_t timestamp = time(nullptr);
-		if (extract_records_->size() && extract_records_->get_record(0, true) != that_->current_qso_) {
+		if (extract_records_->size() && extract_records_->get_record(0, true) != that->current_qso_) {
 			bool found = false;
 			item_num_t item_num;
 			item_num_t found_item;
@@ -204,14 +203,15 @@ int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& respon
 		return 0;
 	}
 	else {
-		that_->generate_error(-2, "Wrong number of parameters in call", response);
+		that->generate_error(-2, "Wrong number of parameters in call", response);
 		return 1;
 	}
 }
 
 // Add new record
-int fllog_emul::add_record(rpc_data_item::rpc_list& params, rpc_data_item& response) {
-	that_->check_connected();
+int fllog_emul::add_record(void* v, rpc_data_item::rpc_list& params, rpc_data_item& response) {
+	fllog_emul* that = (fllog_emul*)v;
+	that->check_connected();
 	if (params.size() == 1) {
 		// Clear down any look up from fldigi
 		extract_records_->clear_criteria();
@@ -221,7 +221,7 @@ int fllog_emul::add_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 		ss.str(item->get_string());
 		adi_reader* reader = new adi_reader();
 		adi_reader::load_result_t dummy;
-		record* qso = that_->putative_qso_;
+		record* qso = that->putative_qso_;
 		reader->load_record(qso, ss, dummy);
 		// Frig - fldigi sets MY_STATE incorrectly, and only uses MODE
 		qso->item("MY_STATE", std::string(""));
@@ -231,14 +231,15 @@ int fllog_emul::add_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 		return 0;
 	}
 	else {
-		that_->generate_error(-2, "Wrong number of parameters in call", response);
+		that->generate_error(-2, "Wrong number of parameters in call", response);
 		return 1;
 	}
 }
 
 // Update fields in current selection
-int fllog_emul::update_record(rpc_data_item::rpc_list& params, rpc_data_item& response) {
-	that_->check_connected();
+int fllog_emul::update_record(void* v, rpc_data_item::rpc_list& params, rpc_data_item& response) {
+	fllog_emul* that = (fllog_emul*)v;
+	that->check_connected();
 	if (params.size() == 1) {
 		// Convert the adif data into a new record - use existing code from adi_reader
 		rpc_data_item* item = params.front();
@@ -248,24 +249,25 @@ int fllog_emul::update_record(rpc_data_item::rpc_list& params, rpc_data_item& re
 		adi_reader::load_result_t dummy;
 		record* changes = new record();
 		reader->load_record(changes, ss, dummy);
-		that_->current_qso_->merge_records(changes);
+		that->current_qso_->merge_records(changes);
 		return 0;
 	}
 	else {
-		that_->generate_error(-2, "Wrong number of parameters in call", response);
+		that->generate_error(-2, "Wrong number of parameters in call", response);
 		return 1;
 	}
 
 }
 
 // List methods - std::string returns std::list of methods suppported
-int fllog_emul::list_methods(rpc_data_item::rpc_list& params, rpc_data_item& response) {
-	that_->check_connected();
+int fllog_emul::list_methods(void* v, rpc_data_item::rpc_list& params, rpc_data_item& response) {
+	fllog_emul* that = (fllog_emul*)v;
+	that->check_connected();
 	if (params.size() == 0) {
 		// Copied nearly verbatim from fllog
 		printf("list_methods\n");
 		rpc_data_item::rpc_array* array = new rpc_data_item::rpc_array;
-		for (auto it = that_->that_->method_list_.begin(); it != that_->method_list_.end(); it++) {
+		for (auto it = that->method_list_.begin(); it != that->method_list_.end(); it++) {
 			rpc_data_item::rpc_struct* method_data = new rpc_data_item::rpc_struct;
 			method_data->clear();
 			rpc_data_item* name = new rpc_data_item;
@@ -285,7 +287,7 @@ int fllog_emul::list_methods(rpc_data_item::rpc_list& params, rpc_data_item& res
 		return 0;
 	}
 	else {
-		that_->generate_error(-2, "Wrong number of parameters in call", response);
+		that->generate_error(-2, "Wrong number of parameters in call", response);
 		return 1;
 	}
 
@@ -301,13 +303,13 @@ void fllog_emul::check_connected() {
 
 // Returns connected state
 bool fllog_emul::has_data() {
-	return that_->connected_;
+	return connected_;
 }
 
 // server state
 bool fllog_emul::has_server() {
-	if (that_->rpc_handler_) {
-		return that_->rpc_handler_->has_server();
+	if (rpc_handler_) {
+		return rpc_handler_->has_server();
 	} else {
 		return false;
 	}
