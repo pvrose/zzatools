@@ -1199,3 +1199,56 @@ void record::invalidate_qsl_status() {
 		item("CLUBLOG_QSO_UPLOAD_STATUS", std::string("M"));
 	}
 }
+
+//! Convert record to ADIF as a std::string
+void to_adif(std::string& adif_string, record& rec) {
+	adif_string = "";
+	// For each field in the record
+	for (auto it = rec.begin(); it != rec.end(); it++) {
+		std::string field_name = it->first;
+		std::string field_value = it->second;
+		// Skip empty fields
+		if (field_value != "") {
+			// Append to ADIF std::string
+			char buffer[20];
+			sprintf(buffer, "<%s:%zu>", field_name.c_str(), field_value.length());
+			adif_string += std::string(buffer) + field_value + " ";
+		}
+	}
+	// Append end of record
+	adif_string += "<EOR>\n";
+}
+
+//! Convert record from ADIF std::string
+void from_adif( std::string& adif_string, record& rec) {
+	size_t pos = 0;
+	// While we have more fields
+	while (pos < adif_string.length()) {
+		// Find the next field start
+		size_t left = adif_string.find('<', pos);
+		if (left == adif_string.npos) break;
+		// Find the field end
+		size_t right = adif_string.find('>', left);
+		if (right == adif_string.npos) break;
+		// Get the field descriptor
+		std::string field_descriptor = adif_string.substr(left + 1, right - left - 1);
+		// Is it an EOR?
+		if (field_descriptor == "EOR") {
+			// End of record
+			break;
+		}
+		// Find the colon
+		size_t colon = field_descriptor.find(':');
+		if (colon == field_descriptor.npos) break;
+		// Get the field name
+		std::string field_name = field_descriptor.substr(0, colon);
+		// Get the length
+		size_t length = atoi(field_descriptor.substr(colon + 1).c_str());
+		// Get the field value
+		std::string field_value = adif_string.substr(right + 1, length);
+		// Set the field in the record
+		rec.item(field_name, field_value);
+		// Move position on
+		pos = right + 1 + length;
+	}
+}

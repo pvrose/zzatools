@@ -190,6 +190,7 @@ int socket_server::create_server()
 	bool multicast = (server_addr.sin_addr.s_addr & (unsigned)0x000000F0) == (unsigned)0x000000E0;
 	if (multicast) {
 #ifdef _WIN32
+
 		handle_error("Multicast not yet implemented in app on Windows");
 		return -1;
 #else

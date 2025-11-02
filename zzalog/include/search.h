@@ -106,25 +106,31 @@
 		}
 	)
 
-	//! JSON serialisation for search_combi_t
-	NLOHMANN_JSON_SERIALIZE_ENUM(search_combi_t, {
-		{ XM_NEW, "New search" },
-		{ XM_AND, "AND" },
-		{ XM_OR, "OR" }
-		}
-	)
+		//! JSON serialisation for search_combi_t
+		NLOHMANN_JSON_SERIALIZE_ENUM(search_combi_t, {
+			{ XM_NEW, "New search" },
+			{ XM_AND, "AND" },
+			{ XM_OR, "OR" }
+			}
+		)
 
-	//! JSON serialisation for search_comp_t
-	NLOHMANN_JSON_SERIALIZE_ENUM(search_comp_t, {
-		{ XP_REGEX, "Regex" },
-		{ XP_NE, "Not equal" },
-		{ XP_LT, "Less than"  },
-		{ XP_LE, "Less than or equal" },
-		{ XP_EQ, "Equal" },
-		{ XP_GE, "Greater than or equal" },
-		{ XP_GT, "Greater than" }
-		}
-	)
+		//! JSON serialisation for search_comp_t
+		NLOHMANN_JSON_SERIALIZE_ENUM(search_comp_t, {
+			{ XP_REGEX, "Regex" },
+			{ XP_NE, "Not equal" },
+			{ XP_LT, "Less than"  },
+			{ XP_LE, "Less than or equal" },
+			{ XP_EQ, "Equal" },
+			{ XP_GE, "Greater than or equal" },
+			{ XP_GT, "Greater than" }
+			}
+		)
+
+	//! to_json for search_criteria_t
+	void to_json(nlohmann::json& j, const search_criteria_t& p);
+	//! from_json for search_criteria_t
+	void from_json(const nlohmann::json& j, search_criteria_t& p);
+
 
 
 #endif

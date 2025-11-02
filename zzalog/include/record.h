@@ -54,6 +54,9 @@ record.h - Individual record data item: header file
 	// forward declaration
 	enum hint_t : uchar;
 
+	//! QSO identifier type
+	using qso_id = uint32_t;
+
 	typedef size_t qso_num_t;    // QSO number
 
 	//! This class represents a single QSO record as a container of field items NAME=>VALUE
@@ -181,5 +184,9 @@ record.h - Individual record data item: header file
 		static bool inhibit_error_reporting_;
 
 	};
+
+
+	void to_adif(std::string& os, record& rec);
+	void from_adif(std::string& is, record& rec);
 
 #endif

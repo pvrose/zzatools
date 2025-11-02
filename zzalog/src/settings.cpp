@@ -102,6 +102,7 @@ template bool settings::get<bool>(std::string, bool&, const bool);
 template bool settings::get<double>(std::string, double&, const double);
 template bool settings::get<float>(std::string, float&, const float);
 template bool settings::get<int>(std::string, int&, const int);
+template bool settings::get<uint32_t>(std::string, uint32_t&, const uint32_t);
 template bool settings::get<time_t>(std::string, time_t&, const time_t);
 template bool settings::get<std::list<std::string>>(std::string, std::list<std::string>&, const std::list<std::string>);
 template bool settings::get<std::string>(std::string, std::string&, const std::string);
