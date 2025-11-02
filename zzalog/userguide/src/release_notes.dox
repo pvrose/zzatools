@@ -2,11 +2,13 @@
 
 \section rev_3-6-10 Revision 3.6.9+
 
+- Added multicast support for UDP in Windows. (Already present for Linux).
 - Cosmetic changes.
   - Current QSO frequency does not show up properly in LIGHT mode.
 - Bug fixes:
   - "Don't QSL" list ignored when saving a net.
   - Adding an application should select the new tab in qso_apps.
+  - apps.json doesn't load correctly if no script defined for app.
 
 \section rev_369 Revision 3.6.9
 

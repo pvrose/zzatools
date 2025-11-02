@@ -71,7 +71,7 @@ void socket_server::run_server()
 			break;
 		}
 	}
-	// Start listening for packets - will std::set a timer to the listen after that
+	// Start listening for packets - will set a timer to the listen after that
 	if (DEBUG_THREADS) {
 		printf("SOCKET MAIN: Staring std::thread for %s\n", protocol_ == UDP ? "UDP" : "HTTP");
 	}
@@ -148,7 +148,7 @@ int socket_server::create_server()
 	case UDP:
 #ifdef _WIN32
 // Windows does not support SOCK_NONBLOCK
-		server_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+		server_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP);
 #else
 		server_ = socket(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK, IPPROTO_UDP);
 #endif
@@ -189,77 +189,59 @@ int socket_server::create_server()
 	// Multicast addresses 224.0.0.0 to 239.255.255.255 = NB byte order
 	bool multicast = (server_addr.sin_addr.s_addr & (unsigned)0x000000F0) == (unsigned)0x000000E0;
 	if (multicast) {
-#ifdef _WIN32
-
-		handle_error("Multicast not yet implemented in app on Windows");
-		return -1;
-#else
+		// Allow multiple sockets to use the same port number
 		int set_option_on = 1;
-		// Allow address to be reused
 		result = setsockopt(server_, SOL_SOCKET, SO_REUSEADDR, (char*)&set_option_on,
 			sizeof(set_option_on));
 		if (result < 0) {
-			handle_error("Unable to std::set socket reusable");
+			handle_error("Unable to set socket reusable");
 			return result;
 		}
-		// Apply to join the multicast group
-		switch (protocol_) {
-			case UDP: {
-				// Set Multicast loop
-				char loop = 1;
-				result = setsockopt(server_, IPPROTO_IP, IP_MULTICAST_LOOP, &loop, sizeof(loop));
-				if (result < 0) {
-					handle_error("Cannot std::set multicast loopback");
-					return result;
-				}
-				// Set Multicast all
-				char mall = 1;
-				result = setsockopt(server_, IPPROTO_IP, IP_MULTICAST_ALL, &mall, sizeof(mall));
-				if (result < 0) {
-					handle_error("Canmnot std::set multicast all");
-					return result;
-				}
-				ip_mreq mreq = { server_addr.sin_addr, INADDR_ANY };
-				result = setsockopt(server_, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq));
-				if (result < 0) {
-					handle_error("Unable to join multicast group");
-					return result;
-				}
-				else {
-					snprintf(message, sizeof(message), "SOCKET: Joined multicast %s", inet_ntoa(server_addr.sin_addr));
-					status_->misc_status(ST_OK, message);
-				}
-				break;
-			}
-			case HTTP:
-				snprintf(message, sizeof(message), "SOCKET: Cannot std::set multicast %s for HTTP", inet_ntoa(server_addr.sin_addr));
-				status_->misc_status(ST_WARNING, message);
-				break;
+		// Set up destimation address
+		SOCKADDR_IN d_addr;
+		memset(&d_addr, 0, sizeof(d_addr));
+		d_addr.sin_family = AF_INET;
+		d_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+		d_addr.sin_port = htons(port_num_);
+
+		// Bind to receive address
+		result = bind(server_, (SOCKADDR*)&d_addr, sizeof(d_addr));
+		if (result < 0) {
+			handle_error("Unable to bind multicast");
+			return result;
 		}
-#endif
-	} else {
+
+		// Request to join multicase group
+		ip_mreq mreq;
+		mreq.imr_multiaddr.s_addr = inet_addr(address_.c_str());
+		mreq.imr_interface.s_addr = htonl(INADDR_ANY);
+		result = setsockopt(server_, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mreq, sizeof(mreq));
+		if (result < 0) {
+			handle_error("Request to join multicase declined");
+			return result;
+		}
+
+	}
+	else {
 		int set_option_on = 1;
 		// Allow address to be reused - it may be hanging around from a previous
 		result = setsockopt(server_, SOL_SOCKET, SO_REUSEADDR, (char*)&set_option_on,
 			sizeof(set_option_on));
 		if (result < 0) {
-			handle_error("Unable to std::set socket reusable");
+			handle_error("Unable to set socket reusable");
 			return result;
+			// Associate the socket with this address data
+			result = bind(server_, (SOCKADDR*)&server_addr, len_server_addr);
+			if (result < 0)
+			{
+				handle_error("Unable to bind the socket");
+				return result;
+			}
 		}
 	}
-	// Associate the socket with this address data
-	result = bind(server_, (SOCKADDR *)&server_addr, len_server_addr);
-	if (result < 0)
-	{
-		handle_error("Unable to bind the socket");
-		return result;
-	}
-	else
-	{
-		getsockname(server_, (SOCKADDR *)&server_addr, &len_server_addr);
-		snprintf(message, 256, "SOCKET: Connected socket %s:%d", inet_ntoa(server_addr.sin_addr), htons(server_addr.sin_port));
-		status_->misc_status(ST_OK, message);
-	}
+//	getsockname(server_, (SOCKADDR *)&server_addr, &len_server_addr);
+	snprintf(message, 256, "SOCKET: Connected socket %s:%d", inet_ntoa(server_addr.sin_addr), htons(server_addr.sin_port));
+	status_->misc_status(ST_OK, message);
 
  #ifdef _WIN32
 	// Windows way of supporting non-blocking operations
@@ -337,7 +319,7 @@ int socket_server::rcv_packet()
 	char *buffer = new char[MAX_SOCKET];
 	int buffer_len = MAX_SOCKET;
 	int bytes_rcvd = 0;
-	// Generate a std::set of socket descriptors for use in select()
+	// Generate a set of socket descriptors for use in select()
 //#ifdef _WIN32
 //	FD_SET set_sockets;
 //#else
@@ -387,22 +369,25 @@ int socket_server::rcv_packet()
 			Fl::awake(cb_th_packet, this);
 		}
 #ifdef _WIN32
-		else if (WSAGetLastError() == WSAEWOULDBLOCK)
-		{
-			// Try again immediately after letting FLTK in
-			this_thread::yield();
-		}
-		else if (WSAGetLastError() == WSAENOTSOCK && closing_)
-		{
-			// We can get here through a race between closing and turning the timers off
-			delete[] buffer;
-			buffer = nullptr;
-		}
-		else
-		{
-			handle_error("Unable to read from client");
-			delete[] buffer;
-			buffer = nullptr;
+		else {
+			auto error = WSAGetLastError();
+			if (error == WSAEWOULDBLOCK)
+			{
+				// Try again immediately after letting FLTK in
+				this_thread::yield();
+			}
+			else if (error == WSAENOTSOCK && closing_)
+			{
+				// We can get here through a race between closing and turning the timers off
+				delete[] buffer;
+				buffer = nullptr;
+			}
+			else
+			{
+				handle_error("Unable to read from client");
+				delete[] buffer;
+				buffer = nullptr;
+			}
 		}
 #else
 		else
@@ -529,7 +514,7 @@ void socket_server::dump(std::string data)
 			escaped += *it;
 		}
 	}
-	// printf("%s\n", escaped.c_str());
+	 // printf("%s\n", escaped.c_str());
 }
 
 // main std::thread side handle packet

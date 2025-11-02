@@ -61,7 +61,7 @@ void from_json(const json& j, app_data_t& d) {
         j.at("Network address").get_to(d.address);
         j.at("Network port").get_to(d.port_num);
     }
-    if (j.find("Scripts") != j.end()) {
+    if (j.find("Scripts") != j.end() && !j.at("Scripts").is_null()) {
         auto scripts = j.at("Scripts").get<std::map<std::string, std::string> >();
         for (auto& sc : scripts) {
             d.commands[sc.first] = sc.second;
@@ -547,7 +547,7 @@ int qso_apps::handle(int event) {
 
 
 // Load settings
-void qso_apps::load_values() {
+    void qso_apps::load_values() {
     std::string filename;
     std::ifstream i;
     char msg[128];
