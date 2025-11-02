@@ -253,6 +253,7 @@
     <ClCompile Include="src\rig_if.cpp" />
     <ClCompile Include="src\rpc_data_item.cpp" />
     <ClCompile Include="src\rpc_handler.cpp" />
+    <ClCompile Include="src\search.cpp" />
     <ClCompile Include="src\search_dialog.cpp" />
     <ClCompile Include="src\serial.cpp" />
     <ClCompile Include="src\settings.cpp" />
@@ -278,6 +279,7 @@
     <ClCompile Include="src\wx_handler.cpp" />
     <ClCompile Include="..\widgets\src\filename_input.cpp" />
     <ClCompile Include="src\zl4_logdata.cpp" />
+    <ClCompile Include="src\zl4_log_beif.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\include\pugixml.hpp" />
@@ -402,6 +404,7 @@
     <ClInclude Include="include\wsjtx_handler.h" />
     <ClInclude Include="include\wx_handler.h" />
     <ClInclude Include="include\zl4_logdata.h" />
+    <ClInclude Include="include\zl4_log_beif.h" />
     <ClInclude Include="packages\pthreads.2.9.1.4\build\native\include\pthread.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="..\widgets\include\button_input.h" />

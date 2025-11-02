@@ -363,6 +363,12 @@
     <ClCompile Include="src\zl4_logdata.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\zl4_log_beif.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\search.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="packages\pthreads.2.9.1.4\build\native\include\pthread.h">
@@ -741,6 +747,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\zl4_logdata.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\zl4_log_beif.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
