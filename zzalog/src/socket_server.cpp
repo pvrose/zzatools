@@ -514,7 +514,7 @@ void socket_server::dump(std::string data)
 			escaped += *it;
 		}
 	}
-	// printf("%s\n", escaped.c_str());
+	 // printf("%s\n", escaped.c_str());
 }
 
 // main std::thread side handle packet
