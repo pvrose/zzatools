@@ -27,7 +27,7 @@ class socket_server;
 		~wsjtx_handler();
 
 		//! Returns true if server has been started
-		static bool has_server();
+		bool has_server();
 		//! Start server
 		void run_server();
 		//! Close servver
@@ -44,10 +44,7 @@ class socket_server;
 		void delete_qso(std::string call);
 
 		//! Return true if a packet has been received.
-		static bool has_data();
-
-		//! Used in static methods to point to the single instance of this class
-		static wsjtx_handler* that_;
+		bool has_data();
 
 	protected:
 
@@ -167,7 +164,7 @@ class socket_server;
 		};
 
 		//! Callback from server std::thread: Receive a datagram from WSJT-X, returns the type of datagram.
-		static int rcv_request(std::stringstream& os);
+		static int rcv_request(void* instance, std::stringstream& os);
 		//! Receive a datagram from WSJT-X, returns the type of datagram.
 		int rcv_dgram(std::stringstream& os);
 

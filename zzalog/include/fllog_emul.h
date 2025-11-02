@@ -25,41 +25,46 @@ class record;
 		//! Close the server.
 		void close_server();
 		//! Returns the server state.
-		static bool has_server();
+		bool has_server();
 		//! Returns true if a request has been received.
-		static bool has_data();
+		bool has_data();
 
 	protected:
 		//! Fetch the first record that matches callsign request.
 		
+		//! \param v Pointer to this instance.
 		//! \param params Request.
 		//! \param response Returned response.
 		//! \return true if request fails, otherwise false.
-		static int get_record(rpc_data_item::rpc_list& params, rpc_data_item& response);
+		static int get_record(void* v, rpc_data_item::rpc_list& params, rpc_data_item& response);
 		//! Check duplicate - replies true (exact match), possible (callsign matches), false (not a match.
 
+		//! \param v Pointer to this instance.
 		//! \param params Request.
 		//! \param response Returned response.
 		//! \return true if request fails, otherwise false.
-		static int check_dup(rpc_data_item::rpc_list& params, rpc_data_item& response);
+		static int check_dup(void* v, rpc_data_item::rpc_list& params, rpc_data_item& response);
 		//! Add new record
 
+		//! \param v Pointer to this instance.
 		//! \param params Request.
 		//! \param response Returned response.
 		//! \return true if request fails, otherwise false.
-		static int add_record(rpc_data_item::rpc_list& params, rpc_data_item& response);
+		static int add_record(void* v, rpc_data_item::rpc_list& params, rpc_data_item& response);
 		//! Update fileds in current selection
 
+		//! \param v Pointer to this instance.
 		//! \param params Request.
 		//! \param response Returned response.
 		//! \return true if request fails, otherwise false.
-		static int update_record(rpc_data_item::rpc_list& params, rpc_data_item& response);
+		static int update_record(void* v, rpc_data_item::rpc_list& params, rpc_data_item& response);
 		//! List methods - std::string responds with a std::list of methods suppported
 
+		//! \param v Pointer to this instance.
 		//! \param params Request.
 		//! \param response Returned response.
 		//! \return true if request fails, otherwise false.
-		static int list_methods(rpc_data_item::rpc_list& params, rpc_data_item& response);
+		static int list_methods(void* v, rpc_data_item::rpc_list& params, rpc_data_item& response);
 
 		//! Generate error response
 		
@@ -80,9 +85,6 @@ class record;
 		//! The std::list of methods supported by the RPC interface
 		std::list<rpc_handler::method_entry> method_list_;
 		
-		//! The only instance
-		static fllog_emul* that_;
-
 		//! Connected
 		bool connected_;
 

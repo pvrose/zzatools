@@ -265,17 +265,48 @@ void app_grp::enable_widgets() {
         bn_show_script_->deactivate();
     }
     if (app_data_->server) {
-        if (app_data_->has_server && (*(app_data_->has_server))()) {
-            bn_listening_->value(true);
-            bn_listening_->activate();
-            if (!app_data_->admin || strlen(ip_passw_->value()) > 0) {
-                bn_connect_->activate();
-                if (app_data_->has_data && (*(app_data_->has_data))()) {
-                    bn_connect_->value(true);
-                } else {
-                    bn_connect_->value(false);
+        if (app_data_->name == FLDIGI) {
+            if (fllog_emul_ && fllog_emul_->has_server()) {
+                bn_listening_->value(true);
+                bn_listening_->activate();
+                if (!app_data_->admin || strlen(ip_passw_->value()) > 0) {
+                    bn_connect_->activate();
+                    if (fllog_emul_->has_data()) {
+                        bn_connect_->value(true);
+                    }
+                    else {
+                        bn_connect_->value(false);
+                    }
                 }
-            } else {
+                else {
+                    bn_connect_->deactivate();
+                }
+            }
+            else {
+                bn_listening_->value(false);
+                bn_listening_->activate();
+                bn_connect_->deactivate();
+            }
+        } else if (app_data_->name == WSJTX) {
+            if (wsjtx_handler_ && wsjtx_handler_->has_server()) {
+                bn_listening_->value(true);
+                bn_listening_->activate();
+                if (!app_data_->admin || strlen(ip_passw_->value()) > 0) {
+                    bn_connect_->activate();
+                    if (wsjtx_handler_->has_data()) {
+                        bn_connect_->value(true);
+                    }
+                    else {
+                        bn_connect_->value(false);
+                    }
+                }
+                else {
+                    bn_connect_->deactivate();
+                }
+            }
+            else {
+                bn_listening_->value(false);
+                bn_listening_->activate();
                 bn_connect_->deactivate();
             }
         } else {
@@ -733,9 +764,6 @@ void qso_apps::cb_bn_new(Fl_Widget* w, void* v) {
     new_data->commands = {};
     new_data->rig_class = AUDIO_CAT;
     new_data->server = false;
-    new_data->has_data = nullptr;
-    new_data->has_server = nullptr;
-    new_data->can_disable = false;
     new_data->admin = false;
 
     if (new_data->server) that->add_servers(new_data);
@@ -764,19 +792,11 @@ void qso_apps::cb_tabs(Fl_Widget* w, void* v) {
 
 // Add the server links
 void qso_apps::add_servers(app_data_t* data) {
-    if (data->name == FLDIGI) {
-        if (fllog_emul_) {
-            data->has_server = fllog_emul_->has_server;
-            data->has_data = fllog_emul_->has_data;
-        }
+    if (data->name == FLDIGI && fllog_emul_) {
     } 
-    else if (data->name == WSJTX) {
-        if (wsjtx_handler_) {
-            data->has_server = wsjtx_handler_->has_server;
-            data->has_data = wsjtx_handler_->has_data;
-        }
+    else if (data->name == WSJTX && wsjtx_handler_) {
     }
-    else if (data->has_server) {
+    else if (data->server) {
         char msg[128];
         snprintf(msg, sizeof(msg), "APPS: Don't know how to serve %s", data->name.c_str());
         status_->misc_status(ST_WARNING, msg);

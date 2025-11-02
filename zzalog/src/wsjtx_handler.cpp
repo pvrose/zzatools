@@ -32,12 +32,9 @@
 #include <FL/Fl.H>
 #include <FL/fl_ask.H>
 
-wsjtx_handler* wsjtx_handler::that_ = nullptr;
-
 // Constructor: 
 wsjtx_handler::wsjtx_handler()
 {
-	that_ = this;
 	server_ = nullptr;
 	qsos_.clear();
 	run_server();
@@ -58,8 +55,8 @@ wsjtx_handler::~wsjtx_handler() {
 };
 
 // This callback must be static
-int wsjtx_handler::rcv_request(std::stringstream& ss) {
-	return that_->rcv_dgram(ss);
+int wsjtx_handler::rcv_request(void* instance, std::stringstream& ss) {
+	return ((wsjtx_handler*)instance)->rcv_dgram(ss);
 }
 
 // Receive the datagram. Decide which one an go to the individual decode methods
@@ -379,7 +376,7 @@ void wsjtx_handler::put_utf8(std::stringstream& ss, std::string s) {
 
 // Return that the server is there
 bool wsjtx_handler::has_server() {
-	return (that_->server_ != nullptr && that_->server_->has_server());
+	return server_ != nullptr && server_->has_server();
 }
 
 // Start the server
@@ -389,7 +386,7 @@ void wsjtx_handler::run_server() {
 		int udp_port = qso_manager_->apps()->network_port(WSJTX);
 		if (address.length()) {
 			server_ = new socket_server(socket_server::UDP, address, udp_port);
-			server_->callback(rcv_request);
+			server_->callback(this, rcv_request);
 		}
 		else return;
 	}
@@ -946,5 +943,5 @@ void wsjtx_handler::delete_qso(std::string call) {
 
 // Received data
 bool wsjtx_handler::has_data() {
-	return that_->connected_;
+	return connected_;
 }

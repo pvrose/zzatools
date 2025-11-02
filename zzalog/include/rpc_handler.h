@@ -45,7 +45,7 @@ class socket_server;
 		//! \return true if successful.
 		bool do_request(std::string method_name, rpc_data_item::rpc_list* params, rpc_data_item* response);
 		//! Receive the request from strean \p ss.
-		static int rcv_request(std::stringstream& ss);
+		static int rcv_request(void* instance, std::stringstream& ss);
 		//! Run server
 		void run_server();
 		//! Close server
@@ -56,14 +56,15 @@ class socket_server;
 		
 		//! \param method Method entry structire.
 		//! \param callback Local method to handle request.
-		void add_method(method_entry method, int(*callback)(rpc_data_item::rpc_list& params, rpc_data_item& response));
+		void add_method(void* v, method_entry method, int(*callback)(void* v, rpc_data_item::rpc_list& params, rpc_data_item& response));
 
 	protected:
 		//! Method definition structure
 		struct method_def {
 			std::string signature;        //!< Method signature (coded form of parameters and response).
 			std::string help_text;        //!< Help text
-			int(*callback)(rpc_data_item::rpc_list& params, rpc_data_item& response) { nullptr };
+			void* v{ nullptr };                 //!< Instance pointer for callback
+			int(*callback)(void* v, rpc_data_item::rpc_list& params, rpc_data_item& response) { nullptr };
 			                         //!< Method call - callback(params, response) 
 		};
 
@@ -102,9 +103,9 @@ class socket_server;
 		//! Decode the request on the input stream \p ss, perform the action and send response.
 		int handle_request(std::stringstream& ss);
 		//! Reserved method: List the available methods.
-		static int list_methods(rpc_data_item::rpc_list& params, rpc_data_item& response);
+		static int list_methods(void* v, rpc_data_item::rpc_list& params, rpc_data_item& response);
 		//! Reseeved method: Send method help message.
-		static int method_help(rpc_data_item::rpc_list& params, rpc_data_item& response);
+		static int method_help(void* v, rpc_data_item::rpc_list& params, rpc_data_item& response);
 
 		//! Generate error \p response for \p code with \p message.
 		void generate_error(int code, std::string message, rpc_data_item& response);
@@ -122,8 +123,6 @@ class socket_server;
 		socket_server* server_;
 		//! Server port
 		int server_port_;
-		//! Pointer back to self
-		static rpc_handler* that_;
 		//! The method definitions
 		std::map<std::string, method_def> method_list_;
 
