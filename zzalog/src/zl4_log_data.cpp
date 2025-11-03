@@ -1,6 +1,5 @@
-#include "zl4_logdata.h"
+#include "zl4_log_data.h"
 
-#include "main.h"
 #include "record.h"
 #include "settings.h"
 
@@ -12,7 +11,7 @@
 using string = std::string;
 
 //! Constructor
-zl4_logdata::zl4_logdata()
+zl4_log_data::zl4_log_data()
 {	
 	settings s;
 	s.get<std::string>("Data Directory", data_directory_, "./logdata");
@@ -22,7 +21,7 @@ zl4_logdata::zl4_logdata()
 
 //! Destructor
 //! Stop launder thread and clean up
-zl4_logdata::~zl4_logdata()
+zl4_log_data::~zl4_log_data()
 {
 	if (th_launder_) {
 		while(any_dirty() || deleted_qsos_.size() > 0) {
@@ -35,15 +34,15 @@ zl4_logdata::~zl4_logdata()
 }
 
 //! Thread function to launder data to filestore
-//! \param that zl4_logdata instance
+//! \param that zl4_log_data instance
 //! Launder data to filestore continually if any records are dirty
 //! or any records have been deleted
 //! This runs in a separate thread
-//! This function loops forever until the zl4_logdata instance is destroyed
+//! This function loops forever until the zl4_log_data instance is destroyed
 //! It sleeps for 1 second between checks
 //! If any records are dirty or any records have been deleted
 //! it calls launder_data to write them to filestore
-void zl4_logdata::th_launder_data(zl4_logdata* that)
+void zl4_log_data::th_launder_data(zl4_log_data* that)
 {
 	while (true) {
 		if (that->any_dirty() || that->deleted_qsos_.size() > 0) {
@@ -58,7 +57,7 @@ void zl4_logdata::th_launder_data(zl4_logdata* that)
 //! Loads all log data from filestore into memory
 //! records are kept in filestore one per file named by QSO ID split 100 per directory
 //! e.g. logdata/00/00/1.adi, logdata/00/00/2.adi ... logdata/99/99/99.adi etc.
-bool zl4_logdata::load_data()
+bool zl4_log_data::load_data()
 {
 	log_data_.clear();
 	for (qso_id id = 1; id < next_qso_id_; id++) {
@@ -83,7 +82,7 @@ bool zl4_logdata::load_data()
 
 //! Write dirty records to filestore
 //! \return true if successful
-bool zl4_logdata::launder_data()
+bool zl4_log_data::launder_data()
 {
 	for (auto& item : log_data_) {
 		qso_id id = item.first;
@@ -99,7 +98,7 @@ bool zl4_logdata::launder_data()
 				log_rec.dirty = false;
 			}
 			else {
-				printf("ZL4_LOGDATA: Failed to launder QSO ID %u to file %s\n",
+				printf("zl4_log_data: Failed to launder QSO ID %u to file %s\n",
 					id, filename.c_str());
 				return false;
 			}
@@ -108,7 +107,7 @@ bool zl4_logdata::launder_data()
 	for (auto& id : deleted_qsos_) {
 		string filename = qso_filename(id);
 		if (remove(filename.c_str()) != 0) {
-			printf("ZL4_LOGDATA: Failed to delete QSO ID %u file %s\n",
+			printf("zl4_log_data: Failed to delete QSO ID %u file %s\n",
 				id, filename.c_str());
 			return false;
 		}
@@ -123,7 +122,7 @@ bool zl4_logdata::launder_data()
 
 //! \param id QSO identifier
 //! \return reference to record
-record* zl4_logdata::get(qso_id& id)
+record* zl4_log_data::get(qso_id& id)
 {
 	if (log_data_.size() == 0) {
 		id = 0;
@@ -147,7 +146,7 @@ record* zl4_logdata::get(qso_id& id)
 //! If log data is empty nullptr is returned and id is set to 0
 //! If multiple records match the criteria the first one found is returned
 //! If no records match the criteria nullptr is returned and id is set to 0
-record* zl4_logdata::get_next(qso_id& id, search_criteria_t& criteria)
+record* zl4_log_data::get_next(qso_id& id, search_criteria_t& criteria)
 {
 	if (log_data_.size() == 0) {
 		id = 0;
@@ -181,7 +180,7 @@ record* zl4_logdata::get_next(qso_id& id, search_criteria_t& criteria)
 //! If the record is not found false is returned
 //! If the record is found and removed true is returned
 //! If the record is removed it is moved to deleted_qsos so that launder_data will delete it from filestore	
-bool zl4_logdata::erase(qso_id& id)
+bool zl4_log_data::erase(qso_id& id)
 {
 	if (log_data_.size() == 0 || id == 0) {
 		return false;
@@ -205,7 +204,7 @@ bool zl4_logdata::erase(qso_id& id)
 //! If id is 0 a new record is added and id is updated to the new QSO ID
 //! If id is non-zero the existing record with that QSO ID is updated
 //! If the record is successfully added or updated true is returned
-bool zl4_logdata::put(qso_id& id, const record& rec)
+bool zl4_log_data::put(qso_id& id, const record& rec)
 {
 	if (id == 0) {
 		// Add new record
@@ -238,7 +237,7 @@ bool zl4_logdata::put(qso_id& id, const record& rec)
 //! \param id QSO identifier
 //! \return filename
 //! Returns the filename for the record with QSO ID id
-string zl4_logdata::qso_filename(qso_id id)
+string zl4_log_data::qso_filename(qso_id id)
 {
 	char dir1[4];
 	char dir2[4];
@@ -255,7 +254,7 @@ string zl4_logdata::qso_filename(qso_id id)
 //! \param criteria Search criteria
 //! \return true if record matches criteria
 //! Returns true if the record matches the search criteria
-bool zl4_logdata::matches(record& rec, search_criteria_t& criteria)
+bool zl4_log_data::matches(record& rec, search_criteria_t& criteria)
 {	// Two level matching
 	bool match = basic_match(rec, criteria) && refine_match(rec, criteria);
 	return match;
@@ -266,7 +265,7 @@ bool zl4_logdata::matches(record& rec, search_criteria_t& criteria)
 //! \param rec QSO record to match.
 //! \param criteria Search criteria.
 //! \return true if the field comparison check agrees, false if not.
-bool zl4_logdata::basic_match(record& rec, search_criteria_t& criteria)
+bool zl4_log_data::basic_match(record& rec, search_criteria_t& criteria)
 {	// See if record matches criterion
 	switch (criteria.condition) {
 	case XC_UNFILTERED:
@@ -333,7 +332,7 @@ bool zl4_logdata::basic_match(record& rec, search_criteria_t& criteria)
 //! \param record QSO record to match.
 //! \param criteria Search criteria.
 //! \return true if the addition criteria match, false if not.
-bool zl4_logdata::refine_match(record& record, search_criteria_t& criteria)
+bool zl4_log_data::refine_match(record& record, search_criteria_t& criteria)
 {
 	// now refine by dates
 	if (criteria.by_dates) {
@@ -372,7 +371,7 @@ bool zl4_logdata::refine_match(record& record, search_criteria_t& criteria)
 }
 
 //! item matching - std::string value.
-bool zl4_logdata::match_string(std::string test, int comparator, std::string value)
+bool zl4_log_data::match_string(std::string test, int comparator, std::string value)
 {
 	switch ((search_comp_t)comparator) {
 	case XP_REGEX:
@@ -406,7 +405,7 @@ bool zl4_logdata::match_string(std::string test, int comparator, std::string val
 //! \param value the value from the QSO record.
 //! \return true if the values match, false if not.
 //! Converts the test and value to integers and compares them
-bool zl4_logdata::match_int(std::string test, int comparator, std::string value)
+bool zl4_log_data::match_int(std::string test, int comparator, std::string value)
 {
 	try {
 		return match_int(std::stoi(test), comparator, std::stoi(value));
@@ -424,7 +423,7 @@ bool zl4_logdata::match_int(std::string test, int comparator, std::string value)
 //! \return true if the values match, false if not.
 //! Compares the integer values according to the comparator
 //! If comparator is XP_REGEX false is returned
-bool zl4_logdata::match_int(int test, int comparator, int value)
+bool zl4_log_data::match_int(int test, int comparator, int value)
 {
 	switch ((search_comp_t)comparator) {
 	case XP_REGEX:
@@ -453,7 +452,7 @@ bool zl4_logdata::match_int(int test, int comparator, int value)
 //! If any record is dirty true is returned
 //! If no records are dirty false is returned
 //! This is used to determine if launder_data needs to be called
-bool zl4_logdata::any_dirty()
+bool zl4_log_data::any_dirty()
 {
 	for (auto& item : log_data_) {
 		log_record_t& log_rec = item.second;

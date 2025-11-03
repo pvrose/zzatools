@@ -1,20 +1,24 @@
 #include "zl4_log_beif.h"
 
+#include "json_rpc.h"
 #include "record.h"
 #include "settings.h"
-#include "socket_server.h"
-#include "zl4_logdata.h"
+#include "zl4_log_data.h"
 
-extern zl4_logdata* zl4_logdata_;
+extern zl4_log_data* zl4_log_data_;
 
 //! Constructor.
 //! Sets up UDP socket server to receive log requests.
 zl4_log_beif::zl4_log_beif()
 {
 	load_values();
-	server_ = new socket_server(socket_server::UDP, address_, static_cast<int>(port_));
-	server_->callback(this, zl4_log_beif::rcv_request);
-	server_->run_server();
+	server_ = new json_rpc(address_, port_);
+	server_->set_callbacks(
+		this,
+		rcv_request,
+		nullptr,
+		nullptr
+	);
 }
 
 //! Destructor.
@@ -22,7 +26,7 @@ zl4_log_beif::zl4_log_beif()
 //! 
 zl4_log_beif::~zl4_log_beif()
 {
-	server_->close_server(false);
+	delete server_;
 	save_values();
 }
 
@@ -48,66 +52,37 @@ void zl4_log_beif::save_values()
 //! \param v pointer to zl4_log_beif instance.
 //! \param ss the request stream.
 //! \return 0 if request was handled OK, else error code.
-int zl4_log_beif::rcv_request(void* v, stringstream& ss)
+bool zl4_log_beif::rcv_request(void* v, int id, json& jreq)
 {
 	zl4_log_beif* that = static_cast<zl4_log_beif*>(v);
 	if (that) {
-		if (that->process_request(ss)) {
-			return 0;
-		}
+		return that->process_request(id, jreq);
 	}
-	return -1;
+	return false;
 }
 
 //! handler for processing log requests from frontend.
-//! \param ss the request stream.
+//! \param id the request identifier.
+//! \param jreq the json request data.
 //! \return true if request was handled.
-
-bool zl4_log_beif::process_request(stringstream& ss)
+//! This method dispatches the request to the appropriate handler based on the "method" field in the JSON request.
+bool zl4_log_beif::process_request(int id, json& jreq)
 {
-	try {
-		json jreq;
-		ss >> jreq;
-		// Basic validation of request.
-		if (jreq.is_null()) {
-			return false;
-		} 
-		// Check for jsonrpc version 2.0
-		if (!jreq.contains("jsonrpc")) {
-			return false;
-		} else if (jreq["jsonrpc"] != "2.0") {
-			return false;
-		}
-		if (!jreq.contains("id")) {
-			return false;
-		}
-		int id = jreq.at("id").get<int>();
-		if (!jreq.contains("params")) {
-			return false;
-		}
-		json jparams = jreq.at("params");
-		if (!jparams.is_object()) {
-			return false;
-		}
-		// Determine request type.
-		if (!jparams.contains("method")) {
-			return false;
-		}
-		string method = jparams.at("method").get<std::string>();
-		if (method == "get") {
-			return handle_get(id, jparams);
-		} else if (method == "get_next") {
-			return handle_get_next(id, jparams);
-		} else if (method == "put") {
-			return handle_put(id, jparams);
-		} else if (method == "erase") {
-			return handle_erase(id, jparams);
-		} else {
-			return false;
-		}
-	}
-	catch (...) {
+	if (!jreq.contains("method")) {
 		return false;
+	}
+	string method = jreq.at("method").get<string>();
+	if (method == "get") {
+		return handle_get(id, jreq);
+	}
+	else if (method == "get_next") {
+		return handle_get_next(id, jreq);
+	}
+	else if (method == "put") {
+		return handle_put(id, jreq);
+	}
+	else if (method == "erase") {
+		return handle_erase(id, jreq);
 	}
 	return false;
 }
@@ -123,36 +98,18 @@ bool zl4_log_beif::handle_get(int id, const json& jreq)
 		return false;
 	}
 	qso_id q_id = jreq.at("qso id").get<int>();
-	record* rec = zl4_logdata_->get(q_id);
+	record* rec = zl4_log_data_->get(q_id);
 	if (rec) {
-		// Prepare response.
-		json jres;
-		jres["jsonrpc"] = "2.0";
-		jres["id"] = req_id;
 		// Result is { qso_id, record }
 		json jrec;
 		jrec["record"] = json(*rec);
 		jrec["qso_id"] = q_id;
-		jres["result"] = jrec;
-		stringstream ss;
-		ss << jres;
-		server_->send_response(ss);
+		server_->send_response(req_id, jrec);
 		return true;
 	}
 	else {
 		// Prepare error response.
-		json jres;
-		jres["jsonrpc"] = "2.0";
-		jres["id"] = req_id;
-		json jerr;
-		jerr["code"] = -32001;
-		char emsg[64];
-		snprintf(emsg, sizeof(emsg), "QSO ID %u not found", q_id);
-		jerr["message"] = emsg;
-		jres["error"] = jerr;
-		stringstream ss;
-		ss << jres;
-		server_->send_response(ss);
+		server_->send_error(req_id, -32001, "QSO ID %u not found", q_id);
 		return true;
 	}
 }
@@ -172,36 +129,17 @@ bool zl4_log_beif::handle_get_next(int id, const json& jreq)
 		return false;
 	}
 	search_criteria_t criteria = jreq.at("criteria").get<search_criteria_t>();
-	record* rec = zl4_logdata_->get_next(q_id, criteria);
+	record* rec = zl4_log_data_->get_next(q_id, criteria);
 	if (rec) {
 		// Prepare response.
 		json jres;
 		jres["jsonrpc"] = "2.0";
 		jres["id"] = req_id;
-		// Result is { qso_id, record }
-		json jrec;
-		jrec["record"] = json(*rec);
-		jrec["qso id"] = q_id;
-		jres["result"] = jrec;
-		stringstream ss;
-		ss << jres;
-		server_->send_response(ss);
+		server_->send_response(req_id, jres);
 		return true;
 	}
 	else {
-		// Prepare error response.
-		json jres;
-		jres["jsonrpc"] = "2.0";
-		jres["id"] = req_id;
-		json jerr;
-		jerr["code"] = -32001;
-		char emsg[64];
-		snprintf(emsg, sizeof(emsg), "No matching QSO found after ID %u", q_id);
-		jerr["message"] = emsg;
-		jres["error"] = jerr;
-		stringstream ss;
-		ss << jres;
-		server_->send_response(ss);
+		server_->send_error(req_id, -32001, "No matching QSO found after ID %u", q_id);
 		return true;
 	}
 }
@@ -218,31 +156,17 @@ bool zl4_log_beif::handle_put(int id, const json& jreq)
 		return false;
 	}
 	qso_id q_id = jreq.at("qso id").get<int>();
-	if (zl4_logdata_->put(q_id, rec)) {
+	if (zl4_log_data_->put(q_id, rec)) {
 		// Prepare response.
 		json jres;
 		jres["jsonrpc"] = "2.0";
 		jres["id"] = req_id;
 		jres["result"]["qso id"] = q_id;
-		stringstream ss;
-		ss << jres;
-		server_->send_response(ss);
+		server_->send_response(req_id, jres);
 		return true;
 	}
 	else {
-		// Prepare error response.
-		json jres;
-		jres["jsonrpc"] = "2.0";
-		jres["id"] = req_id;
-		json jerr;
-		jerr["code"] = -32002;
-		char emsg[64];
-		snprintf(emsg, sizeof(emsg), "Failed to put QSO ID %u", q_id);
-		jerr["message"] = emsg;
-		jres["error"] = jerr;
-		stringstream ss;
-		ss << jres;
-		server_->send_response(ss);
+		server_->send_error(req_id, -32002, "Failed to put QSO ID %u", q_id);
 		return true;
 	}
 }
@@ -255,31 +179,18 @@ bool zl4_log_beif::handle_erase(int id, const json& jreq)
 		return false;
 	}
 	qso_id q_id = jreq.at("qso id").get<int>();
-	if (zl4_logdata_->erase(q_id)) {
+	if (zl4_log_data_->erase(q_id)) {
 		// Prepare response.
 		json jres;
 		jres["jsonrpc"] = "2.0";
 		jres["id"] = req_id;
 		jres["result"]["qso id"] = q_id;
-		stringstream ss;
-		ss << jres;
-		server_->send_response(ss);
+		server_->send_response(req_id, jres);
 		return true;
 	}
 	else {
-		// Prepare error response.
-		json jres;
-		jres["jsonrpc"] = "2.0";
-		jres["id"] = req_id;
-		json jerr;
-		jerr["code"] = -32003;
-		char emsg[64];
-		snprintf(emsg, sizeof(emsg), "Failed to erase QSO ID %u", q_id);
-		jerr["message"] = emsg;
-		jres["error"] = jerr;
-		stringstream ss;
-		ss << jres;
-		server_->send_response(ss);
+		server_->send_error(req_id, -32003, "Failed to erase QSO ID %u", q_id);
 		return true;
 	}
 }
+

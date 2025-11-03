@@ -209,6 +209,7 @@
     <ClCompile Include="src\init_dialog.cpp" />
     <ClCompile Include="src\intl_dialog.cpp" />
     <ClCompile Include="src\intl_widgets.cpp" />
+    <ClCompile Include="src\json_rpc.cpp" />
     <ClCompile Include="src\log_table.cpp" />
     <ClCompile Include="src\lotw_handler.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -278,7 +279,7 @@
     <ClCompile Include="src\wsjtx_handler.cpp" />
     <ClCompile Include="src\wx_handler.cpp" />
     <ClCompile Include="..\widgets\src\filename_input.cpp" />
-    <ClCompile Include="src\zl4_logdata.cpp" />
+    <ClCompile Include="src\zl4_log_data.cpp" />
     <ClCompile Include="src\zl4_log_beif.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -331,6 +332,7 @@
     <ClInclude Include="include\init_dialog.h" />
     <ClInclude Include="include\intl_dialog.h" />
     <ClInclude Include="include\intl_widgets.h" />
+    <ClInclude Include="include\json_rpc.h" />
     <ClInclude Include="include\logo.h" />
     <ClInclude Include="include\log_table.h" />
     <ClInclude Include="include\lotw_handler.h" />
@@ -403,7 +405,7 @@
     <ClInclude Include="include\win_dialog.h" />
     <ClInclude Include="include\wsjtx_handler.h" />
     <ClInclude Include="include\wx_handler.h" />
-    <ClInclude Include="include\zl4_logdata.h" />
+    <ClInclude Include="include\zl4_log_data.h" />
     <ClInclude Include="include\zl4_log_beif.h" />
     <ClInclude Include="packages\pthreads.2.9.1.4\build\native\include\pthread.h" />
     <ClInclude Include="resource.h" />

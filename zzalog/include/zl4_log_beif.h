@@ -4,7 +4,8 @@
 #include <sstream>
 #include <string>
 
-class socket_server;
+class json_rpc;
+
 using json = nlohmann::json;
 using string = std::string;
 using stringstream = std::stringstream;
@@ -24,11 +25,11 @@ public:
 	void save_values();
 
 	//! Callback to handle frontend requests to update backend data.
-	static int rcv_request(void* v, stringstream& ss);
+	static bool rcv_request(void* v, int id, json& jreq);
 
 protected:
 	//! handler for processing log requests from frontend.
-	bool process_request(stringstream& ss);
+	bool process_request(int id, json& jreq);
 
 	//! handler for "get" requests.
 	
@@ -61,7 +62,6 @@ protected:
 	string address_; //!< Address of the logging server.
 	uint16_t port_;    //!< Port of the logging server.
 
-	socket_server* server_; //!< Socket server to handle requests.
-
+	json_rpc* server_; //!< JSON-RPC protocol layer instance.
 };
 

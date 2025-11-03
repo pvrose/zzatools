@@ -360,13 +360,16 @@
     <ClCompile Include="src\file_holder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\zl4_logdata.cpp">
+    <ClCompile Include="src\zl4_log_data.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\zl4_log_beif.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\search.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\json_rpc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -746,10 +749,13 @@
     <ClInclude Include="include\file_holder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\zl4_logdata.h">
+    <ClInclude Include="include\zl4_log_data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\zl4_log_beif.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\json_rpc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -10,13 +10,13 @@
 #include <thread>
 
 //! This class provides the data for all the log records and updates the filestore copies.
-class zl4_logdata
+class zl4_log_data
 {
 public:
 	//! Constructor	
-	zl4_logdata();
+	zl4_log_data();
 	//! Destructor
-	~zl4_logdata();
+	~zl4_log_data();
 
 	//! Load ZL4 log data from filestore
 	bool load_data();
@@ -48,7 +48,7 @@ public:
 protected:
 
 	//! Thread function to launder data to filestore
-	static void th_launder_data(zl4_logdata* that);
+	static void th_launder_data(zl4_log_data* that);
 
 	//! Return filename for QSO ID
 	std::string qso_filename(qso_id id);

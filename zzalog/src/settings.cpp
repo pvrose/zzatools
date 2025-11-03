@@ -103,6 +103,7 @@ template bool settings::get<double>(std::string, double&, const double);
 template bool settings::get<float>(std::string, float&, const float);
 template bool settings::get<int>(std::string, int&, const int);
 template bool settings::get<uint32_t>(std::string, uint32_t&, const uint32_t);
+template bool settings::get<uint16_t>(std::string, uint16_t&, const uint16_t);
 template bool settings::get<time_t>(std::string, time_t&, const time_t);
 template bool settings::get<std::list<std::string>>(std::string, std::list<std::string>&, const std::list<std::string>);
 template bool settings::get<std::string>(std::string, std::string&, const std::string);
@@ -130,6 +131,7 @@ void settings::set(std::string name, const T value) {
 template void settings::set<bool>(std::string, const bool);
 template void settings::set<float>(std::string, const float); 
 template void settings::set<int>(std::string, const int);
+template void settings::set<uint16_t>(std::string, const uint16_t);
 template void settings::set<time_t>(std::string, const time_t);
 template void settings::set<std::list<std::string>>(std::string, const std::list<std::string>);
 template void settings::set<std::string>(std::string, const std::string);
