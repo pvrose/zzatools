@@ -66,15 +66,15 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>C:\Users\pvros\Documents\dev\fltk-master\build\lib\Debug;C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\lib;C:\Users\pvros\Documents\dev\zzatools\Debug;C:\Program Files %28x86%29\hamlib-w32-4.5.3\lib\msvc;C:\Users\pvros\Documents\dev\deps\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Users\pvros\Documents\dev\fltk-master\build\lib\Debug;C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\lib;C:\Users\pvros\Documents\dev\zzalog\Debug;C:\Program Files %28x86%29\hamlib-w32-4.5.3\lib\msvc;C:\Users\pvros\Documents\dev\deps\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\pvros\Documents\dev\deps\lib;C:\Users\pvros\Documents\dev\fltk-master\build\lib\RelWithDebInfo;C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\lib;C:\Users\pvros\Documents\dev\zzatools\Release;$(LibraryPath);C:\Program Files %28x86%29\hamlib-w32-4.5.3\lib\msvc</LibraryPath>
+    <LibraryPath>C:\Users\pvros\Documents\dev\deps\lib;C:\Users\pvros\Documents\dev\fltk-master\build\lib\RelWithDebInfo;C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\lib;C:\Users\pvros\Documents\dev\zzalog\Release;$(LibraryPath);C:\Program Files %28x86%29\hamlib-w32-4.5.3\lib\msvc</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>${LibraryPath};C:\Program Files\hamlib-w64-4.6.5\lib\msvc;C:\Users\pvros\source\repos\fltk\build\lib\Debug;C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x86-release-static-ipv6-sspi-schannel-obj-lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>${LibraryPath};C:\Program Files\hamlib-w64-4.6.5\lib\msvc;C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x86-release-static-ipv6-sspi-schannel-obj-lib;C:\Program Files %28x86%29\FLTK\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LibraryPath>${LibraryPath};C:\Program Files\hamlib-w64-4.6.4\lib\msvc;C:\Users\pvros\source\repos\fltk\build\lib\Release;C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x86-release-static-ipv6-sspi-schannel-obj-lib;$(LibraryPath)</LibraryPath>
@@ -86,7 +86,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\include;C:\Users\pvros\Documents\dev\fltk-master;C:\Users\pvros\Documents\dev\fltk-master\build;C:\Program Files %28x86%29\hamlib-w32-4.5.3\include;C:\Users\pvros\Documents\dev\zzatools\zzalog\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\include;C:\Users\pvros\Documents\dev\fltk-master;C:\Users\pvros\Documents\dev\fltk-master\build;C:\Program Files %28x86%29\hamlib-w32-4.5.3\include;C:\Users\pvros\Documents\dev\zzalog\zzalog_fe\include</AdditionalIncludeDirectories>
       <AssemblerOutput>NoListing</AssemblerOutput>
       <ExpandAttributedSource>false</ExpandAttributedSource>
       <ShowIncludes>false</ShowIncludes>
@@ -110,7 +110,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\include;C:\Users\pvros\Documents\dev\fltk-master\build;C:\Users\pvros\Documents\dev\fltk-master;%(AdditionalIncludeDirectories);C:\Program Files %28x86%29\hamlib-w32-4.5.3\include;C:\Users\pvros\Documents\dev\zzatools\zzalog\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\include;C:\Users\pvros\Documents\dev\fltk-master\build;C:\Users\pvros\Documents\dev\fltk-master;%(AdditionalIncludeDirectories);C:\Program Files %28x86%29\hamlib-w32-4.5.3\include;C:\Users\pvros\Documents\dev\zzalog\zzalog_fe\include</AdditionalIncludeDirectories>
       <AssemblerOutput>NoListing</AssemblerOutput>
       <UseUnicodeForAssemblerListing>false</UseUnicodeForAssemblerListing>
     </ClCompile>
@@ -127,12 +127,13 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\pvros\source\repos\pvrose\zzatools\zzalog\include;C:\Users\pvros\source\repos\fltk\build;C:\Program Files\hamlib-w64-4.6.5\include;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\pthread-win32;C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x64-release-dll-ipv6-sspi-schannel\include;C:\Users\pvros\source\repos\fltk\png;C:\Users\pvros\source\repos\fltk\zlib;C:\Users\pvros\source\repos\pvrose\zzatools\common\include;C:\Users\pvros\source\repos\pvrose\zzatools\widgets\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_HAS_STD_BYTE=0;CURL_STATICLIB;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\zzalog_fe\include;C:\Program Files\hamlib-w64-4.6.5\include;C:\Users\pvros\source\repos\pthread-win32;C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x64-release-dll-ipv6-sspi-schannel\include;..\common\include;..\widgets\include;C:\Program Files %28x86%29\FLTK\include;C:\Program Files %28x86%29\FLTK\include\FL\images</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_HAS_STD_BYTE=0;CURL_STATICLIB;NOMINMAX;_ITERATOR_DEBUG_LEVEL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>gdiplus.lib;gdi32.lib;libcurl.lib;Crypt32.lib;ws2_32.lib;normaliz.lib;winmm.lib;wldap32.lib;libhamlib-4.lib;fltkd.lib;fltk_jpegd.lib;fltk_pngd.lib;fltk_zd.lib;fltk_imagesd.lib;comctl32.lib;comdlg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>gdiplus.lib;gdi32.lib;libcurl.lib;Crypt32.lib;ws2_32.lib;normaliz.lib;winmm.lib;wldap32.lib;libhamlib-4.lib;fltk.lib;fltk_jpeg.lib;fltk_png.lib;fltk_z.lib;fltk_images.lib;comctl32.lib;comdlg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
       <DelayLoadDLLs>%(DelayLoadDLLs)</DelayLoadDLLs>
@@ -145,7 +146,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\pvros\source\repos\pvrose\zzatools\zzalog\include;C:\Users\pvros\source\repos\fltk\build;C:\Program Files\hamlib-w64-4.6.4\include;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\pthread-win32;C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x64-release-dll-ipv6-sspi-schannel\include;C:\Users\pvros\source\repos\fltk\png;C:\Users\pvros\source\repos\fltk\zlib;C:\Users\pvros\source\repos\pvrose\zzatools\common\include;C:\Users\pvros\source\repos\pvrose\zzatools\widgets\include;C:\Users\pvros\source\repos\pugixml-1.15\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\zzalog_fe\include;C:\Program Files\hamlib-w64-4.6.4\include;C:\Users\pvros\source\repos\pthread-win32;C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x64-release-dll-ipv6-sspi-schannel\include;C:\Program Files %28x86%29\FLTK\include;..\common\include;..\widgets\include;C:\Program Files %28x86%29\FLTK\include\FL\images</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_HAS_STD_BYTE=0;CURL_STATICLIB;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -481,11 +482,13 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\nlohmann.json.3.12.0\build\native\nlohmann.json.targets" Condition="Exists('..\packages\nlohmann.json.3.12.0\build\native\nlohmann.json.targets')" />
+    <Import Project="packages\nlohmann.json.3.12.0\build\native\nlohmann.json.targets" Condition="Exists('packages\nlohmann.json.3.12.0\build\native\nlohmann.json.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\nlohmann.json.3.12.0\build\native\nlohmann.json.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\nlohmann.json.3.12.0\build\native\nlohmann.json.targets'))" />
+    <Error Condition="!Exists('packages\nlohmann.json.3.12.0\build\native\nlohmann.json.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\nlohmann.json.3.12.0\build\native\nlohmann.json.targets'))" />
   </Target>
 </Project>

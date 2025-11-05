@@ -801,10 +801,10 @@
     <None Include="userguide\qsls.dox" />
     <None Include="userguide\local_data.dox" />
     <None Include="userguide\release_notes.dox" />
-    <None Include="packages.config" />
     <None Include="ZZALOG.pdf" />
     <None Include="userguide\src\condx_view.dox" />
     <None Include="userguide\ZZALOG.pdf" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="zzalog.ico">
