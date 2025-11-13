@@ -7,7 +7,6 @@ record.cpp - Individual record data item: implementation file
 */
 #include "record.h"
 
-#include "adif.h"
 #include "book.h"
 #include "cty_data.h"
 #include "main.h"

@@ -3,7 +3,7 @@
 #include <string>
 #include <cstdio>
 
-#include "png.h"
+#include "FL/images/png.h"
 
 class Fl_RGB_Image;
 class book;

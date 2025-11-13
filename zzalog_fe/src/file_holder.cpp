@@ -6,27 +6,65 @@
 #include <cstdlib>
 
 #include <FL/fl_utf8.h>
+#include <FL/Fl_PNG_Image.H>
+#include <FL/Fl_Window.H>
 
 file_holder* file_holder_ = nullptr;
 uint16_t DEBUG_RESET_CONFIG = 0;
 
-file_holder::file_holder(bool development, std::string directory) {
+file_holder::file_holder(const char* arg0, bool& development) {
+	char * pwd = fl_getcwd(nullptr, 256);
+	string run_dir = directory(arg0);
+	printf("ZZALOG: Running in %s\n", run_dir.c_str());
+	// Try reading from run directory first - if present then
+	// we are development
 #ifdef _WIN32
-	// Source directory - for resetting reference data
-	if (development) {
-		// $ProjectDir/../reference
-		default_source_directory_ =
-			directory + "..\\reference\\";
-		default_code_directory_ = directory;
-		default_html_directory_ = directory;
+	if (run_dir[1] == ':') {
+		// We have an absolutre path
+		default_source_directory_ = run_dir + "\\..\\";
+	} else {
+		default-source_directory_ = std::string(pwd) + "\\" + run_dir + "\\";
 	}
-	else {
-		default_source_directory_ =
-			std::string(getenv("ALLUSERSPROFILE")) + "\\" + VENDOR + "\\" + PROGRAM_ID + "\\";
-		default_code_directory_ = "";
-		default_html_directory_ = 
-			std::string(getenv("APPDATA")) + "\\" + VENDOR + "\\" + PROGRAM_ID + "\\";
+#else
+    if (run_dir[0] == '/') {
+		// We have an absolute path
+		default_source_directory_ = run_dir + "/../";
+	} else {
+		default_source_directory_ = std::string(pwd) + "/" + run_dir + "/../";
 	}
+
+#endif
+	default_code_directory_ = default_code_directory_;
+	// Test the path using the icon
+	string logo = get_filename(FILE_ICON_ZZA);
+	Fl_PNG_Image* ilog = new Fl_PNG_Image(logo.c_str());
+	if (ilog && !ilog->fail()) {
+		development = true;
+	} else {
+		development = false;
+#ifdef _WIN32
+		default_source_directory_ = 
+			std::string(getenv("ALLUSERSPROFILE")) + "\\" + 
+			VENDOR + "\\" + PROGRAM_ID + "\\";
+#else
+		default_source_directory_ = 
+			"/etc/" + VENDOR + "/" + PROGRAM_ID + "/";
+#endif
+		// Try again in release directory
+		logo = get_filename(FILE_ICON_ZZA);
+		ilog = new Fl_PNG_Image(logo.c_str());
+		if (!ilog || ilog->fail()) {
+			printf("ZZALOG: Unable to find logo file - file accesses will fail\n");
+			default_source_directory_ = "";
+			default_code_directory_ = "";
+			default_data_directory_ = "";
+			default_html_directory_ = "";
+		}
+	}
+	Fl_Window::default_icon(ilog);
+
+#ifdef _WIN32
+	default_html_directory_ = default_source_directory_);
 	// Working directory
 	default_data_directory_ =
 		std::string(getenv("APPDATA")) + "\\" + VENDOR + "\\" + PROGRAM_ID + "\\";
@@ -38,21 +76,7 @@ file_holder::file_holder(bool development, std::string directory) {
 	fl_make_path(unixified.c_str());
 	// Code directory
 #else 
-	// Source directory - for resetting reference data
-	if (development) {
-		// $PWD/../reference
-		default_source_directory_ =
-			directory + "../reference/";
-		default_code_directory_ = directory;
-		default_html_directory_ = directory;
-	}
-	else {
-		default_source_directory_ =
-			"/etc/" + VENDOR + "/" + PROGRAM_ID + "/";
-		default_code_directory_ = "";
-		default_html_directory_ =
-			std::string(getenv("HOME")) + "/.config/" + VENDOR + "/" + PROGRAM_ID + "/";
-	}
+	default_html_directory_ = default_source_directory_;
 	// Working directory
 	default_data_directory_ =
 		std::string(getenv("HOME")) + "/.config/" + VENDOR + "/" + PROGRAM_ID + "/";

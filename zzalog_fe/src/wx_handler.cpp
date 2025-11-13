@@ -148,10 +148,16 @@ void wx_handler::update() {
         key_);
     if (url_handler_->read_url(std::string(url), &ss)) {
         ss.seekg(std::ios::beg);
-        json j;
-        ss >> j;
-        j.get_to(report_);
-     } else {
+        try {
+            json j;
+            ss >> j;
+            j.get_to(report_);
+        }
+		catch (const json::exception& e) {
+			printf("WX THREAD: Failed to decode WX: %d (%s)\n",
+			    e.id, e.what());
+            
+		}
         report_ = wx_report();
         report_.city_name = "Not known";
     }

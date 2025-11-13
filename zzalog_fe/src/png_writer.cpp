@@ -9,8 +9,8 @@
 
 #include <ctime>
 
-#include "png.h"
-#include "zlib.h"
+#include "FL/images/png.h"
+#include "FL/images/zlib.h"
 #include <FL/fl_utf8.h>
 
 png_writer::png_writer() {

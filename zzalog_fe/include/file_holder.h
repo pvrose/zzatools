@@ -58,6 +58,7 @@ enum file_contents_t : uint8_t {
 	FILE_SOLAR,                             //!< Solar data (read every hour at most frequent
 	FILE_STATUS,                            //!< Status log file
 	FILE_STATION,                           //!< Station configuration file
+	FILE_ICON_ZZA,                          //!< GM3ZZA Icon
 };
 
 //! File control datra
@@ -80,7 +81,8 @@ const std::map < file_contents_t, file_control_t > FILE_CONTROL = {
 	{ FILE_CONTEST, { "contests.json", false, false, DEBUG_RESET_TEST }},
 	{ FILE_SOLAR, { "solar.xml", false, false, 0}},
 	{ FILE_STATUS, { "status.txt", false, false, 0}},
-	{ FILE_STATION, { "station.json", false, false, DEBUG_RESET_STN }}
+	{ FILE_STATION, { "station.json", false, false, DEBUG_RESET_STN }},
+	{ FILE_ICON_ZZA, { "rose.png", true, true, 0}}
 };
 
 //! Data type for getting directory 
@@ -96,7 +98,7 @@ class file_holder
 {
 public:
 	//! Constructor
-	file_holder(bool development, std::string directory);
+	file_holder(const char* arg0, bool& development);
 	//! Destructor
 	~file_holder() {};
 

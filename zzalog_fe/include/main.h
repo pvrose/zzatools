@@ -248,11 +248,6 @@ void resize_window();
 //! Delete all created data items
 void tidy();
 
-//! Set the default icon for all windows.
-
-//! \param arg0 not used.
-void add_icon(const char* arg0);
-
 //! Display the arguments in the status log.
 
 //! \param argc number of arguments

@@ -497,16 +497,6 @@ int cb_args(int argc, char** argv, int& i) {
 		NEW_BOOK = true;
 		i += 1;
 	}
-	// HTML Directory - expecetd to be "-g ./" when run in development 
-	else if (strcmp("-g", argv[i]) == 0 || strcmp("--userguide", argv[i]) == 0) {
-		DEVELOPMENT_MODE = true;
-		i += 1;
-		if (i < argc) {
-			development_directory_ = argv[i];
-			default_code_directory_ = argv[i];
-			i += 1;
-	}
-	}
 	// Help
 	else if (strcmp("-h", argv[i]) == 0 || strcmp("--help", argv[i]) == 0) {
 		HELP = true;
@@ -661,7 +651,6 @@ void show_help() {
 	"\t\tt|threads\tProvide debug tracing on std::thread use\n"
 	"\t\t\tnot|nothreads\n"
 	"\t-e|--new\tCreate new file\n"
-	"\t-g|--userguide\tSpecify HTML Directory\n"
 	"\t-h|--help\tPrint this\n"
 	"\t-k|--dark\tDark mode (sticky)\n"
 	"\t-l|--light\tLight mode (sticky)\n"
@@ -1021,12 +1010,6 @@ void tidy() {
 	delete main_window_;
 }
 
-// Add the icon
-void add_icon(const char* arg0) {
-	// std::set the default Icon
-	Fl_Window::default_icon(&main_icon_);
-}
-
 // Map argument letter to colour name
 std::map<uchar, std::string> colours = {
 	{ 'n', "None" },
@@ -1203,7 +1186,8 @@ int main(int argc, char** argv)
 	int i = 1;
 	Fl::args(argc, argv, i, cb_args);
 	// Set the default data directories
-	file_holder_ = new file_holder(DEVELOPMENT_MODE, development_directory_);
+	bool development;
+	file_holder_ = new file_holder(argv[0], DEVELOPMENT_MODE);
 	// Read any switches that stick between calls
 	read_saved_switches();
 	customise_fltk();
@@ -1237,7 +1221,6 @@ int main(int argc, char** argv)
 		show_help();
 		return 0;
 	}
-	add_icon(argv[0]);
 
 	// Ctreate status to handle status messages
 	status_ = new status();

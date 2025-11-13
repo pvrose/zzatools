@@ -1,7 +1,6 @@
 #include "spec_data.h"
 
 #include "adi_writer.h"
-#include "adif.h"
 #include "band.h"
 #include "book.h"
 #include "corr_dialog.h"
@@ -162,18 +161,18 @@ bool spec_data::load_json() {
 			process_subdivision("Secondary_Administrative_Subdivision_Alt");
 			snprintf(msg, sizeof(msg), "ADIF SPEC: File %s loaded OK", filename.c_str());
 			status_->misc_status(ST_OK, msg);
-			if (adif_version_ != ADIF::VERSION) {
-				snprintf(msg, sizeof(msg), "ADIF SPEC: Built-in ADIF values are based on version %s, version %s loaded",
-					ADIF::VERSION.c_str(), adif_version_.c_str());
-				status_->misc_status(ST_WARNING, msg);
-				if (generate_adif_hfile()) {
-					status_->misc_status(ST_WARNING, "ADIF SPEC: Recompile with new ADIF header file");
-				}
-				else {
-					status_->misc_status(ST_ERROR, "ADIF SPEC: Contact the development team");
-				}
-				return false;
-			}
+			// if (adif_version_ != ADIF::VERSION) {
+			// 	snprintf(msg, sizeof(msg), "ADIF SPEC: Built-in ADIF values are based on version %s, version %s loaded",
+			// 		ADIF::VERSION.c_str(), adif_version_.c_str());
+			// 	status_->misc_status(ST_WARNING, msg);
+			// 	if (generate_adif_hfile()) {
+			// 		status_->misc_status(ST_WARNING, "ADIF SPEC: Recompile with new ADIF header file");
+			// 	}
+			// 	else {
+			// 		status_->misc_status(ST_ERROR, "ADIF SPEC: Contact the development team");
+			// 	}
+			// 	return false;
+			// }
 			return true;
 		}
 		catch (const json::exception& e) {

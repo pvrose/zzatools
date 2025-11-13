@@ -54,6 +54,7 @@ class socket_server;
 		bool has_server();
 		//! Add a method for the server to handle.
 		
+		//! \param v Pointer to indicate callback instance.
 		//! \param method Method entry structire.
 		//! \param callback Local method to handle request.
 		void add_method(void* v, method_entry method, int(*callback)(void* v, rpc_data_item::rpc_list& params, rpc_data_item& response));

@@ -16,5 +16,6 @@
         "utility": "cpp",
         "variant": "cpp",
         "string": "cpp"
-    }
+    },
+    "cmake.ignoreCMakeListsMissing": true
 }
