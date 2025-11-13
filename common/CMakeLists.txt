@@ -38,12 +38,15 @@ if (MSVC)
 set(FLTK_DIR "C:/Users/pvros/source/repos/fltk/build"
     CACHE FILEPATH "FLTK installation or build directory")
 endif()
+find_package(FLTK 1.5.0 CONFIG REQUIRED)
 set(CMAKE_MODULE_PATH ../)
 
 set(CMAKE_BUILD_RPATH ${CMAKE_CURRENT_BINARY_DIR})
 add_library(${TARGET})
 target_include_directories(${TARGET} PRIVATE 
-  ./include)
+  ./include
+  ${FLTK_INCLUDE_DIR}
+)
 # Add QBS_logo.h to ensure it gets generated
 target_sources(${TARGET} 
   PRIVATE 

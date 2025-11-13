@@ -139,7 +139,15 @@ endif()
 set(CMAKE_MODULE_PATH ../ ./)
 find_package(FLTK 1.5.0 CONFIG REQUIRED)
 find_package(CURL)
+if (NOT CURL_FOUND AND MSVC)
+  message("CURL not found")
+endif()
 find_package(Hamlib)
+if (NOT HAMLIB_FOUND AND MSVC)
+  message("Hamlib not found")
+  set(HAMLIB_INCLUDE_DIR "C:\\Program Files\\hamlib-w64-4.6.5\\include")
+  set(HAMLIB_LIBRARY "C:\\Program Files\\hamlib-w64-4.6.5\\lib\\msvc\\libhamlib-4.lib")
+endif()
 
 set(CMAKE_BUILD_RPATH ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -147,7 +155,10 @@ add_executable(${TARGET} WIN32 MACOSX_BUNDLE)
 
 
 target_include_directories(${TARGET} PRIVATE 
-  ./include ../common/include ../widgets/include)
+  ./include ../common/include ../widgets/include
+  ${FLTK_INCLUDE_DIR}
+  ${HAMLIB_INCLUDE_DIR}
+)
 # Add QBS_logo.h to ensure it gets generated
 target_sources(${TARGET} PRIVATE ${CPPFILES})
 

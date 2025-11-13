@@ -20,7 +20,6 @@ if(DOXYGEN_FOUND)
  
   # Command for generating dox from config file
   add_custom_command(
-    OUTPUT 
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/html/index.html
     DEPENDS ${DOXY_API_FILES} ${DOXY_UG_OUT}
     COMMAND ${DOXYGEN_EXECUTABLE} ${DOXY_API_OUT}

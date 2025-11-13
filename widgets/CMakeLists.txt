@@ -45,7 +45,9 @@ find_package(FLTK 1.5.0 CONFIG REQUIRED)
 set(CMAKE_BUILD_RPATH ${CMAKE_CURRENT_BINARY_DIR})
 add_library(${TARGET})
 target_include_directories(${TARGET} PRIVATE 
-  ./include ../common/include)
+  ./include ../common/include
+  ${FLTK_INCLUDE_DIR}
+)
 # Add QBS_logo.h to ensure it gets generated
 target_sources(${TARGET} 
   PRIVATE 
