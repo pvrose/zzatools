@@ -182,13 +182,13 @@ void qso_buttons::create_form(int X, int Y) {
 		bn_action_[ix] = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "");
 		if ((ix + 1) % NUMBER_PER_ROW == 0 && ix < MAX_ACTIONS) {
 			curr_x += WBUTTON;
-			max_x = std::max(max_x, curr_x);
+			max_x = std::max<int>(max_x, curr_x);
 			curr_x = X + GAP;
 			curr_y += HBUTTON;
 		}
 		else {
 			curr_x += WBUTTON;
-			max_x = std::max(max_x, curr_x);
+			max_x = std::max<int>(max_x, curr_x);
 		}
 	}
 	if (MAX_ACTIONS % NUMBER_PER_ROW != 0) {

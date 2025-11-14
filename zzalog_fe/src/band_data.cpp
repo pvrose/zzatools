@@ -204,7 +204,7 @@ void band_data::create_bands() {
 			current_range = (*it)->range;
 		} else {
 			if (!std::isnan((*it)->range.upper)) {
-				current_range.upper = std::max(current_range.upper, (*it)->range.upper);
+				current_range.upper = std::max<double>(current_range.upper, (*it)->range.upper);
 			}
 		}
 		// Collate the modes
@@ -223,8 +223,8 @@ void band_data::create_bands() {
 			entry->modes = {};
 			entry->summary = band_name;
 			for (auto b1 : b.second) {
-				entry->range.lower = std::min(entry->range.lower, b1.lower);
-				entry->range.upper = std::max(entry->range.upper, b1.upper);
+				entry->range.lower = std::min<double>(entry->range.lower, b1.lower);
+				entry->range.upper = std::max<double>(entry->range.upper, b1.upper);
 			}
 			entries_.insert(entry);
 		}

@@ -134,8 +134,8 @@ void band_widget::set_range(bool restore_default) {
 		std::set<range_t> ranges = band_data_->bands().at(band_);
 		band_limits_ = { DBL_MAX, 0.0 };
 		for (auto it = ranges.begin(); it != ranges.end(); it++) {
-			band_limits_.lower = std::min(band_limits_.lower, (*it).lower);
-			band_limits_.upper = std::max(band_limits_.upper, (*it).upper);
+			band_limits_.lower = std::min<double>(band_limits_.lower, (*it).lower);
+			band_limits_.upper = std::max<double>(band_limits_.upper, (*it).upper);
 		}
 		if (auto_bw_ || prev_band != band_ || restore_default) {
 			// We are resetting to show the full band
@@ -450,8 +450,8 @@ void band_widget::generate_items() {
 		char* text = new char[128];
 		double l = (*it)->range.lower;
 		double u = (*it)->range.upper;
-		double ll = std::max(l, scale_range_.lower);
-		double lu = std::min(u, scale_range_.upper);
+		double ll = std::max<double>(l, scale_range_.lower);
+		double lu = std::min<double>(u, scale_range_.upper);
 		band_data::entry_t type = (*it)->type;
 		bool include;
 		if ((l >= scale_range_.lower && l < scale_range_.upper) ||
@@ -627,7 +627,7 @@ void band_widget::adjust_markers() {
 	while (it2 != markers_.begin()) {
 		int next = it2->y_text + FL_NORMAL_SIZE;
 		if (it1->y_text < next) {
-			it1->y_text = std::min(next, y_lower_);
+			it1->y_text = std::min<double>(next, y_lower_);
 			if (it1->y_text != next) squashed = true;
 		} else {
 		}
@@ -652,7 +652,7 @@ void band_widget::adjust_markers() {
 	while (it2 != markers_.end()) {
 		int next = it1->y_text - FL_NORMAL_SIZE;
 		if (it2->y_text > next) {
-			it2->y_text = std::max(next, y_upper_);
+			it2->y_text = std::max<int>(next, y_upper_);
 			if (it2->y_text != next) squashed = true;
 		} else {
 		}
@@ -676,7 +676,7 @@ void band_widget::adjust_markers() {
 	while (it2 != markers_.end()) {
 		int next = it2->y_text + FL_NORMAL_SIZE;
 		if (it1->y_text > next) {
-			it1->y_text = std::min(next, y_lower_);
+			it1->y_text = std::min<int>(next, y_lower_);
 			if (it1->y_text != next) squashed = true;
 		} else {
 		}
@@ -700,7 +700,7 @@ void band_widget::adjust_markers() {
 	while (it2 != markers_.begin()) {
 		int next = it1->y_text - FL_NORMAL_SIZE;
 		if (it2->y_text < next) {
-			it2->y_text = std::max(next, y_upper_);
+			it2->y_text = std::max<int>(next, y_upper_);
 			if (it2->y_text != next) squashed = true;
 		}
 		do it2--;

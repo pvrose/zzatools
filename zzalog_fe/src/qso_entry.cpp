@@ -134,12 +134,12 @@ void qso_entry::create_form(int X, int Y) {
 
 		curr_x += ip_field_[ix]->w() + GAP;
 		if (ix % NUMBER_PER_ROW == (NUMBER_PER_ROW - 1)) {
-			max_x = std::max(max_x, curr_x);
+			max_x = std::max<int>(max_x, curr_x);
 			curr_x = X + GAP;
 			curr_y += HBUTTON;
 		}
 	}
-	max_x = std::max(max_x, curr_x);
+	max_x = std::max<int>(max_x, curr_x);
 	// Clear QSO fields
 
 	curr_x = max_x;
@@ -428,7 +428,7 @@ void qso_entry::copy_cat_to_qso(bool clear) {
 				}
 				qso_->item("TX_PWR", tx_power);
 				if (std::isnan(tx_power)) tx_power = 0.0;
-				tx_power = std::max(tx_power, rig->get_dpower(true));
+				tx_power = std::max<int>(tx_power, rig->get_dpower(true));
 				snprintf(txp, sizeof(txp), "%0.0f", tx_power);
 				qso_->item("TX_PWR", std::string(txp));
 				copy_qso_to_display(CF_CAT);
@@ -454,7 +454,7 @@ void qso_entry::copy_cat_to_qso(bool clear) {
 				std::string old_txp = qso_->item("TX_POWER");
 				qso_->item("TX_PWR", tx_power);
 				if (std::isnan(tx_power)) tx_power = 0.0;
-				tx_power = std::max(tx_power, rig->get_dpower(true));
+				tx_power = std::max<int>(tx_power, rig->get_dpower(true));
 				snprintf(txp, sizeof(txp), "%0.0f", tx_power);
 				qso_->item("TX_PWR", std::string(txp));
 				snprintf(message, sizeof(message), "DASH: TX_power changed from '%s' to '%s'", old_txp.c_str(), txp);

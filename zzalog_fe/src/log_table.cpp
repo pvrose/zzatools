@@ -356,22 +356,22 @@ int log_table::handle(int event) {
 			// PGUP -  Go up one page (find out number of records displayed)
 			if (order_ == LAST_TO_FIRST) {
 				// The lower of the one page above where we are or last record
-				my_book_->selection(std::min(my_book_->selection() + rows_per_page_, my_book_->size() - 1));
+				my_book_->selection(std::min<size_t>(my_book_->selection() + rows_per_page_, my_book_->size() - 1));
 			}
 			else {
 				// The greater of record 0 or one page above where we are (record numbers are unsigned (size_t))
-				my_book_->selection(std::max(0, (signed)my_book_->selection() - rows_per_page_));
+				my_book_->selection(std::max<size_t>(0, (signed)my_book_->selection() - rows_per_page_));
 			}
 			return true;
 		case FL_Page_Down:
 			// PGDN - Go down one page
 			if (order_ == LAST_TO_FIRST) {
 				// The greater of record 0 or one page above where we are (record numbers are unsigned (size_t))
-				my_book_->selection(std::max(0, (signed)my_book_->selection() - rows_per_page_));
+				my_book_->selection(std::max<size_t>(0, (signed)my_book_->selection() - rows_per_page_));
 			}
 			else {
 				// The lower of the one page above where we are or last record
-				my_book_->selection(std::min(my_book_->selection() + rows_per_page_, my_book_->size() - 1));
+				my_book_->selection(std::min<size_t>(my_book_->selection() + rows_per_page_, my_book_->size() - 1));
 			}
 			return true;
 		case FL_Alt_R:
@@ -482,7 +482,7 @@ void log_table::adjust_row_sizes() {
 	fl_measure(max_number.c_str(), w1, height);
 	// Get the size of the row header "column header" and std::set the width to the larger of the two
 	fl_measure("QSO No.", w2, height);
-	row_header_width(std::max(w1, w2));
+	row_header_width(std::max<int>(w1, w2));
 }
  
 // Override of Fl_Table_Row method to provide data and formats for each cell

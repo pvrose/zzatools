@@ -200,20 +200,20 @@ void condx_view::create_form() {
 	int saved_rh = rh;
 
 	create_hf(rx, ry, rw, rh);
-	rw = std::max(rw, g_hf_->w());
-	rh = std::max(rh, g_hf_->h());
+	rw = std::max<int>(rw, g_hf_->w());
+	rh = std::max<int>(rh, g_hf_->h());
 
 	create_vhf(rx, ry, rw, rh);
-	rw = std::max(rw, g_vhf_->w());
-	rh = std::max(rh, g_vhf_->h());
+	rw = std::max<int>(rw, g_vhf_->w());
+	rh = std::max<int>(rh, g_vhf_->h());
 
 	create_solar(rx, ry, rw, rh);
-	rw = std::max(rw, g_solar_->w());
-	rh = std::max(rh, g_solar_->h());
+	rw = std::max<int>(rw, g_solar_->w());
+	rh = std::max<int>(rh, g_solar_->h());
 
 	create_geomag(rx, ry, rw, rh);
-	rw = std::max(rw, g_geo_->w());
-	rh = std::max(rh, g_geo_->h());
+	rw = std::max<int>(rw, g_geo_->w());
+	rh = std::max<int>(rh, g_geo_->h());
 
 	//create_image(rx, ry, rw, rh);
 	//rw = max(rw, g_image_->w());

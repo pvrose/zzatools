@@ -955,21 +955,21 @@ void resize_window() {
 	// Only allow the views to resize fully - the bars will resize horizontally
 	main_window_->resizable(tabbed_forms_);
 	// Get minimum resizing from all the children - horizontal limited by views and toolbar
-	int min_w = std::max(tabbed_forms_->min_w(), toolbar_->min_w());
+	int min_w = std::max<int>(tabbed_forms_->min_w(), toolbar_->min_w());
 	// Vertical limited by view, the bars remain a fixed height
 	int min_h = tabbed_forms_->min_h() + toolbar_->h() + menu_->h();
 	main_window_->size_range(min_w, min_h);
 	// Set the size to the setting or minimum specified by the view + bars if that's larger
 	int rx = left;
 	int ry = top;
-	int rw = std::max(min_w, width);
-	int rh = std::max(min_h, height);
+	int rw = std::max<int>(min_w, width);
+	int rh = std::max<int>(min_h, height);
 	int sx, sy, sw, sh;
 	Fl::screen_work_area(sx, sy, sw, sh);
 	if (rx < sx) rx = sx;
-	else if (rx + rw > sx + sw) rx = std::max(0, sx + sw - rw);
+	else if (rx + rw > sx + sw) rx = std::max<int>(0, sx + sw - rw);
 	if (ry < sy) ry = sy;
-	else if (ry + rh > sy + sh) ry = std::max(20, sy + sh - rh);
+	else if (ry + rh > sy + sh) ry = std::max<int>(20, sy + sh - rh);
 	main_window_->resize(rx, ry, rw, rh);
 }
 

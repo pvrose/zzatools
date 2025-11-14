@@ -103,7 +103,7 @@ void qso_log_info::create_form(int X, int Y) {
 	curr_x = X + GAP;
 	curr_y += bn_save_enable_->h() + GAP;
 
-	max_x = std::max(max_x, curr_x);
+	max_x = std::max<int>(max_x, curr_x);
 
 
 	resizable(nullptr);

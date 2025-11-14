@@ -109,8 +109,8 @@ void qso_manager::create_form(int X, int Y) {
 	data_group_->create_form(curr_x, curr_y);
 	curr_x += data_group_->w();
 	curr_y += data_group_->h();
-	max_x = std::max(max_x, curr_x);
-	max_y = std::max(max_y, curr_y);
+	max_x = std::max<int>(max_x, curr_x);
+	max_y = std::max<int>(max_y, curr_y);
 
 	curr_x = X + GAP;
 	curr_y += GAP;
@@ -129,12 +129,12 @@ void qso_manager::create_form(int X, int Y) {
 	info_group_ = new qso_log(curr_x, curr_y, 50, 50, nullptr);
 	curr_x += info_group_->w() + GAP;
 
-	curr_y += std::max(
-		std::max(clock_group_->h(), rig_group_->h()),
+	curr_y += std::max<int>(
+		std::max<int>(clock_group_->h(), rig_group_->h()),
 		info_group_->h());
 
-	max_x = std::max(max_x, curr_x);
-	max_y = std::max(max_y, curr_y);
+	max_x = std::max<int>(max_x, curr_x);
+	max_y = std::max<int>(max_y, curr_y);
 
 	Fl_Box* b_cr = new Fl_Box(X, max_y, max_x + GAP - X, FOOT_HEIGHT);
 	b_cr->copy_label(std::string(COPYRIGHT + " " + CONTACT + "     ").c_str());

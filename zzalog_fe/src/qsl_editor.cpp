@@ -151,7 +151,7 @@ void qsl_editor::create_form(int X, int Y) {
     curr_x += w10101->w() + GAP;
 	curr_y += w10101->h() + GAP;
 
-	max_x = std::max(max_x, curr_x);
+	max_x = std::max<int>(max_x, curr_x);
 
     g_1_->resizable(nullptr);
     g_1_->size(max_x - g_1_->x(), curr_y - g_1_->y());
@@ -351,12 +351,12 @@ void qsl_editor::create_form(int X, int Y) {
 	g_203->end();
   
     g_2_->resizable(nullptr);
-	int w = std::max(g_201->w() + g_202->w(), g_203->w()) + GAP;
-	int h = std::max(g_201->h(), g_202->h()) + g_203->h();
+	int w = std::max<int>(g_201->w() + g_202->w(), g_203->w()) + GAP;
+	int h = std::max<int>(g_201->h(), g_202->h()) + g_203->h();
     g_2_->size(w + GAP, h + GAP);
     g_2_->end();
 
-    max_x = std::max(max_x, g_2_->x() + g_2_->w());
+    max_x = std::max<int>(max_x, g_2_->x() + g_2_->w());
 
     curr_x = x() + GAP;
     curr_y = g_2_->y() + g_2_->h();
@@ -396,8 +396,8 @@ void qsl_editor::resize() {
     int h = display_->h();
     w_display_->size(w, h);
 
-    w = std::max(g_1_->w(), g_2_->w());
-    w = std::max(w, g_4_->w());
+    w = std::max<int>(g_1_->w(), g_2_->w());
+    w = std::max<int>(w, g_4_->w());
 
     h = g_4_->y() + g_4_->h();
     size(w, h);
@@ -510,16 +510,16 @@ void qsl_editor::create_items() {
 			g_401->resizable(nullptr);
 			g_401->size(curr_x - g_401->x(), g_401->h());
 			g_401->end();
-			max_x = std::max(max_x, curr_x);
+			max_x = std::max<int>(max_x, curr_x);
 		}
 	}
 	gg_401->resizable(nullptr);
 	gg_401->size(max_x - gg_401->x() + GAP +  Fl::scrollbar_size(), gg_401->h());
 	gg_401->end();
-	max_x = std::max(max_x, gg_401->x() + gg_401->w());
+	max_x = std::max<int>(max_x, gg_401->x() + gg_401->w());
 
 	curr_y = gg_401->y() + available_h + GAP;
-	max_x = std::max(max_x, curr_x) + GAP + Fl::scrollbar_size();
+	max_x = std::max<int>(max_x, curr_x) + GAP + Fl::scrollbar_size();
 
 	g_4_->resizable(nullptr);
 	g_4_->size(max_x - g_4_->x(), g_4_->h());

@@ -34,8 +34,8 @@ search_dialog::search_dialog() :
 	const int WCAL = HBUTTON;
 	const int WDATE = WSMEDIT;
 	const int WCHOICE = 2 * WBN;
-	const int HBN = std::max(HRADIO, HBUTTON);
-	const int HBNT = std::max(HBN, HTEXT);
+	const int HBN = std::max<int>(HRADIO, HBUTTON);
+	const int HBNT = std::max<int>(HBN, HTEXT);
 	// Group 1 - conditions
 	// rows 1-2   o radio o radio o radio o radio
 	// rows 3     o radio o radio [ text ]
@@ -46,7 +46,7 @@ search_dialog::search_dialog() :
 	const int C13 = C12 + WBN;
 	const int C14 = C13 + WBN;
 	const int YG1 = EDGE;
-	const int WG1 = std::max(C14 + WBN + GAP, C12 + WCHOICE + GAP) - XG;
+	const int WG1 = std::max<int>(C14 + WBN + GAP, C12 + WCHOICE + GAP) - XG;
 	const int R11 = YG1 + HTEXT;
 	const int R12 = R11 + HBN;
 	const int R13 = R12 + HBN;
@@ -88,7 +88,7 @@ search_dialog::search_dialog() :
 	const int C233 = C232 + W232;
 	const int W233 = WBUTTON;
 	const int W23 = C233 + W233 + GAP;
-	const int WG2 = std::max(W21, std::max(W22, W23)) - XG;
+	const int WG2 = std::max<int>(W21, std::max<int>(W22, W23)) - XG;
 	const int HG2 = R23 + HBUTTON + GAP - YG2;
 	// Group 3
 	const int YG3 = YG2 + HG2 + GAP;
@@ -101,7 +101,7 @@ search_dialog::search_dialog() :
 	const int HG3 = R31 + HBUTTON + GAP - YG3;
 
 	// Ungrouped OK and Cancel buttons
-	const int W = XG + std::max(WG1, std::max(WG2, WG3)) + EDGE;
+	const int W = XG + std::max<int>(WG1, std::max<int>(WG2, WG3)) + EDGE;
 	const int YGX = YG3 + HG3 + GAP;
 	const int CX2 = W - EDGE - WBUTTON;
 	const int CX1 = CX2 - GAP - WBUTTON;

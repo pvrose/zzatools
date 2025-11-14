@@ -122,7 +122,7 @@ void user_dialog::create_form(int X, int Y) {
 	val0->callback(cb_value<Fl_Counter, float>, &session_elapse_);
 	// End group - fit to size
 	pos_y = val0->y() + val0->h() + GAP;
-	pos_x = std::max(br2->x() + br2->w(), val0->x() + val0->w()) + GAP;
+	pos_x = std::max<int>(br2->x() + br2->w(), val0->x() + val0->w()) + GAP;
 	g1->resizable(nullptr);
 	g1->size(pos_x - g1->x(), pos_y - g1->y());
 	g1->end();
@@ -167,7 +167,7 @@ void user_dialog::create_form(int X, int Y) {
 	// End group - fit to size
 	g2->resizable(nullptr);
 	pos_y = val1->y() + val1->h() + GAP;
-	pos_x = std::max(br4->x() + br4->w(), val1->x() + val1->w()) + GAP;
+	pos_x = std::max<int>(br4->x() + br4->w(), val1->x() + val1->w()) + GAP;
 	g2->size(pos_x - g2->x(), pos_y - g2->y());
 	g2->end();
 
@@ -302,7 +302,7 @@ void user_dialog::populate_size(Fl_Hold_Browser* br, const Fl_Font* font, const 
 		// We have some sizes
 		if (sizes[0] == 0) {
 			// Scaleable font - so any size available 
-			for (int i = 1; i < std::max(64, sizes[num_sizes - 1]); i++) {
+			for (int i = 1; i < std::max<int>(64, sizes[num_sizes - 1]); i++) {
 				char buff[20];
 				sprintf(buff, "%d", i);
 				br->add(buff);

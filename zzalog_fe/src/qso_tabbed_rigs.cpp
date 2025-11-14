@@ -79,8 +79,8 @@ void qso_tabbed_rigs::create_form(int X, int Y) {
 		add(w);
 		(*ix).second = w;
 		// All versions of qso_rig should be the same size, but...
-		rw = std::max(rw, w->w());
-		rh = std::max(rh, w->h());
+		rw = std::max<int>(rw, w->w());
+		rh = std::max<int>(rh, w->h());
 	}
 	resizable(nullptr);
 	size(rw + delta_w, rh + delta_h);

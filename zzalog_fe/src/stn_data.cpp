@@ -562,7 +562,7 @@ stn_data::stn_match_t stn_data::match_qso_qth(record* qso, qth_info_t qth) {
 				const std::string& qthv = qth.data.at(qv);
 				if (qv == LOCATOR) {
 					// Only match minimum length
-					int len = std::min(qsov.length(), qthv.length());
+					int len = std::min<int>(qsov.length(), qthv.length());
 					if (qsov.substr(0, len) != qthv.substr(0, len)) {
 						return DONT;
 					}

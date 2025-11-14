@@ -101,13 +101,13 @@ void qso_clocks::create_form() {
 
 	qso_weather_ = new qso_wx(rx, ry, rw, rh, "Weather");
 	qso_weather_->align(FL_ALIGN_TOP | FL_ALIGN_LEFT);
-	rw = std::max(rw, qso_weather_->w());
-	rh = std::max(rh, qso_weather_->h());
+	rw = std::max<int>(rw, qso_weather_->w());
+	rh = std::max<int>(rh, qso_weather_->h());
 
 	condx_ = new condx_view(rx, ry, rw, rh, "Conditions");
 	condx_->align(FL_ALIGN_TOP | FL_ALIGN_LEFT);
-	rw = std::max(rw, condx_->w());
-	rh = std::max(rh, condx_->h());
+	rw = std::max<int>(rw, condx_->w());
+	rh = std::max<int>(rh, condx_->h());
 
 	tabs_->resizable(nullptr);
 	tabs_->size(tabs_->w() + rw - saved_rw, tabs_->h() + rh - saved_rh);

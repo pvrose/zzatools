@@ -232,19 +232,19 @@ void qso_rig::create_config(int curr_x, int curr_y) {
 	curr_y = ry;
 	// Create connection tab
 	create_connex(curr_x, curr_y);
-	rh = std::max(rh, connect_tab_->y() + connect_tab_->h() - ry);
+	rh = std::max<int>(rh, connect_tab_->y() + connect_tab_->h() - ry);
 	// Create auto tab
 	create_auto(curr_x, curr_y);
-	rh = std::max(rh, auto_tab_->y() + auto_tab_->h() - ry);
+	rh = std::max<int>(rh, auto_tab_->y() + auto_tab_->h() - ry);
 	// Create defaults tab
 	create_defaults(curr_x, curr_y);
-	rh = std::max(rh, defaults_tab_->y() + defaults_tab_->h() - ry);
+	rh = std::max<int>(rh, defaults_tab_->y() + defaults_tab_->h() - ry);
 	// Create accessory tab
 	create_accessory(curr_x, curr_y);
-	rh = std::max(rh, accessory_tab_->y() + accessory_tab_->h() - ry);
+	rh = std::max<int>(rh, accessory_tab_->y() + accessory_tab_->h() - ry);
 	// Create timeout &c tab
 	create_timeout(curr_x, curr_y);
-	rh = std::max(rh, timeout_tab_->y() + timeout_tab_->h() - ry);
+	rh = std::max<int>(rh, timeout_tab_->y() + timeout_tab_->h() - ry);
 
 
 	config_tabs_->resizable(nullptr);
@@ -265,10 +265,10 @@ void qso_rig::create_connex(int curr_x, int curr_y) {
 	int max_y = curr_y;
 	// Create serial port
 	create_serial(curr_x, curr_y);
-	max_y = std::max(max_y, serial_grp_->y() + serial_grp_->h());
+	max_y = std::max<int>(max_y, serial_grp_->y() + serial_grp_->h());
 	// Create network port
 	create_network(curr_x, curr_y);
-	max_y = std::max(max_y, network_grp_->y() + network_grp_->h());
+	max_y = std::max<int>(max_y, network_grp_->y() + network_grp_->h());
 
 
 	connect_tab_->resizable(nullptr);
@@ -325,10 +325,10 @@ void qso_rig::create_serial(int curr_x, int curr_y) {
 	bn_all_rates_->callback(cb_ch_over, &use_all_rates_);
 	populate_baud_choice();
 	curr_x += HBUTTON + tw;
-	curr_x = std::max(max_x, curr_x);
+	curr_x = std::max<int>(max_x, curr_x);
 
 	curr_y += HBUTTON + GAP;
-	curr_y = std::max(max_y, curr_y);
+	curr_y = std::max<int>(max_y, curr_y);
 	serial_grp_->resizable(nullptr);
 	serial_grp_->size(serial_grp_->w(), curr_y - serial_grp_->y());
 
@@ -471,7 +471,7 @@ void qso_rig::create_defaults(int curr_x, int curr_y) {
 	ip_xtal_->align(FL_ALIGN_RIGHT);
 	ip_xtal_->callback(cb_value_double<Fl_Float_Input>, nullptr);
 	ip_xtal_->tooltip("Provide a fixed frequency - eg crystal");
-	max_y = std::max(max_y, curr_y + HBUTTON + GAP);
+	max_y = std::max<int>(max_y, curr_y + HBUTTON + GAP);
 	int max_x = curr_x + WBUTTON + GAP;
 
 	defaults_tab_->resizable(nullptr);
@@ -521,7 +521,7 @@ void qso_rig::create_accessory(int curr_x, int curr_y) {
 	ip_tvtr_pwr_->callback(cb_value_double<Fl_Float_Input>, nullptr);
 	ip_tvtr_pwr_->tooltip("Specify the transverter power output");
 
-	max_y = std::max(max_y, curr_y + HBUTTON + GAP);
+	max_y = std::max<int>(max_y, curr_y + HBUTTON + GAP);
 	int max_x = curr_x + WBUTTON + GAP;
 
 	accessory_tab_->resizable(nullptr);

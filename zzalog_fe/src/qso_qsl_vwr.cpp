@@ -413,8 +413,8 @@ void qso_qsl_vwr::create_form() {
 
 	grp_editor_->end();
 
-	int th = std::max(grp_viewer_->h(), grp_status_->h());
-	th = std::max(th, grp_editor_->h()) + dh;
+	int th = std::max<int>(grp_viewer_->h(), grp_status_->h());
+	th = std::max<int>(th, grp_editor_->h()) + dh;
 	tabs_->resizable(nullptr);
 	tabs_->size(tabs_->w(), th);
 	tabs_->end();
