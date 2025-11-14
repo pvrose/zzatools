@@ -478,7 +478,7 @@ void log_table::adjust_row_sizes() {
 	int sz = 1;
 	// Get the largest number record - and find its size
 	if (book_) sz = book_->size() + 1;
-	std::string max_number = to_string(sz) + ' ';
+	std::string max_number = std::to_string(sz) + ' ';
 	fl_measure(max_number.c_str(), w1, height);
 	// Get the size of the row header "column header" and std::set the width to the larger of the two
 	fl_measure("QSO No.", w2, height);
@@ -544,7 +544,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 			Fl_Font save = fl_font();
 			fl_font(font_ ^ FL_BOLD_ITALIC, fontsize_);
 			// Display record number (starting at 1) in the row header
-			text = to_string(my_book_->record_number(item_number) + 1);
+			text = std::to_string(my_book_->record_number(item_number) + 1);
 			fl_draw(text.c_str(), X, Y, W, H, FL_ALIGN_LEFT);
 			fl_font(save, fontsize_);
 		}

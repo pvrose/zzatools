@@ -183,8 +183,8 @@ bool adx_handler::store_record(record* qso, xml_node& node) {
 		if (field.first.substr(0, 3) == "APP") {
 			size_t pos = 4;
 			while (field.first[pos] != '_') pos++;
-			string pid = field.first.substr(4, pos - 4);
-			string name = field.first.substr(pos + 1);
+			std::string pid = field.first.substr(4, pos - 4);
+			std::string name = field.first.substr(pos + 1);
 			xml_node n_field = node.append_child("APP");
 			n_field.append_attribute("PROGRAMID") = pid;
 			n_field.append_attribute("FIELDNAME") = name;

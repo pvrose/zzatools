@@ -688,7 +688,7 @@ std::string get_file(char * arg_filename) {
 		if (!filename.length()) {
 			status_->misc_status(ST_WARNING, "ZZALOG: No log file - assuming a new installation.");
 			stn_default defaults = stn_data_->defaults();
-			string def_filename = to_lower(defaults.callsign) + ".adi";
+			std::string def_filename = to_lower(defaults.callsign) + ".adi";
 			Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
 			chooser->title("Select log file name");
 			chooser->preset_file(def_filename.c_str());
@@ -1302,7 +1302,7 @@ void backup_file() {
 	status_->misc_status(ST_NOTE, message);
 	delete[] message;
 	// In and out streams
-	ifstream in(source);
+	std::ifstream in(source);
 	in.seekg(0, in.end);
 	int length = (int)in.tellg();
 	const int increment = 8000;

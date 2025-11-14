@@ -58,7 +58,7 @@ font_dialog::font_dialog(Fl_Font f, Fl_Fontsize sz, Fl_Color c, const char* L) :
 	op_sample_->tooltip("Selected font, size and colour will be shown here");
 	set_sample();
 
-	int max_y = max(op_sample_->y() + op_sample_->h(), w03->y() + w03->h()) + GAP;
+	int max_y = std::max(op_sample_->y() + op_sample_->h(), w03->y() + w03->h()) + GAP;
 	curr_x = w03->x();
 	curr_y = w03->y() + w03->h() + GAP;
 
@@ -76,8 +76,8 @@ font_dialog::font_dialog(Fl_Font f, Fl_Fontsize sz, Fl_Color c, const char* L) :
 	curr_x += WBUTTON;
 	curr_y += HBUTTON;
 
-	max_x = max(max_x, curr_x) + GAP;
-	max_y = max(max_y, curr_y) + GAP;
+	max_x = std::max(max_x, curr_x) + GAP;
+	max_y = std::max(max_y, curr_y) + GAP;
 	
     resizable(nullptr);
     size(max_x - x(), max_y - y());
@@ -160,7 +160,7 @@ void font_dialog::populate_size(Fl_Widget* w, const Fl_Font* font, const Fl_Font
 		if (sizes[0] == 0) {
 			// {0} indicates a scaleable font - so any size available 
 			// Add 1 to largest available (limited to 64)
-			for (int i = 1; i < max(64, sizes[num_sizes - 1]); i++) {
+			for (int i = 1; i < std::max(64, sizes[num_sizes - 1]); i++) {
 				char buff[20];
 				sprintf(buff, "%d", i);
 				br->add(buff);

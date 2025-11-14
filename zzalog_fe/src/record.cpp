@@ -156,14 +156,14 @@ void record::item(std::string field, std::string value, bool formatted/* = false
 					int_value = std::stoi(value, &dummy);
 					if (dummy == value.length()) {
 						// The whole std::string is an integer - convert it back to std::string
-						upper_value = to_string(int_value);
+						upper_value = std::to_string(int_value);
 					}
 					else {
 						// Use the original std::string
 						upper_value = value;
 					}
 				}
-				catch (invalid_argument&) {
+				catch (std::invalid_argument&) {
 					// Empty std::string, so use that
 					upper_value = value;
 				}
@@ -378,7 +378,7 @@ void record::item(std::string field, int& value) {
 			// Return integer value
 			value = std::stoi(item(field));
 		}
-		catch (invalid_argument&) {
+		catch (std::invalid_argument&) {
 			// Not a valid integer
 			value = 0;
 		}
@@ -396,7 +396,7 @@ void record::item(std::string field, unsigned long long& value) {
 			// Return integer value
 			value = stoull(item(field));
 		}
-		catch (invalid_argument&) {
+		catch (std::invalid_argument&) {
 			// Not a valid integer
 			value = 0;
 		}
@@ -414,7 +414,7 @@ void record::item(std::string field, double& value) {
 			// return double value
 			value = std::stod(item(field));
 		}
-		catch (invalid_argument&) {
+		catch (std::invalid_argument&) {
 			// If it's not a valid decimal it may be in LAT/LON format
 			if (field == "LAT" || field == "LON" || field == "MY_LAT" || field == "MY_LON") {
 				// Get formatted version
@@ -422,7 +422,7 @@ void record::item(std::string field, double& value) {
 				try {
 					value = std::stod(item_value);
 				}
-				catch (invalid_argument&) {
+				catch (std::invalid_argument&) {
 					value = nan("");
 				}
 			}
@@ -1130,7 +1130,7 @@ time_t record::timestamp(bool time_off /*= false*/, bool force /*=false*/) {
 			}
 		} 
 	}
-	catch (invalid_argument&) {
+	catch (std::invalid_argument&) {
 		// Return an invalid time
 		return time_t(-1);
 	}

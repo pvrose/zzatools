@@ -124,7 +124,7 @@ bool book::load_data(std::string filename)
 				if (filetype == ".adi" || filetype == ".adif") {
 					// Use ADI reader to read from an input stream connected to thefile
 					adi_reader_ = new adi_reader;
-					input_.open(filename.c_str(), fstream::in);
+					input_.open(filename.c_str(), std::fstream::in);
 					// Load the book
 					if (book_type_ == OT_MAIN) {
 						main_loading_ = true;
@@ -164,7 +164,7 @@ bool book::load_data(std::string filename)
 							}
 							else {
 								main_window_label(filename);
-								if (header_) header_->item("APP_ZZA_NUMRECORDS", to_string(size()));
+								if (header_) header_->item("APP_ZZA_NUMRECORDS", std::to_string(size()));
 							}
 						}
 						delete adi_reader_;
@@ -188,7 +188,7 @@ bool book::load_data(std::string filename)
 					adx_handler_ = new adx_handler;
 					// Opening in text mode appears to do some behind-the-scenes processing
 					// when seeking backwards passed NL.
-					input_.open(filename.c_str(), fstream::in | fstream::binary);
+					input_.open(filename.c_str(), std::fstream::in | std::fstream::binary);
 					main_loading_ = true;
 					if (!input_.good() || !adx_handler_->load_book(this, input_)) {
 						if (new_installation_) {
@@ -334,7 +334,7 @@ bool book::store_data(std::string filename, bool force, field_list* fields) {
 				header_->item("PROGRAMID", PROGRAM_ID);
 				header_->item("PROGRAMVERSION", PROGRAM_VERSION);
 				header_->item("ADIF_VER", spec_data_->adif_version());
-				header_->item("APP_ZZA_NUMRECORDS", to_string(size()));
+				header_->item("APP_ZZA_NUMRECORDS", std::to_string(size()));
 
 				// use supplied filename (for Save As) or remembered filename (for Save)
 				if (filename != "") {
@@ -370,7 +370,7 @@ bool book::store_data(std::string filename, bool force, field_list* fields) {
 					// Connect file to output stream and get ADI writer to write it
 					if (book_type_ == OT_MAIN) {
 					}
-					file.open(filename_.c_str(), fstream::out);
+					file.open(filename_.c_str(), std::fstream::out);
 					adi_writer_ = new adi_writer;
 					if (!adi_writer_->store_book(this, file, book_type_ == OT_MAIN ? true : false, fields)) {
 						// Store failed
@@ -391,7 +391,7 @@ bool book::store_data(std::string filename, bool force, field_list* fields) {
 					// Connect file to output stream and store data
 					if (book_type_ == OT_MAIN) {
 					}
-					file.open(filename_.c_str(), fstream::out);
+					file.open(filename_.c_str(), std::fstream::out);
 					adx_handler_ = new adx_handler;
 					if (!adx_handler_->store_book(this, file, book_type_ == OT_MAIN ? true: false)) {
 						// Store failed
@@ -886,7 +886,7 @@ bool book::basic_match(record* record) {
 		}
 		else {
 			// Treat as a nickname - match against the dxcc value for the nickname
-			return match_string(to_string(dxcc), criteria_->comparator, record->item("DXCC"));
+			return match_string(std::to_string(dxcc), criteria_->comparator, record->item("DXCC"));
 		}
 	}
 	case XC_FIELD:
@@ -985,7 +985,7 @@ bool book::match_int(std::string test, int comparator, std::string value) {
 	try {
 		return match_int(std::stoi(test), comparator, std::stoi(value));
 	}
-	catch (const invalid_argument&) {
+	catch (const std::invalid_argument&) {
 		return false;
 	}
 }
@@ -1222,7 +1222,7 @@ band_set* book::used_bands() {
 }
 
 band_set* book::used_bands(worked_t category = WK_ANY, int32_t entity = 0, std::string call = "") {
-	return used_bands(category, to_string(entity), call);
+	return used_bands(category, std::to_string(entity), call);
 }
 
 band_set* book::used_bands(worked_t category = WK_ANY, std::string entity = "", std::string call = "") {
@@ -1241,7 +1241,7 @@ std::set<std::string>* book::used_modes() {
 }
 
 std::set<std::string>* book::used_modes(worked_t category = WK_ANY, int32_t entity = 0, std::string call = "") {
-	return used_modes(category, to_string(entity), call);
+	return used_modes(category, std::to_string(entity), call);
 }
 
 std::set<std::string>* book::used_modes(worked_t category = WK_ANY, std::string entity = "", std::string call = "") {
@@ -1260,7 +1260,7 @@ std::set<std::string>* book::used_submodes() {
 }
 
 std::set<std::string>* book::used_submodes(worked_t category = WK_ANY, int32_t entity = 0, std::string call = "") {
-	return used_submodes(category, to_string(entity), call);
+	return used_submodes(category, std::to_string(entity), call);
 }
 
 std::set<std::string>* book::used_submodes(worked_t category = WK_ANY, std::string entity = "", std::string call = "") {

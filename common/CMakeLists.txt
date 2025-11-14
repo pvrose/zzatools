@@ -27,18 +27,6 @@ else()
   set(CMAKE_INSTALL_RPATH /etc/${VENDOR}/${PROGRAMID})
 endif()
 
-# ser compiler options
-if (MSVC)
-else()
-  add_compile_options(-g)
-endif()
-
-#FLTK
-if (MSVC)
-set(FLTK_DIR "C:/Users/pvros/source/repos/fltk/build"
-    CACHE FILEPATH "FLTK installation or build directory")
-endif()
-find_package(FLTK 1.5.0 CONFIG REQUIRED)
 set(CMAKE_MODULE_PATH ../)
 
 set(CMAKE_BUILD_RPATH ${CMAKE_CURRENT_BINARY_DIR})

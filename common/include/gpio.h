@@ -7,7 +7,6 @@
 #include <vector>
 #include <string>
 
-using namespace std;
 
 
 // Class to support the GPIO functionality of the MCP2221A chip

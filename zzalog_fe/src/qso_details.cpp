@@ -112,7 +112,7 @@ void qso_details::get_qsos() {
 	std::string mode = qso_ ? qso_->item("MODE") : "";
 	std::string my_call = qso_ ? qso_->item("STATION_CALLSIGN") : "";
 	std::vector<std::basic_regex<char> > body_matches;
-	smatch m;
+	std::smatch m;
 	bool match_possible = true;
 	std::vector < std::string > parts;
 	// Split the call up into potential prefix, body and suffix

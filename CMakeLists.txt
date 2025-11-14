@@ -14,6 +14,28 @@ else()
   set(CMAKE_INSTALL_RPATH /etc/${VENDOR}/${PROGRAMID})
 endif()
 
+# ser compiler options
+if (MSVC)
+else()
+  add_compile_options(-g)
+endif()
+
+#FLTK - work-round for MSVC 
+if (MSVC)
+#set(FLTK_DIR "C:\\Users\\pvros\\source\\repos\\fltk\\out\\install\\x64-Release\\CMake")
+  set(FLTK_INCLUDE_DIR "C:\\Users\\pvros\\source\\repos\\fltk\\out\\install\\x64-Release\\include")
+  set(FLTK_LIBRARIES "C:\\Users\\pvros\\source\\repos\\fltk\\out\\install\\x64-Release\\lib\\fltk.lib;C:\\Users\\pvros\\source\\repos\\fltk\\out\\install\\x64-Release\\lib\\fltk_images.lib;C:\\Users\\pvros\\source\\repos\\fltk\\out\\install\\x64-Release\\lib\\fltk_jpeg.lib;C:\\Users\\pvros\\source\\repos\\fltk\\out\\install\\x64-Release\\lib\\fltk_png.lib;C:\\Users\\pvros\\source\\repos\\fltk\\out\\install\\x64-Release\\lib\\fltk_z.lib;gdiplus.lib;Ws2_32.lib;User32.lib;gdi32.lib;comctl32.lib")
+else()
+    set(CMAKE_MODULE_PATH ../ ./)
+    find_package(FLTK 1.5.0 CONFIG REQUIRED)
+    if (FLTK_FOUND)
+      message(STATUS "FLTK found: ${FLTK_VERSION}")
+      message(STATUS "FLTK include dir: ${FLTK_INCLUDE_DIR}")
+      set(FLTK_LIBRARIES fltk::fltk fltk::fltkimages)
+    else()
+      message(FATAL_ERROR "FLTK not found")
+    endif()
+endif()
 
 add_subdirectory(common)
 add_subdirectory(pugixml)
@@ -39,13 +61,8 @@ add_custom_target(zzalog
 )
 
 # copy reference data
-if(MSVC)
-  file(COPY ${DATAFILES}
-     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE})
-else()
-  file(COPY ${DATAFILES}
-     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-endif()
+file(COPY ${DATAFILES}
+  DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # generate docus
 option(ZZALOG_USERGUIDE "Generate Userguide" ON)

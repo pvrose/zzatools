@@ -29,7 +29,7 @@ std::string wx_handler::wind_cardinal(int dirn) {
     temp += 1;
     temp %= 32;
     temp /= 2;
-    string cardinals[16] =
+    std::string cardinals[16] =
     { "N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
       "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW" };
     return cardinals[temp];
@@ -59,7 +59,7 @@ static void from_json(const json& j, wx_report& s) {
     auto weather = j.at("weather").get<std::vector<json>>();
     json jweather = weather[0];
     jweather.at("description").get_to(s.description);
-    string icon;
+    std::string icon;
     jweather.at("icon").get_to(icon);
     s.icon = wx_handler::fetch_icon(icon);
     json jmain = j.at("main");

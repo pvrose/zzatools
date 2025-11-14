@@ -268,7 +268,7 @@ bool rig_if::open() {
 	if (DEBUG_THREADS) printf("RIG MAIN: Starting rig %s/%s access std::thread\n",
 		hamlib_data_->mfr.c_str(), hamlib_data_->model.c_str());
 	if (rig_ == nullptr) close();
-	opening_.store(true, memory_order_seq_cst);
+	opening_.store(true, std::memory_order_seq_cst);
 	thread_ = new std::thread(th_sopen_rig, this);
 	std::chrono::system_clock::time_point wait_start = std::chrono::system_clock::now();
 	int timeout = 40000;
@@ -393,7 +393,7 @@ void rig_if::th_run_rig(rig_if* that) {
 		that->run_read_ = true;
 		while (that->run_read_ && ok) {
 			// Read the values from the rig once per second
-			this_thread::sleep_for(std::chrono::milliseconds(1000));
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 			ok = that->th_read_values();
 			that->opened_ok_.store(ok);
 		}

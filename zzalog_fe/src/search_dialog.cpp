@@ -440,7 +440,7 @@ void search_dialog::save_values() {
 			try {
 				dxcc = std::stoi(criteria_->pattern, &dummy);
 			}
-			catch (const invalid_argument&) {
+			catch (const std::invalid_argument&) {
 				// exception raised if first character is non-numeric
 				dummy = 0;
 			}
@@ -448,7 +448,7 @@ void search_dialog::save_values() {
 			if (dummy != criteria_->pattern.length()) {
 				// Some letters so nickname supplied - get the ID
 				dxcc = cty_data_->entity(criteria_->pattern);
-				criteria_->pattern = to_string(dxcc);
+				criteria_->pattern = std::to_string(dxcc);
 			}
 
 		}

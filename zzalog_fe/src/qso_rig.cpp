@@ -1281,7 +1281,7 @@ void qso_rig::populate_baud_choice() {
 			int rate = baud_rates[i];
 			if (use_all_rates_ || (rate >= min_baud_rate && rate <= max_baud_rate)) {
 				// capabilities overridden or within the range supported by capabilities
-				ch_baud_rate_->add(to_string(rate).c_str());
+				ch_baud_rate_->add(std::to_string(rate).c_str());
 				if (rate == cat_data_->hamlib->baud_rate) {
 					ch_baud_rate_->value(index);
 					index++;

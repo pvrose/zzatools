@@ -229,14 +229,14 @@ bool cty_data::update_qso(record* qso, bool my_call) {
 	parse(qso);
 	// Use the values in the exceptions entry
 	if (my_call) {
-		qso->item("MY_DXCC", to_string(entity(current_qso_)));
-		if (cq_zone(current_qso_) > 0) qso->item("MY_CQ_ZONE", to_string(cq_zone(current_qso_)));
+		qso->item("MY_DXCC", std::to_string(entity(current_qso_)));
+		if (cq_zone(current_qso_) > 0) qso->item("MY_CQ_ZONE", std::to_string(cq_zone(current_qso_)));
 		qso->item("MY_COUNTRY", name(current_qso_));
 		qso->item("APP_ZZA_MY_CONT", continent(current_qso_));
 	}
 	else {
-		qso->item("DXCC", to_string(entity(current_qso_)));
-		if (cq_zone(current_qso_) > 0) qso->item("CQZ", to_string(cq_zone(current_qso_)));
+		qso->item("DXCC", std::to_string(entity(current_qso_)));
+		if (cq_zone(current_qso_) > 0) qso->item("CQZ", std::to_string(cq_zone(current_qso_)));
 		qso->item("COUNTRY", name(current_qso_));
 		qso->item("CONT", continent(current_qso_));
 		qso->update_bearing();
@@ -340,7 +340,7 @@ bool cty_data::load_data(std::string* filename) {
 		break;
 	}
 	case CLUBLOG: {
-		ifstream in;
+		std::ifstream in;
 		ok = file_holder_->get_file(FILE_COUNTRY_CLUB, in, *filename);
 		cty1_reader* reader = new cty1_reader;
 		import_ = new all_data;
@@ -349,7 +349,7 @@ bool cty_data::load_data(std::string* filename) {
 		break;
 	}
 	case COUNTRY_FILES: {
-		ifstream in;
+		std::ifstream in;
 		ok = file_holder_->get_file(FILE_COUNTRY_CFILES, in, *filename);
 		cty2_reader* reader = new cty2_reader;
 		import_ = new all_data;
@@ -364,7 +364,7 @@ bool cty_data::load_data(std::string* filename) {
 		break;
 	}
 	case DXATLAS: {
-		ifstream in;
+		std::ifstream in;
 		ok = file_holder_->get_file(FILE_COUNTRY_DXATLAS, in, *filename);
 		cty3_reader* reader = new cty3_reader;
 		import_ = new all_data;
@@ -887,7 +887,7 @@ void cty_data::store_json() {
 	std::string filename;
 	status_->misc_status(ST_NOTE, "CTY_DATA: Storing country data");
 	status_->progress(2, OT_PREFIX, "Storing country data", "Steps");
-	ofstream os;
+	std::ofstream os;
 	if (!file_holder_->get_file(FILE_COUNTRY, os, filename)) {
 		status_->misc_status(ST_ERROR, "CTY_DATA: Storing failed");
 		return;
@@ -947,7 +947,7 @@ bool cty_data::load_json() {
 	std::string filename;
 	status_->misc_status(ST_NOTE, "CTY DATA: Loading country data");
 	status_->progress(2, OT_PREFIX, "Loading country data", "Steps");
-	ifstream is;
+	std::ifstream is;
 	json jall;
 	if (file_holder_->get_file(FILE_COUNTRY, is, filename)) {
 		try {

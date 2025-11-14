@@ -807,7 +807,7 @@ bool wsjtx_handler::match_all_txt(record* qso, bool update_qso) {
 	std::string temp;
 	behav_settings.get<std::string>("WSJT-X", temp, "");
 	std::string filename = temp + "/ALL.TXT";
-	ifstream* all_file = new ifstream(filename.c_str());
+	std::ifstream* all_file = new std::ifstream(filename.c_str());
 	if (!all_file->good()) {
 		char msg[100];
 		snprintf(msg, sizeof(msg), "WSJTX: Fail to open %s", filename.c_str());

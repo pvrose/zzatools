@@ -237,7 +237,7 @@ void intl_dialog::add_symbols(std::string text) {
 bool intl_dialog::load_data() {
 	symbols_.clear();
 	std::string filename;
-	ifstream is;
+	std::ifstream is;
 	;
 	std::string line;
 	if (!file_holder_->get_file(FILE_INTLCHARS, is, filename)) {

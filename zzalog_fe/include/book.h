@@ -491,7 +491,7 @@
 		//! Current filename.
 		std::string filename_;
 		//! Current input filestream.
-		ifstream input_;
+		std::ifstream input_;
 		//! File format.
 		adif_format_t format_;
 		//! Inhibit views being updated when selection changes. 

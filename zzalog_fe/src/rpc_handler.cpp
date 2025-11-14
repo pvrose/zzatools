@@ -285,7 +285,7 @@ void rpc_handler::read_item(pugi::xml_node& node, rpc_data_item& item) {
 		rpc_data_item::rpc_struct* str = new rpc_data_item::rpc_struct;
 		for (auto member : n_item.children()) {
 			if (strcmp(member.name(), "member") == 0) {
-				string name = member.text().as_string();
+				std::string name = member.text().as_string();
 				rpc_data_item* datum = new rpc_data_item;
 				read_item(member, *datum);
 				(*str)[name] = datum;

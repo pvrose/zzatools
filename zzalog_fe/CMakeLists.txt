@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# All the source .cpp files
 set(CPPFILES 
   src/about_dialog.cpp
   src/adi_reader.cpp
@@ -123,42 +124,56 @@ set(CPPFILES
 
 )
 
-# ser compiler options
+# libcurl
+find_package(CURL REQUIRED)
 if (MSVC)
-else()
-  add_compile_options(-g)
+  set(CURL_INCLUDE_DIR "C:\\Users\\pvros\\source\\repos\\curl\\include")
+  set(CURL_LIBRARIES CURL::libcurl)
 endif()
 
-
-
-#FLTK
-if (MSVC)
-set(FLTK_DIR "C:/Users/pvros/source/repos/fltk/build"
-    CACHE FILEPATH "FLTK installation or build directory")
-endif()
-set(CMAKE_MODULE_PATH ../ ./)
-find_package(FLTK 1.5.0 CONFIG REQUIRED)
-find_package(CURL)
-if (NOT CURL_FOUND AND MSVC)
-  message("CURL not found")
-endif()
+# libhamlib
 find_package(Hamlib)
 if (NOT HAMLIB_FOUND AND MSVC)
   message("Hamlib not found")
   set(HAMLIB_INCLUDE_DIR "C:\\Program Files\\hamlib-w64-4.6.5\\include")
   set(HAMLIB_LIBRARY "C:\\Program Files\\hamlib-w64-4.6.5\\lib\\msvc\\libhamlib-4.lib")
-endif()
+
+
+endif()  
 
 set(CMAKE_BUILD_RPATH ${CMAKE_CURRENT_BINARY_DIR})
 
+# Define the zzalog_fe executable
 add_executable(${TARGET} WIN32 MACOSX_BUNDLE)
+
+# Work-round for adding hamlib DLLs
+if (NOT HAMLIB_FOUND AND MSVC) 
+     message("Using custom Hamlib settings")
+     add_custom_command(TARGET ${TARGET} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "C:\\Program Files\\hamlib-w64-4.6.5\\bin\\libhamlib-4.dll" ${CMAKE_CURRENT_BINARY_DIR}/.
+     )
+     add_custom_command(TARGET ${TARGET} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "C:\\Program Files\\hamlib-w64-4.6.5\\bin\\libusb-1.0.dll" ${CMAKE_CURRENT_BINARY_DIR}/.
+     )
+     add_custom_command(TARGET ${TARGET} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "C:\\Program Files\\hamlib-w64-4.6.5\\bin\\libwinpthread-1.dll" ${CMAKE_CURRENT_BINARY_DIR}/.
+     )
+endif()
 
 
 target_include_directories(${TARGET} PRIVATE 
   ./include ../common/include ../widgets/include
   ${FLTK_INCLUDE_DIR}
   ${HAMLIB_INCLUDE_DIR}
+  ${CURL_INCLUDE_DIR}
 )
+# pthread
+if (MSVC)
+  target_include_directories(${TARGET} PRIVATE 
+    "C:\\Users\\pvros\\source\\repos\\pthread-win32"
+    "C:\\Users\\pvros\\source\\repos\\json\\include"
+  )
+endif()
 # Add QBS_logo.h to ensure it gets generated
 target_sources(${TARGET} PRIVATE ${CPPFILES})
 
@@ -173,8 +188,7 @@ target_link_libraries(${TARGET} PRIVATE
   zzalog_common
   zzalog_widgets
   pugixml
-  fltk::fltk
-  fltk::images
+  ${FLTK_LIBRARIES}
   ${CURL_LIBRARIES}
   ${HAMLIB_LIBRARY}
   

@@ -379,7 +379,7 @@ void lotw_handler::thread_run(lotw_handler* that) {
 	while (that->run_threads_) {
 		// Wait until qso placed on interface
 		while (that->run_threads_ && that->upload_queue_.empty()) {
-			this_thread::sleep_for(std::chrono::milliseconds(1000));
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		}
 		// Process it
 		that->upload_lock_.lock();
@@ -393,7 +393,7 @@ void lotw_handler::thread_run(lotw_handler* that) {
 		else {
 			that->upload_lock_.unlock();
 		}
-		this_thread::yield();
+		std::this_thread::yield();
 	}
 }
 
@@ -405,7 +405,7 @@ void lotw_handler::th_upload(const char* command) {
 	upload_response_ = result;
 	if (DEBUG_THREADS) printf("LOTW THREAD: Calling std::thread callback result = %d\n", result);
 	Fl::awake(cb_upload_done, (void*)this);
-	this_thread::yield();
+	std::this_thread::yield();
 }
 
 // Callback in main std::thread after upload complete

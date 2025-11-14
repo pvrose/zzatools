@@ -100,7 +100,7 @@ bool band_data::load_json() {
 	char msg[128];
 	// Wrte JSON out to band_plan.json
 	status_->misc_status(ST_NOTE, ("BAND: Loading band-plan data"));
-	ifstream i;
+	std::ifstream i;
 	std::string filename;
 	if (file_holder_->get_file(FILE_BANDPLAN, i, filename)) {
 		try {

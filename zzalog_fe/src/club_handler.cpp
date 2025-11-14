@@ -235,7 +235,7 @@ void club_handler::th_upload(record* this_record) {
 	if (DEBUG_THREADS) printf("CLUBLOG THREAD: Calling std::thread callback result = %d(%s)\n",
 	    ok, upload_error_.c_str());
 	Fl::awake(cb_upload_done, (void*)this);
-	this_thread::yield();
+	std::this_thread::yield();
 }
 
 // Method in the main std::thread that is 
@@ -285,7 +285,7 @@ void club_handler::thread_run(club_handler* that) {
 	while (that->run_threads_) {
 		// Wait until qso placed on interface
 		while (that->run_threads_ && that->upload_queue_.empty()) {
-			this_thread::sleep_for(std::chrono::milliseconds(1000));
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		}
 		// Process it
 		that->upload_lock_.lock();
@@ -299,7 +299,7 @@ void club_handler::thread_run(club_handler* that) {
 		else {
 			that->upload_lock_.unlock();
 		}
-		this_thread::yield();
+		std::this_thread::yield();
 	}
 }
 

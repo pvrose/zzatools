@@ -125,7 +125,7 @@ void fields::load_data() {
 
 // Read - <Prefs path>.fields.tsv
 bool fields::load_collections() {
-    ifstream ip;
+    std::ifstream ip;
     char msg[128];
     if (!file_holder_->get_file(FILE_FIELDS, ip, filename_)) {
         char msg[128];

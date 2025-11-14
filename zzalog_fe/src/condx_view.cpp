@@ -150,9 +150,9 @@ bool condx_view::load_data() {
 	// VHF band phenonema
 	pugi::xml_node n_vhf = n_solar.child("calculatedvhfconditions");
 	for (auto n_phen : n_vhf.children()) {
-		string phenomenon = "";
-		string phen_name = n_phen.attribute("name").value();
-		string phen_loc = n_phen.attribute("location").value();
+		std::string phenomenon = "";
+		std::string phen_name = n_phen.attribute("name").value();
+		std::string phen_loc = n_phen.attribute("location").value();
 		if (phen_name == "vhf-aurora") {
 			if (phen_loc == "northern_hemi") {
 				phenomenon = "Aurora (Bor.)";

@@ -87,7 +87,7 @@ void socket_server::close_server(bool external)
 	// WAit for rcv_packet to tidy up
 	closing_ = true;
 	if (external) {
-		while (!closed_) this_thread::yield();
+		while (!closed_) std::this_thread::yield();
 	}
 	if (th_socket_)
 		th_socket_->detach();
@@ -336,7 +336,7 @@ int socket_server::rcv_packet()
 		while (client_ == INVALID_SOCKET && result == BLOCK && !closing_)
 		{
 			result = accept_client();
-			this_thread::yield();
+			std::this_thread::yield();
 		}
 		if (result == NG)
 		{
@@ -374,7 +374,7 @@ int socket_server::rcv_packet()
 			if (error == WSAEWOULDBLOCK)
 			{
 				// Try again immediately after letting FLTK in
-				this_thread::yield();
+				std::this_thread::yield();
 			}
 			else if (error == WSAENOTSOCK && closing_)
 			{
@@ -399,7 +399,7 @@ int socket_server::rcv_packet()
 	} while (!closing_);
 	// Now see if we have another - the timer goes on the scheduling std::queue so other tasks will get in
 	closed_ = true;
-	this_thread::yield();
+	std::this_thread::yield();
 	if (buffer) delete[] buffer;
 	return 0;
 }

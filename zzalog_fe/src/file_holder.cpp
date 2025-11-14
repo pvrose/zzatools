@@ -14,7 +14,7 @@ uint16_t DEBUG_RESET_CONFIG = 0;
 
 file_holder::file_holder(const char* arg0, bool& development) {
 	char * pwd = fl_getcwd(nullptr, 256);
-	string run_dir = directory(arg0);
+	std::string run_dir = directory(arg0);
 	printf("ZZALOG: Running in %s\n", run_dir.c_str());
 	// Try reading from run directory first - if present then
 	// we are development
@@ -23,7 +23,7 @@ file_holder::file_holder(const char* arg0, bool& development) {
 		// We have an absolutre path
 		default_source_directory_ = run_dir + "\\..\\";
 	} else {
-		default-source_directory_ = std::string(pwd) + "\\" + run_dir + "\\";
+		default_source_directory_ = std::string(pwd) + "\\" + run_dir + "\\";
 	}
 #else
     if (run_dir[0] == '/') {
@@ -36,7 +36,7 @@ file_holder::file_holder(const char* arg0, bool& development) {
 #endif
 	default_code_directory_ = default_code_directory_;
 	// Test the path using the icon
-	string logo = get_filename(FILE_ICON_ZZA);
+	std::string logo = get_filename(FILE_ICON_ZZA);
 	Fl_PNG_Image* ilog = new Fl_PNG_Image(logo.c_str());
 	if (ilog && !ilog->fail()) {
 		development = true;
@@ -64,7 +64,7 @@ file_holder::file_holder(const char* arg0, bool& development) {
 	Fl_Window::default_icon(ilog);
 
 #ifdef _WIN32
-	default_html_directory_ = default_source_directory_);
+	default_html_directory_ = default_source_directory_;
 	// Working directory
 	default_data_directory_ =
 		std::string(getenv("APPDATA")) + "\\" + VENDOR + "\\" + PROGRAM_ID + "\\";

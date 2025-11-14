@@ -406,8 +406,8 @@ std::string qsl_dataset::json_file() {
 }
 
 bool qsl_dataset::load_json() {
-	ifstream is;
-	string filename = json_file();
+	std::ifstream is;
+	std::string filename = json_file();
 	char msg[128];
 	status_->misc_status(ST_NOTE, ("QSL: Loading QSL data"));
 	is.open(filename, std::ios_base::in);

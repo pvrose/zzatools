@@ -168,7 +168,7 @@ bool string_to_tm(std::string source, tm& time, std::string format) {
 						break;
 					}
 				}
-				catch (invalid_argument&) {
+				catch (std::invalid_argument&) {
 					// Invalid integer value detected
 					bad_value = true;
 				}
@@ -213,7 +213,7 @@ void string_to_ints(std::string& text, std::vector<unsigned int>& ints) {
 				current = std::stoi(temp, 0, 10);
 			}
 		}
-		catch (invalid_argument&) {
+		catch (std::invalid_argument&) {
 			invalid = true;
 		}
 		if (!invalid) {
@@ -1069,7 +1069,7 @@ uchar hash8(const char* src) {
 // Basic XOR encryption using a pseudo-random key
 void xor_crypt(char* src, int len, uint32_t seed, uchar offset) {
 	// Seed a pseudo-random number sequence
-	minstd_rand key(seed);
+	std::minstd_rand key(seed);
 	// Now offset into the sequence
 	key.discard(offset);
 	// Now use the sequence to en/decrypt the std::string
@@ -1084,7 +1084,7 @@ std::string xor_crypt(std::string src, uint32_t seed, uchar offset) {
 	std::string result;
 	result.resize(src.length());
 	// Seed a pseudo-random number sequence
-	minstd_rand key(seed);
+	std::minstd_rand key(seed);
 	// Now offset into the sequence
 	key.discard(offset);
 	// Now use the sequence to en/decrypt the std::string

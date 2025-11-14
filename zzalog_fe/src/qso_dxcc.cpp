@@ -514,7 +514,7 @@ void qso_dxcc::wb4_table::set_data() {
 	else {
 		wkd_matrix_[WK_CQZ].mode = true;
 	}
-	wkd_matrix_[WK_CQZ].text = qd->cq_zone_ > 0 ? "CQZ " + to_string(qd->cq_zone_) : "";
+	wkd_matrix_[WK_CQZ].text = qd->cq_zone_ > 0 ? "CQZ " + std::to_string(qd->cq_zone_) : "";
 
 	band_set* ituz_b = book_->used_bands(WK_ITUZ, qd->itu_zone_, qd->station_);
 	std::set<std::string>* ituz_m = book_->used_modes(WK_ITUZ, qd->itu_zone_, qd->station_);
@@ -532,7 +532,7 @@ void qso_dxcc::wb4_table::set_data() {
 	else {
 		wkd_matrix_[WK_ITUZ].mode = true;
 	}
-	wkd_matrix_[WK_ITUZ].text = qd->itu_zone_ > 0 ? "ITUZ " + to_string(qd->itu_zone_) : "";
+	wkd_matrix_[WK_ITUZ].text = qd->itu_zone_ > 0 ? "ITUZ " + std::to_string(qd->itu_zone_) : "";
 
 	band_set* cont_b = book_->used_bands(WK_CONT, qd->continent_, qd->station_);
 	std::set<std::string>* cont_m = book_->used_modes(WK_CONT, qd->continent_, qd->station_);

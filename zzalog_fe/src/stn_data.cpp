@@ -25,7 +25,7 @@ static void to_json(json& j, const qth_info_t& s) {
 
 //! Convert JSON object to qth_info_t
 static void from_json(const json& j, qth_info_t& s) {
-	auto temp = j.get<std::map<std::string, string>>();
+	auto temp = j.get<std::map<std::string, std::string>>();
 	for (auto it : temp) {
 		s.data[STRING_2_QTH_INFO_T[it.first]] = it.second;
 	}
@@ -53,7 +53,7 @@ static std::map<std::string, oper_value_t> STRING_2_OPER_INFO_T = {
 
 //! Convert JSON object to oper_info_t
 static void from_json(const json& j, oper_info_t& s) {
-	auto temp = j.get<std::map<std::string, string>>();
+	auto temp = j.get<std::map<std::string, std::string>>();
 	for (auto it : temp) {
 		s.data[STRING_2_OPER_INFO_T[it.first]] = it.second;
 	}
@@ -140,7 +140,7 @@ void stn_data::load_data() {
 // Load data from station.json
 bool stn_data::load_json() {
 	std::string filename;
-	ifstream is;
+	std::ifstream is;
 	char msg[128];
 	if (!file_holder_->get_file(FILE_STATION, is, filename)) {
 		char msg[128];
@@ -178,7 +178,7 @@ bool stn_data::load_json() {
 				}
 			}
 		}
-		auto temp2 = j.at("Station callsigns").get<std::map<std::string, string>>();
+		auto temp2 = j.at("Station callsigns").get<std::map<std::string, std::string>>();
 		for (auto& it : temp2) {
 			calls_[it.first] = it.second;
 		}
@@ -241,7 +241,7 @@ bool stn_data::store_json() {
 		json j;
 
 		j["Station"] = jall;
-		os << std::setw(2) << j << endl;
+		os << std::setw(2) << j << std::endl;
 		return true;
 	}
 	return false;

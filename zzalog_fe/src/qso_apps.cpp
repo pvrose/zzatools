@@ -609,7 +609,7 @@ int qso_apps::handle(int event) {
     settings top_settings;
     settings view_settings(&top_settings, "Views");
     settings dash_settings(&view_settings, "Dashboard");
-    dash_settings.get("Default App", default_tab_, string(""));
+    dash_settings.get("Default App", default_tab_, std::string(""));
 }
 
 
@@ -726,7 +726,7 @@ void qso_apps::save_values() {
     settings dash_settings(&view_settings, "Dashboard");
     // Find the current selected tab and save its index
     if (tabs_->value()) {
-        dash_settings.set("Default App", string(tabs_->value()->label()));
+        dash_settings.set("Default App", std::string(tabs_->value()->label()));
     }
 }
 

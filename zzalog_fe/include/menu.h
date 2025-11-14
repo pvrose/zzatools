@@ -207,7 +207,7 @@ struct search_criteria_t;
 		//! Set report mode.
 		
 		//! Set check marks on the menu to represent the actual report tree \p mode and \p filter.
-		void report_mode(vector<report_cat_t> mode, report_filter_t filter);
+		void report_mode(std::vector<report_cat_t> mode, report_filter_t filter);
 		//! Set append status: updates check mark as appropriate to \p append.
 		void append_file(bool append);
 		//! Add the recent files to the menu

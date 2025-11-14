@@ -41,8 +41,8 @@ about_dialog::about_dialog() :
 		"Compiled " + TIMESTAMP + "\n" +
 		(spec_data_ ? "using ADIF Version " + spec_data_->adif_version() + "\n" : "") +
 		" hamlib version " + rig_version() +
-		"\n FLTK version " + to_string(FL_MAJOR_VERSION) + "." +
-		to_string(FL_MINOR_VERSION) + "." + to_string(FL_PATCH_VERSION) +
+		"\n FLTK version " + std::to_string(FL_MAJOR_VERSION) + "." +
+		std::to_string(FL_MINOR_VERSION) + "." + std::to_string(FL_PATCH_VERSION) +
 		"\n CURL version " + std::string(data->version) +
 		"\n JSON " +
 		"\n PUGIXML " +

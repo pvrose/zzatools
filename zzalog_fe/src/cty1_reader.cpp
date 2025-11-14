@@ -63,7 +63,7 @@ bool cty1_reader::load_data(cty_data* data, std::istream& in, std::string& versi
 	// Copy exceptions
 	pugi::xml_node n_excs = top.child("exceptions");
 	for (auto n_exc : n_excs.children()) {
-		string call = n_exc.child("call").text().as_string();
+		std::string call = n_exc.child("call").text().as_string();
 		cty_exception* exc = new cty_exception;
 		exc->exc_type_ = cty_exception::EXC_OVERRIDE;
 		exc->name_ = n_exc.child("entity").text().as_string();
@@ -83,7 +83,7 @@ bool cty1_reader::load_data(cty_data* data, std::istream& in, std::string& versi
 	// Copy prefixes
 	pugi::xml_node n_pfxs = top.child("prefixes");
 	for (auto n_pfx : n_pfxs.children()) {
-		string call = n_pfx.child("call").text().as_string();
+		std::string call = n_pfx.child("call").text().as_string();
 		cty_prefix* pfx = new cty_prefix;
 		pfx->name_ = n_pfx.child("entity").text().as_string();
 		pfx->dxcc_id_ = n_pfx.child("adif").text().as_int();
@@ -102,7 +102,7 @@ bool cty1_reader::load_data(cty_data* data, std::istream& in, std::string& versi
 	// Copy invalid operations
 	pugi::xml_node n_invs = top.child("invalid_operations");
 	for (auto n_inv : n_invs.children()) {
-		string call = n_inv.child("call").text().as_string();
+		std::string call = n_inv.child("call").text().as_string();
 		cty_exception* inv = new cty_exception;
 		inv->exc_type_ = cty_exception::EXC_INVALID;
 		inv->time_validity_.start =
@@ -116,7 +116,7 @@ bool cty1_reader::load_data(cty_data* data, std::istream& in, std::string& versi
 	// Copy zone exceptions
 	pugi::xml_node n_zexs = top.child("zone_exceptions");
 	for (auto n_zex : n_zexs.children()) {
-		string call = n_zex.child("call").text().as_string();
+		std::string call = n_zex.child("call").text().as_string();
 		cty_exception* zex = new cty_exception;
 		zex->exc_type_ = cty_exception::EXC_INVALID;
 		zex->cq_zone_ = n_zex.child("zone").text().as_int();

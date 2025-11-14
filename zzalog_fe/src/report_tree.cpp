@@ -235,7 +235,7 @@ void report_tree::add_record(item_num_t record_num, report_map_entry_t* entry) {
 			}
 			else {
 				// Get the PAS dataset
-				std::string pas_name = "Primary_Administrative_Subdivision[" + to_string(dxcc) + "]";
+				std::string pas_name = "Primary_Administrative_Subdivision[" + std::to_string(dxcc) + "]";
 				spec_dataset* state_dataset = spec_data_->dataset(pas_name);
 				std::map<std::string, std::string>* state_data;
 				if (state_dataset == nullptr) {

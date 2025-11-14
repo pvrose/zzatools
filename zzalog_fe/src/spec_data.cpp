@@ -37,7 +37,7 @@ static void from_json(const json& j, spec_dataset& s) {
 	s.column_names = header;
 	for (auto& itr : records) {
 		auto record = new std::map<std::string, std::string>(itr.second);
-		string name = itr.first;
+		std::string name = itr.first;
 		if (record->find("Deleted") != record->end() && record->at("Deleted") == "true") {
 			name += " Deleted";
 		}
@@ -123,7 +123,7 @@ bool spec_data::load_json() {
 	std::string filename;
 	char msg[128];
 	status_->misc_status(ST_NOTE, "ADIF SPEC: Loading ADIF Specification");
-	ifstream is;
+	std::ifstream is;
 	if (file_holder_->get_file(FILE_ADIF, is, filename)) {
 		try {
 			json jall;
@@ -199,7 +199,7 @@ void spec_data::process_subdivision(std::string name) {
 			(*this)[new_name] = new spec_dataset;
 			(*this)[new_name]->column_names = src->column_names;
 		}
-		string adj_name = it.second->at("Code");
+		std::string adj_name = it.second->at("Code");
 		if (it.second->find("Deleted") != it.second->end() &&
 			it.second->at("Deleted") == "true") adj_name += " Deleted";
 		this->at(new_name)->data[adj_name] = it.second;
@@ -877,7 +877,7 @@ bool spec_data::add_user_enum(std::string field, std::string value) {
 // The DXCC has ADIF defined primary administrative subdivisions
 bool spec_data::has_states(int dxcc) {
 	// Look up DXCC name in std::list of DXCCs with "states".
-	if (dataset("Primary_Administrative_Subdivision[" + to_string(dxcc) + "]")) {
+	if (dataset("Primary_Administrative_Subdivision[" + std::to_string(dxcc) + "]")) {
 		return true;
 	}
 	else {
@@ -894,7 +894,7 @@ valn_error_t spec_data::check_number(const std::string&  data, const std::string
 	try {
 		data_value = std::stod(data, &pos);
 	}
-	catch (invalid_argument&) {
+	catch (std::invalid_argument&) {
 		// The first character is not numeric - invalid
 		return VE_VALUE_INVALID;
 	}
@@ -932,7 +932,7 @@ valn_error_t spec_data::check_integer(const std::string&  data, const std::strin
 	try {
 		data_value = std::stoi(data, &pos);
 	} 
-	catch (invalid_argument&) {
+	catch (std::invalid_argument&) {
 		// First character is not numeric - invalid
 		return VE_VALUE_INVALID;
 	}
@@ -999,7 +999,7 @@ valn_error_t spec_data::check_enumeration(const std::string& data, const std::st
 				try {
 					freq_value = std::stod(frequency, &pos);
 				} 
-				catch (invalid_argument&) {
+				catch (std::invalid_argument&) {
 					// Frequency does not start with numeric - band cannot agree - invalid
 					return VE_VALUE_INVALID;
 				}
@@ -2009,7 +2009,7 @@ bool spec_data::auto_correction(valn_error_t error_code, const std::string&  dat
 		else if (field == "TIME_OFF") {
 			// Test to see if TIME_OFF is an hour out.
 			std::chrono::system_clock::time_point time_off = std::chrono::system_clock::from_time_t(record_->timestamp(true));
-			std::chrono::duration<int, ratio<1> > one_hour(3600);
+			std::chrono::duration<int, std::ratio<1> > one_hour(3600);
 			time_t time_on = record_->timestamp(false);
 			time_t new_off = std::chrono::system_clock::to_time_t(time_off + one_hour);
 			if (difftime(new_off, time_on) > 0.0) {
@@ -2398,7 +2398,7 @@ std::string spec_data::describe_enumeration(spec_dataset* dataset, std::string v
 std::string spec_data::entity_name(int dxcc) {
 	std::string result;
 	spec_dataset* dxccs = dataset("DXCC_Entity_Code");
-	std::map<std::string, std::string>* entry = dxccs->data[to_string(dxcc)];
+	std::map<std::string, std::string>* entry = dxccs->data[std::to_string(dxcc)];
 	return (*entry)["Entity Name"];
 }
 
@@ -2449,46 +2449,46 @@ bool spec_data::generate_adif_hfile() {
 	std::string filename = file_holder_->get_directory(DATA_CODEGEN) + "include/adif.h";
 	// Add my application defined fields
 	add_my_appdefs();
-	ofstream os(filename);
-	os << "#pragma once" << endl;
-	os << endl;
-	os << "#include <cstdint>" << endl;
-	os << "#include <map>" << endl;
-	os << "#include <string>" << endl;
+	std::ofstream os(filename);
+	os << "#pragma once" << std::endl;
+	os << std::endl;
+	os << "#include <cstdint>" << std::endl;
+	os << "#include <map>" << std::endl;
+	os << "#include <string>" << std::endl;
 
-	os << endl;
-	os << "//! This namespace holds the ADIF version dependent maps" << endl;
-	os << "namespace ADIF {" << endl;
-	os << endl;
-	os << "  //! Populated with all the valid ADIF field names plus ZLG Applixation specific ones" << endl;
-	os << "  enum field_t : uint16_t {" << endl;
+	os << std::endl;
+	os << "//! This namespace holds the ADIF version dependent maps" << std::endl;
+	os << "namespace ADIF {" << std::endl;
+	os << std::endl;
+	os << "  //! Populated with all the valid ADIF field names plus ZLG Applixation specific ones" << std::endl;
+	os << "  enum field_t : uint16_t {" << std::endl;
 	spec_dataset* fields = dataset("Fields");
 	for (auto f : fields->data) {
-		os << "    " << f.first << ",     //!<" << f.second->at("Description") << endl;
+		os << "    " << f.first << ",     //!<" << f.second->at("Description") << std::endl;
 	}
-	os << "    MAX_FIELD               //!< Used to get maximum value" << endl;
+	os << "    MAX_FIELD               //!< Used to get maximum value" << std::endl;
 	os << "  };";
-	os << endl;
-	os << "	 //! Maps the enumerated value to string: used when exporting data" << endl;
-	os << "  static const std::map< field_t, std::string> FIELD_2_STRING = " << endl;
-	os << "  {" << endl;
+	os << std::endl;
+	os << "	 //! Maps the enumerated value to string: used when exporting data" << std::endl;
+	os << "  static const std::map< field_t, std::string> FIELD_2_STRING = " << std::endl;
+	os << "  {" << std::endl;
 	for (auto f : fields->data) {
-		os << "    { " << f.first << ", \"" << f.first << "\" }," << endl;
+		os << "    { " << f.first << ", \"" << f.first << "\" }," << std::endl;
 	}
-	os << "    { MAX_FIELD, \"\" }" << endl;
-	os << "  };" << endl;
-	os << endl;
-	os << "  //! Maps the string to enumerated value: used when importing data" << endl;
-	os << "  static const std::map< std::string, field_t> STRING_2_FIELD = " << endl;
-	os << "  {" << endl;
+	os << "    { MAX_FIELD, \"\" }" << std::endl;
+	os << "  };" << std::endl;
+	os << std::endl;
+	os << "  //! Maps the string to enumerated value: used when importing data" << std::endl;
+	os << "  static const std::map< std::string, field_t> STRING_2_FIELD = " << std::endl;
+	os << "  {" << std::endl;
 	for (auto f : fields->data) {
-		os << "    { \" " << f.first << "\", " << f.first << " }, " << endl;
+		os << "    { \" " << f.first << "\", " << f.first << " }, " << std::endl;
 	}
-	os << "  };" << endl;
-	os << endl;
-	os << "  //! Current version knwon to compiler" << endl;
+	os << "  };" << std::endl;
+	os << std::endl;
+	os << "  //! Current version knwon to compiler" << std::endl;
 	os << "  static const std::string VERSION = \"" << adif_version_ << "\";";
-    os << endl;
+    os << std::endl;
 	os << "};";
 
 	os.close();

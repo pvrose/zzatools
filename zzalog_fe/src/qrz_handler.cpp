@@ -321,8 +321,8 @@ bool qrz_handler::decode_callsign(pugi::xml_node node) {
 		}
 	}
 	if (!valid_coords) {
-		qrz_info_->item("LAT", (string)"");
-		qrz_info_->item("LON", (string)"");
+		qrz_info_->item("LAT", (std::string)"");
+		qrz_info_->item("LON", (std::string)"");
 	}
 	return true;
 }
@@ -597,7 +597,7 @@ void qrz_handler::thread_run(qrz_handler* that) {
 	while (that->run_threads_) {
 		// Wait until qso placed on interface
 		while (that->run_threads_ && that->upload_queue_.empty()) {
-			this_thread::sleep_for(std::chrono::milliseconds(1000));
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		}
 		// Process it
 		that->upload_lock_.lock();
@@ -611,7 +611,7 @@ void qrz_handler::thread_run(qrz_handler* that) {
 		else {
 			that->upload_lock_.unlock();
 		}
-		this_thread::yield();
+		std::this_thread::yield();
 	}
 }
 
@@ -632,7 +632,7 @@ void qrz_handler::th_upload_qso(record* qso) {
 	upload_resp_ = resp;
 	if (DEBUG_THREADS) printf("QRZ THREAD: Calling std::thread callback\n");
 	Fl::awake(cb_upload_done, (void*)this);
-	this_thread::yield();
+	std::this_thread::yield();
 }
 
 // Upload done: wrapper
@@ -649,7 +649,7 @@ void qrz_handler::upload_done(upload_resp_t* resp) {
 		case IR_GOOD:
 		resp->qso->item("QRZCOM_QSO_UPLOAD_STATUS", std::string("Y"));
 		resp->qso->item("QRZCOM_QSO_UPLOAD_DATE", now(false, "%Y%m%d"));
-		resp->qso->item("APP_QRZLOG_LOGID", to_string(resp->logid));
+		resp->qso->item("APP_QRZLOG_LOGID", std::to_string(resp->logid));
 		snprintf(msg, sizeof(msg), "QRZ: %s %s %s QSL uploaded (logid=%llu)",
 			resp->qso->item("QSO_DATE").c_str(),
 			resp->qso->item("TIME_ON").c_str(),
@@ -661,7 +661,7 @@ void qrz_handler::upload_done(upload_resp_t* resp) {
 	case IR_DUPLICATE:
 		resp->qso->item("QRZCOM_QSO_UPLOAD_STATUS", std::string("Y"));
 		resp->qso->item("QRZCOM_QSO_UPLOAD_DATE", now(false, "%Y%m%d"));
-		resp->qso->item("APP_QRZLOG_LOGID", to_string(resp->logid));
+		resp->qso->item("APP_QRZLOG_LOGID", std::to_string(resp->logid));
 		snprintf(msg, sizeof(msg), "QRZ: %s %s %s QSL uploaded (duplicate logid=%llu)",
 			resp->qso->item("QSO_DATE").c_str(),
 			resp->qso->item("TIME_ON").c_str(),

@@ -9,7 +9,6 @@
 
 #include<FL/fl_draw.H>
 
-using namespace std;
 
 // Default font-size to use (& override FLTK defaults?)
 const int DEFAULT_SIZE = 10;                   //!< Default font size
@@ -74,7 +73,7 @@ enum object_t : char {
 };
 
 //! Default colours to use in tab view labels and/or progress bar
-const map<object_t, Fl_Color> OBJECT_COLOURS = {
+const std::map<object_t, Fl_Color> OBJECT_COLOURS = {
 	{ OT_NONE, FL_BACKGROUND_COLOR },
 	{ OT_MAIN, FL_GREEN },
 	{ OT_EXTRACT, FL_CYAN },
@@ -95,7 +94,7 @@ const map<object_t, Fl_Color> OBJECT_COLOURS = {
 };
 
 //! Names of the objects
-const map<object_t, const char*> OBJECT_NAMES = {
+const std::map<object_t, const char*> OBJECT_NAMES = {
 	{ OT_NONE, "NOTHING" },
 	{ OT_MAIN, "LOG" },
 	{ OT_EXTRACT, "EXTRACT" },

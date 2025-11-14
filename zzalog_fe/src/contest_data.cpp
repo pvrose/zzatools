@@ -34,7 +34,7 @@ void to_json(json& j, const ct_date_t& s) {
 
 //! Conversion of JSON to ct_date_t
 void from_json(const json& j, ct_date_t& s) {
-	string temps;
+	std::string temps;
 	j.at("Start").get_to(temps);
 	std::time_t result = convert_iso_datetime(temps);
 	s.start = std::chrono::system_clock::from_time_t(result);
@@ -106,7 +106,7 @@ ct_entry_t* contest_data::get_contest_info(int number) {
 bool contest_data::load_data() {
 	status_->misc_status(ST_NOTE, "CONTEST: loading contest data");
 	std::string filename;
-	ifstream is;
+	std::ifstream is;
 	if (file_holder_->get_file(FILE_CONTEST, is, filename)) {
 		if (load_json(is)) {
 			status_->misc_status(ST_OK, "CONTEST: Contest data loaded OK");
@@ -141,11 +141,11 @@ bool contest_data::load_json(std::ifstream& is) {
 			std::map<std::string, ct_data_t*> contest;
 			for (auto iti : itc.at("Instances")) {
 				ct_data_t* cd = new ct_data_t(iti.at("Definition").template get<ct_data_t>());
-				string index;
+				std::string index;
 				iti.at("Index").get_to(index);
 				contest[index] = cd;
 			}
-			string name;
+			std::string name;
 			itc.at("Name").get_to(name);
 			contests_[name] = contest;
 		}

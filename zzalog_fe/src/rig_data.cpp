@@ -142,7 +142,7 @@ static void from_json(const json& j, rig_data_t& s) {
     j.at("Antenna").get_to(s.antenna);
     j.at("Use instantaneous").get_to(s.use_instant_values);
     // Default APP is kept as the index into cat_data: default = -1. In JSON it's the nickname
-    string default_cat = "";
+   std::string default_cat = "";
     s.default_app = -1;
     if (j.find("Default CAT") != j.end()) {
         j.at("Default CAT").get_to(default_cat);
@@ -228,7 +228,7 @@ void rig_data::load_data() {
 bool rig_data::load_json() {
     char msg[128];
     std::string filename;
-    ifstream is;
+    std::ifstream is;
     if (!file_holder_->get_file(FILE_RIGS, is, filename)) {
         snprintf(msg, sizeof(msg), "RIGS: Failed to open %s", filename.c_str());
         status_->misc_status(ST_WARNING, msg);
@@ -272,7 +272,7 @@ bool rig_data::store_json() {
                 j["Rigs"].push_back(jr);
             }
         }
-        os << std::setw(2) << j << endl;
+        os << std::setw(2) << j << std::endl;
     }
     if (os.fail()) {
         status_->misc_status(ST_WARNING, "RIGS: failed to save data as JSON");

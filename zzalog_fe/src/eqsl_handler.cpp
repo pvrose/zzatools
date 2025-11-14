@@ -321,12 +321,12 @@ bool eqsl_handler::card_file_valid(std::string& filename) {
 	bool file_exists = false;
 	// Try and open the file
 	std::string testname = filename + ".png";
-	ifstream file(testname.c_str());
+	std::ifstream file(testname.c_str());
 	if (!file.good()) {
 		file.close();
 		// File doesn't exist - try JPEG
 		testname = filename + ".jpg";
-		file = ifstream(testname.c_str());
+		file = std::ifstream(testname.c_str());
 		if  (!file.good()) {
 			file_exists = false;
 		} else {
@@ -1142,7 +1142,7 @@ bool eqsl_handler::th_upload_qso(record* this_record) {
 	upload_response_ = response;
 	if (DEBUG_THREADS) printf("EQSL THREAD: Calling std::thread callback\n");
 	Fl::awake(cb_upload_done, (void*)this);
-	this_thread::yield();
+	std::this_thread::yield();
 
 	return true;
 }
@@ -1214,7 +1214,7 @@ void eqsl_handler::thread_run(eqsl_handler* that) {
 	while (that->run_threads_) {
 		// Wait until qso placed on interface
 		while (that->run_threads_ && that->upload_queue_.empty()) {
-			this_thread::sleep_for(std::chrono::milliseconds(1000));
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		}
 		// Process it
 		that->upload_lock_.lock();
@@ -1228,6 +1228,6 @@ void eqsl_handler::thread_run(eqsl_handler* that) {
 		else {
 			that->upload_lock_.unlock();
 		}
-		this_thread::yield();
+		std::this_thread::yield();
 	}
 }

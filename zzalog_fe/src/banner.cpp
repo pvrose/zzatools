@@ -199,7 +199,7 @@ void banner::enable_widgets() {
 // Add a message to the banner
 void banner::add_message(status_t type, const char* msg) {
 	// Trap any call that is not from the main std::thread
-	if (this_thread::get_id() != main_thread_id_) {
+	if (std::this_thread::get_id() != main_thread_id_) {
 		printf("Calling banner::add_message(%s) when not in the main std::thread\n", msg);
 		throw;
 	}
@@ -240,7 +240,7 @@ void banner::add_message(status_t type, const char* msg) {
 // Add progress
 void banner::start_progress(uint64_t max_value, object_t object, const char* msg, const char* suffix) {
 	// Trap any call that is not from the main std::thread
-	if (this_thread::get_id() != main_thread_id_) {
+	if (std::this_thread::get_id() != main_thread_id_) {
 		printf("Calling banner_start_progress(%s) when not in the main std::thread\n", msg);
 		throw;
 	}
@@ -268,7 +268,7 @@ void banner::start_progress(uint64_t max_value, object_t object, const char* msg
 // Update progress dial and output
 void banner::add_progress(uint64_t value) {
 	// Trap any call that is not from the main std::thread
-	if (this_thread::get_id() != main_thread_id_) {
+	if (std::this_thread::get_id() != main_thread_id_) {
 		printf("Calling banner::add_progress(%lld) when not in the main std::thread\n", value);
 		throw;
 	}
@@ -297,7 +297,7 @@ void banner::add_progress(uint64_t value) {
 // Ending the progress - log message
 void banner::end_progress() {
 	// Trap any call that is not from the main std::thread
-	if (this_thread::get_id() != main_thread_id_) {
+	if (std::this_thread::get_id() != main_thread_id_) {
 		printf("Calling banner::end_progress(%s) when not in the main std::thread\n", prg_msg_);
 		throw;
 	}
@@ -314,7 +314,7 @@ void banner::end_progress() {
 // cancelling the progress - log message
 void banner::cancel_progress(const char* msg) {
 	// Trap any call that is not from the main std::thread
-	if (this_thread::get_id() != main_thread_id_) {
+	if (std::this_thread::get_id() != main_thread_id_) {
 		printf("Calling banner::cancel_progress(%s) when not in the main std::thread\n", msg);
 		throw;
 	}

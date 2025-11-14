@@ -20,8 +20,6 @@
 #include <FL/Fl_Tree.H>
 #include <FL/Fl_Tree_Item.H>
 
-using namespace std;
-
 extern bool DEBUG_ERRORS;
 
 	//! Datatypes to pass to radio and or_check button callbacks 
@@ -72,9 +70,9 @@ extern bool DEBUG_ERRORS;
 		int* target = (int*)v;
 		int i;
 		try {
-			i = stoi(value);
+			i = std::stoi(value);
 		}
-		catch (invalid_argument&) {
+		catch (std::invalid_argument&) {
 			i = 0;
 		}
 		*target = i;
@@ -114,9 +112,9 @@ extern bool DEBUG_ERRORS;
 		double* target = (double*)v;
 		double d;
 		try {
-			d = stod(value);
+			d = std::stod(value);
 		}
-		catch (invalid_argument&) {
+		catch (std::invalid_argument&) {
 			d = nan("");
 		}
 		*target = d;
@@ -207,7 +205,7 @@ extern bool DEBUG_ERRORS;
 	//! Returns the selected text into the string pointed at by v
 	static void cb_choice_text(Fl_Widget* w, void* v) {
 		Fl_Choice* choice = (Fl_Choice*)w;
-		string* enum_value = (string*)v;
+		std::string* enum_value = (std::string*)v;
 		char temp[128];
 		choice->item_pathname(temp, sizeof(temp) - 1);
 		// If there is a value get its text - note as pathname it will be preceded by a '/'.

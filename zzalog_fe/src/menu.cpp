@@ -405,7 +405,7 @@ void menu::cb_mi_file_saveas(Fl_Widget* w, void* v) {
 			filename += ".adi";
 		}
 		// Got a filename
-		ifstream* check = new ifstream(filename.c_str());
+		std::ifstream* check = new std::ifstream(filename.c_str());
 		if (check->fail() || fl_choice("File exists, do you want to over-write", "OK", "No", nullptr) == 0) {
 			// Stop any current import
 			import_data_->stop_update(false);
