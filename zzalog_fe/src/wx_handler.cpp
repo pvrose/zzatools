@@ -158,8 +158,6 @@ void wx_handler::update() {
 			    e.id, e.what());
             
 		}
-        report_ = wx_report();
-        report_.city_name = "Not known";
     }
 }
 
