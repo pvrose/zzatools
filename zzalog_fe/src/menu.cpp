@@ -423,12 +423,14 @@ void menu::cb_mi_file_saveas(Fl_Widget* w, void* v) {
 			default:
 				break;
 			}
-			// Save even if not modified
-			b->store_data(filename, true);
-			if (type == OT_MAIN) {
-				// Change filename in title and top of recent file std::list
-				main_window_label(filename);
-				set_recent_file(filename);
+			if (b) {
+				// Save even if not modified
+				b->store_data(filename, true);
+				if (type == OT_MAIN) {
+					// Change filename in title and top of recent file std::list
+					main_window_label(filename);
+					set_recent_file(filename);
+				}
 			}
 		}
 		delete check;
