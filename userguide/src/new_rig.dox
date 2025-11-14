@@ -151,6 +151,6 @@ It is possible
 to overwrite this file with the latest unreleased version of hamlib. 
 
 On Linux, hamlib is available for compiling from source. Download the latest and follow the instructions for 
-building the hamlib library. Then recompile ZZALOG according to \ref linux_reinstall.
+building the hamlib library. Then rebuild (and if necessary re-install) ZZALOG according to \ref install_proc.
 
 */

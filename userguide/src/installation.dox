@@ -10,10 +10,10 @@ Data used by ZZALOG will be installed in
 
 \subsection win_source Compiling from source
 
-The source may be cloned from https://github.com/pvrose/zzatools. This includes an MSVC solution containing the project. 
-However this has dependencies on the following libraries: FLTK, HAMLIB, LIBCURL and NLOHMANN/JSON and the flow to install these
-libraries has not yet been tested on a clean machine. The documentation also requires the use of Doxygen and again 
-the flow has not yet been tested on a clean machine.
+The source may be cloned from https://github.com/pvrose/zzatools. MSVC may be used to clone this and there is a CMakeLists.txt 
+file that may be used as the basis of the build process. The current file contains hard-coded paths in the author's
+installation. It also contains paths to installations of libcurl, hamlib and fltk that will differ in the 
+user's environment.
 
 \section linux_install Linux Installation
 
@@ -52,43 +52,31 @@ Either clone the source from github (https://github.com/pvrose/zzatools) or down
 source tarball from https://sourceforge.net/projects/zzalog/ and unpack it into the chosen
 directory.
 
-To compile:
+The build and install processes use CMake.
+
+The following CMake flags are available:
+- <B>ZZALOG_USERGUIDE</B> Default: ON. Generates the HTML version of the userguide.
+- <B>ZZALOG_USERGUIDE_PDF</B> Default: ON (OFF on Windows). Generates the PDF version of the userguide.
+- <B>ZZALOG_API_GUIDE</B> Default: ON. Generates HTML specification of the API.
+
+To build ZZALOG with documentation:
 
 <code>
-cd [install directory]/zzatools/zzalog\n
-make
+cd [zzalog]\n
+cmake -B build\n
+cmake --build build\n
 </code>
 
-To generate HTML user guide;
+This creates the executable <i>build/zzalog_fe/zzalog_fe</i>.
+
+To install ZZALOG:
 
 <code>
-make documents
+cd [zzalog]\n
+cmake --install build
 </code>
 
-To install
-
-<code>
-make install
-</code>
-
-\subsection install_pdf Generating PDF (optional)
-
-The PDF document distributed with the source tarball should be sufficient.
-If it needs to be regenerated and installed then:
-
-<code>
-make install_pdf
-</code>
-
-\subsection linux_reinstall Reinstalling after a library change
-
-To recompile and reinstall ZZALOG after a change to one of the external libraries:
-
-<code>
-cd [install directory]/zzatools/zzalog\n
-make clean\n
-make install
-</code>
+This copies the executable <i>zzalog_fe</i> to /usr/local/bin and the reference data to /etc/GM3ZZA/ZZALOG.
 
 \section initial_run First-time Run (Cold-start)
 
