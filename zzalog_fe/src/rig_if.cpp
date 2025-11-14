@@ -600,7 +600,7 @@ bool rig_if::th_read_values() {
 		// Get the max value in the stack
 		int max_smeter = -100;
 		for (auto it = smeters_.begin(); it != smeters_.end(); it++) {
-			max_smeter = max(max_smeter, *it);
+			max_smeter = std::max(max_smeter, *it);
 		}
 		rig_data_.s_value = max_smeter;
 		rig_data_.s_meter = meter_value.i;

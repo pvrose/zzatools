@@ -84,9 +84,9 @@ extern bool DEBUG_ERRORS;
 		unsigned long long* target = (unsigned long long*)v;
 		unsigned long long i;
 		try {
-			i = stoull(value);
+			i = std::stoull(value);
 		}
-		catch (invalid_argument&) {
+		catch (std::invalid_argument&) {
 			i = 0;
 		}
 		*target = i;
@@ -98,9 +98,9 @@ extern bool DEBUG_ERRORS;
 		float* target = (float*)v;
 		float f;
 		try {
-			f = stof(value);
+			f = std::stof(value);
 		}
-		catch (invalid_argument&) {
+		catch (std::invalid_argument&) {
 			f = (float)nan("");
 		}
 		*target = f;
@@ -124,7 +124,7 @@ extern bool DEBUG_ERRORS;
 	static void cb_value_tm(Fl_Widget* w, void* v) {
 		const char* value = ((WIDGET*)w)->value();
 		tm* target = (tm*)v;
-		string_to_tm(string(value), *target, "%Y%m%d");
+		string_to_tm(std::string(value), *target, "%Y%m%d");
 	}
 	//! Callback to get a radio value from a set of radio buttons
 	static void cb_radio(Fl_Widget* w, void* v) {

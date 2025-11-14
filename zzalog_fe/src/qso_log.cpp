@@ -49,26 +49,26 @@ void qso_log::create_form(int X, int Y) {
 	// Log status tab
 	log_info_ = new qso_log_info(rx, ry, rw, rh, "Log");
 	log_info_->labelsize(FL_NORMAL_SIZE + 2);
-	rw = max(rw, log_info_->w());
-	rh = max(rh, log_info_->h());
+	rw = std::max(rw, log_info_->w());
+	rh = std::max(rh, log_info_->h());
 
 	// On-line QSL upload/download tab
 	qsl_ctrl_ = new qso_qsl(rx, ry, rw, rh, "QSLs");
 	qsl_ctrl_->labelsize(FL_NORMAL_SIZE + 2);
-	rw = max(rw, qsl_ctrl_->w());
-	rh = max(rh, qsl_ctrl_->h());
+	rw = std::max(rw, qsl_ctrl_->w());
+	rh = std::max(rh, qsl_ctrl_->h());
 
 	// Modem clients tab
 	apps_ctrl_ = new qso_apps(rx, ry, rw, rh, "Apps");
 	apps_ctrl_->labelsize(FL_NORMAL_SIZE + 2);
-	rw = max(rw, apps_ctrl_->w());
-	rh = max(rh, apps_ctrl_->h());
+	rw = std::max(rw, apps_ctrl_->w());
+	rh = std::max(rh, apps_ctrl_->h());
 
 	// Band-plan display tab
 	bands_ = new qso_bands(rx, ry, rw, rh, "Bandplan");
 	bands_->labelsize(FL_NORMAL_SIZE + 2);
-	rw = max(rw, bands_->w());
-	rh = max(rh, bands_->h());
+	rw = std::max(rw, bands_->w());
+	rh = std::max(rh, bands_->h());
 
 	resizable(nullptr);
 	size(w() + rw - saved_rw, h() + rh - saved_rh);

@@ -113,29 +113,29 @@ void qso_data::create_form(int X, int Y) {
 	g_entry_->labelfont(FL_BOLD);
 	g_entry_->labelsize(FL_NORMAL_SIZE + 2);
 
-	max_x = max(max_x, g_entry_->x() + g_entry_->w());
-	max_y = max(max_y, g_entry_->y() + g_entry_->h());
+	max_x = std::max(max_x, g_entry_->x() + g_entry_->w());
+	max_y = std::max(max_y, g_entry_->y() + g_entry_->h());
 	// Multiple QSO entry
 	g_net_entry_ = new qso_net_entry(curr_x, curr_y, 10, 10);
 	g_net_entry_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	g_net_entry_->labelfont(FL_BOLD);
 	g_net_entry_->labelsize(FL_NORMAL_SIZE + 2);
-	max_x = max(max_x, g_net_entry_->x() + g_net_entry_->w());
-	max_y = max(max_y, g_net_entry_->y() + g_net_entry_->h());
+	max_x = std::max(max_x, g_net_entry_->x() + g_net_entry_->w());
+	max_y = std::max(max_y, g_net_entry_->y() + g_net_entry_->h());
 
 	// Query form
 	g_query_ = new qso_query(curr_x, curr_y, g_net_entry_->w(), g_net_entry_->h());
 
-	max_x = max(max_x, g_query_->x() + g_query_->w());
-	max_y = max(max_y, g_query_->y() + g_query_->h());
+	max_x = std::max(max_x, g_query_->x() + g_query_->w());
+	max_y = std::max(max_y, g_query_->y() + g_query_->h());
 
 	// Manual QSO query - displays a qso_entry form
 	g_qy_entry_ = new qso_entry(curr_x, curr_y, 10, 10);
 	g_qy_entry_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	g_qy_entry_->labelfont(FL_BOLD);
 	g_qy_entry_->labelsize(FL_NORMAL_SIZE + 2);
-	max_x = max(max_x, g_qy_entry_->x() + g_qy_entry_->w());
-	max_y = max(max_y, g_qy_entry_->y() + g_qy_entry_->h());
+	max_x = std::max(max_x, g_qy_entry_->x() + g_qy_entry_->w());
+	max_y = std::max(max_y, g_qy_entry_->y() + g_qy_entry_->h());
 
 	g_entry_->size(g_entry_->w(), g_net_entry_->h());
 	g_qy_entry_->size(g_entry_->w(), g_net_entry_->h());
@@ -144,7 +144,7 @@ void qso_data::create_form(int X, int Y) {
 	curr_x = max_x + GAP;
 	g_misc_ = new qso_misc(curr_x, curr_y, WBUTTON * 7 / 2, g_net_entry_->h());
 
-	max_x = max(max_x, g_misc_->x() + g_misc_->w());
+	max_x = std::max(max_x, g_misc_->x() + g_misc_->w());
 
 
 	curr_y = max_y;
@@ -154,7 +154,7 @@ void qso_data::create_form(int X, int Y) {
 	// Display the buttons for the particular logging_stte_
 	g_buttons_ = new qso_buttons(curr_x, curr_y, 10, 10);
 
-	max_x = max(max_x, g_buttons_->x() + g_buttons_->w());
+	max_x = std::max(max_x, g_buttons_->x() + g_buttons_->w());
 	max_x += GAP;
 	curr_y += g_buttons_->h() + GAP;
 

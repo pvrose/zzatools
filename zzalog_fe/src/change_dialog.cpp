@@ -45,7 +45,7 @@ void change_dialog::create_form() {
 	const int W5 = WBUTTON;
 	const int C5 = C4 + W4 + GAP;
 	const int WB = C5 + W5 - XG;
-	const int WALL = XG + max(WG, WB) + EDGE;
+	const int WALL = XG + std::max(WG, WB) + EDGE;
 	const int YG = EDGE;
 	const int R1 = YG + GAP;
 	const int H1 = HTEXT;

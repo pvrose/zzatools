@@ -511,7 +511,7 @@ void qso_wx::draw_wind_dirn(Fl_Widget* w, unsigned int dirn) {
 	int x_zero = w->w() / 2;
 	int y_zero = w->h() / 2;
 	// arrow will fill 80% widget
-	int radius = min(x_zero, y_zero) * 7 / 10;
+	int radius = std::min(x_zero, y_zero) * 7 / 10;
 	// Create the drawing surface - origin will be top-left of the widget
 	Fl_Image_Surface* image_surface = new Fl_Image_Surface(w->w(), w->h());
 	Fl_Surface_Device::push_current(image_surface);
@@ -565,7 +565,7 @@ void qso_wx::draw_cloud_okta(Fl_Widget* w, unsigned int okta) {
 	fl_color(FL_FOREGROUND_COLOR);
 	fl_push_matrix();
 	fl_translate(w->w() / 2.0, w->h() / 2.0);
-	double radius = min(w->h(), w->w()) * 0.35;
+	double radius = std::min(w->h(), w->w()) * 0.35;
 	switch(okta) {
 		case 0: {
 			// 0 okta - empty circle

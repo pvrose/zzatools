@@ -393,7 +393,7 @@ int socket_server::rcv_packet()
 		else
 		{
 			// Try again after checking for any fltk events
-			this_thread::sleep_for(std::chrono::milliseconds(1000));
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		}
 #endif
 	} while (!closing_);

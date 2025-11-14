@@ -631,8 +631,8 @@ void qso_apps::create_tabs(std::string name) {
 
     // Create a dummy tab to size the upper group correctly
     app_grp* dummy = new app_grp(rx, ry, rw, rh);
-    rh = max(rh, dummy->h());
-    rw = max(rw, dummy->w());
+    rh = std::max(rh, dummy->h());
+    rw = std::max(rw, dummy->w());
     tabs_->remove(dummy);
     Fl::delete_widget(dummy);
 
@@ -640,8 +640,8 @@ void qso_apps::create_tabs(std::string name) {
         app_grp* g = new app_grp(rx, ry, rw, rh, (*it).second->name.c_str());
         g->set_data((*it).second);
         g->labelsize(FL_NORMAL_SIZE + 2);
-        rh = max(rh, g->h());
-        rw = max(rw, g->w());
+        rh = std::max(rh, g->h());
+        rw = std::max(rw, g->w());
     }
 
     if (name.length()) default_tab_ = name;

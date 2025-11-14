@@ -19,6 +19,7 @@
 #include "utils.h"
 
 #include <chrono>
+#include <cmath>
 #include <map>
 
 #include <FL/fl_ask.H>
@@ -250,8 +251,8 @@ void qso_dxcc::enable_widgets() {
 					break;
 			}
 			snprintf(text, sizeof(text), "Loc: %.0f\302\260%c %.0f\302\260%c %s",
-				abs(location_.latitude), location_.latitude > 0 ? 'N' : 'S',
-				abs(location_.longitude), location_.longitude > 0 ? 'E' : 'W',
+				fabs(location_.latitude), location_.latitude > 0 ? 'N' : 'S',
+				fabs(location_.longitude), location_.longitude > 0 ? 'E' : 'W',
 				ls);
 			op_coords_->value(text);
 		}

@@ -218,7 +218,7 @@ int tabbed_forms::min_w() {
 	int result = 0;
 	// For each view (as view) get its minimum width
 	for (auto ix = forms_.begin(); ix != forms_.end(); ix++) {
-		result = max(result, ix->second.v->min_w());
+		result = std::max(result, ix->second.v->min_w());
 	}
 	return result;
 }
@@ -228,7 +228,7 @@ int tabbed_forms::min_h() {
 	int result = 0;
 	// For each view (as view) get its minimum height
 	for (auto ix = forms_.begin(); ix != forms_.end(); ix++) {
-		result = max(result, ix->second.v->min_h());
+		result = std::max(result, ix->second.v->min_h());
 	}
 	return result;
 }

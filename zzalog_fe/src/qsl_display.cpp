@@ -164,9 +164,9 @@ void qsl_display::draw_field(qsl_data::field_def& field) {
 	// Have a minimum size 
 	int min_size = scale(45);
 	// First centre the text horizontally
-	int dx = max(min_size - fw, 0) / 2;
-	fw = max(fw, min_size);
-	fh = max(fh, (min_size / 3));
+	int dx = std::max(min_size - fw, 0) / 2;
+	fw = std::max(fw, min_size);
+	fh = std::max(fh, (min_size / 3));
 	// Get the X and Y positions - "-1" indicates abut it to previous item
 	int fx = (field.dx == -1) ? next_x_ : draw_x_ + scale(field.dx);
 	int fy = (field.dy == -1) ? next_y_ : draw_y_ + scale(field.dy);

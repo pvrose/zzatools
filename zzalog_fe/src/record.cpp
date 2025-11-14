@@ -972,8 +972,8 @@ bool record::items_match(record* record, std::string field_name) {
 		// Special case for GRIDSQUARE
 		// they compare if they are equal for the length
 		// of the shorter.
-		int iLength = min(lhs.length(), rhs.length());
-		iLength = min(iLength, 4);
+		int iLength = std::min(lhs.length(), rhs.length());
+		iLength = std::min(iLength, 4);
 		if (lhs.substr(0, iLength) == rhs.substr(0, iLength)) {
 			return true;
 		}

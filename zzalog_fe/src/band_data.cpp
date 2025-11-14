@@ -25,7 +25,7 @@ NLOHMANN_JSON_SERIALIZE_ENUM(band_data::entry_t, {
 })
 
 void to_json(json& j, const range_t& r) {
-	if (isnan(r.upper) || r.upper == r.lower) {
+	if (std::isnan(r.upper) || r.upper == r.lower) {
 		j = json{
 			{ "Lower", r.lower }
 		};
@@ -203,8 +203,8 @@ void band_data::create_bands() {
 			}
 			current_range = (*it)->range;
 		} else {
-			if (!isnan((*it)->range.upper)) {
-				current_range.upper = max(current_range.upper, (*it)->range.upper);
+			if (!std::isnan((*it)->range.upper)) {
+				current_range.upper = std::max(current_range.upper, (*it)->range.upper);
 			}
 		}
 		// Collate the modes
@@ -223,8 +223,8 @@ void band_data::create_bands() {
 			entry->modes = {};
 			entry->summary = band_name;
 			for (auto b1 : b.second) {
-				entry->range.lower = min(entry->range.lower, b1.lower);
-				entry->range.upper = max(entry->range.upper, b1.upper);
+				entry->range.lower = std::min(entry->range.lower, b1.lower);
+				entry->range.upper = std::max(entry->range.upper, b1.upper);
 			}
 			entries_.insert(entry);
 		}

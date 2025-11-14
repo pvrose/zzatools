@@ -663,8 +663,8 @@ std::string latlong_to_grid(lat_long_t location, int num_chars) {
 lat_long_t grid_to_latlong(std::string gridsquare) {
 	double inc = 20.0;
 	double next_inc;
-	char cg;
-	char ct;
+	int8_t cg;
+	int8_t ct;
 	lat_long_t lat_long = { 0.0, 0.0 };
 	for (unsigned int i = 0; i < gridsquare.length(); i += 2) {
 		switch (i) {

@@ -132,7 +132,7 @@ void banner::create_form() {
 	op_msg_high_->wrap(true);
 	op_msg_high_->textsize(FL_NORMAL_SIZE);
 
-	curr_y = max(curr_y + HMULT, y() + GAP + HICON) + GAP;
+	curr_y = std::max(curr_y + HMULT, y() + GAP + HICON) + GAP;
 
 	// Progress message
 	op_prog_title_ = new Fl_Output(curr_x, curr_y, WOP, HBUTTON);
