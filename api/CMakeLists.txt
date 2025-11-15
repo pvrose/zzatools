@@ -19,18 +19,16 @@ if(DOXYGEN_FOUND)
   configure_file(${DOXY_API_IN} ${DOXY_API_OUT} @ONLY)
  
   # Command for generating dox from config file
+  add_custom_target(api_html
+      DEPENDS ${DOXY_API_FILES} ${DOXY_UG_OUT}
+  )
   add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/html/index.html
-    DEPENDS ${DOXY_API_FILES} ${DOXY_UG_OUT}
+    TARGET api_html
     COMMAND ${DOXYGEN_EXECUTABLE} ${DOXY_API_OUT}
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     COMMENT "Generating API documentation"
     VERBATIM
   )
-  add_custom_target(
-    api_html ALL
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/html/index.html
-  )
-
+  
 
 endif()

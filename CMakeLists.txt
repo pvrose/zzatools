@@ -56,9 +56,8 @@ set(DATAFILES
 )
 
 # Add dummy target
-add_custom_target(zzalog
-    DEPENDS zzalog_fe
-)
+add_custom_target(${TARGET})
+add_dependencies(${TARGET} zzalog_fe)
 
 # copy reference data
 file(COPY ${DATAFILES}
@@ -68,17 +67,17 @@ file(COPY ${DATAFILES}
 option(ZZALOG_USERGUIDE "Generate Userguide" ON)
 option(ZZALOG_USERGUIDE_PDF "Generate PDF" ON)
 if(ZZALOG_USERGUIDE) 
-  message("Adding userguide")
+  message(STATUS "Adding userguide")
   add_subdirectory(userguide)
   add_dependencies(${TARGET} ug_html)
   if (ZZALOG_USERGUIDE_PDF)
-    message("Adding userguide PDF")
+    message(STATUS "Adding userguide PDF")
     add_dependencies(${TARGET} pdf)
   endif()
 endif()
 option(ZZALOG_API_GUIDE "Generate API guide" ON)
 if(ZZALOG_API_GUIDE) 
-  message("Adding API documentation")
+  message(STATUS "Adding API documentation")
   add_subdirectory(api)
   add_dependencies(${TARGET} api_html)
 endif()
