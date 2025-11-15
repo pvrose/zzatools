@@ -84,29 +84,40 @@ if(DOXYGEN_FOUND)
   )
 
   # Command for generating PDF from userguide latex files
-  add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/latex/refman.pdf
-    DEPENDS ug_html
-    COMMAND make -C ${CMAKE_CURRENT_BINARY_DIR}/latex
-    COMMENT "Generating PDF Userguide"
-    VERBATIM
-  )
+  if(MSVC)
+      add_custom_command(
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/latex/refman.pdf
+        DEPENDS ug_html
+        COMMAND miktex-texworks.exe -pdf ${CMAKE_CURRENT_BINARY_DIR}/latex/refman.tex
+        COMMENT "Generating PDF Userguide"
+        VERBATIM
+      )
+  else()
+     add_custom_command(
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/latex/refman.pdf
+        DEPENDS ug_html
+        COMMAND make -C ${CMAKE_CURRENT_BINARY_DIR}/latex
+        COMMENT "Generating PDF Userguide"
+        VERBATIM
+     )
+  endif()
   add_custom_target(
     ug_pdf ALL
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/latex/refman.pdf
   )
   # Copy from latex/refman.pdf to ZZALOG.pdf
   add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${PROGRAMID}.pdf
-    COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/latex/refman.pdf ${CMAKE_CURRENT_BINARY_DIR}/${PROGRAMID}.pdf
+    TARGET pdf POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E rename
+      ${CMAKE_CURRENT_BINARY_DIR}/latex/refman.pdf
+      ${CMAKE_CURRENT_BINARY_DIR}/${PROGRAMID}.pdf}
     DEPENDS ug_pdf
     COMMENT "Copying PDF"
-    VERBATIM
   )
-  add_custom_target(
-    pdf ALL
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${PROGRAMID}.pdf
-  )
+  #add_custom_target(
+  #  pdf ALL
+  #  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${PROGRAMID}.pdf
+  #)
 
 
 

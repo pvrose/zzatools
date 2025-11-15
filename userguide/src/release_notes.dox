@@ -1,14 +1,16 @@
 /** \page release_notes Revision History
 
-\section rev_3-6-10 Revision 3.6.9+
+\section rev_3-6-10 Revision 3.6.10
 
 - Added multicast support for UDP in Windows. (Already present for Linux).
+- Changed build system to CMake on Windows and Linux.
 - Cosmetic changes.
   - Current QSO frequency does not show up properly in LIGHT mode.
 - Bug fixes:
   - "Don't QSL" list ignored when saving a net.
   - Adding an application should select the new tab in qso_apps.
   - apps.json doesn't load correctly if no script defined for app.
+  - Remove use of "using namespace std;" per modern coding guidelines.
 
 \section rev_369 Revision 3.6.9
 
