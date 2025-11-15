@@ -70,8 +70,9 @@ if(DOXYGEN_FOUND)
  
   # Command for generating dox from config file
   message("Adding command to generate: ${CMAKE_CURRENT_BINARY_DIR}/html/index.html")
+  add_custom_target(ug_doxy ALL)
   add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/html/index.html
+    TARGET ug_doxy
     DEPENDS ${DOXY_UG_FILES} ${DOXY_UG_OUT}
     COMMAND ${DOXYGEN_EXECUTABLE} ${DOXY_UG_OUT}
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
@@ -84,9 +85,12 @@ if(DOXYGEN_FOUND)
   )
 
   # Command for generating PDF from userguide latex files
+  add_custom_target(
+      ug_latex ALL
+  )
   if(MSVC)
       add_custom_command(
-        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/latex/refman.pdf
+        TARGET ug_latex
         DEPENDS ug_html
         COMMAND miktex-texworks.exe -pdf ${CMAKE_CURRENT_BINARY_DIR}/latex/refman.tex
         COMMENT "Generating PDF Userguide"
@@ -94,7 +98,7 @@ if(DOXYGEN_FOUND)
       )
   else()
      add_custom_command(
-        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/latex/refman.pdf
+        TARGET ug_latex
         DEPENDS ug_html
         COMMAND make -C ${CMAKE_CURRENT_BINARY_DIR}/latex >> /dev/null
         COMMENT "Generating PDF Userguide"
@@ -114,7 +118,7 @@ if(DOXYGEN_FOUND)
       COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_BINARY_DIR}/latex/refman.pdf
         ${CMAKE_CURRENT_BINARY_DIR}/${PROGRAMID}.pdf
-      DEPENDS ug_pdf
+  #    DEPENDS ug_pdf
       COMMENT "Copying PDF"
   )
  endif()
