@@ -96,7 +96,7 @@ if(DOXYGEN_FOUND)
      add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/latex/refman.pdf
         DEPENDS ug_html
-        COMMAND make -C ${CMAKE_CURRENT_BINARY_DIR}/latex
+        COMMAND make -C ${CMAKE_CURRENT_BINARY_DIR}/latex >> /dev/null
         COMMENT "Generating PDF Userguide"
         VERBATIM
      )
@@ -106,19 +106,15 @@ if(DOXYGEN_FOUND)
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/latex/refman.pdf
   )
   # Copy from latex/refman.pdf to ZZALOG.pdf
-  add_custom_command(
-    TARGET pdf POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E rename
-      ${CMAKE_CURRENT_BINARY_DIR}/latex/refman.pdf
-      ${CMAKE_CURRENT_BINARY_DIR}/${PROGRAMID}.pdf}
-    DEPENDS ug_pdf
-    COMMENT "Copying PDF"
+  add_custom_target(
+    pdf ALL
   )
-  #add_custom_target(
-  #  pdf ALL
-  #  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${PROGRAMID}.pdf
-  #)
-
-
-
-endif()
+  add_custom_command(
+      TARGET pdf POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_BINARY_DIR}/latex/refman.pdf
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROGRAMID}.pdf
+      DEPENDS ug_pdf
+      COMMENT "Copying PDF"
+  )
+ endif()
